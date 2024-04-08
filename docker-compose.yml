@@ -1,0 +1,53 @@
+version: '3.4'
+
+services:
+  #backend
+  api:
+    build:
+      dockerfile: Dockerfile
+      context: ./api
+      target: development
+    volumes:
+      - ./api:/src/app
+      - /fpurdom/Documents/Transcendence/api/node_modules
+    command: npm run start:dev
+    depends_on:
+      - postgres
+    environment:
+      #DATABASE_URL: postgress://postgres:password@postgres:5432/app
+      NODE_ENV: development
+      PORT: 3000
+    ports:
+      - 3000:3000
+      - 9229:9229
+
+  #frontend
+  frontend:
+    build:
+      dockerfile: Dockerfile
+      context: ./frontend
+    command: npm run start
+    volumes:
+      - ./frontend:/frontend/src/app
+      - /frontend/src/app/node_modules
+    ports:
+      - 4200:4200
+    links:
+      - api
+
+  #database
+  postgres:
+    image: postgres:12-alpine
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USERNAME: postgres
+      POSTGRES_DB: app
+    ports:
+      - 5432:5432
+  adminer:
+    image: adminer
+    restart: always
+    depends_on:
+      - postgres
+    ports:
+      - 8080:8080
