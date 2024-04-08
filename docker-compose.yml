@@ -9,7 +9,7 @@ services:
       target: development
     volumes:
       - ./api:/src/app
-      - /fpurdom/Documents/Transcendence/api/node_modules
+      - /src/app/node_modules
     command: npm run start:dev
     depends_on:
       - postgres
