@@ -8,6 +8,10 @@ export interface Test {
   password: string,
 }
 
+export interface Friend {
+	name: string,
+}
+
 @Injectable({
   providedIn: 'root',
 })
