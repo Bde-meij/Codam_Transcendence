@@ -18,7 +18,7 @@ export interface Friend {
 export class TestService {
   constructor(private http: HttpClient) { };
 
-  getTest() {
-    return this.http.get<Test>('http://api:3000/api/auth');
-  }
+//   getTest() {
+//     return this.http.get<Test>('http://api:3000/api/auth');
+//   }
 }
