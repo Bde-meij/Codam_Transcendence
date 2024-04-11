@@ -1,12 +1,41 @@
 /* You can add global styles to this file, and also import other style files */
-$font-stack: Linden Hill;
-$primary-color: #333;
+/* linden-hill-regular - latin */
+@font-face {
+	font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+	font-family: 'Linden Hill';
+	font-style: normal;
+	font-weight: 400;
+	color:darkgreen;
+	src: url('assets/fonts/linden-hill-v24-latin-regular.woff2') format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+}
 
-* {
-	background-color: B1ACA2;
+$font-stack: Linden Hill;
+$font-color: darkolivegreen;
+$background-color: darkseagreen;
+
+// * {
+// 	background-color: lightyellow;
+// }
+
+nav {
+	color: linen;
+	background-color: seagreen;
 }
 
 body {
-  font: 100% $font-stack;
-  color: $primary-color;
+
+	width: 600px;
+	margin: 0 auto;
+	background-color: #ff9500;
+	padding: 0 20px 20px 20px;
+	border: 5px solid black;
+  	font: 100% $font-stack;
+  	color: $font-color;
+  	background-color: $background-color;
+ 	position: "absolute";
+}
+
+div {
+	background-color: linen;
+	position: "absolute";
 }
