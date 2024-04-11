@@ -1,13 +1,13 @@
+@import '../../../styles/styles.scss';
 
-
-.column {
+.friend_column {
 	flex: 33.33%;
 	height: 200px;
 	padding: 10px;
 	margin: 5px;
-	background-color: #cccccc;
+	background-color: $background-color;
 	text-align: center;
-  }
-  .container {
-	 display: flex;
-  }	
+}
+.friend_container {
+	display: flex;
+}

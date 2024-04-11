@@ -8,5 +8,5 @@ import { Component } from '@angular/core';
   styleUrl: './account.component.scss'
 })
 export class AccountComponent {
-
+	name = "";
 }

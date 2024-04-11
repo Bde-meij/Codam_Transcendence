@@ -27,6 +27,7 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "src/favicon.ico",
+			  "src/kastje.ico",
               "src/assets"
             ],
             "styles": [
@@ -93,6 +94,7 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "src/favicon.ico",
+			  "src/kastje.ico",
               "src/assets"
             ],
             "styles": [
