@@ -10,29 +10,29 @@ import { Observable } from 'rxjs';
 	providedIn: 'root'
 })
 export class AuthService {
-	private authApi : string = "http://api:3000/api/auth";
+	private authApi : string = "http://api:3000/api/auth/";
 	private httpOptions = {
 		headers: new HttpHeaders({ 'Content-Type': 'application/json' })
 	};
 
-	constructor(private http: HttpClient, @Inject(PLATFORM_ID) private platformId: Object) {};
+	constructor(private http: HttpClient) {};
 
-	registerUser(newUser: User) {
-		newUser.id;
-		return this.http.post<User>(this.authApi + '/register', newUser);
-	};
-	loginUser(username: string, password: string): Observable<any> {
-		return this.http.post(this.authApi + '/login', {username, password});
-	};
-	logoutUser(username: string, password: string): Observable<any> {
-		return this.http.post(this.authApi + '/logout', {username, password});
+	// registerUser(newUser: User) {
+	// 	newUser.id;
+	// 	return this.http.post<User>(this.authApi + 'register', newUser);
+	// };
+	register(newUser: User) {
+		return this.http.post<User>(this.authApi + 'register', newUser, this.httpOptions);
+	}
+
+	login(username: string, password: string): Observable<any> {
+		return this.http.post(this.authApi + 'login', {username, password}, this.httpOptions);
 	};
 
-	logout(){
-		return this.http.post(this.authApi + '/logout', { });
+	logout(): Observable<any>{
+		return this.http.post(this.authApi + 'logout', { }, this.httpOptions);
 	}
 	
-	// log out User
 
 	refreshToken() {
 		return this.http.post(this.authApi + 'refreshtoken', { }, this.httpOptions);
