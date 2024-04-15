@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { NgOptimizedImage } from '@angular/common';
 import { AppComponent } from '../../app.component';
 
@@ -10,5 +10,5 @@ import { AppComponent } from '../../app.component';
   styleUrl: './welcome.component.scss'
 })
 export class WelcomeComponent {
-	title = '';
+	@Input() title = '';
 }
