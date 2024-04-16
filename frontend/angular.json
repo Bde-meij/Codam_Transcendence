@@ -1,6 +1,10 @@
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "version": 1,
+  "cli": {
+    "packageManager": "npm",
+    "analytics": false
+  },
   "newProjectRoot": "projects",
   "projects": {
     "frontend": {
@@ -33,12 +37,7 @@
             "styles": [
               "src/styles/styles.scss"
             ],
-            "scripts": [],
-            "server": "src/main.server.ts",
-            "prerender": true,
-            "ssr": {
-              "entry": "server.ts"
-            }
+            "scripts": []
           },
           "configurations": {
             "production": {
@@ -66,13 +65,15 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
+		  "options": {
+			"proxyConfig": "src/proxy.conf.json"
+		  },
           "configurations": {
             "production": {
               "buildTarget": "frontend:build:production"
             },
             "development": {
-              "buildTarget": "frontend:build:development",
-              "proxyConfig": "proxy.conf.json"
+              "buildTarget": "frontend:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -94,19 +95,15 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "src/favicon.ico",
-			  "src/kastje.ico",
               "src/assets"
             ],
             "styles": [
-              "src/styles.scss"
+              "src/styles/styles.scss"
             ],
             "scripts": []
           }
         }
       }
     }
-  },
-  "cli": {
-    "analytics": "540b3f36-c572-4490-acf2-f6d573d1a20c"
   }
 }

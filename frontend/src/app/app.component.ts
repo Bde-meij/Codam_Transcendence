@@ -1,73 +1,34 @@
-import { Component } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
-import { Subscription } from 'rxjs';
-
-import { Test, TestService } from './services/test/test.service';
-// import { Observable } from 'rxjs';
-import { CommonModule } from '@angular/common';
-import { WelcomeComponent } from './components/welcome/welcome.component';
-import { AccountService } from './services/account/account.service';
+import { Component, OnInit } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 import { AuthService } from './services/auth/auth.service';
-import { EventBusService } from './services/EventBus/event-bus.service';
-
-
+import { User } from './models/user.class';
+import { JsonPipe } from '@angular/common';
 
 @Component({
-	selector: 'app-root',
-	standalone: true,
-	imports: [RouterLink, RouterOutlet],
-	templateUrl: './app.component.html',
-	styleUrl: './app.component.scss'
+  selector: 'app-root',
+  standalone: true,
+  imports: [RouterOutlet, JsonPipe],
+  templateUrl: './app.component.html',
+  styleUrl: './app.component.scss'
 })
-export class AppComponent {
-	title = "Gary's basement";
-	isLoggedIn = false;
-	username?: string;
+export class AppComponent implements OnInit{
 
-	eventBusSub?: Subscription;
+	title = 'frontend';
 
-	constructor(
-		private accountService: AccountService,
-		private authService: AuthService,
-		private eventBusService: EventBusService
-	) {};
+	// anotherUser: User | undefined;
+	constructor(private authService: AuthService) {
+		// authService.getTest().subscribe(data => console.log(data));
+	};
 
-	ngOnInit(): void {
-		this.isLoggedIn = this.accountService.isLoggedIn();
+	testUser: User | undefined;
 
-		if (this.isLoggedIn) {
-			const user = this.accountService.getUser();
-			this.username = user.username;
-		}
 
-		this.eventBusSub = this.eventBusService.on('logout', () => {
-			this.logout();
-		})
-	}
+	ngOnInit() {
+		this.authService.getTest().subscribe(data => this.testUser = { ...data });
+	} 
 
-	logout(): void {
-		this.authService.logout().subscribe({
-			next: res => {
-				console.log(res);
-				this.accountService.clean();
+	// public myUser = new User(1, "blabla", "blabla@mail.nl");
 
-				window.location.reload();
-			},
-			error: err => {
-				console.log(err);
-			}
-		});
-	}
-//   testValue : Test | undefined;
+	
 
-//   showTest() {
-//     this.service.getTest()
-//       // clone the data object, using its known Config shape
-//       .subscribe(data => this.testValue = { ...data });
-//   }
-
-  
-  // testValue = this.service.getTest();
-
-//   constructor(private service: TestService) {this.showTest()}
 }

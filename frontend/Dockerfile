@@ -10,6 +10,6 @@ RUN npm install -g @angular/cli
 
 COPY . .
 
-RUN npm run build
+# RUN npm run start
 
 EXPOSE 4200

@@ -1,0 +1,13 @@
+// @import '../../../styles/styles.scss';
+
+.friend_column {
+	flex: 33.33%;
+	height: 200px;
+	padding: 10px;
+	margin: 5px;
+	background-color: $background-color;
+	text-align: center;
+}
+.friend_container {
+	display: flex;
+}
