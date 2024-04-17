@@ -19,7 +19,7 @@ export class AuthService {
 
 	getTest() {
 		console.log("Statement");
-		return this.http.get<User>(this.authApi);
+		return this.http.get<User[]>(this.authApi);
 	}
 
 	// register(newUser: User) {

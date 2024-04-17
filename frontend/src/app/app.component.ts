@@ -22,9 +22,12 @@ export class AppComponent implements OnInit{
 
 	testUser: User | undefined;
 
+	allUsers: User[] = [];
+
 
 	ngOnInit() {
-		this.authService.getTest().subscribe(data => this.testUser = { ...data });
+		this.authService.getTest().subscribe(data => this.testUser = { ...data[0] });
+		this.authService.getTest().subscribe(data => this.allUsers = { ...data});
 	} 
 
 	// public myUser = new User(1, "blabla", "blabla@mail.nl");
