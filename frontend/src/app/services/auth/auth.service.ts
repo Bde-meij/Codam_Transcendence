@@ -22,6 +22,12 @@ export class AuthService {
 		return this.http.get<User[]>(this.authApi);
 	}
 
+	getAnother() {
+		console.log("Statement");
+		return this.http.get<User>(this.authApi);
+	}
+
+
 	// register(newUser: User) {
 	// 	return this.http.post<User>(this.authApi + 'register', newUser, this.httpOptions);
 	// };
