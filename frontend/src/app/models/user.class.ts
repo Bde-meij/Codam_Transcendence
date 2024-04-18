@@ -9,3 +9,11 @@ export class User {
 		this.password = password;
 	}
 }
+
+
+export interface testUser {
+	id: number;
+	name: string;
+	password: string;
+}
+
