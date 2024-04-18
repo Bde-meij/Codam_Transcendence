@@ -14,6 +14,9 @@ export class GameService {
 
 	constructor(private http: HttpClient) { };
 
+	// newGame() {
+	// 	return this.http.post<any>(this.gameApi + '/new', {});
+	// };
 	keyUp(amount: number) {
 		return this.http.post<number>(this.gameApi + '/keyup', amount);
 	};

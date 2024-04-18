@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { AuthService } from '@auth0/auth0-angular';
 
 @Component({
   selector: 'app-login',
@@ -8,8 +9,9 @@ import { Component } from '@angular/core';
   styleUrl: './login.component.scss'
 })
 export class LoginComponent {
-	constructor() {};
+	constructor(public auth:AuthService) {};
 
 	login(): void {
+		this.auth.loginWithRedirect();
 	}
 }
