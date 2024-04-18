@@ -1,6 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
+export interface Positions {
+	player_one_ypos: number;
+	player_two_ypos: number;
+}
 
 @Injectable({
 	providedIn: 'root'
@@ -16,4 +20,7 @@ export class GameService {
 	keyDown(amount: number) {
 		return this.http.post<number>(this.gameApi + '/keydown', amount);
 	};
+	getPos() {
+		return this.http.get<Positions>(this.gameApi + '/pos');
+	}
 }
