@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { Test, TestService } from './services/test.service';
+import { Auth, Test, TestService } from './services/test.service';
 import { Observable } from 'rxjs';
 import { CommonModule } from '@angular/common';
 
@@ -17,6 +17,11 @@ export class AppComponent {
 
   
   testValue : Test | undefined;
+  
+  testUser: Auth = {
+    name: 'tester',
+    password: 'newpass'
+  }
 
   showTest() {
     this.service.getTest()
@@ -24,8 +29,11 @@ export class AppComponent {
       .subscribe(data => this.testValue = { ...data });
   }
 
+  postTest(testUser: Auth) {
+    this.service.sendTest(testUser).subscribe();
+  }
   
   // testValue = this.service.getTest();
 
-  constructor(private service: TestService) {this.showTest()}
+  constructor(private service: TestService) {this.postTest(this.testUser); this.showTest()}
 }

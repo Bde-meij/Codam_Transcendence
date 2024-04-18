@@ -8,6 +8,11 @@ export interface Test {
   password: string,
 }
 
+export interface Auth {
+  name: string,
+  password: string,
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -19,5 +24,9 @@ export class TestService {
 
   getTest() {
     return this.http.get<Test>('http://api:3000/api/auth');
+  }
+
+  sendTest(newTest: Auth) {
+    return this.http.post<Auth>('http://api:3000/api/auth', {name: newTest.name, password: newTest.password});
   }
 }
