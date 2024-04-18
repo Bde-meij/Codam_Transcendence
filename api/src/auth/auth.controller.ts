@@ -6,16 +6,41 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
+import { fortyTwoGuard } from './guard/fortyTwo.guard';
+import { Request } from 'express';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private readonly authService: AuthService) {}
 
-  @Post()
+  @UseGuards(fortyTwoGuard)
+  @Get('login')
+  handlerLogin() {
+    return this.handlerLogin()
+  }
+
+  @UseGuards(fortyTwoGuard)
+  @Get('redirect')
+  handlerRedirect() {
+    return this.handlerRedirect()
+  }
+
+  @Get('status')
+  user(@Req() req: Request) {
+    if (req.user) {
+      return {message: 'Authenticated', user: req.user}
+    } else {
+      return {message: 'Not Authentiated'}
+    }
+  }
+
+/*  @Post()
   create(@Body() createAuthDto: CreateAuthDto) {
     return this.authService.create(createAuthDto);
   }
@@ -38,5 +63,5 @@ export class AuthController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.authService.remove(+id);
-  }
+  }*/
 }

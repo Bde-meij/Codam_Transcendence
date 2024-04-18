@@ -4,15 +4,39 @@ import { UpdateAuthDto } from './dto/update-auth.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Auth } from './entities/auth.entity';
 import { Repository } from 'typeorm';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class AuthService {
-  constructor(@InjectRepository(Auth) private authRepository: Repository<Auth>){}
-  async create(createAuthDto: CreateAuthDto) : Promise<void> {
-    await this.authRepository.save({...createAuthDto});
+  constructor(@InjectRepository(User) private readonly userRepo: Repository<User>){}
+
+  async validateUser(email: string, displayName: string) {
+    const user = await this.userRepo.findOne({where: {email: email}});
+
+    if (user) {
+      return user;
+    }
+
+    const newUser = this.userRepo.create({email, displayName});
+    await this.userRepo.save(newUser);
+    return newUser;
   }
 
-  async findAll(): Promise<Auth[]> {
+  async findUser(id: string) {
+    const user = await this.userRepo.findOne({where: {id}});
+    return id;
+  }
+
+  handlerLogin() {
+    return 'handlerLogin';
+  }
+
+  handlerRedirect() {
+    return 'handlerRedirect';
+  }
+}
+
+  /*async findAll(): Promise<Auth[]> {
     return this.authRepository.find();
   }
 
@@ -41,4 +65,4 @@ export class AuthService {
   async remove(id: number) {
     await this.authRepository.delete({id});
   }
-}
+}*/
