@@ -1,34 +1,12 @@
 
 <h1>
-	hello
+	{{title}}
 </h1>
 
-<p>
-	test user: 
-	{{testUser | json}}
-</p>
-<p>
-	User details: 
-	{{testUser?.id}} |
-	{{testUser?.name}} |
-	{{testUser?.password}}
-	<!-- {{testUser?.username}} -->
-	<!-- {{anotherUser?.username}} -->
-	<!-- {{myUser.username}} -->
-</p>
-<p>
-	All users: 
 
-	<!-- @for (os of operatingSystems; track os.id) {
-		{{ os.name }}
-	} -->
-	@if (allUsers[0]) {
-		{{allUsers[0].name}}
+<div *ngFor="let user of users$ | async">
+	<h6>{{user.id}}. {{user.name}}</h6>
+</div>
 
-		<!-- @for (user of allUsers; track user.id) {
-			{{user.name}}
-		} -->
-	}
-</p>
 
 <router-outlet />

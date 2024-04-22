@@ -1,11 +1,12 @@
 import { Component, Input } from '@angular/core';
 import { NgOptimizedImage } from '@angular/common';
 import { AppComponent } from '../../app.component';
+import { LoginComponent } from '../login/login.component';
 
 @Component({
   selector: 'app-welcome',
   standalone: true,
-  imports: [NgOptimizedImage, AppComponent],
+  imports: [NgOptimizedImage, AppComponent, LoginComponent],
   templateUrl: './welcome.component.html',
   styleUrl: './welcome.component.scss'
 })

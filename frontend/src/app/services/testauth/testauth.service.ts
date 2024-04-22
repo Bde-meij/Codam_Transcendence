@@ -6,7 +6,7 @@ import { User } from '../../models/user.class';
 @Injectable({
   providedIn: 'root'
 })
-export class AuthService {
+export class TestAuthService {
 	private authApi : string = "/api/auth";
 
 
