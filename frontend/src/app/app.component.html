@@ -4,9 +4,29 @@
 </h1>
 
 
+
+
 <div *ngFor="let user of users$ | async">
+	user:
 	<h6>{{user.id}}. {{user.name}}</h6>
 </div>
 
+<button (click)="mykeyup()">key up</button>
+<button (click)="mykeydown()">key down</button>
+
+<!-- {{games$?.yPosP1 | async }} -->
+
+pos:
+<p>
+
+	<!-- @if (pos$.yPosP1) {
+		{{ pos$.yPosP1 }}
+	} -->
+	{{pos$ | async }}
+	<ul>yPosP1: 
+	{{mypos?.yPosP1 }}</ul>
+	<ul>yPosP2: 
+	{{mypos?.yPosP2}}</ul>
+<!-- <h6>{{games$.yPosP2 | async}}</h6> -->
 
 <router-outlet />

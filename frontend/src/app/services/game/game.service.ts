@@ -2,8 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 export interface Positions {
-	player_one_ypos: number;
-	player_two_ypos: number;
+	yPosP1: number;
+	yPosP2: number;
 }
 
 @Injectable({
@@ -14,16 +14,14 @@ export class GameService {
 
 	constructor(private http: HttpClient) { };
 
-	// newGame() {
-	// 	return this.http.post<any>(this.gameApi + '/new', {});
-	// };
-	keyUp(amount: number) {
-		return this.http.post<number>(this.gameApi + '/keyup', amount);
+	keyUp(player: string, amount: string) {
+		return this.http.post<any>(this.gameApi + '/keyup/' + player + '/' + amount, { });
 	};
-	keyDown(amount: number) {
-		return this.http.post<number>(this.gameApi + '/keydown', amount);
+	keyDown(player: string, amount: string) {
+		return this.http.post<any>(this.gameApi + '/keydown/' + player + '/' + amount, { });
 	};
 	getPos() {
-		return this.http.get<Positions>(this.gameApi + '/pos');
+		console.log(this.gameApi);
+		return this.http.get<Positions>(this.gameApi);
 	}
 }
