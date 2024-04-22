@@ -16,17 +16,12 @@
 
 <!-- {{games$?.yPosP1 | async }} -->
 
-pos:
-<p>
+<div>
+	@if (subpos) {
+		<ul>yPosP1: {{ subpos.yPosP1 }}</ul>
+	}
 
-	<!-- @if (pos$.yPosP1) {
-		{{ pos$.yPosP1 }}
-	} -->
-	{{pos$ | async }}
-	<ul>yPosP1: 
-	{{mypos?.yPosP1 }}</ul>
-	<ul>yPosP2: 
-	{{mypos?.yPosP2}}</ul>
-<!-- <h6>{{games$.yPosP2 | async}}</h6> -->
+	<ul>yPosP2: {{ subpos?.yPosP2 }}</ul>
+</div>
 
-<router-outlet />
+<router-outlet></router-outlet>

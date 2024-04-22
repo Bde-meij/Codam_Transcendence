@@ -21,8 +21,8 @@ export class AppComponent implements OnInit{
 
 	title="gary";
 
-	mypos : Positions | undefined =  {yPosP1:0, yPosP2:0};
-	
+
+	subpos: Positions | undefined;
 
 	constructor(private testauthService: TestAuthService, private gameService: GameService) {
 	};
@@ -30,20 +30,31 @@ export class AppComponent implements OnInit{
 
 	ngOnInit() {
 		// this.games$ = this.gameService.getPos();
-		this.pos$ = this.gameService.getPos()
-			.pipe(map(data => (this.mypos = {
-			yPosP1 : data.yPosP1,
-			yPosP2 : data.yPosP2,
-		})))
+		this.pos$ = this.gameService.getPos();
 
 		this.users$ = this.testauthService.getTest();
+
+		this.gameService.getPos().subscribe(data=> this.subpos = {
+			yPosP1 : data.yPosP1,
+			yPosP2 : data.yPosP2,
+		})
 	};
 
 	public mykeyup() {
 		this.gameService.keyUp("2", "1").subscribe();
-	}
+		this.getPos();
+	};
 	public mykeydown() {
 		this.gameService.keyDown("1", "1").subscribe();
-	}
+		this.getPos();
+	};
 
+	public getPos() : void {
+		if (this.pos$) {
+			this.pos$.subscribe(data => this.subpos = {
+				yPosP1 : data.yPosP1,
+				yPosP2 : data.yPosP2,
+			})
+		}
+	};
 }
