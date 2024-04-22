@@ -1,11 +1,15 @@
-FROM node:alpine
+FROM node:21.7.1 AS development
 
+WORKDIR /frontend/src/app
 
+COPY package*.json ./
 
-COPY . .
+RUN npm install
 
 RUN npm install -g @angular/cli
 
-EXPOSE 4200
+COPY . .
 
-CMD [ "npm", "start" ]
+RUN npm run build
+
+EXPOSE 4200

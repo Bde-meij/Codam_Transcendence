@@ -6,6 +6,8 @@ COPY package*.json ./
 
 RUN npm install
 
+RUN npm install typeorm @nestjs/typeorm @nestjs/config passport @nestjs/passport @types/passport pg express-session @types/express-session passport-google-oauth20 @types/passport-google-oauth20
+
 COPY . .
 
 RUN npm run build
