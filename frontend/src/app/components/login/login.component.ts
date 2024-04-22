@@ -12,6 +12,7 @@ export class LoginComponent {
 	constructor(public auth:AuthService) {};
 
 	login(): void {
+		console.log("authservice.login() is called");
 		this.auth.loginWithRedirect();
 	}
 }
