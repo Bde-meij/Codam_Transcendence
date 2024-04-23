@@ -6,6 +6,7 @@ import { GameComponent } from './components/game/game.component';
 import { FriendsComponent } from './components/friends/friends.component';
 import { AccountComponent } from './components/account/account.component';
 import { AuthGuard } from './authguard';
+import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
 
 export const routes: Routes = [
 	{
@@ -39,5 +40,10 @@ export const routes: Routes = [
 				component: AccountComponent,
 			},
 		],
+	},
+	{
+		path: '**',
+		pathMatch: "full",
+		component: PageNotFoundComponent,
 	},
 ];
