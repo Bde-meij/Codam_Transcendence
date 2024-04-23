@@ -37,7 +37,6 @@ export class LoginComponent {
 	// login(): void {
 	// 	console.log("authservice.login() is called");
 	// 	this.auth.loginWithRedirect(
-			
 	// 	);
 	// }
 	

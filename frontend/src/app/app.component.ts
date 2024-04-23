@@ -3,7 +3,7 @@ import { RouterOutlet } from '@angular/router';
 import { TestAuthService } from './services/testauth/testauth.service';
 import { User } from './models/user.class';
 import { AsyncPipe, JsonPipe, NgFor } from '@angular/common';
-import { Observable, map } from 'rxjs';
+import { Observable } from 'rxjs';
 import { GameService, Positions } from './services/game/game.service';
 
 @Component({
@@ -19,7 +19,7 @@ export class AppComponent implements OnInit{
 
 	// pos : Positions | undefined;
 
-	title="gary";
+	title="Gary's basement";
 
 
 	subpos: Positions | undefined;
