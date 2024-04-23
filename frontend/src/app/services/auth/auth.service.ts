@@ -10,7 +10,7 @@ import { WebAuth } from 'auth0-js';
 })
 export class AuthService {
 	private auth: WebAuth;
-	private authApi = "/api/auth";
+	private authApi = 'http://localhost:3000/api/auth/code';
 
 	constructor(private http: HttpClient) {
 		this.auth = new WebAuth({
@@ -22,11 +22,11 @@ export class AuthService {
 		})
 	};
 
-	login() : void {
+	login(){
 		this.auth.authorize();
 	};
-	
-	sendCode(code: string) : void {
-		this.http.post(this.authApi + '/code', code);
+
+	sendCode(code: string){
+		return this.http.post<any>(this.authApi, code);
 	}
 }

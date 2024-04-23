@@ -1,16 +1,25 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { HttpException, HttpStatus, Injectable, Req } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Auth } from './entities/auth.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
+import { Request } from 'express';
 
 @Injectable()
 export class AuthService {
-  constructor(@InjectRepository(User) private readonly userRepo: Repository<User>){}
+  constructor(private userRepo: Repository<User>){}
 
-  async validateUser(email: string, displayName: string) {
+  async createUser(userData: any) {
+    const newUser = await this.userRepo.create(userData);
+    return newUser;
+  }
+
+  async findUser(id: string) {
+    const user = await this.userRepo.findOne({where: {id}});
+    return id;
+  }
+}
+
+  /*async validateUser(email: string, displayName: string) {
     const user = await this.userRepo.findOne({where: {email: email}});
 
     if (user) {
@@ -20,14 +29,10 @@ export class AuthService {
     const newUser = this.userRepo.create({email, displayName});
     await this.userRepo.save(newUser);
     return newUser;
-  }
+  }*/
 
-  async findUser(id: string) {
-    const user = await this.userRepo.findOne({where: {id}});
-    return id;
-  }
 
-  handlerLogin() {
+  /*handlerLogin() {
     return 'handlerLogin';
   }
 
@@ -36,7 +41,7 @@ export class AuthService {
   }
 }
 
-  /*async findAll(): Promise<Auth[]> {
+  async findAll(): Promise<Auth[]> {
     return this.authRepository.find();
   }
 

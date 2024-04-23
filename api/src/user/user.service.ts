@@ -16,6 +16,10 @@ export class UserService {
     return `This action returns a #${id} user`;
   }
 
+  findByEmail(email: string) {
+    return `This action returns user with email ${email}`;
+  }
+
   update(id: number, updateUserDto: UpdateUserDto) {
     return `This action updates a #${id} user`;
   }

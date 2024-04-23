@@ -5,6 +5,8 @@ import * as session from 'express-session';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  app.setGlobalPrefix('api');
+
   app.use(
     session({
       secret: require('crypto').randomBytes(64).toString('hex'),
@@ -12,8 +14,6 @@ async function bootstrap() {
       saveUninitialized: false,
     })
   )
-
-  app.setGlobalPrefix('api');
   await app.listen(3000);
 }
 bootstrap();

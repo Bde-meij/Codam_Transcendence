@@ -13,17 +13,17 @@ import { AuthService } from './auth.service';
 import { Request } from 'express';
 import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
+import { UserService } from 'src/user/user.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService, private configService: ConfigService) {}
+  constructor(private readonly authService: AuthService, private readonly configService: ConfigService) {}
 
-  @Post( 'login')
-  async login(@Body() body: {code: string}): Promise<any> {
-    const code = body.code;
+  @Post('code')
+  async login(@Body() code: string): Promise<any> {
     const clientId = this.configService.get<string>('CLIENT_ID');
     const clientSecert = this.configService.get<string>('CLIENT_SECRET');
-    const redirectUri = 'http://localhost:4200'
+    const redirectUri = 'http://localhost:4200/callback'
     const tokenEndpoint = 'https://api.intra.42.fr/v2/oauth';
 
     try {
@@ -36,6 +36,7 @@ export class AuthController {
       });
 
       const accessToken = response.data.access_token;
+      console.log('Access token: ', accessToken);
       const userInfoEndpoint = 'https://api.intra.42.fr/v2/me'
       const userInfoResponse = await axios.get(userInfoEndpoint, {
         headers: {
@@ -44,7 +45,11 @@ export class AuthController {
       })
 
       const userInfo = userInfoResponse.data;
-      const userExists = await this.
+      const userExists = await this.authService.findUser(userInfo.id);
+
+      if (!userExists){
+        await this.authService.createUser(userInfo);
+      }
 
       return userInfo;
     }
@@ -54,7 +59,7 @@ export class AuthController {
       throw error;
     }
   }
-
+}
   /*@UseGuards(fortyTwoGuard)
   @Get('login')
   handlerLogin() {
@@ -100,4 +105,3 @@ export class AuthController {
   remove(@Param('id') id: string) {
     return this.authService.remove(+id);
   }*/
-}

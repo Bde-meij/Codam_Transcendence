@@ -19,7 +19,6 @@ import { GameModule } from './game/game.module';
       synchronize: true,
       logging: true,
     }),
-    AuthModule,
     UserModule,
     GameModule,
   ],
