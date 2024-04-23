@@ -14,11 +14,16 @@ export class GameService {
 
 	constructor(private http: HttpClient) { };
 
-	keyUp(player: string, amount: string) {
-		return this.http.post<any>(this.gameApi + '/keyup/' + player + '/' + amount, { });
+	// update start position
+	startKey(player: string, ypos: number) {
+		return this.http.post<any>(this.gameApi + '/startkey/' + player + '/' + ypos.toString(), { });
 	};
-	keyDown(player: string, amount: string) {
-		return this.http.post<any>(this.gameApi + '/keydown/' + player + '/' + amount, { });
+
+	upKey(player: string, amount: string) {
+		return this.http.post<any>(this.gameApi + '/upkey/' + player + '/' + amount, { });
+	};
+	downKey(player: string, amount: string) {
+		return this.http.post<any>(this.gameApi + '/downkey/' + player + '/' + amount, { });
 	};
 	getPos() {
 		console.log(this.gameApi);
