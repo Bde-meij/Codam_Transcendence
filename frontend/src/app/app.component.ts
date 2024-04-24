@@ -34,18 +34,18 @@ export class AppComponent implements OnInit{
 
 		this.users$ = this.testauthService.getTest();
 
-		this.gameService.getPos().subscribe(data=> this.subpos = {
+		this.gameService.getPos().subscribe(data => this.subpos = {
 			yPosP1 : data.yPosP1,
 			yPosP2 : data.yPosP2,
 		})
 	};
 
 	public mykeyup() {
-		this.gameService.keyUp("2", "1").subscribe();
+		this.gameService.upKey("2", "1").subscribe();
 		this.getPos();
 	};
 	public mykeydown() {
-		this.gameService.keyDown("1", "1").subscribe();
+		this.gameService.downKey("1", "1").subscribe();
 		this.getPos();
 	};
 
