@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import{Actor,Engine,Color,Keys,vec,ExcaliburGraphicsContext,Vector}from "excalibur";
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Actor, Engine, Color, Keys, vec, ExcaliburGraphicsContext,Vector}from "excalibur";
 import { GameService, Positions } from '../../services/game/game.service';
 import { Observable } from 'rxjs';
-import{Player,Ball,addAfterImage}from "./gameActors"
-import{makeLines,drawScore,leftScorePos,rightScorePos}from "./lineDrawing";
+import { Player,Ball,addAfterImage}from "./gameActors"
+import { makeLines,drawScore,leftScorePos,rightScorePos}from "./lineDrawing";
 
 @Component({
   selector: 'app-game',
@@ -12,7 +12,7 @@ import{makeLines,drawScore,leftScorePos,rightScorePos}from "./lineDrawing";
   templateUrl: './game.component.html',
   styleUrl: './game.component.scss'
 })
-export class GameComponent implements OnInit {
+export class GameComponent implements OnInit, OnDestroy {
     
 	title = "my game";
 	constructor(private gameService: GameService){};
@@ -35,6 +35,7 @@ export class GameComponent implements OnInit {
     squareBall = (new Ball(this.width/2, this.height/2).returnAct());
     ballShadows: Actor[] = addAfterImage(this.squareBall);
 
+	private game: Engine | undefined;
 	
     public getPos() : void 
     {
@@ -44,16 +45,17 @@ export class GameComponent implements OnInit {
 			{
 				yPosP1 : data.yPosP1,
 				yPosP2 : data.yPosP2,
-		})}};
+			})
+		}
+	};
 			
-		ngOnInit()
-		{
-			this.pos$ = this.gameService.getPos();
-			this.gameService.startKey("1", this.leftPlayer.pos.y).subscribe();
-			this.gameService.startKey("2", this.rightPlayer.pos.y).subscribe();
-				
-		var game = new Engine
-		({
+	ngOnInit()
+	{
+		this.pos$ = this.gameService.getPos();
+		this.gameService.startKey("1", this.leftPlayer.pos.y).subscribe();
+		this.gameService.startKey("2", this.rightPlayer.pos.y).subscribe();
+			
+		this.game = new Engine({
 			width: this.width,
 			height: this.height,
 			backgroundColor: Color.Black,
@@ -61,7 +63,7 @@ export class GameComponent implements OnInit {
   
         setTimeout(() => {
             this.squareBall.vel = vec(this.height, 0);
-          }, 1000);
+		}, 1000);
 
 		// test for LAGS, do not remove
 		// const updateLeftPlayer = (player: Actor) =>
@@ -78,21 +80,20 @@ export class GameComponent implements OnInit {
 		// 	}
 		// }
 
-		const updateLeftPlayer = (player: Actor) =>
-		{
-			if (game.input.keyboard.isHeld(Keys.W) && player.pos.y > player.height / 2)
+		const updateLeftPlayer = (player: Actor) => {
+			if (this.game?.input.keyboard.isHeld(Keys.W) && player.pos.y > player.height / 2)
 				this.gameService.upKey("1", (this.playerSpeed).toString()).subscribe();
-			if (game.input.keyboard.isHeld(Keys.S) && player.pos.y < this.height - player.height / 2)
+			if (this.game?.input.keyboard.isHeld(Keys.S) && player.pos.y < this.height - player.height / 2)
 				this.gameService.downKey("1", (this.playerSpeed).toString()).subscribe();
 		}
 		
 		const updateRightPlayer = (player: Actor) =>
 		{
-			if (game.input.keyboard.isHeld(Keys.Up) && player.pos.y > player.height / 2)
+			if (this.game?.input.keyboard.isHeld(Keys.Up) && player.pos.y > player.height / 2)
 				this.gameService.upKey("2", (this.playerSpeed).toString()).subscribe();
-			if (game.input.keyboard.isHeld(Keys.Down) && player.pos.y < this.height - player.height / 2)
+			if (this.game?.input.keyboard.isHeld(Keys.Down) && player.pos.y < this.height - player.height / 2)
 				this.gameService.downKey("2", (this.playerSpeed).toString()).subscribe();
-			if (game.input.keyboard.wasPressed(Keys.Space)) (this.lScore += 1), (this.rScore += 1);
+			if (this.game?.input.keyboard.wasPressed(Keys.Space)) (this.lScore += 1), (this.rScore += 1);
 		}
 
 		const resetBall = (vel: number) =>
@@ -107,8 +108,7 @@ export class GameComponent implements OnInit {
 		}
 		
 		let hitPlayer: boolean = false;
-		this.squareBall.on("collisionstart", () =>
-		{
+		this.squareBall.on("collisionstart", () => {
 			if (!hitPlayer)
 			{
 				hitPlayer = true;
@@ -116,61 +116,58 @@ export class GameComponent implements OnInit {
 			}
 		});
 
-		const wallBounce = () =>
-{
-	if ((this.squareBall.pos.y < 5 || this.squareBall.pos.y > this.height-5) 
-	&& (!this.hitYWall))
-	{
-		this.hitYWall = true;
-		this.squareBall.vel.y *= -1;
-		if (Math.abs(this.squareBall.vel.y) < 2)
-			this.squareBall.vel.y *= 10;
-	}
-}
-	const checkScoring = () =>
-{
-	if((this.squareBall.pos.x < 0) && !this.hitXWall)
-	{
-		this.hitXWall = true;
-		this.rScore+=1;
-		if (this.rScore == 11) 
-		{
-			alert("right player win!");
-			(this.lScore = 0), (this.rScore = 0);
+		const wallBounce = () => {
+			if ((this.squareBall.pos.y < 5 || this.squareBall.pos.y > this.height-5) 
+			&& (!this.hitYWall))
+			{
+				this.hitYWall = true;
+				this.squareBall.vel.y *= -1;
+				if (Math.abs(this.squareBall.vel.y) < 2)
+					this.squareBall.vel.y *= 10;
+			}
 		}
-		resetBall(-this.height);
-	}
-	if((this.squareBall.pos.x > this.width) && !this.hitXWall)
-	{
-		this.hitXWall = true;
-		this.lScore+=1;
-		if (this.lScore == 11) 
-		{
-			alert("left player win!");
-			(this.lScore = 0), (this.rScore = 0);
-		}
-		resetBall(this.height);
-	}
-}
 
-this.leftPlayer.on("collisionstart", () => 
-	{
-		if (game.input.keyboard.isHeld(Keys.W))
-			this.squareBall.vel.y -= this.height*0.15;
-		if (game.input.keyboard.isHeld(Keys.S))
-			this.squareBall.vel.y += this.height*0.15;
-	});
+		const checkScoring = () =>
+		{
+			if((this.squareBall.pos.x < 0) && !this.hitXWall) {
+				this.hitXWall = true;
+				this.rScore+=1;
+				if (this.rScore == 11) 
+				{
+					alert("right player win!");
+					(this.lScore = 0), (this.rScore = 0);
+				}
+				resetBall(-this.height);
+			}
+			if((this.squareBall.pos.x > this.width) && !this.hitXWall) {
+				this.hitXWall = true;
+				this.lScore+=1;
+				if (this.lScore == 11) 
+				{
+					alert("left player win!");
+					(this.lScore = 0), (this.rScore = 0);
+				}
+				resetBall(this.height);
+			}
+		}
+
+		this.leftPlayer.on("collisionstart", () => {
+			if (this.game?.input.keyboard.isHeld(Keys.W))
+				this.squareBall.vel.y -= this.height*0.15;
+			if (this.game?.input.keyboard.isHeld(Keys.S))
+				this.squareBall.vel.y += this.height*0.15;
+		});
 	
-	this.rightPlayer.on("collisionstart", () => 
-	{
-		if (game.input.keyboard.isHeld(Keys.ArrowUp))
-			this.squareBall.vel.y -= this.ballMod;
-		if (game.input.keyboard.isHeld(Keys.ArrowDown))
-			this.squareBall.vel.y += this.ballMod;
-	});
+		this.rightPlayer.on("collisionstart", () => 
+		{
+			if (this.game?.input.keyboard.isHeld(Keys.ArrowUp))
+				this.squareBall.vel.y -= this.ballMod;
+			if (this.game?.input.keyboard.isHeld(Keys.ArrowDown))
+				this.squareBall.vel.y += this.ballMod;
+		});
 
-		game.on("postupdate", () => {updateLeftPlayer(this.leftPlayer)});
-		game.on("postupdate", () => {updateRightPlayer(this.rightPlayer)});
+		this.game.on("postupdate", () => {updateLeftPlayer(this.leftPlayer)});
+		this.game.on("postupdate", () => {updateRightPlayer(this.rightPlayer)});
 		this.squareBall.on("postupdate",()=>{this.hitXWall=false, this.hitYWall=false;});
 		this.squareBall.on("collisionend",()=>{hitPlayer=false;});
 		this.squareBall.on("preupdate", () =>
@@ -180,16 +177,16 @@ this.leftPlayer.on("collisionstart", () =>
 		});
 
 		// updates postition
-		game.on("preupdate", () => 
+		this.game?.on("preupdate", () => 
 		{
-				this.getPos();
-				var idiotvar: number | undefined = 0;
-				idiotvar = this.ypositions?.yPosP1;
-				if (idiotvar)
-					this.leftPlayer.pos.y = idiotvar;
-				idiotvar = this.ypositions?.yPosP2;
-				if (idiotvar)
-					this.rightPlayer.pos.y = idiotvar;
+			this.getPos();
+			var idiotvar: number | undefined = 0;
+			idiotvar = this.ypositions?.yPosP1;
+			if (idiotvar)
+				this.leftPlayer.pos.y = idiotvar;
+			idiotvar = this.ypositions?.yPosP2;
+			if (idiotvar)
+				this.rightPlayer.pos.y = idiotvar;
         });
 
 		var score = new Actor;
@@ -200,14 +197,19 @@ this.leftPlayer.on("collisionstart", () =>
 			drawScore(ctx, this.rScore, rightScorePos);
 		}
 
-		game.add(makeLines());
-		game.add(this.leftPlayer);
-		game.add(this.rightPlayer);
-		game.add(this.squareBall);
-		game.add(this.ballShadows[2]);
-		game.add(this.ballShadows[1]);
-		game.add(this.ballShadows[0]);
-		game.add(score);
-        game.start();
+		this.game.add(makeLines());
+		this.game.add(this.leftPlayer);
+		this.game.add(this.rightPlayer);
+		this.game.add(this.squareBall);
+		this.game.add(this.ballShadows[2]);
+		this.game.add(this.ballShadows[1]);
+		this.game.add(this.ballShadows[0]);
+		this.game.add(score);
+        this.game.start();
     }
+
+	ngOnDestroy() {
+		this.game?.stop();
+		delete this.game;
+	}
 }
