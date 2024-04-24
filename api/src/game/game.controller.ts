@@ -15,20 +15,28 @@ export class GameController {
 		return this.gameService.pos();
 	}
 
-	@Post('keyup/:player/:amount/')
-	keyUp(
+	@Post('startkey/:player/:amount/')
+	startKey(
 		@Param('player') player: string,
-		@Param('amount') amount: string
+		@Param('amount') amount: number
 	) {
-		return this.gameService.keyUp(player, +amount);
+		return this.gameService.startKey(player, +amount);
 	}
 
-	@Post('keydown/:player/:amount')
-	keyDown(
+	@Post('upkey/:player/:amount/')
+	upKey(
 		@Param('player') player: string,
 		@Param('amount') amount: string
 	) {
-		return this.gameService.keyDown(player, +amount);
+		return this.gameService.upKey(player, +amount);
+	}
+
+	@Post('downkey/:player/:amount')
+	downKey(
+		@Param('player') player: string,
+		@Param('amount') amount: string
+	) {
+		return this.gameService.downKey(player, +amount);
 	}
 	
 	
