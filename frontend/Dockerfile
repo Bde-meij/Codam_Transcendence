@@ -6,7 +6,7 @@ COPY package*.json ./
 
 RUN npm install
 
-RUN npm install -g @angular/cli
+RUN npm install -g @angular/cli@17.3.5
 
 COPY . .
 
