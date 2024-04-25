@@ -210,6 +210,7 @@ export class GameComponent implements OnInit, OnDestroy {
 
 	ngOnDestroy() {
 		this.game?.stop();
+		this.game?.canvas.remove();
 		delete this.game;
 	}
 }
