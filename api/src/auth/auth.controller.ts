@@ -8,56 +8,31 @@ import {
   Delete,
   UseGuards,
   Req,
+  Res,
+  Redirect,
+  HttpStatus,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
 import { UserService } from 'src/user/user.service';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService, private readonly configService: ConfigService) {}
 
-  @Post('code')
-  async login(@Body() code: string): Promise<any> {
-    const clientId = this.configService.get<string>('CLIENT_ID');
-    const clientSecert = this.configService.get<string>('CLIENT_SECRET');
-    const redirectUri = 'http://localhost:4200/callback'
-    const tokenEndpoint = 'https://api.intra.42.fr/v2/oauth';
+  @Get('login')
+  @UseGuards(AuthGuard('fortytwo'))
+  async login() {
+  }
 
-    try {
-      const response = await axios.post(tokenEndpoint, {
-        code,
-        client_id: clientId,
-        client_secret: clientSecert,
-        redirect_uri: redirectUri,
-        grant_type: 'client_credentials',
-      });
-
-      const accessToken = response.data.access_token;
-      console.log('Access token: ', accessToken);
-      const userInfoEndpoint = 'https://api.intra.42.fr/v2/me'
-      const userInfoResponse = await axios.get(userInfoEndpoint, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        }
-      })
-
-      const userInfo = userInfoResponse.data;
-      const userExists = await this.authService.findUser(userInfo.id);
-
-      if (!userExists){
-        await this.authService.createUser(userInfo);
-      }
-
-      return userInfo;
-    }
-
-    catch (error) {
-      console.error('Error exchanging code for access token:', error);
-      throw error;
-    }
+  @Get('callback')
+  @UseGuards(AuthGuard('fortytwo'))
+  async callback(@Req() req: Request, @Res() res: Response) {
+    console.log('User information:', req.user);
+    res.status(HttpStatus.FOUND).redirect('http://localhost:4200/dashboard');
   }
 }
   /*@UseGuards(fortyTwoGuard)

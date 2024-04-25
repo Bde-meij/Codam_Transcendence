@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { AuthService } from '../../services/auth/auth.service';
 
 
 @Component({
@@ -10,9 +9,9 @@ import { AuthService } from '../../services/auth/auth.service';
   styleUrl: './login.component.scss'
 })
 export class LoginComponent {
-	constructor(public auth: AuthService) {};
+	constructor() {};
 
 	login() : void {
-		this.auth.login();
+		window.location.href = 'http://localhost:3000/api/auth/login';
 	}
 }
