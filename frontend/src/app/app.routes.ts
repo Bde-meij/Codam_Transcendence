@@ -8,11 +8,12 @@ import { AccountComponent } from './components/account/account.component';
 import { AuthGuard } from './authguard';
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
 import { CallbackComponent } from './components/callback/callback.component';
+import { ChatComponent } from './components/chat/chat.component';
 
 export const routes: Routes = [
 	{
 		path: '',
-		redirectTo: 'welcome',
+		redirectTo: 'dashboard',
 		pathMatch: "full"
 	},
 	{
@@ -43,6 +44,10 @@ export const routes: Routes = [
 			{
 				path: 'account',
 				component: AccountComponent,
+			},
+			{
+				path: 'chat',
+				component: ChatComponent,
 			},
 		],
 	},
