@@ -6,16 +6,25 @@ import { Request } from 'express';
 
 @Injectable()
 export class AuthService {
-  constructor(private userRepo: Repository<User>){}
+  constructor(@InjectRepository(User) private readonly userRepo: Repository<User>){}
+
+  async userExists(id: string)
+  {
+    const user = await this.userRepo.findOne({where: {id}});
+    if (user)
+      return true;
+    return false;
+  } 
 
   async createUser(userData: any) {
     const newUser = await this.userRepo.create(userData);
-    return newUser;
+    const savedUser = await this.userRepo.save(newUser);
+    return savedUser;
   }
 
   async findUser(id: string) {
     const user = await this.userRepo.findOne({where: {id}});
-    return id;
+    return user;
   }
 }
 
