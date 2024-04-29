@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { NgFor } from '@angular/common';
+import { AsyncPipe, JsonPipe, NgFor } from '@angular/common';
 import { ChatService } from '../../services/chat/chat.service';
 import { FormsModule } from '@angular/forms';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-chat',
   standalone: true,
-  imports: [NgFor, FormsModule],
+  imports: [NgFor, FormsModule, AsyncPipe, JsonPipe],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss'
 })
@@ -25,6 +26,7 @@ export class ChatComponent implements OnInit {
 	sendMessage() {
 		if (this.message) {
 			this.chatService.sendMessage(this.message);
+			this.messages.push(this.message);
 		}
 		this.message = '';
 	}
