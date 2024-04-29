@@ -6,9 +6,9 @@ import { io } from 'socket.io-client';
   providedIn: 'root'
 })
 export class ChatService {
-	private chatSocket = io('/api/chat', { 
-		path: '/api/chat'
-	})
+	private chatSocket = io('/api/chat-socket', {
+		path: '/api/chat-socket/socket.io'
+	});
 
 	constructor() { };
 

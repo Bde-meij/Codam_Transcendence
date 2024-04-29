@@ -14,13 +14,10 @@ import { Observable } from 'rxjs';
 export class ChatComponent implements OnInit {
 	message: string | undefined;
 	messages: string[] = [];
-	mes$: Observable<string> | undefined;
 
 	constructor(private chatService: ChatService) {};
 	
 	ngOnInit() {
-		this.mes$ = this.chatService.getMessages();
-
 		this.chatService.getMessages().subscribe((newmessage ) => {
 			this.messages.push(newmessage);
 		})
@@ -29,6 +26,7 @@ export class ChatComponent implements OnInit {
 	sendMessage() {
 		if (this.message) {
 			this.chatService.sendMessage(this.message);
+			this.messages.push(this.message);
 		}
 		this.message = '';
 	}

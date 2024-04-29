@@ -1,14 +1,10 @@
 <p>chat works!</p>
-]<div>
-	<ul>
+<div>
+	<ol>
 		<li *ngFor="let m of messages">
 			{{ m }}
 		</li>
-	</ul>
-	<ul>
-		{{ mes$ | async }}
-	</ul>
-
+	</ol>
 
 	<input [(ngModel)]="message" (keydown.enter)="sendMessage()" type="text" > 
 	<button (click)="sendMessage()"> Send </button>
