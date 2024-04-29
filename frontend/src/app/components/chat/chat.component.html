@@ -1,7 +1,9 @@
 <p>chat works!</p>
 ]<div>
 	<ul>
-		<li *ngFor="let m of messages">{{ m }}</li>
+		<li *ngFor="let m of messages">
+			{{ m }}
+		</li>
 	</ul>
 	<ul>
 		{{ mes$ | async }}
