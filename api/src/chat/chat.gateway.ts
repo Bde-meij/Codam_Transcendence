@@ -12,6 +12,7 @@ import { Socket, Server } from 'socket.io';
 
 @WebSocketGateway({
 	cors: { origin: 'http://localhost:4200' },
+	// cors: { origin: '/frontend' }, (might be better?)
 	namespace: '/api/chat-socket',
 	path: '/api/chat-socket/socket.io',
 })

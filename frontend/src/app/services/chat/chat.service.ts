@@ -7,7 +7,11 @@ import { io } from 'socket.io-client';
 })
 export class ChatService {
 	private chatSocket = io('/api/chat-socket', {
-		path: '/api/chat-socket/socket.io'
+		path: '/api/chat-socket/socket.io',
+		// TO DO : add auth details (cookie or token)
+		// auth: {
+		// 	token: localStorage.
+		// },
 	});
 
 	constructor() { };
