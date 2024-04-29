@@ -28,10 +28,4 @@ export class ChatComponent implements OnInit {
 		}
 		this.message = '';
 	}
-
-	// sendMessage() {
-	// 	this.chatService.sendMessage(this.message);
-	// 	this.message = '';
-	// }
-
 }

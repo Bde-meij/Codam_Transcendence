@@ -21,29 +21,4 @@ export class ChatService {
 			});
 		});
 	}
-
-	// sendMessage(message: String) {
-	// 	this.socket.emit('new-message', message);
-	// };
-
-
-	// getMessages() {
-	// 	let observable = new Observable<{ message: string }>(observer => {
-	// 	  this.socket.on('new-message', (data) => {
-	// 		observer.next(data);
-	// 	  });
-	// 	  return () => { this.socket.disconnect(); };  
-	// 	});
-	// 	return observable;
-	//   }
-	
-	// getMessages() {
-	// 	let observable = new Observable<{user: String, message: String}>(observer => {
-	// 		this.socket.on('new-message', (data) => {
-	// 			observer.next(data);
-	// 		});
-	// 		return () => { this.socket.disconnect(); };
-	// 	});
-	// 	return observable;
-	// };
 }
