@@ -6,17 +6,19 @@ import { io } from 'socket.io-client';
   providedIn: 'root'
 })
 export class ChatService {
-	private socket = io('/api/chat')
+	private chatSocket = io('/api/chat', { 
+		path: '/api/chat'
+	})
 
 	constructor() { };
 
 	sendMessage(message: string): void {
-		this.socket.emit('message', message);
+		this.chatSocket.emit('message', message);
 	}
 
 	getMessages(): Observable<string> {
 		return new Observable((observer) => {
-			this.socket.on('message', (message) => {
+			this.chatSocket.on('message', (message) => {
 				observer.next(message);
 			});
 		});
