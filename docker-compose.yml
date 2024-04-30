@@ -16,10 +16,10 @@ services:
     environment:
       #DATABASE_URL: postgress://postgres:password@postgres:5432/app
       NODE_ENV: development
-      PORT: 3000
-    ports:
-      - 3000:3000
-      - 9229:9229
+      # PORT: 3000
+    # ports:
+      # - 3000:3000
+      # - 9229:9229
 
   #frontend
   frontend:
@@ -49,5 +49,5 @@ services:
     restart: always
     depends_on:
       - postgres
-    ports:
-      - 8080:8080
+    # ports:
+      # - 8080:8080

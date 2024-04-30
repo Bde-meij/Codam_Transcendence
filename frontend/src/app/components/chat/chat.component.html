@@ -1,4 +1,25 @@
 <p>chat works!</p>
+
+<div class = chat_container>
+
+	<div class = chat_column>
+		<h3> Your channels </h3>
+		<p> ... </p>
+	</div>
+
+	<div class = chat_column>
+		<h3> the messages in channel:  </h3>
+		<ul>
+			<li *ngFor="let m of messages">
+				{{ m }}
+			</li>
+		</ul>
+	
+		<input [(ngModel)]="message" (keydown.enter)="sendMessage()" type="text" > 
+		<button (click)="sendMessage()"> Send </button>
+	</div>
+</div>
+<!-- 
 <div>
 	<ol>
 		<li *ngFor="let m of messages">
@@ -8,4 +29,4 @@
 
 	<input [(ngModel)]="message" (keydown.enter)="sendMessage()" type="text" > 
 	<button (click)="sendMessage()"> Send </button>
-</div>
+</div> -->

@@ -12,7 +12,7 @@ import { Router } from '@angular/router';
 export class CallbackComponent {
 	constructor(auth: AuthService, private router: Router) {
 		console.log(window.location.search);
-		auth.sendCode(window.location.search);
+		// auth.sendCode(window.location.search);
 		router.navigate(['/dashboard']);
 	};
 }

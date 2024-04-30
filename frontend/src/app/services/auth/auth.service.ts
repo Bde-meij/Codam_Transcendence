@@ -11,34 +11,34 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class AuthService {
-	private auth: auth0.WebAuth;
-	private authApi = "/api/auth";
-	logstatus$ : Observable<boolean> | undefined;
+	// private auth: auth0.WebAuth;
+	// private authApi = "/api/auth";
+	// logstatus$ : Observable<boolean> | undefined;
 
-	constructor(private http: HttpClient) {
-		this.auth = new auth0.WebAuth({
-			domain: 'http://api.intra.42.fr/v2/oauth',
-			clientID: 'u-s4t2ud-7ae181090888396e717cc9cdec0e0ff9a312c655e22ea37b1cc2e426536847cb',
-			redirectUri: "http://localhost:4200/callback",
-			responseType: 'code',
-			scope: 'public',
-		})
-	};
+	// constructor(private http: HttpClient) {
+	// 	this.auth = new auth0.WebAuth({
+	// 		domain: 'http://api.intra.42.fr/v2/oauth',
+	// 		clientID: 'u-s4t2ud-7ae181090888396e717cc9cdec0e0ff9a312c655e22ea37b1cc2e426536847cb',
+	// 		redirectUri: "http://localhost:4200/callback",
+	// 		responseType: 'code',
+	// 		scope: 'public',
+	// 	})
+	// };
 
 	login() : void {
 		console.log("authservice.login called");
-		this.http.post(this.authApi + '/login', { });
-		this.auth.authorize();
+		// this.http.post(this.authApi + '/login', { });
+		// this.auth.authorize();
 	};
 
 	logout() : void {
 		console.log("authservice.logout called");
-		this.http.post(this.authApi + '/logout', { });
+		// this.http.post(this.authApi + '/logout', { });
 	}	
 	
-	sendCode(code: string) : void {
-		this.http.post(this.authApi + '/code', code);
-	}
+	// sendCode(code: string) : void {
+	// 	this.http.post(this.authApi + '/code', code);
+	// }
 
 	// make request to backend
 	// getLogStatus() : Observable<boolean> {
