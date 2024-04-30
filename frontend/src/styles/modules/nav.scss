@@ -1,4 +1,16 @@
 nav {
+
+	width: 80%;
+	text-align: center;
 	color: $background-color;
+	position: fixed;
 	background-color: $font-color;
+	padding: 15px;
+	margin: 0px;
+	font-family: $font-stack;
+	font-size: medium;
+	// display: inline;
+	a {
+		padding: 14px;
+	}
 }

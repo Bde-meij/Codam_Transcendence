@@ -10,5 +10,5 @@ import { LogoutComponent } from '../logout/logout.component';
   styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent {
-
+	title = "Gary's basement";
 }

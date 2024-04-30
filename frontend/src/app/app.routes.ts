@@ -13,6 +13,7 @@ import { ChatComponent } from './components/chat/chat.component';
 export const routes: Routes = [
 	{
 		path: '',
+		title: "Gary's basement",
 		redirectTo: 'dashboard',
 		pathMatch: "full"
 	},
