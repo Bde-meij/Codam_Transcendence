@@ -9,6 +9,7 @@ import { makeLines,drawScore,leftScorePos,rightScorePos}from "./lineDrawing";
   selector: 'app-game',
   standalone: true,
   imports: [],
+  providers: [GameService],
   templateUrl: './game.component.html',
   styleUrl: './game.component.scss'
 })
