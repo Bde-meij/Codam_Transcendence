@@ -1,6 +1,5 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { ChatService } from './services/chat/chat.service';
 
 @Component({
   selector: 'app-root',
@@ -9,12 +8,8 @@ import { ChatService } from './services/chat/chat.service';
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent implements OnInit {
-	constructor(private chatService : ChatService) {};
-
-	ngOnInit() {
-		this.chatService.newUserRegister();
-	}
+export class AppComponent {
+	constructor() {};
 
 	title = "Gary's basement";
 }

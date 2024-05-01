@@ -11,6 +11,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class AuthService {
+	private loggedin = false;
 	// private auth: auth0.WebAuth;
 	// private authApi = "/api/auth";
 	// logstatus$ : Observable<boolean> | undefined;
@@ -27,12 +28,14 @@ export class AuthService {
 
 	login() : void {
 		console.log("authservice.login called");
+		this.loggedin = true;
 		// this.http.post(this.authApi + '/login', { });
 		// this.auth.authorize();
 	};
 
 	logout() : void {
 		console.log("authservice.logout called");
+		this.loggedin = false;
 		// this.http.post(this.authApi + '/logout', { });
 	}	
 	
@@ -46,6 +49,6 @@ export class AuthService {
 	// }
 
 	getLogStatus() : boolean {
-		return (true);
+		return (this.loggedin);
 	}
 }

@@ -6,16 +6,6 @@ import { io, Socket } from 'socket.io-client';
   providedIn: 'root'
 })
 export class ChatService {
-	// private chatSocket = io('/api/chat-socket', {
-	// 	path: '/api/chat-socket/socket.io',
-	// 	timeout: 50000,
-	// 	ackTimeout: 10000
-	// 	// TO DO : add auth details (cookie or token)
-	// 	// auth: {
-	// 	// 	token: localStorage...
-	// 	// },
-	// });
-
 	private chatSocket = io('/api/chat-socket', {
 		path: '/api/chat-socket/socket.io',
 		timeout: 50000,
@@ -28,27 +18,16 @@ export class ChatService {
 
 	constructor() {
 		this.chatSocket.onAny((event, ...args) => {
-			console.log("SOCK EVENT: ");
+			console.log("CHAT-SOCK EVENT: ");
 			console.log(event, args);
 		});
+		this.newUserRegister();
 	}
 
-
-
-	// chatSocket.onAny((event, ...args) => {
-	// 	console.log(event, args);
-	// });
-
-	// constructor(private chatSocket: Socket) {};
-
-	// chatSocket.onAny((event, ...args) => {
-	// 	console.log(event, args);
-	// });
-
 	newUserRegister() : void {
-		this.chatSocket.emit('message', "new User Register", (err: any) => {
+		this.chatSocket.emit('message', "new chatSocket", (err: any) => {
 			if (err) {
-				console.log("error: ");
+				console.log("chat-sock error: ");
 				console.log(err.message);
 			}
 		})
@@ -57,7 +36,7 @@ export class ChatService {
 	sendMessage(message: string): void {
 		this.chatSocket.emit('message', message, (err: any) => {
 			if (err) {
-				console.log("error: ");
+				console.log("chat-sock error: ");
 				console.log(err);
 			}
 		});
