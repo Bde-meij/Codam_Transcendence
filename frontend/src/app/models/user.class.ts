@@ -1,19 +1,35 @@
+export interface userInterface {
+	intraId: string;
+	nickname: string;
+	status: string;
+	avatar: File;
+}
+
 export class User {
-	id: number;
-	name: string;
-	password: string;
+	constructor(private user: userInterface) {	};
 
-	constructor(id: number, name: string, password: string) {
-		this.id = id;
-		this.name = name;
-		this.password = password;
-	}
+	// getNickName() : string {
+	// 	return this.user.nickname;
+	// }
+	// getStatus() : string {
+	// 	return this.user.status;
+	// }
+	// getIntraID() : string {
+	// 	return this.user.intraId;
+	// }
+	// getAvatar() : File {
+	// 	return this.user.avatar;
+	// }
+	// setNickName(newNickname: string) : void {
+	// 	this.user.nickname = newNickname;
+	// }
+	// setStatus(newStatus: string) : void {
+	// 	this.user.status = newStatus;
+	// }
+	// setIntraID(newIntraId: string) : void {
+	// 	this.user.intraId = newIntraId;
+	// }
+	// setAvatar(newAvatar: File) : void {
+	// 	this.user.avatar = newAvatar;
+	// }
 }
-
-
-export interface testUser {
-	id: number;
-	name: string;
-	password: string;
-}
-
