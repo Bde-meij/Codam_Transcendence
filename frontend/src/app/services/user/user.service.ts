@@ -1,16 +1,17 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { User } from '../../models/user.class';
-
+import { UserInterface } from '../../models/user.class';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-	private userUrl = "/api/user"
-	constructor(private http: HttpClient) { }
+	private userUrl = "/api/user";
+	// user$ : Observable<UserInterface>;
+	constructor(private http: HttpClient) { };
 
-	ngOnInit() {
-		this.http.get<User>(this.userUrl, {});
+	getUser() : Observable<UserInterface>{
+		return this.http.get<UserInterface>(this.userUrl, {});
 	};
 }

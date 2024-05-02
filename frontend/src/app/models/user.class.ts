@@ -1,35 +1,35 @@
-export interface userInterface {
+export interface UserInterface {
 	intraId: string;
 	nickname: string;
 	status: string;
 	avatar: File;
 }
 
-export class User {
-	constructor(private user: userInterface) {	};
+// export class User {
+// 	constructor(private user: UserInterface) {	};
 
-	// getNickName() : string {
-	// 	return this.user.nickname;
-	// }
-	// getStatus() : string {
-	// 	return this.user.status;
-	// }
-	// getIntraID() : string {
-	// 	return this.user.intraId;
-	// }
-	// getAvatar() : File {
-	// 	return this.user.avatar;
-	// }
-	// setNickName(newNickname: string) : void {
-	// 	this.user.nickname = newNickname;
-	// }
-	// setStatus(newStatus: string) : void {
-	// 	this.user.status = newStatus;
-	// }
-	// setIntraID(newIntraId: string) : void {
-	// 	this.user.intraId = newIntraId;
-	// }
-	// setAvatar(newAvatar: File) : void {
-	// 	this.user.avatar = newAvatar;
-	// }
-}
+// 	getNickName() : string {
+// 		return this.user.nickname;
+// 	}
+// 	getStatus() : string {
+// 		return this.user.status;
+// 	}
+// 	getIntraID() : string {
+// 		return this.user.intraId;
+// 	}
+// 	getAvatar() : File {
+// 		return this.user.avatar;
+// 	}
+// 	setNickName(newNickname: string) : void {
+// 		this.user.nickname = newNickname;
+// 	}
+// 	setStatus(newStatus: string) : void {
+// 		this.user.status = newStatus;
+// 	}
+// 	setIntraID(newIntraId: string) : void {
+// 		this.user.intraId = newIntraId;
+// 	}
+// 	setAvatar(newAvatar: File) : void {
+// 		this.user.avatar = newAvatar;
+// 	}
+// }
