@@ -1,15 +1,13 @@
 nav {
-
-	width: 80%;
 	text-align: center;
 	color: $background-color;
-	position: fixed;
+	position:sticky;
 	background-color: $font-color;
 	padding: 15px;
 	margin: 0px;
 	font-family: $font-stack;
 	font-size: medium;
-	// display: inline;
+	display:flexbox;
 	a {
 		padding: 14px;
 	}

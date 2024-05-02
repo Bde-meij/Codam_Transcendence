@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { AsyncPipe, NgFor } from '@angular/common';
 import { ChatService } from '../../services/chat/chat.service';
 import { FormsModule } from '@angular/forms';
-import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-chat',

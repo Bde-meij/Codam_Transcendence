@@ -7,7 +7,6 @@ import { FriendsComponent } from './components/friends/friends.component';
 import { AccountComponent } from './components/account/account.component';
 import { AuthGuard } from './authguard';
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
-import { CallbackComponent } from './components/callback/callback.component';
 import { ChatComponent } from './components/chat/chat.component';
 
 export const routes: Routes = [
@@ -20,10 +19,6 @@ export const routes: Routes = [
 	{
 		path: 'welcome',
 		component: WelcomeComponent,
-	},
-	{
-		path: 'callback',
-		component: CallbackComponent,
 	},
 	{
 		path: 'dashboard',

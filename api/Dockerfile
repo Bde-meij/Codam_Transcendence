@@ -10,7 +10,7 @@ COPY . .
 
 RUN npm run build
 
-# EXPOSE 3000
+EXPOSE 3000
 
 #PRODUCTION#
 
@@ -23,6 +23,6 @@ WORKDIR /src/app
 
 COPY --from=development /src/app/ .
 
-# EXPOSE 3000
+EXPOSE 3000
 
 CMD [ "node", "dist/main"]
