@@ -1,5 +1,5 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { io } from 'socket.io-client';
 
 export interface Positions {
 	yPosP1: number;
@@ -10,23 +10,34 @@ export interface Positions {
 	providedIn: 'root'
 })
 export class GameService {
-	private gameApi : string = "/api/game";
+	private gameSocket = io('/api/game-socket', {
+		path: '/api/game-socket/socket.io',
+		timeout: 50000,
+		ackTimeout: 10000
+		// TO DO : add auth details (cookie or token)
+		// auth: {
+		// 	token: localStorage...
+		// },
+	});
 
-	constructor(private http: HttpClient) { };
-
-	// update start position
-	startKey(player: string, ypos: number) {
-		return this.http.post<any>(this.gameApi + '/startkey/' + player + '/' + ypos.toString(), { });
-	};
-
-	upKey(player: string, amount: string) {
-		return this.http.post<any>(this.gameApi + '/upkey/' + player + '/' + amount, { });
-	};
-	downKey(player: string, amount: string) {
-		return this.http.post<any>(this.gameApi + '/downkey/' + player + '/' + amount, { });
-	};
-	getPos() {
-		console.log(this.gameApi);
-		return this.http.get<Positions>(this.gameApi);
+	constructor() {
+		// for debugging:
+		this.gameSocket.onAny((event, ...args) => {
+			console.log("GAME-SOCK EVENT: ");
+			console.log(event, args);
+		});
+		this.newUserRegister();
 	}
+
+	// for debugging:
+	newUserRegister() : void {
+		this.gameSocket.emit('game', "new gameSocket", (err: any) => {
+			if (err) {
+				console.log("game-sock error: ");
+				console.log(err.message);
+			}
+		})
+	}
+
+	// other functionality
 }

@@ -1,7 +1,8 @@
 
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { WebAuth } from 'auth0-js';
+import { Injectable, Input } from '@angular/core';
+import { AppComponent } from '../../app.component';
+import { Observable } from 'rxjs';
 
 // import { JwtHelperService } from '@auth0/angular-jwt';
 
@@ -9,24 +10,44 @@ import { WebAuth } from 'auth0-js';
   providedIn: 'root'
 })
 export class AuthService {
-	private auth: WebAuth;
-	private authApi = "/api/auth";
+	private loggedin = false;
+	// private auth: auth0.WebAuth;
+	// private authApi = "/api/auth";
+	// logstatus$ : Observable<boolean> | undefined;
 
-	constructor(private http: HttpClient) {
-		this.auth = new WebAuth({
-			domain: 'http://api.intra.42.fr/v2/oauth',
-			clientID: 'u-s4t2ud-7ae181090888396e717cc9cdec0e0ff9a312c655e22ea37b1cc2e426536847cb',
-			redirectUri: "http://localhost:4200/callback",
-			responseType: 'code',
-			scope: 'public',
-		})
-	};
+	// constructor(private http: HttpClient) {
+	// 	this.auth = new auth0.WebAuth({
+	// 		domain: 'http://api.intra.42.fr/v2/oauth',
+	// 		clientID: 'u-s4t2ud-7ae181090888396e717cc9cdec0e0ff9a312c655e22ea37b1cc2e426536847cb',
+	// 		redirectUri: "http://localhost:4200/callback",
+	// 		responseType: 'code',
+	// 		scope: 'public',
+	// 	})
+	// };
 
 	login() : void {
-		this.auth.authorize();
+		console.log("authservice.login called");
+		this.loggedin = true;
+		// this.http.post(this.authApi + '/login', { });
+		// this.auth.authorize();
 	};
+
+	logout() : void {
+		console.log("authservice.logout called");
+		this.loggedin = false;
+		// this.http.post(this.authApi + '/logout', { });
+	}	
 	
-	sendCode(code: string) : void {
-		this.http.post(this.authApi + '/code', code);
+	// sendCode(code: string) : void {
+	// 	this.http.post(this.authApi + '/code', code);
+	// }
+
+	// make request to backend
+	// getLogStatus() : Observable<boolean> {
+	// 	return (this.http.get<boolean>(this.authApi, {}));
+	// }
+
+	getLogStatus() : boolean {
+		return (this.loggedin);
 	}
 }

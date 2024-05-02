@@ -1,16 +1,54 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { HttpException, HttpStatus, Injectable, Req } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Auth } from './entities/auth.entity';
 import { Repository } from 'typeorm';
+import { User } from 'src/user/entities/user.entity';
+import { Request } from 'express';
 
 @Injectable()
 export class AuthService {
-  constructor(@InjectRepository(Auth) private authRepository: Repository<Auth>){}
-  async create(createAuthDto: CreateAuthDto) : Promise<void> {
-    await this.authRepository.save({...createAuthDto});
+  constructor(@InjectRepository(User) private readonly userRepo: Repository<User>){}
+
+  async userExists(id: string)
+  {
+    const user = await this.userRepo.findOne({where: {id}});
+    if (user)
+      return true;
+    return false;
+  } 
+
+  async createUser(userData: any) {
+    const newUser = await this.userRepo.create(userData);
+    const savedUser = await this.userRepo.save(newUser);
+    return savedUser;
   }
+
+  async findUser(id: string) {
+    const user = await this.userRepo.findOne({where: {id}});
+    return user;
+  }
+}
+
+  /*async validateUser(email: string, displayName: string) {
+    const user = await this.userRepo.findOne({where: {email: email}});
+
+    if (user) {
+      return user;
+    }
+
+    const newUser = this.userRepo.create({email, displayName});
+    await this.userRepo.save(newUser);
+    return newUser;
+  }*/
+
+
+  /*handlerLogin() {
+    return 'handlerLogin';
+  }
+
+  handlerRedirect() {
+    return 'handlerRedirect';
+  }
+}
 
   async findAll(): Promise<Auth[]> {
     return this.authRepository.find();
@@ -41,4 +79,4 @@ export class AuthService {
   async remove(id: number) {
     await this.authRepository.delete({id});
   }
-}
+}*/

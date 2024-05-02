@@ -11,5 +11,7 @@ import { LoginComponent } from '../login/login.component';
   styleUrl: './welcome.component.scss'
 })
 export class WelcomeComponent {
+	height = 600;
+	width = this.height * 1.15;
 	@Input() title = '';
 }

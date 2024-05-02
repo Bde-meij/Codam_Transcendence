@@ -1,4 +1,14 @@
 nav {
+	text-align: center;
 	color: $background-color;
+	position:sticky;
 	background-color: $font-color;
+	padding: 15px;
+	margin: 0px;
+	font-family: $font-stack;
+	font-size: medium;
+	display:flexbox;
+	a {
+		padding: 14px;
+	}
 }
