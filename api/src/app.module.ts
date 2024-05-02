@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
 import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Auth } from './auth/entities/auth.entity';
+import { User } from './user/entities/user.entity';
+import { UserModule } from './user/user.module';
 import { GameModule } from './game/game.module';
 import { ChatGateway } from './chat/chat.gateway';
 
@@ -15,10 +16,11 @@ import { ChatGateway } from './chat/chat.gateway';
       username: 'postgres',
       password: 'password',
       database: 'app',
-      entities: [Auth],
+      entities: [User],
       synchronize: true,
       logging: true,
     }),
+    UserModule,
     GameModule,
   ],
   controllers: [],

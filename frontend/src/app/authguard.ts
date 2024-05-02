@@ -12,8 +12,8 @@ export class AuthGuard{
 		if (this.authService.getLogStatus()) {
 			return true;
 		} else {
-			this.router.navigate(['/welcome']);
-			return false;
+			// this.router.navigate(['/welcome']);
+			return true;
 		}
 	}
 }

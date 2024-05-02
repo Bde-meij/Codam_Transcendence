@@ -14,6 +14,11 @@ export class LoginComponent {
 
 	login() : void {
 		this.auth.login();
-		this.router.navigate(['/dashboard']);
+		window.location.href = 'http://localhost:3000/api/auth/login';
+		// this.router.navigate(['/auth']);
+		// this.router.navigate(['/dashboard']);
 	}
+	// login() : void {
+		// window.location.href = 'http://localhost:3000/api/auth/login';
+	// }
 }
