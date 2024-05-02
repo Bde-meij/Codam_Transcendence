@@ -30,12 +30,12 @@ export class AuthController {
   @Get('callback')
   @UseGuards(AuthGuard('fortytwo'))
   async callback(@Req() req: Request, @Res() res: Response, @Session() session: Record<string, any>) {
-    //console.log('User information:', req.user);
+    // console.log('User information:', req.user);
     session.userId = (req.user as any).id;
     if (!await this.authService.userExists(session.userId))
     {
       //res.status(HttpStatus.FOUND).redirect('http://localhost:4200/register');
-      session.displayName = (req.user as any).displayName;
+      session.displayName = (req.user as any).usual_full_name;
       const userData = {id: session.userId, displayName: session.displayName};
       await this.authService.createUser(userData);
     }

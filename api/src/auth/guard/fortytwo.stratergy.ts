@@ -10,6 +10,13 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy, 'fortytwo') {
       clientID: configService.get<string>('CLIENT_ID'),
       clientSecret: configService.get<string>('CLIENT_SECRET'),
       callbackURL: configService.get<string>('CALL_BACK_URL'),
+	  profileFields: {
+		'id': function (obj) { return String(obj.id); },
+		'usual_full_name': 'usual_full_name',
+		'login': 'login',
+		'emails.0.value': 'email',
+		'photos.0.value': 'image_url'
+	  }
     });
   }
 
@@ -17,9 +24,9 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy, 'fortytwo') {
     // Here, you can access user profile information and perform custom logic
     const user = {
       id: profile.id,
-      username: profile.username,
+      usual_full_name: profile.usual_full_name,
+      login: profile.login,
       email: profile.emails[0].value,
-      displayName: profile.displayName,
       accessToken,
       refreshToken,
     };
