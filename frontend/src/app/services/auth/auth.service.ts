@@ -1,7 +1,6 @@
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable, Input } from '@angular/core';
-import auth0 from 'auth0-js';
 import { AppComponent } from '../../app.component';
 import { Observable } from 'rxjs';
 
