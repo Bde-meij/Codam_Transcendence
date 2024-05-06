@@ -6,8 +6,8 @@ import { io, Socket } from 'socket.io-client';
   providedIn: 'root'
 })
 export class ChatService {
-	private chatSocket = io('http://localhost:3000/api/chat-socket', {
-		path: '/api/chat-socket/socket.io',
+	private chatSocket = io({
+		path: '/sock',
 		timeout: 50000,
 		ackTimeout: 10000
 		// TO DO : add auth details (cookie or token)
