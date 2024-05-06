@@ -6,7 +6,7 @@ import { io, Socket } from 'socket.io-client';
   providedIn: 'root'
 })
 export class ChatService {
-	private chatSocket = io('/api/chat-socket', {
+	private chatSocket = io('http://localhost:3000/api/chat-socket', {
 		path: '/api/chat-socket/socket.io',
 		timeout: 50000,
 		ackTimeout: 10000
