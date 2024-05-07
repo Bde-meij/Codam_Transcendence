@@ -1,46 +1,20 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
+import { SockService } from '../sock.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class ChatService {
-	// constructor() {
-	// 	this.mainSocket();
-	// };
+export class ChatService{
+	private chatSocket = io("/chat");
 
-	private chatSocket = io( "/chat", {
-		path: '/sock',
-		timeout: 50000,
-		ackTimeout: 10000
-		// TO DO : add auth details (cookie or token)
-		// auth: {
-		// 	token: localStorage...
-		// },
-	});
-
-	// private chatSocket = io("/chat");
-
-	constructor() {
-		// this.mainSocket.onAny((event, ...args) => {
-		// 	console.log("MAIN-SOCK EVENT: ");
-		// 	console.log(event, args);
-		// });
+	constructor(sockService: SockService) {
 		this.chatSocket.onAny((event, ...args) => {
 			console.log("CHAT-SOCK EVENT: ");
 			console.log(event, args);
 		});
-		this.newUserRegister();
-	}
-
-	newUserRegister() : void {
-		this.chatSocket.emit('message', "new chatSocket", (err: any) => {
-			if (err) {
-				console.log("chat-sock error: ");
-				console.log(err.message);
-			}
-		})
+		sockService.newSocketRegister("chatSocket");
 	}
 
 	sendMessage(message: string): void {
