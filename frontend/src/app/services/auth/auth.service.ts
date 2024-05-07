@@ -11,18 +11,18 @@ export class AuthService {
 	constructor(private http: HttpClient) { };
 
 	register() : void {
-		this.http.post(this.authUrL + '/register', { });
+		this.http.post(this.authUrL + '/register', { }).subscribe();
 		console.log("authservice.register called");
 	}
 
 	login() : void {
-		this.http.post(this.authUrL + '/login', { });
+		this.http.post(this.authUrL + '/login', window.origin).subscribe();
 		console.log("authservice.login called");
 		this.loggedin = true;
 	};
 
 	logout() : void {
-		this.http.post(this.authUrL + '/logout', { });
+		this.http.post(this.authUrL + '/logout', { }).subscribe();
 		console.log("authservice.logout called");
 		this.loggedin = false;
 	}	
