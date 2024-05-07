@@ -12,6 +12,7 @@ import { Socket, Server } from 'socket.io';
 
 @WebSocketGateway({
 	cors: { origin: 'http://localhost:4200' },
+	namespace: "/chat"
 	// cors: { origin: '/frontend' }, (might be better?)
 })
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
@@ -39,6 +40,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	): string {
 		console.log('message recieved from ' + client.id + ': ' + data);
 		client.broadcast.emit('message', data);
-		return 'Hello world!';
+		return data;
 	}
 }

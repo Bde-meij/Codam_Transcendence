@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Actor, Engine, Color, Keys, vec, ExcaliburGraphicsContext,Vector}from "excalibur";
-import { GameService, Positions } from '../../services/game/game.service';
+import { GameService, Positions } from '../../services/sock/game/game.service';
 import { Observable } from 'rxjs';
 import { Player,Ball,addAfterImage}from "./gameActors"
 import { makeLines,drawScore,leftScorePos,rightScorePos}from "./lineDrawing";

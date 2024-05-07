@@ -3,7 +3,7 @@
 		"target": "http://api:3000",
 		"secure": false
 	},
-	"/sock/*": {
+	"/sock": {
 		"target": "ws://api:3000/socket.io/",
 		"secure": false,
 		"ws": true,

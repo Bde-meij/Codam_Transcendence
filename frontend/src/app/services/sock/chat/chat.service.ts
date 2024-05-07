@@ -6,7 +6,11 @@ import { io, Socket } from 'socket.io-client';
   providedIn: 'root'
 })
 export class ChatService {
-	private chatSocket = io({
+	// constructor() {
+	// 	this.mainSocket();
+	// };
+
+	private chatSocket = io( "/chat", {
 		path: '/sock',
 		timeout: 50000,
 		ackTimeout: 10000
@@ -16,7 +20,13 @@ export class ChatService {
 		// },
 	});
 
+	// private chatSocket = io("/chat");
+
 	constructor() {
+		// this.mainSocket.onAny((event, ...args) => {
+		// 	console.log("MAIN-SOCK EVENT: ");
+		// 	console.log(event, args);
+		// });
 		this.chatSocket.onAny((event, ...args) => {
 			console.log("CHAT-SOCK EVENT: ");
 			console.log(event, args);

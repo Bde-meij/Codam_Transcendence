@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
-import { ChatService } from '../../services/chat/chat.service';
+import { ChatService } from '../../services/sock/chat/chat.service';
 import { LogoutComponent } from '../logout/logout.component';
 import { Observable } from 'rxjs';
 import { UserInterface } from '../../models/user.class';
