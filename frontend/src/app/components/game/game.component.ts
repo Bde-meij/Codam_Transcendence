@@ -9,14 +9,13 @@ import { makeLines,drawScore,leftScorePos,rightScorePos}from "./lineDrawing";
   selector: 'app-game',
   standalone: true,
   imports: [],
-  providers: [GameService],
   templateUrl: './game.component.html',
   styleUrl: './game.component.scss'
 })
 export class GameComponent implements OnInit, OnDestroy {
-    
 	title = "my game";
-	// constructor(private gameService: GameService){};
+
+	constructor(private gameService: GameService){};
 
     // pos$:Observable<Positions> | undefined;
     // ypositions: Positions | undefined

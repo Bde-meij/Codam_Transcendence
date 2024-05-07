@@ -24,11 +24,12 @@ export class SockService {
 	}
 
 	newSocketRegister(socketName: string) : void {
-		this.mainSocket.emit('message', "new " + socketName, (err: any) => {
-			if (err) {
-				console.log("main-sock error: ");
-				console.log(err.message);
-			}
-		})
+		console.log("new socket register: " + socketName);
+		// this.mainSocket.emit('message', "new " + socketName, (err: any) => {
+		// 	if (err) {
+		// 		console.log("main-sock error: ");
+		// 		console.log(err.message);
+		// 	}
+		// })
 	}
 }
