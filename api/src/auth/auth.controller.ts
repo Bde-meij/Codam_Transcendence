@@ -21,16 +21,17 @@ import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  private hostname: string;
+  constructor(private readonly authService: AuthService, private readonly configService: ConfigService) {}
 
   @Get('login')
   @UseGuards(AuthGuard('fortytwo'))
-  async login() {}
+  async login() {console.log("It hereee");}
 
   @Get('callback')
   @UseGuards(AuthGuard('fortytwo'))
   async callback(@Req() req: Request, @Res() res: Response, @Session() session: Record<string, any>) {
-    // console.log('User information:', req.user);
+    // console.log('Information:', req);
     session.userId = (req.user as any).id;
     if (!await this.authService.userExists(session.userId))
     {
@@ -44,7 +45,7 @@ export class AuthController {
       const user = await this.authService.findUser(session.userId);
       session.displayName = user.displayName;
     }
-    res.status(HttpStatus.FOUND).redirect('http://localhost:4200/dashboard');
+    res.status(HttpStatus.FOUND).redirect(`http://${req.hostname}:4200/dashboard`);
   }
 
   @Get('register')
@@ -53,7 +54,7 @@ export class AuthController {
     session.displayName = (req.user as any).username;
     const userData = {id: session.userId, displayName: session.displayName};
     await this.authService.createUser(userData);
-    res.status(HttpStatus.FOUND).redirect('http://localhost:4200/dashboard');
+    res.status(HttpStatus.FOUND).redirect(`http://${req.hostname}:4200/dashboard`);
   }
 }
   /*@UseGuards(fortyTwoGuard)
