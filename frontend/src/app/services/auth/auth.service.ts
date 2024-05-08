@@ -16,7 +16,7 @@ export class AuthService {
 	}
 
 	login() : void {
-		this.http.post(this.authUrL + '/login', window.origin).subscribe();
+		this.http.get(this.authUrL + '/login', { }).subscribe();
 		console.log("authservice.login called");
 		this.loggedin = true;
 	};

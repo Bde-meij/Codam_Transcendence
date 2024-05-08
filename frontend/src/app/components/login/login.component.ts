@@ -13,8 +13,8 @@ export class LoginComponent {
 	constructor(private router: Router, public auth: AuthService) {};
 
 	login() : void {
-		this.auth.login();
-		// window.location.href = 'http://localhost:3000/api/auth/login';
+		// this.auth.login();
+		window.location.href = '/api/auth/login';
 		// this.router.navigate(['/auth']);
 		// this.router.navigate(['/dashboard']);
 	}
