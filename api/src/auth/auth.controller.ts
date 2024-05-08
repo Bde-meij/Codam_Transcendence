@@ -51,11 +51,16 @@ export class AuthController {
   //@UseGuards(AuthGuard('fortytwo'))
   async register(@Req() req: Request, @Res() res: Response, @Session() session: Record<string, any>, @Body() data: any) {
     if (!await this.userService.findUserByName(data.nickname)) {
-      session.displayName = data.nickname;
-      this.user.displayName = data.nickname;
-      await this.userService.createUser(this.user);
-      return res.status(HttpStatus.OK);
+      if (!await this.userService.findUserById(data.userId)) {
+        session.displayName = data.nickname;
+        this.user.displayName = data.nickname;
+        await this.userService.createUser(this.user);
+        return res.status(HttpStatus.OK);
+      }
+      else
+        return res.status(HttpStatus.FORBIDDEN).json({message: 'User already registered'});
     }
-    return res.status(HttpStatus.FORBIDDEN).json({message: 'Name is already taken'});
+    else
+      return res.status(HttpStatus.FORBIDDEN).json({message: 'Name is already taken'});
   }
 }
