@@ -7,6 +7,7 @@ import { UserInterface } from '../../models/user.class';
 import { UserService } from '../../services/user/user.service';
 import { AsyncPipe, JsonPipe } from '@angular/common';
 import { SockService } from '../../services/sock/sock.service';
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'app-dashboard',
@@ -21,13 +22,20 @@ export class DashboardComponent implements OnInit {
 
 	user$ : Observable<UserInterface> | undefined;
 
-	unread = false;
+	unread = this.chatService.isUnread();
 
-	constructor(private userService: UserService, private chatService: ChatService) {
-		this.unread = chatService.isUnread();
+	constructor(private userService: UserService, private chatService: ChatService, private cookieService: CookieService) {
+		// Set cookie
+		this.cookieService.set('cookieName', 'koekje');
+
+		// Get cookie
+		const cookieValue = this.cookieService.get('connect.sid');
+		console.log('Cookie value:', cookieValue);
 	};
 
 	ngOnInit(): void {
 		this.user$ = this.userService.getUser();
 	}
+
+	// testvalue = window.Cookies
 }
