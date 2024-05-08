@@ -16,6 +16,6 @@ export class UserService {
 	};
 
 	registerUser(newUser: UserInterface) {
-		this.http.post(this.userUrl, newUser).subscribe();
+		return this.http.post(this.userUrl, newUser);
 	}
 }

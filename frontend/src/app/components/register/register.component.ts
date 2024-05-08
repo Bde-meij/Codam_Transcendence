@@ -23,6 +23,6 @@ export class RegisterComponent {
 	};
 
 	register() {
-		this.userService.registerUser(this.registration);
+		this.userService.registerUser(this.registration).subscribe(error => console.log(error));
 	};
 }
