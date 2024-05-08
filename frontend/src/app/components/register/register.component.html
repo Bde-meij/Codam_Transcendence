@@ -1,4 +1,4 @@
-<frame>
+
 
 	<label for="nickname">Nickname:</label>
 	<input type="text" id="nickname" [(ngModel)]="registration.nickname" placeholder="Enter a nickname here" />
@@ -10,9 +10,8 @@
 	<p>Now show yourself to Gary </p>
 
 	<label for="avatar">Avatar:</label>
-	<input type="file" id="avatar" [(ngModel)]="registration.avatar" placeholder="Enter an avatar here" />
+	<input type="file" id="avatar" [(ngModel)]="filename" />
 
 	<div>
 		<button class="logbutton" (click)="register()"> register </button>
 	</div>
-</frame>

@@ -16,8 +16,10 @@ export class RegisterComponent {
 	constructor(private userService: UserService, private router: Router) {};
 
 	success = false;
+	error = false;
 
 	default_avatar: File = new File(["default_avatar"], "/assets/src/images/default_avatar.png");
+	filename = "";
 
 	registration : UserInterface = {
 		intraId: '',
@@ -30,11 +32,15 @@ export class RegisterComponent {
 		// this.userService.registerUser(this.registration).subscribe(data => {console.log(data.error.message)});
 		this.userService.registerUser(this.registration).subscribe({
 			next: (v) => {console.log(v), this.success = true},
-			error: (e : HttpErrorResponse) => console.log(e.error.message),
+			error: (e : HttpErrorResponse) => {console.log(e.error.message), this.error=true},
 			complete: () => console.info('complete') 
 		});
 
 		if (this.success) {
+			console.log("success!");
+		}
+
+		if (!this.error) {
 			this.router.navigate(['/dashboard']);
 		}
 		
