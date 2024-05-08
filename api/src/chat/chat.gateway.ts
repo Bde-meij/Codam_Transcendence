@@ -26,11 +26,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	handleConnection(client: any, ...args: any[]) {
 		const { sockets } = this.io.sockets;
 
-		console.log("user " + client.id + " connected");
+		console.log("chat: user " + client.id + " connected");
 	}
 	
 	handleDisconnect(client: any) {
-		console.log("user " + client.id + " disconnected");
+		console.log("chat: user " + client.id + " disconnected");
 	}
 
 	@SubscribeMessage('message')
@@ -38,7 +38,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		@MessageBody() data: string,
 		@ConnectedSocket() client: Socket,
 	): string {
-		console.log('message recieved from ' + client.id + ': ' + data);
+		console.log('chat: message recieved from ' + client.id + ': ' + data);
 		client.broadcast.emit('message', data);
 		return data;
 	}

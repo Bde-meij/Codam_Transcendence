@@ -8,10 +8,9 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
 
   app.enableCors({
-    origin: ["http://localhost:4200"],
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true,
-  });
+	origin: ["http://localhost:4200"],
+	credentials: false,
+  })
 
   app.use(
     session({

@@ -9,6 +9,8 @@ import { SockService } from '../sock.service';
 export class ChatService{
 	private chatSocket = io("/chat");
 
+	private unread = false;
+
 	constructor(sockService: SockService) {
 		this.chatSocket.onAny((event, ...args) => {
 			console.log("CHAT-SOCK EVENT: ");
@@ -32,5 +34,9 @@ export class ChatService{
 				observer.next(message);
 			});
 		});
+	}
+	 
+	isUnread() {
+		return this.unread;
 	}
 }

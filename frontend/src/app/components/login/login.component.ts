@@ -16,8 +16,8 @@ export class LoginComponent {
   };
 
 	login() : void {
-		this.auth.login();
-		//window.location.href = `http://${this.hostname}:3000/api/auth/login`;
+		// this.auth.login();
+		window.location.href = '/api/auth/login';
 		// this.router.navigate(['/auth']);
 		// this.router.navigate(['/dashboard']);
 	}
