@@ -7,6 +7,11 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api');
 
+  app.enableCors({
+	origin: ["http://localhost:4200"],
+	credentials: false,
+  })
+
   app.use(
     session({
       secret: require('crypto').randomBytes(64).toString('hex'),
