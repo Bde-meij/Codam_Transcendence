@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { UserService } from '../../services/user/user.service';
 import { UserInterface } from '../../models/user.class';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-register',
@@ -11,7 +13,9 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './register.component.scss'
 })
 export class RegisterComponent {
-	constructor(private userService: UserService) {};
+	constructor(private userService: UserService, private router: Router) {};
+
+	success = false;
 
 	default_avatar: File = new File(["default_avatar"], "/assets/src/images/default_avatar.png");
 
@@ -23,6 +27,26 @@ export class RegisterComponent {
 	};
 
 	register() {
-		this.userService.registerUser(this.registration);
+		// this.userService.registerUser(this.registration).subscribe(data => {console.log(data.error.message)});
+		this.userService.registerUser(this.registration).subscribe({
+			next: (v) => {console.log(v), this.success = true},
+			error: (e : HttpErrorResponse) => console.log(e.error.message),
+			complete: () => console.info('complete') 
+		});
+
+		if (this.success) {
+			this.router.navigate(['/dashboard']);
+		}
+		
+		// this.userService.registerUser(this.registration).subscribe(
+		// 	// () => {
+		// 	// 	this.router.navigate(['/dashboard']);
+		// 	// },
+		// 	(error) => {
+		// 		console.log(error.message);
+		// 	}
+		// );
+		
+		// this.router.navigate(['/dashboard']);
 	};
 }
