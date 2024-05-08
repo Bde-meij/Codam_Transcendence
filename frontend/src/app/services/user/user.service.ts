@@ -17,6 +17,6 @@ export class UserService {
 	};
 
 	registerUser(newUser: UserInterface) {
-		return this.http.post("/api/auth/register", newUser);
+		return this.http.post<any>("/api/auth/register", newUser);
 	}
 }
