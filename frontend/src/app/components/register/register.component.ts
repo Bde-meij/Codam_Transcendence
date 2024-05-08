@@ -39,20 +39,5 @@ export class RegisterComponent {
 		if (this.success) {
 			console.log("success!");
 		}
-
-		if (!this.error) {
-			this.router.navigate(['/dashboard']);
-		}
-		
-		// this.userService.registerUser(this.registration).subscribe(
-		// 	// () => {
-		// 	// 	this.router.navigate(['/dashboard']);
-		// 	// },
-		// 	(error) => {
-		// 		console.log(error.message);
-		// 	}
-		// );
-		
-		// this.router.navigate(['/dashboard']);
 	};
 }
