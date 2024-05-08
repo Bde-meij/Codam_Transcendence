@@ -14,4 +14,8 @@ export class UserService {
 	getUser() : Observable<UserInterface>{
 		return this.http.get<UserInterface>(this.userUrl, {});
 	};
+
+	registerUser(newUser: UserInterface) {
+		this.http.post(this.userUrl, newUser).subscribe();
+	}
 }

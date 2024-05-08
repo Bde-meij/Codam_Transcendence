@@ -8,6 +8,7 @@ import { AccountComponent } from './components/account/account.component';
 import { AuthGuard } from './authguard';
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
 import { ChatComponent } from './components/chat/chat.component';
+import { RegisterComponent } from './components/register/register.component';
 
 export const routes: Routes = [
 	{
@@ -19,6 +20,10 @@ export const routes: Routes = [
 	{
 		path: 'welcome',
 		component: WelcomeComponent,
+	},
+	{
+		path: 'register',
+		component: RegisterComponent,
 	},
 	{
 		path: 'dashboard',
