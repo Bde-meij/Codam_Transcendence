@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Redirect } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, Redirect, HttpStatus, Session } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Response } from 'express';
 
 @Controller('user')
 export class UserController {
@@ -12,10 +13,9 @@ export class UserController {
     //return this.userService.create(createUserDto);
   }
 
-  @Get()
-  async findAll(@Req() req: Request) {
-	// console.log(req.headers.host);
-    //return await this.userService.findAll();
+  @Get('current')
+  async getUsername(@Res() res: Response, @Session() session: Record<string, any>) {
+    return await this.userService.findUserById(session.userId);
   }
 
   @Get(':id')

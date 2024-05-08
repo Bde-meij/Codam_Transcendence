@@ -8,12 +8,12 @@ import { Router } from '@angular/router';
   providedIn: 'root'
 })
 export class UserService {
-	private userUrl = "/api/user";
+	private userUrl = "/api/user/current";
 	// user$ : Observable<UserInterface>;
 	constructor(private http: HttpClient, private router: Router) { };
 
 	getUser() : Observable<UserInterface>{
-		return this.http.get<UserInterface>(this.userUrl, {});
+		return this.http.get<UserInterface>(this.userUrl);
 	};
 
 	registerUser(newUser: UserInterface) {
