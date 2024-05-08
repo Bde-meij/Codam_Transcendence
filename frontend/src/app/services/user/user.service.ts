@@ -17,13 +17,6 @@ export class UserService {
 	};
 
 	registerUser(newUser: UserInterface) {
-		this.http.post("/api/auth/register", newUser).subscribe(
-			() => {
-				this.router.navigate(['/dashboard']);
-			},
-			(error) => {
-				console.log(error);
-			}
-		);
+		return this.http.post("/api/auth/register", newUser);
 	}
 }
