@@ -11,7 +11,7 @@ export class AuthService {
 	constructor(private http: HttpClient) { };
 
 	register() : void {
-		this.http.post(this.authUrL + '/register', { });
+		this.http.post(this.authUrL + '/register', { }).subscribe();
 		console.log("authservice.register called");
 	}
 
@@ -22,7 +22,7 @@ export class AuthService {
 	};
 
 	logout() : void {
-		this.http.post(this.authUrL + '/logout', { });
+		this.http.post(this.authUrL + '/logout', { }).subscribe();
 		console.log("authservice.logout called");
 		this.loggedin = false;
 	}	
