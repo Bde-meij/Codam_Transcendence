@@ -15,6 +15,6 @@ import { UserService } from 'src/user/user.service';
   providers: [AuthService, {provide: 'AUTH_SERVICE', useClass: AuthService}, SessionSerializer, Repository, FortyTwoStrategy, UserService],
   imports: [PassportModule.register({defaultStratergy: 'fortytwo'}),
             TypeOrmModule.forFeature([User]),
-            ConfigModule.forRoot({isGlobal: true, envFilePath: '.env',})],
+            ConfigModule],
 })
 export class AuthModule {}
