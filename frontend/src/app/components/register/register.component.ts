@@ -22,7 +22,7 @@ export class RegisterComponent {
 	filename = "";
 
 	registration : UserInterface = {
-		intraId: '',
+		id: '',
 		nickname: '',
 		status: '',
 		avatar: this.default_avatar,

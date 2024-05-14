@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, Redirect, HttpStatus, Session } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, Redirect, HttpStatus, Session, UseGuards, Req } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Response } from 'express';
+import { JwtGuard } from 'src/auth/guard/jwt.guard';
 
 @Controller('user')
 export class UserController {
@@ -14,8 +15,11 @@ export class UserController {
   }
 
   @Get('current')
-  async getUsername(@Res() res: Response, @Session() session: Record<string, any>) {
-    return await this.userService.findUserById(session.userId);
+  @UseGuards(JwtGuard)
+  async getUsername(@Req() req) {
+	const user = await this.userService.findUserById(req.user.sub);
+	console.log("GET /api/user/current: ", user);
+    return user;
   }
 
   @Get(':id')

@@ -31,9 +31,11 @@ export class AuthController {
 
   @Get('callback')
   @UseGuards(AuthGuard('fortytwo'))
-  async callback(@Req() req: Request, @Res() res: Response, @Session() session: Record<string, any>) {
-    this.user = {id: (req.user as any).id, displayName: (req.user as any).displayName};
-    session.userId = this.user.id;
+  async callback(@Req() req: Request, @Res() res: Response) {
+    this.user = {id: (req.user as any).id, nickname: (req.user as any).nickname};
+	const token = await this.authService.getJwtAccessToken(this.user);
+	res.cookie("access_token", token.access_token);
+	console.log(token);
     if (!await this.userService.userExists(this.user.id)) {
         console.log("user not found");
         res.status(HttpStatus.FOUND).redirect(`http://${req.hostname}:4200/register`);
@@ -42,7 +44,6 @@ export class AuthController {
     {
       console.log("user found");
       const user = await this.userService.findUserById(this.user.id);
-      session.displayName = user.displayName;
       res.status(HttpStatus.FOUND).redirect(`http://${req.hostname}:4200/dashboard`);
     }
   }
@@ -52,8 +53,8 @@ export class AuthController {
   async register(@Req() req: Request, @Res() res: Response, @Session() session: Record<string, any>, @Body() data: any) {
     if (!await this.userService.findUserByName(data.nickname)) {
       if (!await this.userService.findUserById(data.userId)) {
-        session.displayName = data.nickname;
-        this.user.displayName = data.nickname;
+        session.nickname = data.nickname;
+        this.user.nickname = data.nickname;
         await this.userService.createUser(this.user);
         return res.status(HttpStatus.OK);
       }

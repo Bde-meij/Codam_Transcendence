@@ -1,5 +1,5 @@
 export interface UserInterface {
-	intraId: string;
+	id: string;
 	nickname: string;
 	status: string;
 	avatar: File;
