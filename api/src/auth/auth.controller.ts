@@ -50,10 +50,9 @@ export class AuthController {
   
   @Post('register')
   //@UseGuards(AuthGuard('fortytwo'))
-  async register(@Req() req: Request, @Res() res: Response, @Session() session: Record<string, any>, @Body() data: any) {
+  async register(@Req() req: Request, @Res() res: Response, @Body() data: any) {
     if (!await this.userService.findUserByName(data.nickname)) {
       if (!await this.userService.findUserById(data.userId)) {
-        session.nickname = data.nickname;
         this.user.nickname = data.nickname;
         await this.userService.createUser(this.user);
         return res.status(HttpStatus.OK);
