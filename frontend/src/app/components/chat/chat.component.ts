@@ -3,6 +3,11 @@ import { AsyncPipe, NgFor } from '@angular/common';
 import { ChatService } from '../../services/sock/chat/chat.service';
 import { FormsModule } from '@angular/forms';
 
+export interface MessageInterface {
+	sender: string,
+	message: string
+}
+
 @Component({
   selector: 'app-chat',
   standalone: true,
