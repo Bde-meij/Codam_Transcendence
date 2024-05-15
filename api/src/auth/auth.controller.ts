@@ -50,7 +50,7 @@ export class AuthController {
 	@UseGuards(JwtGuard)
 	//@UseGuards(AuthGuard('fortytwo'))
 	async register(@Req() req, @Res() res: Response, @Body() data: any) {
-	var user: User = {id: req.user.sub, nickname: data.nickname};
+	var user: User = {id: req.user.id, nickname: data.nickname};
 
 	if (await this.userService.findUserById(user.id))
 		return res.status(HttpStatus.FORBIDDEN).json({message: 'User already registered'});
