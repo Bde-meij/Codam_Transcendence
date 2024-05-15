@@ -1,3 +1,4 @@
+import { NotAcceptableException, Req } from '@nestjs/common';
 import {
 	ConnectedSocket,
 	MessageBody,
@@ -9,6 +10,8 @@ import {
 	WebSocketServer,
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
+import { AuthService } from 'src/auth/auth.service';
+import { UserService } from 'src/user/user.service';
 
 @WebSocketGateway({
 	cors: { origin: 'http://localhost:4200' },
@@ -19,27 +22,54 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	@WebSocketServer() io: Server;
 
+	constructor(private authService: AuthService, private userService: UserService) {}
+
 	afterInit() {
 		console.log("server initialized");
 	}
 
-	handleConnection(client: any, ...args: any[]) {
-		const { sockets } = this.io.sockets;
-
-		console.log("chat: user " + client.id + " connected");
+	async handleConnection(client: Socket) {
+		try {
+			console.log(client.id, "connecting...");
+			const cookies = client.handshake.headers.cookie?.split('; ');
+			if (!cookies)
+				throw new NotAcceptableException();
+			var token: string;
+			for (var cookie of cookies) {
+				const [key, value] = cookie.split('=');
+				// console.log(value);
+				if (key === 'access_token') {
+					token = value;
+					break;
+				}
+			}
+			if (!token)
+				throw new NotAcceptableException();
+			const payload = await this.authService.verifyJwtAccessToken(token);
+			const user = await this.userService.findUserById(payload.id);
+			if (!user)
+				throw new NotAcceptableException();
+			client.data.nickname = user.nickname;
+			console.log(user.nickname, "connected on socket:", client.id);
+		} catch {
+			console.log(client.id, "connection refused");
+			client.disconnect();
+			return;
+		}
+		
 	}
 	
 	handleDisconnect(client: any) {
 		console.log("chat: user " + client.id + " disconnected");
 	}
-
+	
 	@SubscribeMessage('message')
-	handleMessage(
+	async handleMessage(
 		@MessageBody() data: string,
 		@ConnectedSocket() client: Socket,
-	): string {
-		console.log('chat: message recieved from ' + client.id + ': ' + data);
-		client.broadcast.emit('message', data);
+	) {
+		console.log('chat: message recieved from ' + client.data.nickname + ': ' + data);
+		client.broadcast.emit('message', client.data.nickname + ": " + data);
 		return data;
 	}
 }

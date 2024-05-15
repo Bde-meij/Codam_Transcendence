@@ -19,7 +19,7 @@ import { User } from 'src/user/entities/user.entity';
 				synchronize: configService.getOrThrow('POSTGRES_SYNC'),
 				logging: true,
 			})
-		  }),
+		}),
 	]
 })
 export class DatabaseModule {}

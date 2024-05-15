@@ -7,33 +7,41 @@ import { JwtGuard } from 'src/auth/guard/jwt.guard';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+	constructor(private readonly userService: UserService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    //return this.userService.create(createUserDto);
-  }
+	@Post()
+	create(@Body() createUserDto: CreateUserDto) {
+		//return this.userService.create(createUserDto);
+	}
 
-  @Get('current')
-  @UseGuards(JwtGuard)
-  async getUsername(@Req() req) {
-	const user = await this.userService.findUserById(req.user.sub);
-	console.log("GET /api/user/current: ", user);
-    return user;
-  }
+	@Get('current')
+	@UseGuards(JwtGuard)
+	async getUsername(@Req() req) {
+		const user = await this.userService.findUserById(req.user.sub);
+		return user;
+	}
+	
+	@Get(':id')
+	@UseGuards(JwtGuard)
+	async findUserById(@Req() req, @Param('id') id: string) {
+		const user = await this.userService.findUserById(req.user.sub);
+		return user;
+	}
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    //return this.userService.findOne(+id);
-  }
+	@Get('/name/:id')
+	@UseGuards(JwtGuard)
+	async findUserByName(@Req() req, @Param('name') name: string) {
+		const user = await this.userService.findUserByName(name);
+		return user;
+	}
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    //return this.userService.update(+id, updateUserDto);
-  }
+	@Patch(':id')
+	update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+		//return this.userService.update(+id, updateUserDto);
+	}
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    //return this.userService.remove(+id);
-  }
+	@Delete(':id')
+	remove(@Param('id') id: string) {
+		//return this.userService.remove(+id);
+	}
 }

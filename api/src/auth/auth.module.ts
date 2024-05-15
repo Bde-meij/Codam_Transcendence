@@ -12,21 +12,29 @@ import { UserService } from 'src/user/user.service';
 import { JwtModule } from '@nestjs/jwt';
 
 @Module({
-  controllers: [AuthController],
-  providers: [AuthService, {provide: 'AUTH_SERVICE', useClass: AuthService}, SessionSerializer, Repository, FortyTwoStrategy, UserService],
-  imports: [PassportModule.register({defaultStratergy: 'fortytwo'}),
-  TypeOrmModule.forFeature([User]),
-  ConfigModule,
-  JwtModule.registerAsync({
-	  inject: [ConfigService],
-	useFactory: async (configService: ConfigService) => {
-		return {
-			global: true,
-			secret: configService.getOrThrow('JWT_SECRET'),
-			signOptions: {expiresIn: '1h'},
-		}
-	}
-  })
-		],
+	controllers: [AuthController],
+	providers: [
+		AuthService, {provide: 'AUTH_SERVICE', useClass: AuthService},
+		SessionSerializer,
+		Repository,
+		FortyTwoStrategy,
+		UserService
+	],
+	imports: [
+		PassportModule.register({defaultStratergy: 'fortytwo'}),
+		TypeOrmModule.forFeature([User]),
+		ConfigModule,
+		JwtModule.registerAsync({
+			inject: [ConfigService],
+			useFactory: async (configService: ConfigService) => {
+				return {
+					global: true,
+					secret: configService.getOrThrow('JWT_SECRET'),
+					signOptions: {expiresIn: '1h'},
+				}
+			}
+		})
+	],
+	exports: [AuthService],
 })
 export class AuthModule {}

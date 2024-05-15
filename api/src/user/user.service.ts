@@ -10,27 +10,27 @@ export class UserService {
 	constructor(@InjectRepository(User) private readonly userRepo: Repository<User>) {}
 
   async userExists(id: string)
-  {
-    const user = await this.userRepo.findOne({where: {id}});
-    if (user)
-      return true;
-    return false;
-  } 
+	{
+		const user = await this.userRepo.findOne({where: {id}});
+		if (user)
+			return true;
+		return false;
+	} 
 
-  async createUser(userData: any) {
-    const newUser = await this.userRepo.create(userData);
-    const savedUser = await this.userRepo.save(newUser);
-    return savedUser;
-  }
+	async createUser(userData: any) {
+		const newUser = await this.userRepo.create(userData);
+		const savedUser = await this.userRepo.save(newUser);
+		return savedUser;
+	}
 
-  async findUserById(id: string) {
-    const user = await this.userRepo.findOne({where: {id}});
-    return user;
-  }
+	async findUserById(id: string) {
+		const user = await this.userRepo.findOne({where: {id}});
+		return user;
+	}
 
-  async findUserByName(name: string) {
-    const user = await this.userRepo.findOne({where: {nickname :name}});
-    console.log(user);
-    return user;
-  }
+	async findUserByName(name: string) {
+		const user = await this.userRepo.findOne({where: {nickname :name}});
+		console.log(user);
+		return user;
+	}
 }

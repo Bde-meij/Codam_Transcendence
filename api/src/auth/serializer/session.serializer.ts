@@ -6,18 +6,18 @@ import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class SessionSerializer extends PassportSerializer {
-  constructor(
-    @Inject('AUTH_SERVICE') private readonly userService: UserService,
-  ) {
-    super();
-  }
+	constructor(
+		@Inject('AUTH_SERVICE') private readonly userService: UserService,
+	) {
+		super();
+	}
 
-  serializeUser(user: User, done: Function) {
-    done(null, user);
-  }
+	serializeUser(user: User, done: Function) {
+		done(null, user);
+	}
 
-  async deserializeUser(payload: any, done: Function) {
-    const user = await this.userService.findUserById(payload.id);
-    return user ? done(null, user) : done(null, null);
-  }
+	async deserializeUser(payload: any, done: Function) {
+		const user = await this.userService.findUserById(payload.id);
+		return user ? done(null, user) : done(null, null);
+	}
 }

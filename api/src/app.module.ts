@@ -9,15 +9,18 @@ import { DatabaseModule } from './database/database.module';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [
-    AuthModule,
-    DatabaseModule,
-    UserModule,
-    GameModule,
-    DatabaseModule,
-	ConfigModule.forRoot({isGlobal: true, envFilePath: '.env',}),
-  ],
-  controllers: [],
-  providers: [ChatGateway],
+	imports: [
+		AuthModule,
+		DatabaseModule,
+		UserModule,
+		GameModule,
+		DatabaseModule,
+		ConfigModule.forRoot({
+			isGlobal: true,
+			envFilePath: '.env',
+		}),
+	],
+	controllers: [],
+	providers: [ChatGateway],
 })
 export class AppModule {}

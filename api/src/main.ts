@@ -3,17 +3,17 @@ import { AppModule } from './app.module';
 import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+	const app = await NestFactory.create(AppModule);
 
-  app.setGlobalPrefix('api');
+	app.setGlobalPrefix('api');
 
-  app.enableCors({
-	origin: ["http://f1r3s14.codam.nl:4200"],
-	credentials: false,
-  })
+	app.enableCors({
+		origin: ["http://f1r3s14.codam.nl:4200"],
+		credentials: false,
+	})
 
-  app.use(cookieParser());
+	app.use(cookieParser());
 
-  await app.listen(3000);
+	await app.listen(3000);
 }
 bootstrap();
