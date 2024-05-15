@@ -31,7 +31,10 @@ export class RegisterComponent {
 	register() {
 		// this.userService.registerUser(this.registration).subscribe(data => {console.log(data.error.message)});
 		this.userService.registerUser(this.registration).subscribe({
-			next: (v) => {console.log(v), this.success = true},
+			next: (v) => {
+				console.log(v), this.success = true,
+				this.router.navigate(['/dashboard']);
+			},
 			error: (e : HttpErrorResponse) => {console.log(e.error.message), this.error=true},
 			complete: () => console.info('complete') 
 		});
