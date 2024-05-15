@@ -21,13 +21,14 @@ export class DashboardComponent implements OnInit {
 
 	user$ : Observable<UserInterface> | undefined;
 
-	unread = false;
+	unread = this.chatService.isUnread();
 
 	constructor(private userService: UserService, private chatService: ChatService) {
-		this.unread = chatService.isUnread();
 	};
 
 	ngOnInit(): void {
 		this.user$ = this.userService.getUser();
 	}
+
+	// testvalue = window.Cookies
 }
