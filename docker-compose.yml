@@ -38,10 +38,7 @@ services:
   #database
   postgres:
     image: postgres:12-alpine
-    environment:
-      POSTGRES_PASSWORD: password
-      POSTGRES_USERNAME: postgres
-      POSTGRES_DB: app
+    env_file: ./api/.env
     ports:
       - 5432:5432
   adminer:

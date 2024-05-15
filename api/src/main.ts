@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import * as session from 'express-session';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -8,17 +8,11 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
 
   app.enableCors({
-	origin: ["http://localhost:4200"],
+	origin: ["http://f1r3s14.codam.nl:4200"],
 	credentials: false,
   })
 
-  app.use(
-    session({
-      secret: require('crypto').randomBytes(64).toString('hex'),
-      resave: false,
-      saveUninitialized: false,
-    })
-  )
+  app.use(cookieParser());
 
   await app.listen(3000);
 }

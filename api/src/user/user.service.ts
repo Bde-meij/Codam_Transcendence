@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Res, HttpStatus } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -9,24 +9,28 @@ import { User } from './entities/user.entity';
 export class UserService {
 	constructor(@InjectRepository(User) private readonly userRepo: Repository<User>) {}
 
+  async userExists(id: string)
+  {
+    const user = await this.userRepo.findOne({where: {id}});
+    if (user)
+      return true;
+    return false;
+  } 
 
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  async createUser(userData: any) {
+    const newUser = await this.userRepo.create(userData);
+    const savedUser = await this.userRepo.save(newUser);
+    return savedUser;
   }
 
-  async findAll() {
-    return await this.userRepo.find();
+  async findUserById(id: string) {
+    const user = await this.userRepo.findOne({where: {id}});
+    return user;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
-
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async findUserByName(name: string) {
+    const user = await this.userRepo.findOne({where: {nickname :name}});
+    console.log(user);
+    return user;
   }
 }

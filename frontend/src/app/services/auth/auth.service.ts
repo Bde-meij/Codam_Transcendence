@@ -7,8 +7,11 @@ import { Injectable } from '@angular/core';
 export class AuthService {
 	private loggedin = false;
 	private authUrL = "/api/auth";
+	private hostname: string;
 	
-	constructor(private http: HttpClient) { };
+	constructor(private http: HttpClient) {
+		this.hostname = window.location.hostname;
+	};
 
 	register() : void {
 		this.http.post(this.authUrL + '/register', { }).subscribe();

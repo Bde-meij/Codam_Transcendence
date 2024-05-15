@@ -7,5 +7,5 @@ export class User {
     id: string;
 
     @Column()
-    displayName: string;
+    nickname: string;
 }
