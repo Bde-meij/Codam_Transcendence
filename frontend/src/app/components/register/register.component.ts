@@ -71,8 +71,6 @@ export class RegisterComponent {
 	// 	}
 	// };
 
-	
-
 	uploadFile(event: Event) {
 		const element = event.currentTarget as HTMLInputElement;
 		let fileList: FileList | null = element.files;
