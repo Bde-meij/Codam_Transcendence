@@ -47,10 +47,12 @@ export class AuthController {
 	}
 	
 	@Post('register')
-	@UseGuards(JwtGuard)
+	// @UseGuards(JwtGuard)
 	//@UseGuards(AuthGuard('fortytwo'))
 	async register(@Req() req, @Res() res: Response, @Body() data: any) {
-	var user: User = {id: req.user.id, nickname: data.nickname};
+	var user: User = {id: "1234", nickname: data.nickname};
+
+	console.log("IMAGE TEST:", data.avatar);
 
 	if (await this.userService.findUserById(user.id))
 		return res.status(HttpStatus.FORBIDDEN).json({message: 'User already registered'});
@@ -59,6 +61,6 @@ export class AuthController {
 		return res.status(HttpStatus.FORBIDDEN).json({message: 'Name is already taken'});
 
 	await this.userService.createUser(user);
-	return res.status(HttpStatus.OK).json({message: 'User registered'});
+		return res.status(HttpStatus.OK).json({message: 'User registered'});
 	}
 }

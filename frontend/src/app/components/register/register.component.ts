@@ -22,7 +22,7 @@ export class RegisterComponent {
 	default_avatar: File = new File(["default_avatar"], "/assets/images/avatar_default.png");
 	// filename = "/assets/src/images/default_avatar.png";
 	filename = "";
-	updated_avatar: File | undefined;
+	updated_avatar: File | undefined = this.default_avatar;
 
 	registration : UserInterface = {
 		id: '',
@@ -31,24 +31,6 @@ export class RegisterComponent {
 		avatar: this.default_avatar,
 	};
 
-	register() {
-		// if (this.filename != "") {
-		// 	this.registration.avatar = new File(["my_avatar"], this.filename);
-		// }
-		// this.userService.registerUser(this.registration).subscribe(data => {console.log(data.error.message)});
-		this.userService.registerUser(this.registration).subscribe({
-			next: (v) => {
-				console.log(v), this.success = true,
-				this.router.navigate(['/dashboard']);
-			},
-			error: (e : HttpErrorResponse) => {console.log(e.error.message), this.error=true},
-			complete: () => console.info('complete') 
-		});
-
-		if (this.success) {
-			console.log("success!");
-		}
-	};
 
 	// form = new FormGroup({
 	// 	title: new FormControl(""),
@@ -77,6 +59,27 @@ export class RegisterComponent {
 		if (fileList) {
 			console.log("FileUpload -> files", fileList);
 			this.updated_avatar = fileList[0];
+			console.log("updated avatar : ", this.updated_avatar);
 		}
 	};
+
+	register() {
+		// if (this.filename != "") {
+		// 	this.registration.avatar = new File(["my_avatar"], this.filename);
+		// }
+		// this.userService.registerUser(this.registration).subscribe(data => {console.log(data.error.message)});
+		this.userService.registerUser(this.registration).subscribe({
+			next: (v) => {
+				console.log(v), this.success = true,
+				this.router.navigate(['/dashboard']);
+			},
+			error: (e : HttpErrorResponse) => {console.log(e.error.message), this.error=true},
+			complete: () => console.info('complete') 
+		});
+
+		if (this.success) {
+			console.log("success!");
+		}
+	};
+
 }
