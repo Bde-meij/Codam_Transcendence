@@ -3,7 +3,7 @@ import{Actor,Engine,Color,Keys,vec,ExcaliburGraphicsContext,Vector}from "excalib
 import{Player,Ball,addAfterImage}from "./gameActors";
 import{makeLines,drawScore,leftScorePos,rightScorePos}from "./lineDrawing";
 import{io, Socket}from "socket.io-client";
-import { SockService } from '../../services/sock/sock.service';
+import { GameService } from '../../services/sock/game/game.service';
 
 @Component({
   selector: 'app-game',
@@ -29,7 +29,9 @@ export class GameComponent implements OnInit, OnDestroy
 	playernum: number = 0;
 	lScore: number = 0;
 	rScore: number = 0;
-	gameSrv = io('/game');
+	gameSrv = io("/game");
+
+	// constructor(private gameSrv: GameService){};
 
 	game = new Engine(
 	{
