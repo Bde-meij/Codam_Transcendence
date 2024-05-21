@@ -2,15 +2,10 @@ import { Injectable } from '@angular/core';
 import { io } from 'socket.io-client';
 import { SockService } from '../sock.service';
 
-export interface Positions {
-	yPosP1: number;
-	yPosP2: number;
-}
-
 @Injectable({
-	providedIn: 'root'
+  providedIn: 'root'
 })
-export class GameService {
+export class GameService{
 	private gameSocket = io("/game");
 
 	constructor(sockService: SockService) {

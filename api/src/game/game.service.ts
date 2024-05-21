@@ -1,52 +1,26 @@
-import { HttpException, Injectable } from '@nestjs/common';
-import { GamePositionsDto } from './dto/game-positions.dto';
+import { Injectable } from '@nestjs/common';
+import { CreateGameDto } from './dto/create-game.dto';
+import { UpdateGameDto } from './dto/update-game.dto';
 
 @Injectable()
 export class GameService {
-	private positions: GamePositionsDto = {
-		yPosP1: 0,
-		yPosP2: 0
-	};
-	
-	constructor() {};
+  create(createGameDto: CreateGameDto) {
+    return 'This action adds a new game';
+  }
 
-	pos(): GamePositionsDto	{
-		console.log('pos()');
-		return (this.positions);
-	}
+  findAll() {
+    return `This action returns all game`;
+  }
 
-	startKey(player: string, amount: number) {
-		if (player === '1')
-			this.positions.yPosP1 = amount;
-		else if (player === '2')
-			this.positions.yPosP2 = amount;
-		else
-			throw new HttpException('Invalid player', 400);
-		console.log('player 1: %d', this.positions.yPosP1);
-		console.log('player 2: %d', this.positions.yPosP2);
-	}
+  findOne(id: number) {
+    return `This action returns a #${id} game`;
+  }
 
-	// y = 0 at top, switched up-= and down+= -bas-
+  update(id: number, updateGameDto: UpdateGameDto) {
+    return `This action updates a #${id} game`;
+  }
 
-	upKey(player: string, amount: number) {
-		if (player === '1')
-			this.positions.yPosP1 -= amount;
-		else if (player === '2')
-			this.positions.yPosP2 -= amount;
-		else
-			throw new HttpException('Invalid player', 400);
-		console.log('player 1: %d', this.positions.yPosP1);
-		console.log('player 2: %d', this.positions.yPosP2);
-	}
-
-	downKey(player: string, amount: number) {
-		if (player === '1')
-			this.positions.yPosP1 += amount;
-		else if (player === '2')
-			this.positions.yPosP2 += amount;
-		else
-			throw new HttpException('Invalid player', 400);
-		console.log('player 1: %d', this.positions.yPosP1);
-		console.log('player 2: %d', this.positions.yPosP2);
-	}
+  remove(id: number) {
+    return `This action removes a #${id} game`;
+  }
 }
