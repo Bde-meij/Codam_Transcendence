@@ -35,11 +35,11 @@ export class RegisterComponent implements OnInit{
 		id: '',
 		nickname: '',
 		status: '',
-		avatar: this.default_avatar,
+		avatar: new FormData,
 	};
 
 	ngOnInit(): void {
-		this.avatarInfo = this.userService.getAvatar();
+		// this.avatarInfo = this.userService.getAvatar();
 	}
 
 	// form = new FormGroup({
@@ -131,8 +131,17 @@ export class RegisterComponent implements OnInit{
 
 	register() {
 		// if (this.filename != "") {
-		// 	this.registration.avatar = new File(["my_avatar"], this.filename);
+			// this.registration.avatar = new File(["my_avatar"], this.filename);
 		// }
+		// const formData : FormData = new FormData();
+	
+		if (this.currentfile) {
+			console.log("current file : ", this.currentfile);
+			this.registration.avatar.append('file', this.currentfile);
+		} else {
+			this.registration.avatar.append('file', this.default_avatar);
+		}
+		// this.registration.avatar = formData;
 		// this.userService.registerUser(this.registration).subscribe(data => {console.log(data.error.message)});
 		this.userService.registerUser(this.registration).subscribe({
 			next: (v) => {
