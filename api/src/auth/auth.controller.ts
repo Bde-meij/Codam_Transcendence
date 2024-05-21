@@ -52,7 +52,7 @@ export class AuthController {
 	async register(@Req() req, @Res() res: Response, @Body() data: any) {
 	var user: User = {id: "1234", nickname: data.nickname};
 
-	console.log("IMAGE TEST:", data.avatar);
+	console.log("IMAGE TEST:", data);
 
 	if (await this.userService.findUserById(user.id))
 		return res.status(HttpStatus.FORBIDDEN).json({message: 'User already registered'});
