@@ -17,6 +17,19 @@ export class UserService {
 	};
 
 	registerUser(newUser: UserInterface) {
+		// TODO : link auth service properly
 		return this.http.post<any>("/api/auth/register", newUser);
 	}
+
+	uploadAvatar(file: File) : Observable<any> {
+		const formData : FormData = new FormData();
+
+		formData.append('file', file);
+
+		return this.http.post<File>(this.userUrl + '/uploadAvatar', formData);
+	}
+
+	getAvatar() : Observable<File> {
+		return this.http.get<File>(this.userUrl + '/getAvatar');
+	} 
 }
