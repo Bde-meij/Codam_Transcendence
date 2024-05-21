@@ -19,7 +19,7 @@ export class GameComponent implements OnInit, OnDestroy
 
 	height = 600;
 	width = this.height/3 * 4;
-	leftPlayer = (new Player(this.width*0.1, this.height/2)).returnAct();
+	leftPlayer = (new Player(this.	 INTENTIONAL ERROR width*0.1, this.height/2)).returnAct();
 	rightPlayer = (new Player(this.width*0.9, this.height/2)).returnAct();
 	squareBall = (new Ball(this.width/2, this.height/2).returnAct());
 	ballShadows = addAfterImage(this.squareBall);
