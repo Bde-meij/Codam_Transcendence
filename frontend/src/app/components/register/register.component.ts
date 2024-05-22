@@ -1,19 +1,26 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { UserService } from '../../services/user/user.service';
 import { UserInterface } from '../../models/user.class';
 import { FormControl, FormGroup, FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { HttpErrorResponse } from '@angular/common/http';
-import { NgOptimizedImage } from '@angular/common';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { AsyncPipe, NgOptimizedImage } from '@angular/common';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [FormsModule, NgOptimizedImage],
+  imports: [FormsModule, NgOptimizedImage, AsyncPipe],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss'
 })
-export class RegisterComponent {
+export class RegisterComponent implements OnInit{
+	currentfile?: File;
+	message = "";
+	preview = "";
+	
+	avatarInfo?: Observable<any>;
+
 	constructor(private userService: UserService, private router: Router) {};
 
 	success = false;
@@ -22,33 +29,18 @@ export class RegisterComponent {
 	default_avatar: File = new File(["default_avatar"], "/assets/images/avatar_default.png");
 	// filename = "/assets/src/images/default_avatar.png";
 	filename = "";
-	updated_avatar: File | undefined;
+	updated_avatar: File | undefined = this.default_avatar;
 
 	registration : UserInterface = {
 		id: '',
 		nickname: '',
 		status: '',
-		avatar: this.default_avatar,
+		avatar: new FormData,
 	};
 
-	register() {
-		// if (this.filename != "") {
-		// 	this.registration.avatar = new File(["my_avatar"], this.filename);
-		// }
-		// this.userService.registerUser(this.registration).subscribe(data => {console.log(data.error.message)});
-		this.userService.registerUser(this.registration).subscribe({
-			next: (v) => {
-				console.log(v), this.success = true,
-				this.router.navigate(['/dashboard']);
-			},
-			error: (e : HttpErrorResponse) => {console.log(e.error.message), this.error=true},
-			complete: () => console.info('complete') 
-		});
-
-		if (this.success) {
-			console.log("success!");
-		}
-	};
+	ngOnInit(): void {
+		// this.avatarInfo = this.userService.getAvatar();
+	}
 
 	// form = new FormGroup({
 	// 	title: new FormControl(""),
@@ -71,12 +63,98 @@ export class RegisterComponent {
 	// 	}
 	// };
 
-	uploadFile(event: Event) {
+
+	selectFile(event: any) {
+		this.message = '';
+		this.preview = '';
+		const	selectedFiles = event.target.files;
+		if (selectedFiles) {
+			const file: File | null = selectedFiles.item(0);
+
+			if (file) {
+				this.preview = '';
+				this.currentfile = file;
+			
+				const reader = new FileReader();
+				reader.onload = (e: any) => {
+					console.log("e.target.result: ", e.target.result);
+					this.preview = e.target.result;
+				};
+
+				reader.readAsDataURL(this.currentfile);
+			}
+		}
+	};
+
+	uploadFile() {
+		if (this.currentfile) {
+			this.userService.uploadAvatar(this.currentfile).subscribe({
+				next: (event:any) => {
+					if (event instanceof HttpResponse) {
+						this.message = event.body.message;
+						// this.avatarInfo = this.userService.getAvatar();
+					}
+				},
+				error: (err: any) => {
+					console.log(err);
+
+					if (err.error && err.error.message) {
+						this.message = err.error.message;
+					} else {
+						this.message = "could not upload the file!";
+					}
+				},
+				complete: () => {
+					this.currentfile = undefined;
+				}
+			});
+		}
+	}
+
+	olduploadFile(event: Event) {
 		const element = event.currentTarget as HTMLInputElement;
 		let fileList: FileList | null = element.files;
 		if (fileList) {
 			console.log("FileUpload -> files", fileList);
+			
+			const reader = new FileReader();
+			reader.onload = (e: any) => {
+				console.log("e.target.result: ", e.target.result);
+        		this.preview = e.target.result;
+			};
+
 			this.updated_avatar = fileList[0];
+			reader.readAsDataURL(fileList[0]);
+			console.log("updated avatar : ", this.updated_avatar);
 		}
 	};
+
+	register() {
+		// if (this.filename != "") {
+			// this.registration.avatar = new File(["my_avatar"], this.filename);
+		// }
+		// const formData : FormData = new FormData();
+	
+		if (this.currentfile) {
+			console.log("current file : ", this.currentfile);
+			this.registration.avatar.append('file', this.currentfile);
+		} else {
+			this.registration.avatar.append('file', this.default_avatar);
+		}
+		// this.registration.avatar = formData;
+		// this.userService.registerUser(this.registration).subscribe(data => {console.log(data.error.message)});
+		this.userService.registerUser(this.registration).subscribe({
+			next: (v) => {
+				console.log(v), this.success = true,
+				this.router.navigate(['/dashboard']);
+			},
+			error: (e : HttpErrorResponse) => {console.log(e.error.message), this.error=true},
+			complete: () => console.info('complete') 
+		});
+
+		if (this.success) {
+			console.log("success!");
+		}
+	};
+
 }

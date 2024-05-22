@@ -2,7 +2,7 @@ export interface UserInterface {
 	id: string;
 	nickname: string;
 	status: string;
-	avatar: File;
+	avatar: FormData; //File?
 }
 
 // export class User {

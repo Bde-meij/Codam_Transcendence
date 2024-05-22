@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, Redirect, HttpStatus, Session, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, Redirect, HttpStatus, Session, UseGuards, Req, HttpCode, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Response } from 'express';
 import { JwtGuard } from 'src/auth/guard/jwt.guard';
+import { Express } from 'express'
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('user')
 export class UserController {
@@ -44,4 +46,30 @@ export class UserController {
 	remove(@Param('id') id: string) {
 		//return this.userService.remove(+id);
 	}
+
+
+	@Get('getAvatar')
+	@UseGuards(JwtGuard)
+	async getAvatar(@Req() req) {
+		const user = await this.userService.findUserById(req.user.id);
+		// return user.avatar; // TO DO : add avatar to user
+		return ;
+	}
+
+	@Post('uploadAvatar')
+	@UseGuards(JwtGuard)
+	@UseInterceptors(FileInterceptor('file'))
+	async uploadAvatar(@Req() req, @UploadedFile() file: Express.Multer.File) {
+		console.log("MY DATA: ", file);
+		return ;
+	}
+
 }
+
+
+
+// @Post('upload')
+// @UseInterceptors(FileInterceptor('file'))
+// uploadFile(@UploadedFile() file: Express.Multer.File) {
+//   console.log(file);
+// }
