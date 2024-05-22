@@ -6,6 +6,7 @@
 		<ul class="friends">
 			<li *ngFor="let friend of friends">
 			<button [class.selected]="friend === selectedFriend" type="button" (click)="onSelect(friend)">
+				<!-- <app-user-detail [user]="selectedFriend"></app-user-detail> -->
 				<span class="badge">{{ friend.id }}</span>
 				<span class="name">{{ friend.name }}</span>
 			</button>
@@ -14,9 +15,7 @@
 	</div>
 
 	<div class="friend_column" *ngIf="selectedFriend">
-		<h3> {{selectedFriend.name | uppercase }} </h3>
-		<div><span>id: </span>{{selectedFriend.id}}</div>
-		<div><span>name: </span>{{selectedFriend.name}}</div>
+		<app-user-detail [user]="selectedFriend"></app-user-detail>
 	</div>
 
 	<div class="friend_column">

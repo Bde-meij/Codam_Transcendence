@@ -1,6 +1,6 @@
 <p>account works!</p>
 
-<div>
+<!-- <div>
 	<h2>{{ user.nickname }}</h2>
 
 	<h3> current avatar (if any) </h3>
@@ -16,13 +16,18 @@
 		status: {{ user.status }}
 	</p>
 	
-</div>
+</div> -->
 
-<app-user-detail></app-user-detail>
 
-<h2>{{testuser.name | uppercase }} Details</h2>
+<app-user-detail [user]="passuser"></app-user-detail>
+
+<!-- <div *ngIf="passuser">
+	<app-user-detail [user]="passuser"></app-user-detail>
+</div> -->
+
+<!-- <h2>{{testuser.name | uppercase }} Details</h2>
 <div><span>id: </span>{{testuser.id}}</div>
-<div><span>name: </span>{{testuser.name}}</div>
+<div><span>name: </span>{{testuser.name}}</div> -->
 
 <!-- <div>
   <label for="name">user name: </label>
