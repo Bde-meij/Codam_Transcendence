@@ -50,7 +50,7 @@ export class AuthController {
 	// @UseGuards(JwtGuard)
 	//@UseGuards(AuthGuard('fortytwo'))
 	async register(@Req() req, @Res() res: Response, @Body() data: any) {
-	var user: User = {id: "1234", nickname: data.nickname};
+	var user: User = {id: req.id, nickname: data.nickname};
 
 	console.log("IMAGE TEST:", data);
 

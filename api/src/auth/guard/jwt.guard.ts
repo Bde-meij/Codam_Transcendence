@@ -25,7 +25,7 @@ export class JwtGuard implements CanActivate {
 
 	private extractTokenFromHeader(request: Request): string | undefined {
 		const token = request.cookies['access_token']
-		// console.log("jwt guard: extractTokenFromHeader():", token);
+		console.log("jwt guard: extractTokenFromHeader():", token);
 		return (token);
 	}
 }

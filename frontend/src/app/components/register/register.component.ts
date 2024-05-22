@@ -92,7 +92,7 @@ export class RegisterComponent implements OnInit{
 				next: (event:any) => {
 					if (event instanceof HttpResponse) {
 						this.message = event.body.message;
-						this.avatarInfo = this.userService.getAvatar();
+						// this.avatarInfo = this.userService.getAvatar();
 					}
 				},
 				error: (err: any) => {
