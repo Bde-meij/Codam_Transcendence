@@ -1,4 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { GameService } from '../../services/sock/game/game.service';
 // import{Actor,Engine,Color,Keys,vec,ExcaliburGraphicsContext,Vector}from "excalibur";
 // import{Player,Ball,addAfterImage}from "./gameActors";
 // import{makeLines,drawScore,leftScorePos,rightScorePos}from "./lineDrawing";
@@ -30,7 +31,7 @@ export class GameComponent implements OnInit, OnDestroy
 	// rScore: number = 0;
 
 
-	// constructor(private gameSrv: GameService){};
+	constructor(private gameService: GameService){};
 
 	// game = new Engine(
 	// {
@@ -48,6 +49,9 @@ export class GameComponent implements OnInit, OnDestroy
 	// }
 	ngOnInit()
 	{
+		this.gameService.connect();
+		
+
 		// console.log("frontend game initiated");
 		
 
@@ -199,5 +203,6 @@ export class GameComponent implements OnInit, OnDestroy
 		// this.game?.stop();
 		// this.game?.canvas.remove();
 		// delete this.game;
+		this.gameService.disconnect();
 	}
 }

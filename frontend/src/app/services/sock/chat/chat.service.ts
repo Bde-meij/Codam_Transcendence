@@ -9,7 +9,7 @@ import { SockService } from '../sock.service';
 export class ChatService{
 	private chatSocket = io("/chat");
 
-	private unread = false;
+	private unread = true;
 
 	constructor(sockService: SockService) {
 		this.chatSocket.onAny((event, ...args) => {
