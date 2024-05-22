@@ -1,15 +1,41 @@
 <h2> Friends! </h2>
 <div class="friend_container">
-   <div class="friend_column">
-	 <h3> Your friends </h3>
-	 <p> This is first column of our grid system </p>
-   </div>
-   <div class="friend_column">
-	 <h3> incoming requests </h3>
-	 <p> This is second column of our grid system </p>
-   </div>
-   <div class="friend_column">
-	 <h3> outgoing requests </h3>
-	 <p> This is third column of our grid system </p>
-   </div>
+	<div class="friend_column">
+		<h3> Your friends </h3>
+
+		<ul class="friends">
+			<li *ngFor="let friend of friends">
+			<button [class.selected]="friend === selectedFriend" type="button" (click)="onSelect(friend)">
+				<span class="badge">{{ friend.id }}</span>
+				<span class="name">{{ friend.name }}</span>
+			</button>
+			</li>
+		</ul>
+	</div>
+
+	<div class="friend_column" *ngIf="selectedFriend">
+		<h3> {{selectedFriend.name | uppercase }} </h3>
+		<div><span>id: </span>{{selectedFriend.id}}</div>
+		<div><span>name: </span>{{selectedFriend.name}}</div>
+	</div>
+
+	<div class="friend_column">
+		<h3> incoming requests </h3>
+		<p> ... </p>
+	</div>
+
+	<div class="friend_column">
+		<h3> outgoing requests </h3>
+		<p> ... </p>
+	</div>
 </div>
+
+
+<!-- <div *ngIf="selectedHero">
+	<h2>{{selectedHero.name | uppercase}} Details</h2>
+	<div>id: {{selectedHero.id}}</div>
+	<div>
+	  <label for="hero-name">Hero name: </label>
+	  <input id="hero-name" [(ngModel)]="selectedHero.name" placeholder="name">
+	</div>
+  </div> -->

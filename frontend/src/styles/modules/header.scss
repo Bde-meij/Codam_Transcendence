@@ -1,0 +1,10 @@
+
+h1 {
+	color: darken($font-color, 5%);
+	font-size: 250%;
+}
+
+h2, h3 {
+	color: darken($font-color, 3%);
+	font-weight: lighter;
+}

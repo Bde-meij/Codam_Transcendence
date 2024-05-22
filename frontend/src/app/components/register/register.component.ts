@@ -18,7 +18,6 @@ export class RegisterComponent implements OnInit{
 	currentfile?: File;
 	message = "";
 	preview = "";
-	
 	avatarInfo?: Observable<any>;
 
 	constructor(private userService: UserService, private router: Router) {};
@@ -39,7 +38,7 @@ export class RegisterComponent implements OnInit{
 	};
 
 	ngOnInit(): void {
-		// this.avatarInfo = this.userService.getAvatar();
+		this.avatarInfo = this.userService.getAvatar();
 	}
 
 	// form = new FormGroup({
@@ -92,7 +91,7 @@ export class RegisterComponent implements OnInit{
 				next: (event:any) => {
 					if (event instanceof HttpResponse) {
 						this.message = event.body.message;
-						// this.avatarInfo = this.userService.getAvatar();
+						this.avatarInfo = this.userService.getAvatar();
 					}
 				},
 				error: (err: any) => {
