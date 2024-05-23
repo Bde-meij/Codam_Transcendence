@@ -11,5 +11,5 @@ import { RouterOutlet } from '@angular/router';
 export class AppComponent {
 	constructor() {};
 
-	title = "Gary's basement";
+	public title = "Gary's basement";
 }

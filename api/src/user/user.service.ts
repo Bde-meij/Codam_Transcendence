@@ -36,4 +36,8 @@ export class UserService {
 	async updateStatus(id: string, newStatus: string) {
 		await this.userRepo.update(id, {status: newStatus});
 	}
+
+	async updateAvatar(id: string, newAvatar: string) {
+		await this.userRepo.update(id, {avatar: newAvatar});
+	}
 }

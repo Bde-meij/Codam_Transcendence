@@ -21,6 +21,7 @@ export const routes: Routes = [
 	{
 		path: 'welcome',
 		component: WelcomeComponent,
+		data: { title: "Gary's basement" }
 	},
 	{
 		path: 'register',

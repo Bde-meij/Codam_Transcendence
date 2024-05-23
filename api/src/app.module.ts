@@ -21,6 +21,6 @@ import { ConfigModule } from '@nestjs/config';
 		}),
 	],
 	controllers: [],
-	providers: [ChatGateway],
+	providers: [GameModule, ChatGateway],
 })
 export class AppModule {}

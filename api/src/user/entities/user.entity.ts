@@ -12,6 +12,6 @@ export class User {
 	@Column()
 	status: string;
 
-	@Column({default: "/assets/src/images/default_avatar.png"})
+	@Column()
 	avatar: string;
 }

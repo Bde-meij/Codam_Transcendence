@@ -51,21 +51,13 @@ export class AuthController {
 			res.status(HttpStatus.FOUND).redirect(`http://${req.hostname}:4200/dashboard`);
 		}
 	}
-	
+
 	@Post('register')
 	@UseGuards(JwtGuard)
-	@UseInterceptors(FileInterceptor('avatar', {
-		storage: diskStorage({
-			destination: './uploads',
-			filename: (req, file, cb) => {
-				const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('');
-				cb(null, `${randomName}${extname(file.originalname)}`);
-			},
-		}),
-	}))
-	async register(@Req() req, @Res() res: Response, @Body() data: any, @UploadedFile() avatar: Express.Multer.File) {
-		console.log("avatar name:", avatar);
-		const user: any = {id: req.user.id, nickname: data.nickname, avatar: avatar ? avatar.filename : "/assets/src/images/default_avatar.png", status: "online"};
+	async register(@Req() req, @Res() res: Response, @Body() data: any) {
+		const user: any = {id: req.user.id, nickname: data.nickname, avatar: "/assets/src/images/default_avatar.png", status: "online"};
+
+		console.log("IMAGE TEST:", data);
 
 		if (await this.userService.findUserById(user.id))
 			return res.status(HttpStatus.FORBIDDEN).json({message: 'User already registered'});
