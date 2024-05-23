@@ -7,7 +7,8 @@ import { JwtGuard } from 'src/auth/guard/jwt.guard';
 import { Express } from 'express'
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { extname } from 'path';
+import { extname, join } from 'path';
+import { createReadStream } from 'fs';
 
 @Controller('user')
 export class UserController {
@@ -52,9 +53,10 @@ export class UserController {
 
 	@Get('getAvatar')
 	@UseGuards(JwtGuard)
-	async getAvatar(@Req() req) {
+	async getAvatar(@Req() req, @Res() res) {
 		const user = await this.userService.findUserById(req.user.id);
-		// return user.avatar; // TO DO : add avatar to user
+		const file = createReadStream(join(process.cwd(), 'uploads/' + user.avatar));
+		file.pipe(res);
 		return ;
 	}
 
