@@ -1,0 +1,70 @@
+<label for="nickname">Nickname:</label>
+<input type="text" id="nickname" [(ngModel)]="registration.nickname" placeholder="Enter a nickname here" />
+
+
+
+<h1>Hello {{ registration.nickname }}!</h1>
+
+<p>Now show yourself to Gary </p>
+
+<label for="avatar">Avatar:</label>
+<input type="file"  (change)="olduploadFile($event)"/>
+
+<div>
+	<button class="logbutton" (click)="register()"> register </button>
+</div>
+
+<!-- <img ngSrc="/assets/images/another_gary.jpeg" width="100" height="100" priority />  -->
+<img ngSrc={{default_avatar.name}} width="100" height="100" priority /> 
+
+
+@if (this.filename != "") {
+	<p> {{this.filename}} </p>
+	<img ngSrc={{this.filename}} width="100" height="100" priority /> 
+}
+
+@if (this.updated_avatar) {
+	<p> {{this.updated_avatar.name}} </p>
+	<img ngSrc={{this.updated_avatar.name}} width="100" height="100" priority />
+	<!-- <a href="{{ updated_avatar.url }}">{{ updated_avatar.name }}</a> -->
+}
+
+
+@if (this.preview != "") {
+	<p> preview </p>
+	<img src={{this.preview}} width="100" height="100" />
+}
+
+
+<h2> New try for image uploading : </h2>
+
+<div>
+	<div>
+		<input type="file" accept="image/*" (change)="selectFile($event)" />
+	</div>
+	<button [disabled]="!currentfile" (click)="uploadFile()" > uploadFile </button>
+</div>
+
+<div>
+	<img [src]="preview" class="preview" />
+</div>
+
+@if (message) {
+	<div>
+		<p>
+			{{ message }}
+		</p>
+	</div>
+}
+
+<div>
+	<h3> current avatar (if any) </h3>
+	<ul>
+		@for (avatar of avatarInfo | async; track avatar.name) {
+			<li>
+				<p> <a href="{{ avatar.url }}"> {{ avatar.name}} </a></p>
+				<img src="{{ avatar.url}}" alt="{{ avatar.name}}" height="80px" />
+			</li>
+		}
+	</ul>
+</div>

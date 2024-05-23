@@ -1,103 +1,66 @@
 import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  UseGuards,
-  Req,
-  Res,
-  Redirect,
-  HttpStatus,
-  Session,
+	Controller,
+	Get,
+	Post,
+	Body,
+	Patch,
+	Param,
+	Delete,
+	UseGuards,
+	Req,
+	Res,
+	Redirect,
+	HttpStatus,
+	Session,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { UserService } from 'src/user/user.service';
 import { AuthGuard } from '@nestjs/passport';
+import { User } from 'src/user/entities/user.entity';
+import { JwtGuard } from './guard/jwt.guard';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+	constructor(private readonly authService: AuthService, private readonly configService: ConfigService, private readonly userService: UserService) {}
 
-  @Get('login')
-  @UseGuards(AuthGuard('fortytwo'))
-  async login() {}
+	@Get('login')
+	@UseGuards(AuthGuard('fortytwo'))
+	async login() {console.log("It hereee");}
 
-  @Get('callback')
-  @UseGuards(AuthGuard('fortytwo'))
-  async callback(@Req() req: Request, @Res() res: Response, @Session() session: Record<string, any>) {
-    // console.log('User information:', req.user);
-    session.userId = (req.user as any).id;
-    if (!await this.authService.userExists(session.userId))
-    {
-      //res.status(HttpStatus.FOUND).redirect('http://localhost:4200/register');
-      session.displayName = (req.user as any).usual_full_name;
-      const userData = {id: session.userId, displayName: session.displayName};
-      await this.authService.createUser(userData);
-    }
-    else
-    {
-      const user = await this.authService.findUser(session.userId);
-      session.displayName = user.displayName;
-    }
-    res.status(HttpStatus.FOUND).redirect('http://localhost:4200/dashboard');
-  }
+	@Get('callback')
+	@UseGuards(AuthGuard('fortytwo'))
+	async callback(@Req() req: Request, @Res() res: Response) {
+		const user = {id: (req.user as any).id, nickname: (req.user as any).nickname};
+	const token = await this.authService.getJwtAccessToken(user);
+	res.cookie("access_token", token.access_token);
+		if (!await this.userService.userExists(user.id)) {
+			console.log("user not found");
+			res.status(HttpStatus.FOUND).redirect(`http://${req.hostname}:4200/register`);
+		}
+		else
+		{
+			console.log("user found");
+			res.status(HttpStatus.FOUND).redirect(`http://${req.hostname}:4200/dashboard`);
+		}
+	}
+	
+	@Post('register')
+	@UseGuards(JwtGuard)
+	//@UseGuards(AuthGuard('fortytwo'))
+	async register(@Req() req, @Res() res: Response, @Body() data: any) {
+	var user: User = {id: req.user.id, nickname: data.nickname};
 
-  @Get('register')
-  @UseGuards(AuthGuard('fortytwo'))
-  async register(@Req() req: Request, @Res() res: Response, @Session() session: Record<string, any>) {
-    session.displayName = (req.user as any).username;
-    const userData = {id: session.userId, displayName: session.displayName};
-    await this.authService.createUser(userData);
-    res.status(HttpStatus.FOUND).redirect('http://localhost:4200/dashboard');
-  }
+	console.log("IMAGE TEST:", data);
+
+	if (await this.userService.findUserById(user.id))
+		return res.status(HttpStatus.FORBIDDEN).json({message: 'User already registered'});
+
+	if (await this.userService.findUserByName(data.nickname)) 
+		return res.status(HttpStatus.FORBIDDEN).json({message: 'Name is already taken'});
+
+	await this.userService.createUser(user);
+	return res.status(HttpStatus.OK).json({message: 'User registered'});
+	}
 }
-  /*@UseGuards(fortyTwoGuard)
-  @Get('login')
-  handlerLogin() {
-    return this.handlerLogin()
-  }
-
-  @UseGuards(fortyTwoGuard)
-  @Get('redirect')
-  handlerRedirect() {
-    return this.handlerRedirect()
-  }
-
-  @Get('status')
-  user(@Req() req: Request) {
-    if (req.user) {
-      return {message: 'Authenticated', user: req.user}
-    } else {
-      return {message: 'Not Authentiated'}
-    }
-  }
-
-  @Post()
-  create(@Body() createAuthDto: CreateAuthDto) {
-    return this.authService.create(createAuthDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.authService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.authService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
-    return this.authService.updatePass(+id, updateAuthDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.authService.remove(+id);
-  }*/

@@ -6,7 +6,7 @@
 
 <nav>
 	|
-	<a routerLink="/dashboard" > dashboard </a>
+	<a routerLink="/dashboard/home" > home </a>
 	|
 	<a routerLink="/dashboard/settings"> settings </a>
 	|
@@ -16,12 +16,20 @@
 	|
 	<a routerLink="/dashboard/account"> account </a>
 	|
-	<a routerLink="/dashboard/chat"> chat </a>
+	@if (this.unread) {
+		<a class="newchat" routerLink="/dashboard/chat"> NEW CHAT </a>
+	}
+	@else {
+		<a routerLink="/dashboard/chat"> chat </a>
+	}
 	|
 </nav>
 
 <p>
-	hi {{user$ | async | json}};
+	hi {{user$ | async | json }};
 </p>
 
+
 <router-outlet></router-outlet>
+
+
