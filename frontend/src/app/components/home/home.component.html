@@ -1,5 +1,8 @@
-<p>home works!</p>
-
-<div>
-	<img ngSrc="/assets/images/welcome_gary.jpeg" width={{this.width}} height={{this.height}} priority /> 
+<div class="home_image_container">
+	<img 	ngSrc="/assets/images/basement_home.jpg" 
+			width={{this.width}} 
+			height={{this.height}} 
+			priority /> 
+	<button class="home_game_button" [routerLink]="['/dashboard/game']">play game</button>
+	<button class="home_settings_button" [routerLink]="['/dashboard/settings']"> settings </button>
 </div>
