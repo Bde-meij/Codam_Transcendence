@@ -1,12 +1,11 @@
 import { Component} from '@angular/core';
 import { NgOptimizedImage } from '@angular/common';
-import { LoginComponent } from '../login/login.component';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-welcome',
   standalone: true,
-  imports: [NgOptimizedImage, LoginComponent],
+  imports: [NgOptimizedImage],
   templateUrl: './welcome.component.html',
   styleUrl: './welcome.component.scss'
 })
@@ -19,5 +18,8 @@ export class WelcomeComponent {
 		route.data.subscribe(data =>
 			this.title = data['title']
 		)
+	}
+	login() :void {
+		window.location.href = '/api/auth/login';
 	}
 }
