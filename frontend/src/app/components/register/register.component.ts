@@ -19,7 +19,6 @@ export class RegisterComponent {
 	error = false;
 
 	default_avatar: File = new File(["default_avatar"], "/assets/src/images/default_avatar.png");
-	filename = "";
 
 	registration : UserInterface = {
 		id: '',
@@ -28,8 +27,22 @@ export class RegisterComponent {
 		avatar: this.default_avatar,
 	};
 
+	fileToUpload: File | null = null;
+
+	handleFileInput(event: any) {
+		const files = event.target.files;
+		if (files.length > 0) {
+		  this.fileToUpload = files[0];
+		} else {
+		  this.fileToUpload = null;
+		}
+	}
+
 	register() {
 		// this.userService.registerUser(this.registration).subscribe(data => {console.log(data.error.message)});
+		if (this.fileToUpload) {
+			this.registration.avatar = this.fileToUpload;
+		}
 		this.userService.registerUser(this.registration).subscribe({
 			next: (v) => {
 				console.log(v), this.success = true,

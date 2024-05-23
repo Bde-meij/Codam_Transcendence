@@ -10,7 +10,7 @@
 	<p>Now show yourself to Gary </p>
 
 	<label for="avatar">Avatar:</label>
-	<input type="file" id="avatar" [(ngModel)]="filename" />
+	<input type="file" id="avatar" (change)="handleFileInput($event)" />
 
 	<div>
 		<button class="logbutton" (click)="register()"> register </button>
