@@ -14,9 +14,10 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './account.component.scss'
 })
 export class AccountComponent implements OnInit {
-	currentavatar?: File = new File(["default_avatar"], "/assets/images/avatar_default.png"); // default
+	currentavatar?: File = new File(["default_avatar"], "assets/images/avatar_default.png"); // default
 	message = "";
-	avatarInfo?: Observable<any>;
+	avatarInfo?: Observable<Blob>;
+	avatar?: string;
 
 	constructor(private userService: UserService){}
 
@@ -40,7 +41,6 @@ export class AccountComponent implements OnInit {
 
 	passuser?: User;
 
-
 	ngOnInit() {
 		this.userService.getUser().subscribe((userData) => (
 			this.user = userData,
@@ -60,6 +60,9 @@ export class AccountComponent implements OnInit {
 
 
 		this.avatarInfo = this.userService.getAvatar();
+		this.avatarInfo.subscribe(data => {
+			this.avatar = URL.createObjectURL(data);
+		});
 		// this.user.avatar.append('file', this.userService.getAvatar().subscribe());
 	};
 }

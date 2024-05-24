@@ -2,7 +2,6 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Res, Redirect, HttpS
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Response } from 'express';
 import { JwtGuard } from 'src/auth/guard/jwt.guard';
 import { Express } from 'express'
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -26,12 +25,12 @@ export class UserController {
 		return user;
 	}
 	
-	@Get(':id')
-	@UseGuards(JwtGuard)
-	async findUserById(@Req() req, @Param('id') id: string) {
-		const user = await this.userService.findUserById(id);
-		return user;
-	}
+	// @Get(':id')
+	// @UseGuards(JwtGuard)
+	// async findUserById(@Req() req, @Param('id') id: string) {
+	// 	const user = await this.userService.findUserById(id);
+	// 	return user;
+	// }
 
 	@Get('/name/:id')
 	@UseGuards(JwtGuard)
@@ -50,14 +49,12 @@ export class UserController {
 		//return this.userService.remove(+id);
 	}
 
-
 	@Get('getAvatar')
 	@UseGuards(JwtGuard)
 	async getAvatar(@Req() req, @Res() res) {
 		const user = await this.userService.findUserById(req.user.id);
-		const file = createReadStream(join(process.cwd(), 'uploads/' + user.avatar));
+		const file = createReadStream(join(process.cwd(), user.avatar));
 		file.pipe(res);
-		return ;
 	}
 
 	@Post('uploadAvatar')
@@ -72,16 +69,8 @@ export class UserController {
 		}),
 	}))
 	async uploadAvatar(@Req() req, @UploadedFile() file: Express.Multer.File) {
-		this.userService.updateAvatar(req.user.id, file.filename);
+		this.userService.updateAvatar(req.user.id, file.path);
 		console.log("MY DATA: ", file);
 		return ;
 	}
 }
-
-
-
-// @Post('upload')
-// @UseInterceptors(FileInterceptor('file'))
-// uploadFile(@UploadedFile() file: Express.Multer.File) {
-//   console.log(file);
-// }
