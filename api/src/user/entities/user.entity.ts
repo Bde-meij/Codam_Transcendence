@@ -8,4 +8,10 @@ export class User {
 
 	@Column()
 	nickname: string;
+
+	@Column()
+	status: string;
+
+	@Column()
+	avatar: string;
 }

@@ -29,7 +29,7 @@ export class UserService {
 		return this.http.post<File>(this.userUrl + '/uploadAvatar', formData);
 	}
 
-	getAvatar() : Observable<File> {
-		return this.http.get<File>(this.userUrl + '/getAvatar');
+	getAvatar() : Observable<Blob> {
+		return this.http.get(this.userUrl + '/getAvatar', {responseType: 'blob'});
 	} 
 }

@@ -105,6 +105,7 @@ export class RegisterComponent implements OnInit{
 				},
 				complete: () => {
 					this.currentfile = undefined;
+					this.router.navigate(['/dashboard']);
 				}
 			});
 		}
@@ -129,26 +130,13 @@ export class RegisterComponent implements OnInit{
 	};
 
 	register() {
-		// if (this.filename != "") {
-			// this.registration.avatar = new File(["my_avatar"], this.filename);
-		// }
-		// const formData : FormData = new FormData();
-	
-		if (this.currentfile) {
-			console.log("current file : ", this.currentfile);
-			this.registration.avatar.append('file', this.currentfile);
-		} else {
-			this.registration.avatar.append('file', this.default_avatar);
-		}
-		// this.registration.avatar = formData;
-		// this.userService.registerUser(this.registration).subscribe(data => {console.log(data.error.message)});
 		this.userService.registerUser(this.registration).subscribe({
 			next: (v) => {
 				console.log(v), this.success = true,
 				this.router.navigate(['/dashboard']);
 			},
 			error: (e : HttpErrorResponse) => {console.log(e.error.message), this.error=true},
-			complete: () => console.info('complete') 
+			complete: () => this.uploadFile()
 		});
 
 		if (this.success) {
