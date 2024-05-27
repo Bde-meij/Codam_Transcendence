@@ -20,10 +20,28 @@ export class AccountComponent implements OnInit {
 	message = "";
 	avatarInfo?: Observable<Blob>;
 	avatar?: string;
+	user ?: User;
+	passuser?: User;
 
 	constructor(private userService: UserService){}
 
 	ngOnInit(): void {
+
+		this.userService.getUser().subscribe((userData) => (
+			this.user = userData,
+			this.passuser = {
+				id: Number(this.user.id),
+				nickname: this.user.nickname,
+				avatar: '',
+				status: this.user.status,
+			})
+		);
+		// if (this.user)	{
+		// 	this.passuser = {
+		// 		id: Number(this.user.id),
+		// 		nickname: this.user.nickname,
+		// 	};
+		// }
 		this.avatarInfo = this.userService.getAvatar();
 		this.avatarInfo.subscribe({
 			next : (data) => {
@@ -34,6 +52,9 @@ export class AccountComponent implements OnInit {
 			error: (e : HttpErrorResponse) => {console.log(e.error.message)},
 			complete: () => console.info('complete')
 		})
+		if (this.avatar && this.passuser) {
+			this.passuser.avatar = this.avatar;
+		}
 	};
 }
 
