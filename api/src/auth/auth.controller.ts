@@ -32,7 +32,7 @@ export class AuthController {
 	@Get('callback')
 	@UseGuards(AuthGuard('fortytwo'))
 	async callback(@Req() req: Request, @Res() res: Response) {
-		const user = {id: (req.user as any).id, nickname: (req.user as any).nickname};
+		const user = {id: (req.user as any).id, nickname: (req.user as any).nickname, rooms: (req.user as any).rooms};
 	const token = await this.authService.getJwtAccessToken(user);
 	res.cookie("access_token", token.access_token);
 		if (!await this.userService.userExists(user.id)) {
@@ -50,7 +50,7 @@ export class AuthController {
 	@UseGuards(JwtGuard)
 	//@UseGuards(AuthGuard('fortytwo'))
 	async register(@Req() req, @Res() res: Response, @Body() data: any) {
-	var user: User = {id: req.user.id, nickname: data.nickname};
+	var user: User = {id: req.user.id, nickname: data.nickname, rooms: data.rooms};
 
 	if (await this.userService.findUserById(user.id))
 		return res.status(HttpStatus.FORBIDDEN).json({message: 'User already registered'});

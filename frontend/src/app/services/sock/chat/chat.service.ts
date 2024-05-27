@@ -24,6 +24,45 @@ export class ChatService{
 			if (err) {
 				console.log("chat-sock error: ");
 				console.log(err);
+				console.log(err.message);
+			}
+		});
+	}
+
+	createRoom(message: string): void {
+		console.log("createRoom called");
+
+		this.chatSocket.emit('createRoom', {
+			roomId: message,
+			password: "",}, (err: any) => {
+			if (err) {
+				console.log("createRoom chat-sock error: ");
+				console.log(err);
+				console.log(err.message);
+			}
+		});
+	}
+
+	joinRoom(message: string): void {
+		this.chatSocket.emit('joinRoom', {
+			roomId: message,
+			password: "",}, (err: any) => {
+			console.log("connecting: " + message);
+			if (err) {
+				console.log("joinRoom chat-sock error: ");
+				console.log(err);
+				console.log(err.message);
+			}
+		});
+	}
+
+
+	sendUserList(message: string): void {
+		this.chatSocket.emit('getUserList', message, (err: any) => {
+			if (err) {
+				console.log("chat-sock error: ");
+				console.log(err);
+				console.log(err.message);
 			}
 		});
 	}
@@ -32,11 +71,33 @@ export class ChatService{
 		return new Observable((observer) => {
 			this.chatSocket.on('message', (message) => {
 				observer.next(message);
+				console.log("getmessage");
+
 			});
 		});
 	}
-	 
+
+	getUserList(): Observable<string> {
+		return new Observable((observer) => {
+			this.chatSocket.on('userList', (message) => {
+				observer.next(message);
+			});
+		});
+	}
+
+	getRooms(): Observable<string> {
+		return new Observable((observer) => {
+			this.chatSocket.on('getRooms', (message) => {
+				console.log("getRooms: " + message);
+				observer.next(message);
+			});
+		});
+	}
+
+	
+
 	isUnread() {
 		return this.unread;
 	}
+
 }

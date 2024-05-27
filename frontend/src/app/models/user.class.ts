@@ -3,6 +3,7 @@ export interface UserInterface {
 	nickname: string;
 	status: string;
 	avatar: File;
+	rooms: string[];
 }
 
 // export class User {

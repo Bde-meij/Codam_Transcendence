@@ -1,0 +1,24 @@
+1.	Verschillende componenten chat dashboard
+	- dashboard
+		- chats
+		- room
+			- messages
+
+	html + css + typescripts fixen
+	interfaces
+
+2. Selector informatie room werkend. + max aantal pagina's
+
+3. Alle ingelogde users weergeven - nieuwe naam proberen mee te geven.
+
+4. Berichten naar elkaar sturen, chatroom voor de andere aanmaken bij ontvangst bericht.
+
+5. inviten op basis van dropdown menu, search?
+
+6. knop createRoom met opties.
+
+7. knoppen (un)ban/(un)mute/kick/ leaveRoom - 
+
+8. settings per room - admins - owner
+
+9. entity's + database

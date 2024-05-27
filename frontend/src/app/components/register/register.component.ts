@@ -29,6 +29,7 @@ export class RegisterComponent {
 		nickname: '',
 		status: '',
 		avatar: this.default_avatar,
+		rooms: [],	
 	};
 
 	register() {

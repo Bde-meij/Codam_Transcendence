@@ -28,6 +28,10 @@ export class DashboardComponent implements OnInit {
 
 	ngOnInit(): void {
 		this.user$ = this.userService.getUser();
+		this.user$.subscribe((user: UserInterface) => {
+			this.title = "Gary's basement with: " + user.nickname;
+			// console.log(user.nickname);
+		  });
 	}
 
 	// testvalue = window.Cookies
