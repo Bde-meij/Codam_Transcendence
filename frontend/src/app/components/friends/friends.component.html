@@ -8,7 +8,7 @@
 			<button [class.selected]="friend === selectedFriend" type="button" (click)="onSelect(friend)">
 				<!-- <app-user-detail [user]="selectedFriend"></app-user-detail> -->
 				<span class="badge">{{ friend.id }}</span>
-				<span class="name">{{ friend.name }}</span>
+				<span class="name">{{ friend.nickname }}</span>
 			</button>
 			</li>
 		</ul>

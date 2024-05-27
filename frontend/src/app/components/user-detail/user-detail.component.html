@@ -2,8 +2,11 @@
 
 
 <div *ngIf="user" >
-	<h3> {{user.name | uppercase }} </h3>
+	<h3> {{user.nickname | uppercase }} </h3>
 
 	<div><span>id: </span>{{user.id}}</div>
-	<div><span>name: </span>{{user.name}}</div>
+	<div><span>name: </span>{{user.nickname}}</div>
+	<div><span>avatar: </span><img src="{{user.avatar}}" height="80px" /></div>
 </div>
+
+
