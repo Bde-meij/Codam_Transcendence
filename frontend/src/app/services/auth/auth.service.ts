@@ -13,9 +13,9 @@ export class AuthService {
 		this.hostname = window.location.hostname;
 	};
 
-	register() : void {
-		this.http.post(this.authUrL + '/register', { }).subscribe();
+	register(nickname : string) {
 		console.log("authservice.register called");
+		return this.http.post(this.authUrL + '/register', {nickname});
 	}
 
 	login() : void {
@@ -33,4 +33,8 @@ export class AuthService {
 	getLogStatus() : boolean {
 		return (this.loggedin);
 	}
+
+	// isAuthenticated() : boolean {
+
+	// }
 }

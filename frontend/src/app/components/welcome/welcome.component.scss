@@ -1,4 +1,29 @@
+@import '../../../styles/helpers/constants.scss';
+
 .welcome {
-	background: url("/assets/gifs/gary_spongebob.gif");
-	min-height: 1000px;
+	// z-index: 2;
+	// background-size: 100%;
+	// background-image: url("/assets/gifs/door.gif");
+	min-height: 600px; 
+	height: auto;
+}
+
+.welcome_button {
+	position: absolute;
+	transform: translate(-50%);
+	height: 384px;
+	width: 512px;
+	z-index: 2;
+	background-size: 100%;
+	background-image: url("/assets/images/door.jpeg");
+	color: transparent;
+}
+
+.welcome_button:hover{
+	// opacity: 0;
+	background: url("/assets/gifs/door.gif");
+	// background-repeat: no-repeat;
+	color: tan;
+	font-size: larger;
+	font-weight: bolder;
 }
