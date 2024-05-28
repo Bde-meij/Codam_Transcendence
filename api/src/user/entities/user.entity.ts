@@ -14,4 +14,10 @@ export class User {
 
 	@Column()
 	avatar: string;
+
+	@Column({nullable: true})
+	twoFASecret: string;
+
+	@Column({default: false})
+	isTwoFAEnabled: boolean;
 }
