@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
+
 export class GameService{
 	private gameSocket = io("/game", {
 		autoConnect: false
@@ -28,7 +29,6 @@ export class GameService{
 		sockService.newSocketRegister("gameSocket");
 	}
 
-	// other functionality
 	connect() {
 		return this.gameSocket.connect();
 	}
@@ -37,13 +37,11 @@ export class GameService{
 		return this.gameSocket.disconnect();
 	}
 
-	// https://rxjs.dev/guide/observable
-
 	assignPlayer(): Observable<number>
 	{
 		return new Observable((observ) => 
 		{
-			this.gameSocket.on('assignPlayer', (playNum: number) =>
+			this.gameSocket.on('assignPlayerNum', (playNum: number) =>
 			{
 				console.log("player assigned with", playNum);
 				observ.next(playNum);
@@ -57,8 +55,18 @@ export class GameService{
 		{
 			this.gameSocket.on('updatePlayerPos', (yPos: number) =>
 			{
-				console.log("player assigned with", yPos);
 				observ.next(yPos);
+			});
+		});
+	}
+
+	getScores(): Observable<number[]>
+	{
+		return new Observable((observ) => 
+		{
+			this.gameSocket.on("updateScore", (scores: number[]) =>
+			{
+				observ.next(scores);
 			});
 		});
 	}
@@ -72,6 +80,11 @@ export class GameService{
 				observ.next(ballPos);
 			});
 		});
+	}
+
+	askNum()
+	{
+		this.gameSocket.emit("assignPlayer");
 	}
 
 	updateBall()
@@ -89,15 +102,8 @@ export class GameService{
 		this.gameSocket.emit("playerbounce", effect);
 	}
 
-	emitWallBounce()
-	{
-		this.gameSocket.emit("wallbounce");
-	}
-
-	emitResetBall(direction: number)
+	emitResetBall(direction: any)
 	{
 		this.gameSocket.emit("resetball", direction);
 	}
-
-
 }

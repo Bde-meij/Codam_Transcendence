@@ -2,6 +2,8 @@ export class SquareBall
 {
 	position: number[] = [400,300];
 	speed: number[] = [10, 0];
+	lScore:number = 0;
+	rScore:number =0;
 
 	move()
 	{

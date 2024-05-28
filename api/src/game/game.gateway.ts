@@ -16,7 +16,13 @@ import { SquareBall} from './SquareBall';
 
 var playerNumber: number = 0;
 var numOfGameRooms: number = 0;
-var squareBall = new SquareBall;
+
+var roomballmap = new Map<string, SquareBall>();
+
+async function sleep(ms: number): Promise<void> {
+    return new Promise(
+        (resolve) => setTimeout(resolve, ms));
+}
 
 @WebSocketGateway({cors: { origin: "http:localhost:4200/"}, namespace: "/game"})
 export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
@@ -33,17 +39,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	handleConnection(client: Socket)
 	{
-		// if (playerNumber%2 == 0)
-		// 	numOfGameRooms+=1;
-		playerNumber+=1;
-		console.log("gameGateway: ", client.id, " has connected, playernum", playerNumber, "on room", "gameroom"+numOfGameRooms);
-		client.emit("assignPlayer", playerNumber);
-		client.join("gameroom"+numOfGameRooms);
-		if (playerNumber == 2)
-			{
-				console.log("SHOULD START");
-				this.server.to("gameroom"+numOfGameRooms).emit("startGame");
-			}
+		console.log("gameGateway: ", client.id, " has connected");
 	}
 
 	@SubscribeMessage('createGame')
@@ -70,8 +66,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		return this.gameService.update(updateGameDto.id, updateGameDto);
 	}
 
-
-
 	@SubscribeMessage('removeGame')
 	remove(@MessageBody() id: number) 
 	{
@@ -85,57 +79,96 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 	// PLAYERS
+	@SubscribeMessage("assignPlayer")
+	assignPlayer(client: Socket)
+	{
+		playerNumber+=1;
+		client.join("gameroom"+numOfGameRooms);
+		client.data.room = "gameroom"+numOfGameRooms;
+		client.emit("assignPlayerNum", playerNumber);
+		if (playerNumber == 2)
+		{
+			roomballmap.set(client.data.room, new SquareBall);
+			playerNumber = 0;
+			numOfGameRooms+=1;
+		}
+	}
+
 	@SubscribeMessage('updatePlayer')
 	updatePlayer(client: Socket, arg: number)
 	{
-		client.in("gameroom"+numOfGameRooms).emit("updatePlayerPos", arg);
+		client.in(client.data.room).emit("updatePlayerPos", arg);
 	}
 
 	// BALLS
 	@SubscribeMessage('updateBall')
 	updateBall(client: Socket)
 	{
-		squareBall.move();
-		// if ((squareBall.position[0] > 700) || (squareBall.position[0] < 100))
-		//   squareBall.speed[0] *= -1;
-		this.server.in("gameroom"+numOfGameRooms).emit("updateBallPos", 
-		squareBall.position);
+		var ball = roomballmap.get(client.data.room)
+		ball.move();
+		if ((ball.position[0] < 0) || (ball.position[0] > 800))
+			this.checkScore(client);
+		if ((ball.position[1] < 5) || (ball.position[1] > 795))
+			this.wallbounce(ball);
+		this.server.in(client.data.room).emit("updateBallPos", ball.position);
 	}
 
-	@SubscribeMessage('resetball')
-	resetball(client: Socket, mod: number)
+	checkScore(client: Socket)
 	{
-		squareBall.speed[0] = 0;
-		squareBall.speed[1] = 0;
-		squareBall.position[0] = 400;
-		squareBall.position[1] = 300;
-		setTimeout(() =>{squareBall.speed[0] = 10*mod;},1000);
-		// if ((squareBall.position[0] > 700) || (squareBall.position[0] < 100))
-		//   squareBall.speed[0] *= -1;
+		var room = client.data.room;
+		var ball = roomballmap.get(client.data.room)
+		if (ball.position[0] < 0)
+		{
+			ball.rScore+=1;
+			this.server.in(room).emit("updateScore", [ball.lScore, ball.rScore]);
+			if (ball.rScore == 11) 
+			{
+				// alert("right player win!");
+				this.server.in(room).emit("right win");
+				(ball.rScore = 0), (ball.rScore = 0);
+			}
+			this.resetball(ball, -1);
+		}
+		else if  (ball.position[0] > 800)
+		{
+			ball.lScore+=1;
+			this.server.in(room).emit("updateScore", [ball.lScore, ball.rScore]);
+			if (ball.lScore == 11) 
+			{
+				// alert("right player win!");
+				this.server.in(room).emit("left win");
+				(ball.lScore = 0), (ball.rScore = 0);
+			}
+			this.resetball(ball, 1);
+		}
 	}
 
-	@SubscribeMessage('wallbounce')
-	wallbounce(client: Socket)
+	wallbounce(ball: SquareBall)
 	{
-		squareBall.speed[1] *= -1;
-		if ((squareBall.speed[1]*squareBall.speed[1]) < 4)
-			squareBall.speed[1] *= 10;
+		ball.speed[1] *= -1;
+		if ((ball.speed[1]*ball.speed[1]) < 4)
+			ball.speed[1] *= 10;
+	}
+
+	resetball(ball: SquareBall, mod: number)
+	{
+		ball.speed[0] = 0;
+		ball.speed[1] = 0;
+		ball.position[0] = 400;
+		ball.position[1] = 300;
+		setTimeout(() =>{ball.speed[0] = 10*mod;},1000)
 	}
 
 	@SubscribeMessage('playerbounce')
 	playerbounce(client: Socket, mod: number)
 	{
-		console.log("modder = ", mod);
-		squareBall.speed[0] *= -1;
-		squareBall.speed[1] += mod;
-		//   if ((squareBall.speed[0]*squareBall.speed[0]) < 4)
-		//     squareBall.speed[0] *= 10;
+		roomballmap.get(client.data.room).speed[0] *= -1;
+		roomballmap.get(client.data.room).speed[1] += mod;
 	}
 }
 
-// OLD TESTS
-// @SubscribeMessage('space')
-// lol(client: Socket, arg: string)
-// {
-// 	console.log(client.id, "says:", arg);
-// }
+// 	setTimeout(()=> {
+// 		roomballmap.forEach((ball,room) =>{
+// 			ball.move();
+// 			this.server.in(room).emit("updateBallPos", ball.position);
+// 		})
