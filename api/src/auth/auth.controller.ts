@@ -30,6 +30,14 @@ import { extname } from 'path';
 export class AuthController {
 	constructor(private readonly authService: AuthService, private readonly configService: ConfigService, private readonly userService: UserService) {}
 
+	// Checks whether the user is authorized using the jwtguard
+	// Returns: {loggedIn: true} on success - 401 Unauthorized on failure
+	@Get('check')
+	@UseGuards(JwtGuard)
+	async checkLoggedIn() {
+		return {loggedIn: true};
+	}
+
 	@Get('login')
 	@UseGuards(AuthGuard('fortytwo'))
 	async login() {console.log("It hereee");}
