@@ -7,18 +7,20 @@ import { GameModule } from './game/game.module';
 import { ChatGateway } from './chat/chat.gateway';
 import { DatabaseModule } from './database/database.module';
 import { ConfigModule } from '@nestjs/config';
+import { TestingModule } from './testing/testing.module';
 
 @Module({
 	imports: [
+		ConfigModule.forRoot({
+			isGlobal: true,
+			envFilePath: '.env',
+		}),
 		AuthModule,
 		DatabaseModule,
 		UserModule,
 		GameModule,
 		DatabaseModule,
-		ConfigModule.forRoot({
-			isGlobal: true,
-			envFilePath: '.env',
-		}),
+		TestingModule,
 	],
 	controllers: [],
 	providers: [GameModule, ChatGateway],
