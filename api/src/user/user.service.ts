@@ -17,8 +17,7 @@ export class UserService {
 	} 
 
 	async createUser(userData: any) {
-		const newUser = await this.userRepo.create(userData);
-		const savedUser = await this.userRepo.save(newUser);
+		const savedUser = await this.userRepo.save(userData);
 		return savedUser;
 	}
 
@@ -31,6 +30,10 @@ export class UserService {
 		const user = await this.userRepo.findOne({where: {nickname :name}});
 		console.log(user);
 		return user;
+	}
+
+	async findAllUsers(): Promise<User[]> {
+		return await this.userRepo.find();
 	}
 
 	async updateStatus(id: string, newStatus: string) {
