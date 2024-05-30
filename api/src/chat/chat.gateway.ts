@@ -28,6 +28,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		console.log("server initialized");
 	}
 
+
+
 	async handleConnection(client: Socket) {
 		try {
 			console.log(client.id, "connecting...");
@@ -59,8 +61,20 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		
 	}
 	
-	handleDisconnect(client: any) {
+	async handleDisconnect(client: any) {
 		console.log("chat: user " + client.id + " disconnected");
+		const cookies = client.handshake.headers.cookie?.split('; ');
+		var token: string;
+		for (var cookie of cookies) {
+			const [key, value] = cookie.split('=');
+			// console.log(value);
+			if (key === 'access_token') {
+				token = value;
+				break;
+			}
+		}
+		const payload = await this.authService.verifyJwtAccessToken(token);
+		this.userService.updateStatus(payload.id, 'offline');
 	}
 	
 	@SubscribeMessage('message')

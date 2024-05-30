@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { AsyncPipe, NgIf, UpperCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-test-fran',
@@ -13,17 +14,29 @@ import { HttpClient } from '@angular/common/http';
 export class TestFranComponent {
   constructor(private http: HttpClient) {};
 
-  isChecked: boolean = false;
+  twoFAEnabled: Observable<any> = this.http.get('/api/auth/is2faenabled');
   qrCode: string = "";
   secret: string = "";
   userInput: string = "";
+  isChecked: boolean = false;
+
+  ngOnInit(): void {
+    this.twoFAEnabled.subscribe(data => {
+      this.isChecked = data.isTwoFAEnabled;
+    })
+  }
 
   onChange() {
     if (this.isChecked) {
-      this.http.get<any>("/api/auth/2fasetup").subscribe( data => {
+      this.http.get<any>('/api/auth/2fasetup').subscribe( data => {
         this.qrCode = data.qrCode;
         this.secret = data.secret;
-    });
+      });
+    }
+    else {
+      this.qrCode = '';
+      this.secret = '';
+      this.http.post('/api/auth/2fadisable', { }).subscribe();
     }
   }
 

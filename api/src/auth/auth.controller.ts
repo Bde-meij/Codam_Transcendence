@@ -24,7 +24,7 @@ export class AuthController {
 
 	@Get('login')
 	@UseGuards(AuthGuard('fortytwo'))
-	async login() {console.log("It hereee");}
+	async login() {}
 
 	@Get('callback')
 	@UseGuards(AuthGuard('fortytwo'))
@@ -39,12 +39,13 @@ export class AuthController {
 		else
 		{
 			console.log("user found");
-			if ((await this.userService.findUserById(user.id)).isTwoFAEnabled) {
-				res.status(HttpStatus.FOUND).redirect(`http://${req.hostname}:4200/2fa`);
-			}
-			else
+			//if ((await this.userService.findUserById(user.id)).isTwoFAEnabled) {
+				//res.status(HttpStatus.FOUND).redirect(`http://${req.hostname}:4200/2fa`);
+			//}
+			//else {
+				this.userService.updateStatus(user.id, 'online');
 				res.status(HttpStatus.FOUND).redirect(`http://${req.hostname}:4200/dashboard`);
-			this.userService.updateStatus(user.id, "online");
+			//}
 		}
 	}
 
@@ -66,13 +67,13 @@ export class AuthController {
 	@Post('logout')
 	@UseGuards(JwtGuard)
 	async logout(@Req() req) {
-		await this.userService.updateStatus(req.user.id, "offline");
+		await this.userService.updateStatus(req.user.id, 'offline');
 	}
 
 	@Get('2fasetup')
 	@UseGuards(JwtGuard)
 	async setupTwoFA(@Req() req, @Res() res) {
-		const user = req.user;
+		const user = await this.userService.findUserById(req.user.id);
 		await this.userService.enableTwoFA(user.id);
 		const secret = await this.authService.generateTwoFASecret(user.id);
 		const otpauthUrl = speakeasy.otpauthURL({
@@ -88,20 +89,37 @@ export class AuthController {
 	@Post('2faverify')
 	@UseGuards(JwtGuard)
 	async verifyTwoFA(@Req() req, @Res() res, @Body() body) {
-		const secret = (await this.userService.findUserById(req.user.id)).twoFASecret;
-		console.log(secret, body.userInput);
+		const user = await this.userService.findUserById(req.user.id);
+		const secret = user.twoFASecret;
 		const isValid = await this.authService.verifyTwoFAToken(secret, body.userInput);
-		if (isValid)
+		if (isValid) {
 			res.json({message: 'Google 2FA verified'});
+			await this.userService.updateStatus(user.id, 'online');
+		}
 		else
 			res.json({message: 'Invalid authentication code'});
 	}
 
+	@Post('2fadisable')
+	@UseGuards(JwtGuard)
+	async disableTwoFA(@Req() req) {
+		this.userService.disableTwoFA(req.user.id);
+		this.userService.updateTwoFASecret(req.user.id, {base32: null});
+	}
+
+	@Get('is2faenabled')
+	@UseGuards(JwtGuard)
+	async isTwoFAEnabled(@Req() req, @Res() res) {
+		const isEnabled = (await this.userService.findUserById(req.user.id)).isTwoFAEnabled;
+		res.json({isTwoFAEnabled: isEnabled});
+	}
+
 	@Get('isloggedin')
 	@UseGuards(JwtGuard)
-	async isLoggedIn(@Req() req) {
-		if (!req.user)
-			return false;
-		return true;
+	async isLoggedIn(@Req() req, @Res() res) {
+		if ((await this.userService.findUserById(req.user.id)).status == 'offline')
+			res.json({loggedIn: false});
+		else
+			res.json({loggedIn: true});
 	}
 }
