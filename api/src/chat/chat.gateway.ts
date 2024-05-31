@@ -29,15 +29,19 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	chatRoomList: Record<string, ChatRoomListDto>;
   	userList: Record<string, userDto>;
 	private connectedUsers: string[] = [];
+	
+
 	constructor(private authService: AuthService, private userService: UserService) {
 		this.chatRoomList = {
 			lobby: {
-			  roomId: 'lobby',
-			  roomName: 'lobby',
+			  roomId: 'roomid',
+			  roomName: 'roomname',
+			  RoomOwner: "owner",
 			  adminList: [],
 			  banList: [],
 			  muteList: [],
-			  password: undefined,
+			  status: "public",
+			  password: null,
 			},
 		  };
 		this.userList = {};
@@ -70,15 +74,13 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				throw new NotAcceptableException();
 			client.data.nickname = user.nickname;
 			console.log(user.nickname, "connected on socket:", client.id);
-			// console.log("users: " + this.connectedUsers);
+
 			this.connectedUsers.push(client.id);
 			console.log("users: " + this.connectedUsers);
-			// const rooms = this.io.sockets.adapter.rooms;
-		  	client.emit('getRooms', Array.from(client.rooms));
+
 			client.emit('getConnectedUsers', this.connectedUsers);
+			this.getRoomsEmit(client);
 			console.log(Array.from(client.rooms))
-		  	// console.log('roomList: ' +  Array.from(rooms.keys()));
-			// const sockets = await io.fetchSockets();
 		} catch {
 			console.log(client.id, "connection refused");
 			client.disconnect();
@@ -90,7 +92,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	handleDisconnect(client: any) {
 		console.log("chat: user " + client.id + " disconnected");
 		this.connectedUsers = this.connectedUsers.filter(item => item !== client.id);
-		client.emit('getRooms', Array.from(client.rooms));
+		
+		this.getRoomsEmit(client);
 	}
 	
 	// @SubscribeMessage('message')
@@ -131,9 +134,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		this.chatRoomList[roomId] = {
 			roomId: roomId,
 			roomName: roomId,
+			RoomOwner: roomId,
 			adminList: [socket.data.nickname],
 			banList: [],
 			muteList: [],
+			status: "public",
 			password: data.password,
 		};
 		if (!this.userList[socket.data.nickname]) {
@@ -179,6 +184,12 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		console.log("channelUserList: " + users);
 	}
 
+	async getRoomsEmit(socket: Socket){
+		const p = Array.from(socket.rooms).filter(item => item !== socket.id);;
+		socket.emit('getRooms', p);
+		// client.emit('getRooms', Array.from(client.rooms));
+	}
+
 	@SubscribeMessage('joinRoom')
 	async joinRoom(
 	@MessageBody() data: { roomId: string, password: string },
@@ -219,4 +230,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@SubscribeMessage('unMute') async unMute() {}
 	@SubscribeMessage('ban') async ban() {}
 	@SubscribeMessage('unBan') async unban() {}
+
+	
+	
 }
