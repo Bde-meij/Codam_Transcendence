@@ -1,35 +1,13 @@
-<p>chat works!</p>
 
-<div class = chat_container>
+<div class = chat_column>
+	<!-- <div *ngIf="room" ></div> -->
+	<h3> the messages in room: {{ room}}   </h3>
+	<ul>
+		<li *ngFor="let message of messages">
+			{{ message }}
+		</li>
+	</ul>
 
-	<div class = chat_column>
-		<h3> Your channels </h3>
-		<ul>
-			<li *ngFor="let r of rooms">
-				{{ r }}
-				<button (click)="joinRoom(r)"> Send </button>
-				<button (click)="sendUserList(r)"> Send </button>
-			</li>
-		</ul>
-		
-	</div>
-
-	<div class="chat_column">
-		<h3>Create a room:</h3>
-		<input [(ngModel)]="roomName" (keydown.enter)="createRoom(roomName!)" type="text">
-		<button (click)="createRoom(roomName!)">Send</button>
-	  </div>
-	  
-
-	<div class = chat_column>
-		<h3> the messages in channel:  </h3>
-		<ul>
-			<li *ngFor="let m of messages">
-				{{ m }}
-			</li>
-		</ul>
-	
-		<input [(ngModel)]="message" (keydown.enter)="sendMessage()" type="text" > 
-		<button (click)="sendMessage()"> Send </button>
-	</div>
+	<input [(ngModel)]="message" (keydown.enter)="sendMessage()" type="text" > 
+	<button (click)="sendMessage()"> Send </button>
 </div>

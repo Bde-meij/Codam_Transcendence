@@ -3,13 +3,14 @@
 @import './base/typography.scss';
 @import './helpers/constants.scss';
 @import './modules/nav.scss';
-
+@import './modules/button.scss';
+@import './modules/header.scss';
 
 $dark-background: darken($background-color, 10%);
 
 body {
 	width: 90%;
-	margin: 0 auto;
+	margin: 0 auto; //2em?
 	padding: 0 20px 20px 20px;
 	border: 5px solid black;
 	font: 100% $font-stack;
@@ -24,22 +25,11 @@ div {
 
 .logbutton {
 	margin: 3;
-	background-color: powderblue;
-	border: 2px solid darken(powderblue, 10%);
+	background-color: $button-color;
+	border: 2px solid darken($button-color, 10%);
 }
 
-.friend_column {
-	flex: 33.33%;
-	height: 200px;
-	padding: 10px;
-	margin: 5px;
-	background-color: linen;
-	// background-color: $background-color;
-	text-align: center;
-}
-.friend_container {
-	display: flex;
-}
+
 
 .chat_column {
 	flex: 50%;
@@ -47,7 +37,7 @@ div {
 	height: auto;
 	padding: 10px;
 	margin: 5px;
-	background-color: linen;
+	background-color: $column-color;
 	// background-color: $background-color;
 	text-align: center;
 }

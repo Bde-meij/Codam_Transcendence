@@ -1,67 +1,44 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { AsyncPipe, NgFor } from '@angular/common';
-import { ChatService } from '../../services/sock/chat/chat.service';
+import { Rooms } from '../../../models/rooms.class';
 import { FormsModule } from '@angular/forms';
+import { ChatService } from '../../../services/sock/chat/chat.service';
+import { NgIf, CommonModule } from '@angular/common';
 
 export interface MessageInterface {
 	sender: string,
+	room: string,
 	message: string
 }
 
 @Component({
-  selector: 'app-chat',
+  selector: 'app-chat-message',
   standalone: true,
-  imports: [NgFor, FormsModule, AsyncPipe],
-  templateUrl: './chat.component.html',
-  styleUrl: './chat.component.scss'
+  imports: [NgFor, FormsModule, AsyncPipe, NgIf, CommonModule ],
+  templateUrl: './chat-message.component.html',
+  styleUrl: './chat-message.component.scss'
 })
-export class ChatComponent implements OnInit {
+
+export class ChatMessageComponent {
+	@Input() room: any;
+	
 	message: string | undefined;
 	messages: string[] = [];
-	rooms: string | undefined;
-	userList: string | undefined;
-	roomName: string | undefined;
+
 	constructor(private chatService: ChatService) {};
 	
 	ngOnInit() {
-		this.chatService.getMessages().subscribe((newmessage ) => {
-			this.messages.push(newmessage);
+		this.chatService.getMessages().subscribe((newmessage: any ) => {
+			this.messages.push(newmessage.message);
 		})
-		this.chatService.getRooms().subscribe((roomList) => {
-			this.rooms = roomList;
-			console.log("getRooms frontend");
-		})
-		this.chatService.getUserList().subscribe((userList) => {
-			this.userList = userList;
-		})
-	};
+	}
 
 	sendMessage() {
 		if (this.message) {
-			this.chatService.sendMessage(this.message);
-			this.messages.push(this.message);
+			this.chatService.sendMessage(this.message, this.room);
+			// this.messages.push(this.message);
 		}
 		this.message = '';
-	}
-
-	createRoom(roomName: string) {
-		if (roomName) {
-		  this.chatService.createRoom(roomName);
-		  this.roomName = '';
-		}
-	}
-
-	getRooms() {
-		this.chatService.getRooms();
-	}
-
-	joinRoom(data: string) {
-		console.log("joinroom component: " + data);
-		this.chatService.joinRoom(data);
-	}
-
-	sendUserList(data: string) {
-		console.log("sendUserList: " + data);
-		this.chatService.sendUserList(data);
+		console.log("sendmessage: " + this.room);
 	}
 }

@@ -1,0 +1,25 @@
+button {
+	background-color: $button-color;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	color: $font-color;
+	font-size: 0.8rem;
+	padding: 1rem;
+	margin-right: 1rem;
+	margin-bottom: 1rem;
+	margin-top: 1rem;
+}
+button:hover {
+	background-color: $font-color;
+	color: lighten($button-color, 20%);
+}
+button:disabled {
+	background-color: $button-color;
+	color: #aaa;
+	cursor: auto;
+}
+
+// .friend_column.button.selected {
+// 	background-color: darken($button-color, 20%);
+// }

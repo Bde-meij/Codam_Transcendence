@@ -22,3 +22,33 @@
 8. settings per room - admins - owner
 
 9. entity's + database
+<h2> Friends! </h2>
+<div class="friend_container">
+	<div class="friend_column">
+		<h3> Your friends </h3>
+
+		<ul class="friends">
+			<li *ngFor="let friend of friends">
+			<button [class.selected]="friend === selectedFriend" type="button" (click)="onSelect(friend)">
+				<!-- <app-user-detail [user]="selectedFriend"></app-user-detail> -->
+				<span class="badge">{{ friend.id }}</span>
+				<span class="name">{{ friend.nickname }}</span>
+			</button>
+			</li>
+		</ul>
+	</div>
+
+	<div class="friend_column" *ngIf="selectedFriend">
+		<app-user-detail [user]="selectedFriend"></app-user-detail>
+	</div>
+
+	<div class="friend_column">
+		<h3> incoming requests </h3>
+		<p> ... </p>
+	</div>
+
+	<div class="friend_column">
+		<h3> outgoing requests </h3>
+		<p> ... </p>
+	</div>
+</div>

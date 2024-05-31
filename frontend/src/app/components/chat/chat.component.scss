@@ -1,0 +1,81 @@
+@import '../../../styles/helpers/constants.scss';
+
+.chat-room_column {
+	flex: 33.33%;
+	min-height: 200px;
+	height: auto;
+	padding: 10px;
+	margin: 5px;
+	background-color: $column-color;
+	// background-color: $background-color;
+	text-align: center;
+}
+.chat-room_container {
+	display: flex;
+}
+
+.friends {
+	margin: 0 0 2em 0;
+	list-style-type: none;
+	padding: 0;
+	width: 15em;
+}
+
+.friends li {
+	display: flex;
+}
+
+.friends button {
+	flex: 1;
+	cursor: pointer;
+	position: relative;
+	left: 0;
+	background-color: $button-color;
+	margin: .5em;
+	padding: 0;
+	border-radius: 4px;
+	display: flex;
+	align-items: stretch;
+	height: 1.8em;
+}
+
+.friends button:hover {
+	color: lighten($font-color, 10%);
+	background-color: darken($button-color, 10%);
+	left: .1em;
+}
+
+.friends button:active {
+	background-color: #525252;
+	color: #fafafa;
+}
+
+.friends button.selected {
+	background-color: $font-color;
+	color: $background-color;
+}
+
+.friends button.selected:hover {
+	background-color: lighten( $font-color, 10%);
+	color: $background-color;
+}
+
+.friends button.selected:active {
+	background-color: $font-color;
+	color: $background-color;
+}
+
+.rooms .room {
+	display: inline-block;
+	font-size: small;
+	color: $background-color;
+	padding: 0.8em 0.7em 0 0.7em;
+	background-color: lighten($font-color, 15%);
+	line-height: 1em;
+	margin-right: .8em;
+	border-radius: 4px 0 0 4px;
+}
+
+.friends .name {
+	align-self: center;
+}

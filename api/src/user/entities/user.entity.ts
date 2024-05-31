@@ -11,4 +11,10 @@ export class User {
 
 	@Column("text", { array: true, default: "{}" })
 	rooms: string[];
+	
+	@Column()
+	status: string;
+
+	@Column()
+	avatar: string;
 }

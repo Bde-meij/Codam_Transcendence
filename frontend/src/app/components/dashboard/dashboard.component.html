@@ -1,35 +1,34 @@
+<span *ngIf="isNotHomeRoute()" >
+	<h1> 
+		{{ title }}
+	</h1>
 
-<h1> 
-	{{ title }}
-</h1>
-<app-logout/>
+	<nav >
+		|
+		<a routerLink="/dashboard/home" > home </a>
+		|
+		<a routerLink="/dashboard/settings"> settings </a>
+		|
+		<a routerLink="/dashboard/game"> game </a>
+		|
+		<a routerLink="/dashboard/friends"> friends </a>
+		|
+		<a routerLink="/dashboard/account"> account </a>
+		|
+		@if (this.unread) {
+			<a class="newchat" routerLink="/dashboard/chat"> NEW CHAT </a>
+		}
+		@else {
+			<a routerLink="/dashboard/chat"> chat </a>
+		}
+		|
+	</nav>
+</span>
 
-<nav>
-	|
-	<a routerLink="/dashboard/home" > home </a>
-	|
-	<a routerLink="/dashboard/settings"> settings </a>
-	|
-	<a routerLink="/dashboard/game"> game </a>
-	|
-	<a routerLink="/dashboard/friends"> friends </a>
-	|
-	<a routerLink="/dashboard/account"> account </a>
-	|
-	@if (this.unread) {
-		<a class="newchat" routerLink="/dashboard/chat"> NEW CHAT </a>
-	}
-	@else {
-		<a routerLink="/dashboard/chat"> chat </a>
-	}
-	|
-</nav>
-
-<p>
+<!-- <p>
 	hi {{user$ | async | json }};
-</p>
-
+</p> -->
 
 <router-outlet></router-outlet>
 
-
+<app-logout/>

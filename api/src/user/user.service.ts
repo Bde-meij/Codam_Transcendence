@@ -9,8 +9,7 @@ import { User } from './entities/user.entity';
 export class UserService {
 	constructor(@InjectRepository(User) private readonly userRepo: Repository<User>) {}
 
-  async userExists(id: string)
-	{
+  	async userExists(id: string) {
 		const user = await this.userRepo.findOne({where: {id}});
 		if (user)
 			return true;
@@ -32,5 +31,13 @@ export class UserService {
 		const user = await this.userRepo.findOne({where: {nickname :name}});
 		console.log(user);
 		return user;
+	}
+
+	async updateStatus(id: string, newStatus: string) {
+		await this.userRepo.update(id, {status: newStatus});
+	}
+
+	async updateAvatar(id: string, newAvatar: string) {
+		await this.userRepo.update(id, {avatar: newAvatar});
 	}
 }
