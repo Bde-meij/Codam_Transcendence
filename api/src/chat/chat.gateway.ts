@@ -242,8 +242,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 	private getInfoRoom(room: Rooms): void {
-		console.log("---- Info Room ----")
-		console.log(room);
+		// console.log("---- Info Room ----")
+		// console.log(room);
 	}
 	
 }
