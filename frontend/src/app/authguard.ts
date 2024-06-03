@@ -13,7 +13,8 @@ export class AuthGuard{
 	canActivate(): boolean {
 		if (this.authService.getLogStatus()) {
 			return true;
-		} else {
+		}
+    else {
 			// this.router.navigate(['/welcome']);
 			return true;
 		}
