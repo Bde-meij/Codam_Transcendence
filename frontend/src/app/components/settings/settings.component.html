@@ -1,1 +1,5 @@
-<p>settings works!</p>
+<input type="checkbox" [(ngModel)]="isChecked" (change)="onChange()">Enable Google 2FA
+<img src="{{this.qrCode}}">
+<p>{{this.secret}}</p>
+<input type="text" [(ngModel)]="userInput">
+<button (click)="verifyUserInput()">Verify</button>

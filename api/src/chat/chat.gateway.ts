@@ -50,9 +50,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		console.log("server initialized");
 	}
 
+
+
 	async handleConnection(client: Socket) {
 		try {
-			console.log("handleConnection: " + client.id, "connecting...");
+			console.log("handleConnection: " + client.id + "connecting...");
 			const cookies = client.handshake.headers.cookie?.split('; ');
 			if (!cookies)
 				throw new NotAcceptableException();
@@ -90,22 +92,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 	
 	handleDisconnect(client: any) {
-		console.log("handeleDisconnect: user " + client.id + " disconnected");
-		this.connectedUsers = this.connectedUsers.filter(item => item !== client.id);
-		this.getRoomsEmit(client);
+		console.log("chat: user " + client.id + " disconnected");
 	}
 	
-	// @SubscribeMessage('message')
-	// async handleMessage(
-	// 	@MessageBody() data: string,
-	// 	@ConnectedSocket() client: Socket
-	// ) {
-	// 	console.log('chat: message recieved from ' + client.data.nickname + ': ' + data);
-	// 	client.broadcast.emit('message', client.data.nickname + ": " + data);
-		
-	// 	return data;
-	// }
-
 	@SubscribeMessage('message')
 	async handleMessage(
 		@MessageBody() data: { message: string, sender: string, room: string },
