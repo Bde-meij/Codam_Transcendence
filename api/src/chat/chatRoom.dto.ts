@@ -1,14 +1,15 @@
-export interface ChatRoomListDto {
-	roomId: string;
-	roomName: string;
-	RoomOwner: string;
-	adminList: string[];
-	banList: string[];
-	muteList: string[];
+export interface Rooms {
+	id: string;
+	name: string;
+	owner: string;
+	admins: string[];
+	banned?: string[];
+	muted?: string[];
 	status: string;
 	password: string | null;
 	created?: Date;
 	updated?: Date;
+	messages?: MessageInterface[];
 }
 
 export interface userDto {
@@ -20,11 +21,10 @@ export interface userDto {
 
 export interface MessageInterface {
 	message: string;
-	channelId: string;
+	roomId: string;
 	senderId: number;
-	channelIdList: number[];
-	blockedUsers: string;
-	sizedPicture?: string;
+	created?: Date;
+	updated?: Date;
 }
 
 // export interface ConnectedInterface {

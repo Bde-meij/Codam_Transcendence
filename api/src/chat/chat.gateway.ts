@@ -1,5 +1,5 @@
 import { NotAcceptableException, Req } from '@nestjs/common';
-import { ChatRoomListDto, userDto } from './chatRoom.dto';
+import { Rooms, userDto, MessageInterface } from './chatRoom.dto';
 import {
 	ConnectedSocket,
 	MessageBody,
@@ -26,20 +26,19 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	@WebSocketServer() 
 	io: Server;
-	chatRoomList: Record<string, ChatRoomListDto>;
+	chatRoomList: Record<string, Rooms>;
   	userList: Record<string, userDto>;
 	private connectedUsers: string[] = [];
-	
 
 	constructor(private authService: AuthService, private userService: UserService) {
 		this.chatRoomList = {
 			lobby: {
-			  roomId: 'roomid',
-			  roomName: 'roomname',
-			  RoomOwner: "owner",
-			  adminList: [],
-			  banList: [],
-			  muteList: [],
+			  id: 'roomid',
+			  name: 'roomname',
+			  owner: "owner",
+			  admins: [],
+			  banned: [],
+			  muted: [],
 			  status: "public",
 			  password: null,
 			},
@@ -53,7 +52,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	async handleConnection(client: Socket) {
 		try {
-			console.log(client.id, "connecting...");
+			console.log("handleConnection: " + client.id, "connecting...");
 			const cookies = client.handshake.headers.cookie?.split('; ');
 			if (!cookies)
 				throw new NotAcceptableException();
@@ -73,13 +72,14 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			if (!user)
 				throw new NotAcceptableException();
 			client.data.nickname = user.nickname;
-			console.log(user.nickname, "connected on socket:", client.id);
-
-			this.connectedUsers.push(client.id);
-			console.log("users: " + this.connectedUsers);
-
+			// client.data.id = user.id;
+			this.connectedUsers.push(user.id);
 			client.emit('getConnectedUsers', this.connectedUsers);
 			this.getRoomsEmit(client);
+			
+
+			console.log(user.nickname, "connected on socketID:", client.id);
+			console.log("ConnectedUsers: " + this.connectedUsers);
 			console.log(Array.from(client.rooms))
 		} catch {
 			console.log(client.id, "connection refused");
@@ -90,9 +90,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 	
 	handleDisconnect(client: any) {
-		console.log("chat: user " + client.id + " disconnected");
+		console.log("handeleDisconnect: user " + client.id + " disconnected");
 		this.connectedUsers = this.connectedUsers.filter(item => item !== client.id);
-		
 		this.getRoomsEmit(client);
 	}
 	
@@ -109,38 +108,44 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	@SubscribeMessage('message')
 	async handleMessage(
-		@MessageBody() data: { message: string, sender: string },
+		@MessageBody() data: { message: string, sender: string, room: string },
 		@ConnectedSocket() socket: Socket,
 	) {
 		const nickname = socket.data.nickname;
 		const message = data.message;
-		const chatRoom = this.chatRoomList[socket.data.roomId];
+		const room = data.room;
+
+		const chatRoom = this.chatRoomList[room];
+		console.log(chatRoom);
+		// const chatRoom = this.chatRoomList[socket.data.id];
+		
 		this.io
-		.to(socket.data.roomId)
+		.to(socket.data.id)
 		.emit('message', { nickname: nickname, message: message });
-		console.log("send message: " + socket.data.roomId + ", nickname: " + nickname + ", msg: " + message + ", chat name: " + socket.id )
+		console.log("send message: " + data.room + ", nickname: " + nickname + ", msg: " + message + ", chat name: " + socket.id )
 	}
 
 	@SubscribeMessage('createRoom')
 	async createRoom(
-	@MessageBody() data: { roomId: string; password: string },
+	@MessageBody() data: { id: string; password: string },
 	@ConnectedSocket() socket: Socket,
 	) {
-		console.log("createRoom called: " + data.roomId);
+		console.log("createRoom called: " + data.id);
 		
-		const roomId = data.roomId;
-		socket.data.roomId = roomId;
-		socket.data.roomName = roomId;
-		this.chatRoomList[roomId] = {
-			roomId: roomId,
-			roomName: roomId,
-			RoomOwner: roomId,
-			adminList: [socket.data.nickname],
-			banList: [],
-			muteList: [],
+		const id = data.id;
+		socket.data.id = id;
+		socket.data.name = id;
+		this.chatRoomList[id] = {
+			id: id,
+			name: id,
+			owner: socket.data.nickname,
+			admins: [socket.data.nickname],
+			banned: [],
+			muted: [],
 			status: "public",
 			password: data.password,
-		};
+			messages: [], 
+		  };
 		if (!this.userList[socket.data.nickname]) {
 			this.userList[socket.data.nickname] = {
 			  roomId: '',
@@ -149,16 +154,18 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			  isAdmin: false,
 			};
 		  }
-		this.userList[socket.data.nickname].roomId = roomId;
+		this.userList[socket.data.nickname].roomId = id;
 		this.userList[socket.data.nickname].isAdmin = true;
-		socket.join(roomId);
-		// socket.emit('joinRoom', { roomName: roomId });
-		// this.io.to(socket.data.roomId).emit('addUser', socket.data.nickname);
-		this.channelUserList(roomId);	
+
+		socket.join(id);
+		// socket.emit('joinRoom', { name: id });
+		// this.io.to(socket.data.id).emit('addUser', socket.data.nickname);
+		this.channelUserList(id);	
 		// socket.emit('isAdmin');
 		console.log('roomList: ' +  Array.from(socket.rooms));
 		// console.log('roomList: ' +  Array.from(socket.rooms)[1]);
-		console.log('socket nickname: ' +  socket.data.roomId);
+		console.log('socket nickname: ' +  socket.data.id);
+		this.getInfoRoom(this.chatRoomList[id]);
 
 
 		// console.log('roomList: ' + (Object.keys(socket.rooms)));
@@ -169,18 +176,18 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		socket.emit('getRooms', Array.from(socket.rooms).slice(1));
 	}
 
-	async channelUserList(roomId: string) {
+	async channelUserList(id: string) {
 		const users = [];
-		// const sockets = this.io.sockets.adapter.rooms.get(roomId);
-		// const sockets = await this.io.of("/chat").in(roomId).allSockets();
-		const sockets = await this.io.in(roomId).fetchSockets();
+		// const sockets = this.io.sockets.adapter.rooms.get(id);
+		// const sockets = await this.io.of("/chat").in(id).allSockets();
+		const sockets = await this.io.in(id).fetchSockets();
 		if (!sockets)
 		  return;
 		sockets.forEach((obj) => {
 			users.push(obj.id);
-			console.log("user: " + obj.data.nickname);
+			console.log("channelUserList: " + obj.data.nickname);
 		});
-		this.io.to(roomId).emit('userList', users);
+		this.io.to(id).emit('userList', users);
 		console.log("channelUserList: " + users);
 	}
 
@@ -192,30 +199,30 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	@SubscribeMessage('joinRoom')
 	async joinRoom(
-	@MessageBody() data: { roomId: string, password: string },
+	@MessageBody() data: { id: string, password: string },
 	@ConnectedSocket() socket: Socket,
 	) {
-		console.log("joinRoom api: " + data.roomId);
-		const roomId = data.roomId;
+		console.log("joinRoom api: " + data.id);
+		const id = data.id;
 		// const Room = Object.values(this.chatRoomList).find(
-		// 	(room) => room.roomId === roomId,
+		// 	(room) => room.id === id,
 		// );
 		// if (Room === undefined) {
 		// 	socket.emit('errorMessage', 'The room does not exists.',);
 		// 	return;
 		// }
-		// else if (Room.roomId === socket.data.roomId) {
+		// else if (Room.id === socket.data.id) {
 		// 	socket.emit('systemMessage', 'You have already entered the room.');
 		// 	return;
 		// }
-		socket.data.roomId = roomId;
-		socket.data.roomName = roomId;
-		socket.join(roomId);
-		this.userList[socket.data.nickname].roomId = roomId;
-		// socket.emit('joinRoom', { roomName: roomId });
-		console.log("joinroom: " + roomId);
-		// this.io.to(socket.data.roomId).emit('addUser', socket.data.nickname);
-		this.channelUserList(roomId);
+		socket.data.id = id;
+		socket.data.name = id;
+		socket.join(id);
+		this.userList[socket.data.nickname].roomId = id;
+		// socket.emit('joinRoom', { name: id });
+		console.log("joinroom: " + id);
+		// this.io.to(socket.data.id).emit('addUser', socket.data.nickname);
+		this.channelUserList(id);
 	}
 	// check pw
 	@SubscribeMessage('joinPrivateRoom') async joinPrivateRoom(){}
@@ -231,6 +238,23 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@SubscribeMessage('ban') async ban() {}
 	@SubscribeMessage('unBan') async unban() {}
 
+	private addMessageToRoom(message: MessageInterface): void {
+		const roomId = message.roomId;
 	
+		if (this.chatRoomList[roomId]) {
+		  if (!this.chatRoomList[roomId].messages) {
+			this.chatRoomList[roomId].messages = [];
+		  }
+		  this.chatRoomList[roomId].messages?.push(message);
+		  console.log(`Message added to room ${roomId}:`, message);
+		} else {
+		  console.error(`Room with ID ${roomId} not found`);
+		}
+	}
+
+	private getInfoRoom(room: Rooms): void {
+		console.log("---- Info Room ----")
+		console.log(room);
+	}
 	
 }

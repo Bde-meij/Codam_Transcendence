@@ -22,6 +22,9 @@
 8. settings per room - admins - owner
 
 9. entity's + database
+
+
+
 <h2> Friends! </h2>
 <div class="friend_container">
 	<div class="friend_column">
