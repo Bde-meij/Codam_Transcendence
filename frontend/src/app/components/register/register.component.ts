@@ -1,51 +1,80 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Injectable, OnInit } from '@angular/core';
 import { UserService } from '../../services/user/user.service';
-import { ReactiveFormsModule, FormControl, FormGroup, FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormControl, FormGroup, Validators, ValidatorFn, AbstractControl, ValidationErrors, AsyncValidator} from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
-import { AsyncPipe, NgOptimizedImage } from '@angular/common';
-import { Observable } from 'rxjs';
+import { NgIf, NgOptimizedImage } from '@angular/common';
 import { AuthService } from '../../services/auth/auth.service';
+import { Observable, catchError, map, of } from 'rxjs';
+
+export function forbiddenNameValidator(nameRe: RegExp): ValidatorFn {
+	return (control: AbstractControl): ValidationErrors | null => {
+		const forbidden = nameRe.test(control.value);
+		return forbidden ? {forbiddenName: {value: control.value}} : null;
+	};
+}
+
+@Injectable({providedIn: 'root'})
+export class UniqueNameValidator implements AsyncValidator {
+	constructor(private authService: AuthService) {}
+
+	validate(control: AbstractControl): Observable<ValidationErrors | null> {
+		return this.authService.isNameTaken(control.value).pipe(
+			map((isTaken) => (isTaken ? {uniqueName: true} : null)),
+			catchError(() => of(null)),
+		);
+	}
+}
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, FormsModule, NgOptimizedImage, AsyncPipe],
+  imports: [ReactiveFormsModule, NgOptimizedImage, NgIf],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss'
 })
 export class RegisterComponent implements OnInit{
 	profileForm = new FormGroup({
-		nickname: new FormControl(''),
+		nickname: new FormControl('', {
+			validators: [
+				Validators.required,
+				forbiddenNameValidator(/gary/),
+				forbiddenNameValidator(/Gary/),
+			],
+			asyncValidators: [
+				this.nameValidator.validate.bind(this.nameValidator),
+			],
+			updateOn: 'change',
+		}),
 	});
 
 	newName : string = '';
 	errorMessage = "";
 
-	constructor(private userService: UserService, private authService: AuthService, private router: Router) {};
+	constructor(private authService: AuthService, private router: Router, private nameValidator: UniqueNameValidator) {};
 
 	ngOnInit(): void {
-		// this.avatarInfo = this.userService.getAvatar();
 	}
 
 	register() {
-		console.log(this.newName);
-		this.authService.register(this.newName).subscribe({
-			next: (data) => {
-				console.log(data),
-				this.router.navigate(['/dashboard/home']);
-			},
-			error: (e : HttpErrorResponse) => {
-				this.errorMessage = e.error.message,
-				console.log(e.error.message)
-			},
-			complete: () => console.info('complete') 
-		});
+		console.log(this.profileForm.value.nickname);
+		if (this.profileForm.value.nickname) {
+			this.authService.register(this.profileForm.value.nickname).subscribe({
+				next: (data) => {
+					console.log(data),
+					this.router.navigate(['/dashboard/home']);
+				},
+				error: (e : HttpErrorResponse) => {
+					this.errorMessage = e.error.message,
+					console.log(e.error.message)
+				},
+				complete: () => console.info('complete') 
+			});
+		}
 	};
 
 	submitForm() {
-		alert (
-			this.profileForm.value.nickname
-		);
+		alert("succesfully clicked the button good job");
+		this.register();
 	}
 }

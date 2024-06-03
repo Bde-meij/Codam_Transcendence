@@ -1,7 +1,36 @@
-<label for="nickname">Nickname:</label>
-<input type="text" id="nickname" [(ngModel)]="this.newName" placeholder="Enter a nickname here" />
+<!-- <label for="nickname">Nickname:</label>
+<input type="text" id="nickname" [(ngModel)]="this.newName" placeholder="Enter a nickname here" /> -->
 
-<h1>Hello {{ newName }}!</h1>
+
+
+
+<!-- <div>
+	<button class="logbutton" (click)="register()"> register </button>
+</div> -->
+
+<form [formGroup]="profileForm" (ngSubmit)="submitForm()">
+	<h1 *ngIf="this.profileForm.value.nickname">Hi {{ this.profileForm.value.nickname }}!</h1>
+	<h1 *ngIf="!this.profileForm.value.nickname">Hey you!</h1>
+	<label>
+		<p>
+			How do you want Gary to call you?
+		</p>
+		<p>
+			<input type="text" formControlName="nickname" placeholder="Gary's cutie 😘"/>
+		</p>
+	</label>
+	<p>
+		<button type="submit" [disabled]="!profileForm.valid">
+			Submit
+		</button>
+	</p>
+</form>
+
+<div *ngIf="profileForm.pending">
+	<img ngSrc="/assets/gifs/gary_spongebob.gif" height="100" width="100" /> 
+</div>
+
+
 
 @if (errorMessage) {
 	<div>
@@ -10,17 +39,3 @@
 		</p>
 	</div>
 }
-
-<div>
-	<button class="logbutton" (click)="register()"> register </button>
-</div>
-
-<form [formGroup]="profileForm" (ngSubmit)="submitForm()">
-	<label>
-		How do you want Gary to call you?
-		<input type="text" formControlName="nickname"/>
-	</label>
-	<button type="submit">
-		Submit
-	</button>
-</form>
