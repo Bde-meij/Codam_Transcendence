@@ -6,12 +6,11 @@ import { AsyncPipe, NgIf, UpperCasePipe } from '@angular/common';
 import { UserDetailComponent } from '../user-detail/user-detail.component';
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
-import { TestFranComponent } from '../test-fran/test-fran.component';
 
 @Component({
   selector: 'app-account',
   standalone: true,
-  imports: [UserDetailComponent, AsyncPipe, UpperCasePipe, FormsModule, NgIf, TestFranComponent],
+  imports: [UserDetailComponent, AsyncPipe, UpperCasePipe, FormsModule, NgIf],
   templateUrl: './account.component.html',
   styleUrl: './account.component.scss'
 })

@@ -24,7 +24,7 @@ export class AuthController {
 
 	// Checks whether the user is authorized using the jwtguard
 	// Returns: {loggedIn: true} on success - 401 Unauthorized on failure
-	@Get('check')
+	@Get('isloggedin')
 	@UseGuards(JwtGuard)
 	async checkLoggedIn() {
 		return {loggedIn: true};
@@ -122,14 +122,5 @@ export class AuthController {
 	async isTwoFAEnabled(@Req() req, @Res() res) {
 		const isEnabled = (await this.userService.findUserById(req.user.id)).isTwoFAEnabled;
 		res.json({isTwoFAEnabled: isEnabled});
-	}
-
-	@Get('isloggedin')
-	@UseGuards(JwtGuard)
-	async isLoggedIn(@Req() req, @Res() res) {
-		if ((await this.userService.findUserById(req.user.id)).status == 'offline')
-			res.json({loggedIn: false});
-		else
-			res.json({loggedIn: true});
 	}
 }
