@@ -9,8 +9,8 @@ export class User {
 	@Column()
 	nickname: string;
 
-	@Column("text", { array: true, default: "{}" })
-	rooms: string[];
+	// @Column("text", { array: true, default: "{}" })
+	// rooms: string[];
 	
 	@Column()
 	status: string;
