@@ -15,15 +15,20 @@
 	width: 512px;
 	z-index: 2;
 	background-size: 100%;
-	background-image: url("/assets/images/door.jpeg");
+	background: url("/assets/images/door.jpeg");
 	color: transparent;
 }
 
 .welcome_button:hover{
-	// opacity: 0;
-	background: url("/assets/gifs/door.gif");
-	// background-repeat: no-repeat;
+	background: url("/assets/gifs/door_once.gif");
 	color: tan;
 	font-size: larger;
 	font-weight: bolder;
 }
+
+// .welcome_button:hover::after {
+// 	background: url("/assets/gifs/door2.gif");
+// }
+
+
+

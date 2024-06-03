@@ -30,7 +30,7 @@ export class RegisterComponent implements OnInit{
 		this.authService.register(this.newName).subscribe({
 			next: (data) => {
 				console.log(data),
-				this.router.navigate(['/dashboard']);
+				this.router.navigate(['/dashboard/home']);
 			},
 			error: (e : HttpErrorResponse) => {
 				this.errorMessage = e.error.message,

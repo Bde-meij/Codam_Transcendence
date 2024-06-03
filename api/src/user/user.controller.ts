@@ -54,6 +54,12 @@ export class UserController {
 	async getAvatar(@Req() req, @Res() res) {
 		const user = await this.userService.findUserById(req.user.id);
 		const file = createReadStream(join(process.cwd(), user.avatar));
+
+		// Return error 404 if the avatar doesn't exist
+		file.on('error', () => {
+			return res.status(HttpStatus.NOT_FOUND).json({message: 'Avatar not found', avatar: user.avatar});
+		})
+		
 		file.pipe(res);
 	}
 
