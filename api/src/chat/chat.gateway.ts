@@ -52,7 +52,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	async handleConnection(client: Socket) {
 		try {
-			console.log("handleConnection: " + client.id, "connecting...");
+			console.log("handleConnection: " + client.id + "connecting...");
 			const cookies = client.handshake.headers.cookie?.split('; ');
 			if (!cookies)
 				throw new NotAcceptableException();
@@ -77,7 +77,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			client.emit('getConnectedUsers', this.connectedUsers);
 			this.getRoomsEmit(client);
 			
-
 			console.log(user.nickname, "connected on socketID:", client.id);
 			console.log("ConnectedUsers: " + this.connectedUsers);
 			console.log(Array.from(client.rooms))
@@ -114,7 +113,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		const nickname = socket.data.nickname;
 		const message = data.message;
 		const room = data.room;
-
+		
 		const chatRoom = this.chatRoomList[room];
 		console.log(chatRoom);
 		// const chatRoom = this.chatRoomList[socket.data.id];
