@@ -113,4 +113,3 @@ export class AccountComponent implements OnInit {
 	// 	// }
 	// 	// this.user.avatar.append('file', this.userService.getAvatar().subscribe());
 	// };
-

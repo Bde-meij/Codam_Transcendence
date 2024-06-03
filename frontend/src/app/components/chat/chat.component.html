@@ -1,11 +1,73 @@
-<p>chat works!</p>
+<h2> Chat Rooms </h2>
+
+<div class = chat-room_container>
+
+	<div class = chat-room_column>
+		<h3> Your chats </h3>
+		<ul class="rooms"></ul>
+			<li *ngFor="let room of rooms">
+				{{ room}}
+			<button [class.selected]="room === selectedRoom" type="button" (click)="onSelect(room)"></button>
+			<button (click)="joinRoom(room.name)"> Send </button>
+			<button (click)="sendUserList(room.name)"> Send </button>
+			</li>
+	</div>
+	<!-- <div class = chat-room_columns>
+		<h3> Your Rooms chats </h3>
+		<ul class="rooms"></ul>
+			<li *ngFor="let room of roomss">
+				{{ room.name}}
+			</li>
+	</div> -->
+
+
+	<div class="chat-room_column" *ngIf="selectedRoom">
+		<app-chat-message [room]="selectedRoom"></app-chat-message>
+	</div>
+
+	<div class="chat_column">
+		<h3>Create a room:</h3>
+		<input [(ngModel)]="roomName" (keydown.enter)="createRoom(roomName!)" type="text">
+		<button (click)="createRoom(roomName!)">Send</button>
+	  </div>
+	  
+
+	<div class = chat_column>
+		<h3> List of connected users:  </h3>
+		<ul>
+			<li *ngFor="let m of userss">
+				{{ m }}
+			</li>
+		</ul>
+	
+		<input [(ngModel)]="message" (keydown.enter)="sendMessage()" type="text" > 
+		<button (click)="sendMessage()"> Send </button>
+	</div>
+</div>
+
+
+<!-- <p>chat works!</p>
 
 <div class = chat_container>
 
 	<div class = chat_column>
 		<h3> Your channels </h3>
-		<p> ... </p>
+		<ul>
+			<li *ngFor="let r of rooms">
+				{{ r }}
+				<button (click)="joinRoom(r)"> Send </button>
+				<button (click)="sendUserList(r)"> Send </button>
+			</li>
+		</ul>
+		
 	</div>
+
+	<div class="chat_column">
+		<h3>Create a room:</h3>
+		<input [(ngModel)]="roomName" (keydown.enter)="createRoom(roomName!)" type="text">
+		<button (click)="createRoom(roomName!)">Send</button>
+	  </div>
+	  
 
 	<div class = chat_column>
 		<h3> the messages in channel:  </h3>
@@ -18,4 +80,4 @@
 		<input [(ngModel)]="message" (keydown.enter)="sendMessage()" type="text" > 
 		<button (click)="sendMessage()"> Send </button>
 	</div>
-</div>
+</div> -->

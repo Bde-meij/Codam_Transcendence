@@ -1,0 +1,13 @@
+
+<div class = chat_column>
+	<!-- <div *ngIf="room" ></div> -->
+	<h3> the messages in room: {{ room}}   </h3>
+	<ul>
+		<li *ngFor="let message of messages">
+			{{ message }}
+		</li>
+	</ul>
+
+	<input [(ngModel)]="message" (keydown.enter)="sendMessage()" type="text" > 
+	<button (click)="sendMessage()"> Send </button>
+</div>
