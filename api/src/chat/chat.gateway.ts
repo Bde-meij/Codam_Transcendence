@@ -50,6 +50,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		console.log("server initialized");
 	}
 
+
+
 	async handleConnection(client: Socket) {
 		try {
 			console.log("handleConnection: " + client.id + "connecting...");
@@ -89,22 +91,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 	
 	handleDisconnect(client: any) {
-		console.log("handeleDisconnect: user " + client.id + " disconnected");
-		this.connectedUsers = this.connectedUsers.filter(item => item !== client.id);
-		this.getRoomsEmit(client);
+		console.log("chat: user " + client.id + " disconnected");
 	}
 	
-	// @SubscribeMessage('message')
-	// async handleMessage(
-	// 	@MessageBody() data: string,
-	// 	@ConnectedSocket() client: Socket
-	// ) {
-	// 	console.log('chat: message recieved from ' + client.data.nickname + ': ' + data);
-	// 	client.broadcast.emit('message', client.data.nickname + ": " + data);
-		
-	// 	return data;
-	// }
-
 	@SubscribeMessage('message')
 	async handleMessage(
 		@MessageBody() data: { message: string, sender: string, room: string },
@@ -184,10 +173,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		  return;
 		sockets.forEach((obj) => {
 			users.push(obj.id);
-			console.log("channelUserList: " + obj.data.nickname);
+			// console.log("channelUserList: " + obj.data.nickname);
 		});
 		this.io.to(id).emit('userList', users);
-		console.log("channelUserList: " + users);
+		// console.log("channelUserList: " + users);
 	}
 
 	async getRoomsEmit(socket: Socket){
@@ -201,7 +190,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@MessageBody() data: { id: string, password: string },
 	@ConnectedSocket() socket: Socket,
 	) {
-		console.log("joinRoom api: " + data.id);
+		// console.log("joinRoom api: " + data.id);
 		const id = data.id;
 		// const Room = Object.values(this.chatRoomList).find(
 		// 	(room) => room.id === id,
@@ -219,7 +208,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		socket.join(id);
 		this.userList[socket.data.nickname].roomId = id;
 		// socket.emit('joinRoom', { name: id });
-		console.log("joinroom: " + id);
+		// console.log("joinroom: " + id);
 		// this.io.to(socket.data.id).emit('addUser', socket.data.nickname);
 		this.channelUserList(id);
 	}
@@ -252,8 +241,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 	private getInfoRoom(room: Rooms): void {
-		console.log("---- Info Room ----")
-		console.log(room);
+		// console.log("---- Info Room ----")
+		// console.log(room);
 	}
 	
 }

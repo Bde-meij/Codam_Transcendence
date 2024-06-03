@@ -12,7 +12,7 @@ export class TestingController {
 	// Adds a single test user to the database
 	@Post('user')
 	async addUser(@Body() user: CreateUserDto): Promise<User[]> {
-		return await this.userService.createUser({...user, avatar: "/uploads/default_avatar.png", status: "online"});
+		return await this.userService.createUser({...user, avatar: "/uploads/default_avatar.png", status: "online", twoFASecret: null, isTwoFAEnabled: false});
 	}
 
 	// Adds an array of test users to the database
@@ -20,7 +20,7 @@ export class TestingController {
 	async addUsers(@Body() users: CreateUserDto[]): Promise<User[]> {
 		var tempUsers: User[] = [];
 		users.forEach(user => {
-			tempUsers.push({...user, avatar: "/uploads/default_avatar.png", status: "online"});
+			tempUsers.push({...user, avatar: "/uploads/default_avatar.png", status: "online", twoFASecret: null, isTwoFAEnabled: false});
 		});
 		return await this.userService.createUser(tempUsers);
 	}
