@@ -10,6 +10,7 @@ import { PageNotFoundComponent } from './components/page-not-found/page-not-foun
 import { ChatComponent } from './components/chat/chat.component';
 import { RegisterComponent } from './components/register/register.component';
 import { HomeComponent } from './components/home/home.component';
+import { GameMenuComponent } from './components/game-menu/game-menu.component';
 
 export const routes: Routes = [
 	{
@@ -43,6 +44,10 @@ export const routes: Routes = [
 			{
 				path: 'game',
 				component: GameComponent,
+			},
+			{
+				path: 'game-menu',
+				component: GameMenuComponent,
 			},
 			{
 				path: 'friends',
