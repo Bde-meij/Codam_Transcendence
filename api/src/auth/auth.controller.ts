@@ -74,7 +74,6 @@ export class AuthController {
 	@UseGuards(JwtGuard)
 	async setupTwoFA(@Req() req, @Res() res) {
 		const user = await this.userService.findUserById(req.user.id);
-		await this.userService.enableTwoFA(user.id);
 		const secret = await this.authService.generateTwoFASecret(user.id);
 		const otpauthUrl = speakeasy.otpauthURL({
 			secret: secret.ascii,
@@ -90,6 +89,9 @@ export class AuthController {
 	@UseGuards(JwtGuard)
 	async verifyTwoFA(@Req() req, @Res() res, @Body() body) {
 		const user = await this.userService.findUserById(req.user.id);
+		if (!user.isTwoFAEnabled) {
+			await this.userService.enableTwoFA(user.id);
+		}
 		const secret = user.twoFASecret;
 		const isValid = await this.authService.verifyTwoFAToken(secret, body.userInput);
 		if (isValid) {
