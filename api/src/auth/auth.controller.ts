@@ -45,7 +45,7 @@ export class AuthController {
 	@Get('callback')
 	@UseGuards(AuthGuard('fortytwo'))
 	async callback(@Req() req: Request, @Res() res: Response) {
-		const user = {id: (req.user as any).id, nickname: (req.user as any).nickname, status: "online", avatar: ""};
+		const user = {id: (req.user as any).id, nickname: (req.user as any).nickname, status: "online", avatar: "", rooms: (req.user as any).rooms};
 	const token = await this.authService.getJwtAccessToken(user);
 	res.cookie("access_token", token.access_token);
 		if (!await this.userService.userExists(user.id)) {
@@ -62,6 +62,7 @@ export class AuthController {
 
 	@Post('register')
 	@UseGuards(JwtGuard)
+	//@UseGuards(AuthGuard('fortytwo'))
 	async register(@Req() req, @Res() res: Response, @Body() body: {nickname : string}) {
 		console.log("NEW NAME:", body.nickname);
 		const user: any = {id: req.user.id, nickname: body.nickname, avatar: "/uploads/default_avatar.png", status: "online"};
