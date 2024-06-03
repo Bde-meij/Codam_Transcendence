@@ -47,7 +47,9 @@ export class ChatComponent implements OnInit {
 		})
 		this.chatService.getRoomss().subscribe((roomList: any) => {
 			this.roomss.push(roomList);
-			console.log("getRooms frontend");
+			console.log("getRoomss frontend");
+			console.log(this.roomss);
+
 		})
 		this.chatService.getConnectedUsers().subscribe((userList: any) => {
 			this.userss = userList;

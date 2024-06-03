@@ -16,6 +16,8 @@ export class ChatService{
 	user$ : Observable<User> | undefined;
 	userss: string[] = [];
 	rooms: Rooms[] = []; 
+	roomss: Rooms[] = []; 
+
 	constructor(sockService: SockService, private userService: UserService) {
 		
 		this.chatSocket.onAny((event, ...args) => {
@@ -132,13 +134,12 @@ export class ChatService{
 		});
 	}
 
-	getRoomss(): Observable<Rooms> {
-		return new Observable<Rooms>((observer) => {
-		  this.chatSocket.on('getRooms', (rooms: Rooms[]) => {
-			console.log("getRoomss: ", rooms[rooms.length - 1]);
-			if (rooms.length > 0) {
-			  const lastRoom = rooms[rooms.length - 1];
-			  observer.next(lastRoom); // Emit the last room in the array
+	getRoomss(): Observable<Rooms[]> {
+		return new Observable<Rooms[]>((observer) => {
+		  this.chatSocket.on('getRoomss', (roomss: Rooms[]) => {
+			console.log("getRoomss: ", roomss);
+			if (roomss.length > 0) {
+			  observer.next(roomss); // Emit the array of rooms
 			} else {
 			  observer.error('No rooms available');
 			}

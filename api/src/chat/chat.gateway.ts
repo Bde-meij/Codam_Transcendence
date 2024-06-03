@@ -31,26 +31,13 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	private connectedUsers: string[] = [];
 
 	constructor(private authService: AuthService, private userService: UserService) {
-		this.chatRoomList = {
-			lobby: {
-			  id: 'roomid',
-			  name: 'roomname',
-			  owner: "owner",
-			  admins: [],
-			  banned: [],
-			  muted: [],
-			  status: "public",
-			  password: null,
-			},
-		  };
+		this.chatRoomList = {};
 		this.userList = {};
 	}
 
 	afterInit() {
 		console.log("server initialized");
 	}
-
-
 
 	async handleConnection(client: Socket) {
 		try {
@@ -79,6 +66,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			client.emit('getConnectedUsers', this.connectedUsers);
 			this.getRoomsEmit(client);
 			
+
 			console.log(user.nickname, "connected on socketID:", client.id);
 			console.log("ConnectedUsers: " + this.connectedUsers);
 			console.log(Array.from(client.rooms))
@@ -102,7 +90,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		const nickname = socket.data.nickname;
 		const message = data.message;
 		const room = data.room;
-		
+
 		const chatRoom = this.chatRoomList[room];
 		console.log(chatRoom);
 		// const chatRoom = this.chatRoomList[socket.data.id];
@@ -153,7 +141,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		console.log('roomList: ' +  Array.from(socket.rooms));
 		// console.log('roomList: ' +  Array.from(socket.rooms)[1]);
 		console.log('socket nickname: ' +  socket.data.id);
-		this.getInfoRoom(this.chatRoomList[id]);
+		// this.getInfoRoom(this.chatRoomList[id]);
 
 
 		// console.log('roomList: ' + (Object.keys(socket.rooms)));
@@ -162,6 +150,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		//   }
 
 		socket.emit('getRooms', Array.from(socket.rooms).slice(1));
+		socket.emit('getRoomss', this.chatRoomList);
+		console.log(this.chatRoomList);
+		
 	}
 
 	async channelUserList(id: string) {
@@ -241,8 +232,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 	private getInfoRoom(room: Rooms): void {
-		// console.log("---- Info Room ----")
-		// console.log(room);
+		console.log("---- Info Room ----")
+		console.log(room);
 	}
 	
 }
