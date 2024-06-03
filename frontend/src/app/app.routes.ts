@@ -8,6 +8,9 @@ import { AccountComponent } from './components/account/account.component';
 import { AuthGuard } from './authguard';
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
 import { ChatComponent } from './components/chat/chat.component';
+import { RegisterComponent } from './components/register/register.component';
+import { HomeComponent } from './components/home/home.component';
+import { GameMenuComponent } from './components/game-menu/game-menu.component';
 
 export const routes: Routes = [
 	{
@@ -19,6 +22,11 @@ export const routes: Routes = [
 	{
 		path: 'welcome',
 		component: WelcomeComponent,
+		data: { title: "Gary's basement" }
+	},
+	{
+		path: 'register',
+		component: RegisterComponent,
 	},
 	{
 		path: 'dashboard',
@@ -26,12 +34,20 @@ export const routes: Routes = [
 		canActivate: [AuthGuard],
 		children: [
 			{
+				path: 'home',
+				component: HomeComponent,
+			},
+			{
 				path: 'settings',
 				component: SettingsComponent,
 			},
 			{
 				path: 'game',
 				component: GameComponent,
+			},
+			{
+				path: 'game-menu',
+				component: GameMenuComponent,
 			},
 			{
 				path: 'friends',

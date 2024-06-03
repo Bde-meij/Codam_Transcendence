@@ -1,53 +1,40 @@
-
 import { HttpClient } from '@angular/common/http';
-import { Injectable, Input } from '@angular/core';
-import { AppComponent } from '../../app.component';
-import { Observable } from 'rxjs';
-
-// import { JwtHelperService } from '@auth0/angular-jwt';
+import { Injectable } from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 	private loggedin = false;
-	// private auth: auth0.WebAuth;
-	// private authApi = "/api/auth";
-	// logstatus$ : Observable<boolean> | undefined;
+	private authUrL = "/api/auth";
+	private hostname: string;
+	
+	constructor(private http: HttpClient) {
+		this.hostname = window.location.hostname;
+	};
 
-	// constructor(private http: HttpClient) {
-	// 	this.auth = new auth0.WebAuth({
-	// 		domain: 'http://api.intra.42.fr/v2/oauth',
-	// 		clientID: 'u-s4t2ud-7ae181090888396e717cc9cdec0e0ff9a312c655e22ea37b1cc2e426536847cb',
-	// 		redirectUri: "http://localhost:4200/callback",
-	// 		responseType: 'code',
-	// 		scope: 'public',
-	// 	})
-	// };
+	register(nickname : string) {
+		console.log("authservice.register called");
+		return this.http.post(this.authUrL + '/register', {nickname});
+	}
 
 	login() : void {
+		this.http.get(this.authUrL + '/login', { }).subscribe();
 		console.log("authservice.login called");
 		this.loggedin = true;
-		// this.http.post(this.authApi + '/login', { });
-		// this.auth.authorize();
 	};
 
 	logout() : void {
+		this.http.post(this.authUrL + '/logout', { }).subscribe();
 		console.log("authservice.logout called");
 		this.loggedin = false;
-		// this.http.post(this.authApi + '/logout', { });
 	}	
 	
-	// sendCode(code: string) : void {
-	// 	this.http.post(this.authApi + '/code', code);
-	// }
-
-	// make request to backend
-	// getLogStatus() : Observable<boolean> {
-	// 	return (this.http.get<boolean>(this.authApi, {}));
-	// }
-
 	getLogStatus() : boolean {
 		return (this.loggedin);
 	}
+
+	// isAuthenticated() : boolean {
+
+	// }
 }

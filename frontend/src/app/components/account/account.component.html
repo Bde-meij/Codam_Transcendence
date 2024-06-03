@@ -1,1 +1,39 @@
 <p>account works!</p>
+
+<!-- <div>
+	<h2>{{ user.nickname }}</h2>
+
+	<h3> current avatar (if any) </h3>
+	<ul>
+		@for (avatar of avatarInfo | async; track avatar.name) {
+			<li>
+				<p> <a href="{{ avatar.url }}"> {{ avatar.name}} </a></p>
+				<img src="{{ avatar.url}}" alt="{{ avatar.name}}" height="80px" />
+			</li>
+		}
+	</ul>
+	<p>
+		status: {{ user.status }}
+	</p>
+	
+</div> -->
+
+<img src="{{this.avatar}}" height="80px" />
+
+
+<app-user-detail [user]="passuser"></app-user-detail>
+
+
+
+<!-- <div *ngIf="passuser">
+	<app-user-detail [user]="passuser"></app-user-detail>
+</div> -->
+
+<!-- <h2>{{testuser.name | uppercase }} Details</h2>
+<div><span>id: </span>{{testuser.id}}</div>
+<div><span>name: </span>{{testuser.name}}</div> -->
+
+<!-- <div>
+  <label for="name">user name: </label>
+  <input id="name" [(ngModel)]="testuser.name" placeholder="name">
+</div> -->
