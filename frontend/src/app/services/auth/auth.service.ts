@@ -30,8 +30,8 @@ export class AuthService {
 		this.loggedin = false;
 	}	
 	
-	getLogStatus() : boolean {
-		return (this.loggedin);
+	getLogStatus() {
+		return this.http.get<any>(this.authUrL + '/isloggedin', { });
 	}
 
 	// isAuthenticated() : boolean {

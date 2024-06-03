@@ -4,6 +4,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
+import * as speakeasy from 'speakeasy';
 
 @Injectable()
 export class UserService {
@@ -42,5 +43,17 @@ export class UserService {
 
 	async updateAvatar(id: string, newAvatar: string) {
 		await this.userRepo.update(id, {avatar: newAvatar});
+	}
+
+	async updateTwoFASecret(id: string, secret: any) {
+		await this.userRepo.update(id, {twoFASecret: secret.base32});
+	}
+
+	async enableTwoFA(id: string) {
+		await this.userRepo.update(id, {isTwoFAEnabled: true});
+	}
+
+	async disableTwoFA(id: string) {
+		await this.userRepo.update(id, {isTwoFAEnabled: false});
 	}
 }
