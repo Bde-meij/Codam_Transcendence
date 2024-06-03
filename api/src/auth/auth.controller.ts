@@ -37,7 +37,7 @@ export class AuthController {
 	@Get('callback')
 	@UseGuards(AuthGuard('fortytwo'))
 	async callback(@Req() req: Request, @Res() res: Response) {
-	const user : User = {id: (req.user as any).id, nickname: (req.user as any).nickname, status: "online", avatar: "", twoFASecret: null, isTwoFAEnabled: false};
+	const user : User = {id: (req.user as any).id, nickname: (req.user as any).nickname, status: "online", avatar: "api/uploads/default_avatar.png", twoFASecret: null, isTwoFAEnabled: false};
 	const token = await this.authService.getJwtAccessToken(user);
 	res.cookie("access_token", token.access_token);
 		if (!await this.userService.userExists(user.id)) {
