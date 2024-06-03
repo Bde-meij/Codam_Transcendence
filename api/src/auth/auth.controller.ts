@@ -37,8 +37,12 @@ export class AuthController {
 	@Get('callback')
 	@UseGuards(AuthGuard('fortytwo'))
 	async callback(@Req() req: Request, @Res() res: Response) {
+<<<<<<< HEAD
 	// const user: any = {id: (req.user as User).id, nickname: (req.user as User).nickname};
 	const user: any = {id: (req.user as User).id, nickname: (req.user as any).nickname, status: "online", avatar: "", rooms: (req.user as any).rooms};
+=======
+	const user : User = {id: (req.user as any).id, nickname: (req.user as any).nickname, status: "online", avatar: "", twoFASecret: null, isTwoFAEnabled: false};
+>>>>>>> 517a8cf634813a832a90eefe0abc26c6a455d666
 	const token = await this.authService.getJwtAccessToken(user);
 	res.cookie("access_token", token.access_token);
 		if (!await this.userService.userExists(user.id)) {
@@ -60,6 +64,10 @@ export class AuthController {
 
 	@Post('register')
 	@UseGuards(JwtGuard)
+<<<<<<< HEAD
+=======
+	//@UseGuards(AuthGuard('fortytwo'))
+>>>>>>> 517a8cf634813a832a90eefe0abc26c6a455d666
 	async register(@Req() req, @Res() res: Response, @Body() body: {nickname : string}) {
 		console.log("NEW NAME:", body.nickname);
 		const user: any = {id: req.user.id, nickname: body.nickname, avatar: "/uploads/default_avatar.png", status: "online"};
