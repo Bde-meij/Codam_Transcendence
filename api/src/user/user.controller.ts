@@ -50,7 +50,7 @@ export class UserController {
 		if (await this.userService.findUserByName(body.nickname))
 			return res.status(HttpStatus.FORBIDDEN).json({message: 'Name is already taken'});
 		await this.userService.updateName(req.user.id, body.nickname);
-		return res.status(HttpStatus.OK).json({message: 'User registered'});
+		return res.status(HttpStatus.OK).json({message: 'Nickname changed'});
 	}
 
 	@Post('register')
@@ -58,7 +58,8 @@ export class UserController {
 	//@UseGuards(AuthGuard('fortytwo'))
 	async register(@Req() req, @Res() res, @Body() body: {nickname : string}) {
 		console.log("NEW NAME:", body.nickname);
-		const user: any = {id: req.user.id, nickname: body.nickname, avatar: "/uploads/default_avatar.png", status: "online"};
+		const user: CreateUserDto = {id: req.user.id, nickname: body.nickname};
+
 		if (await this.userService.findUserById(user.id))
 			return res.status(HttpStatus.FORBIDDEN).json({message: 'User already registered'});
 
@@ -68,6 +69,22 @@ export class UserController {
 		await this.userService.createUser(user);
 		return res.status(HttpStatus.OK).json({message: 'User registered', user: user});
 	}
+
+	// @Post('register')
+	// @UseGuards(JwtGuard)
+	// //@UseGuards(AuthGuard('fortytwo'))
+	// async register(@Req() req, @Res() res, @Body() body: {nickname : string}) {
+	// 	console.log("NEW NAME:", body.nickname);
+	// 	const user: any = {id: req.user.id, nickname: body.nickname, avatar: "/uploads/default_avatar.png", status: "online"};
+	// 	if (await this.userService.findUserById(user.id))
+	// 		return res.status(HttpStatus.FORBIDDEN).json({message: 'User already registered'});
+
+	// 	if (await this.userService.findUserByName(body.nickname))
+	// 		return res.status(HttpStatus.FORBIDDEN).json({message: 'Name is already taken'});
+
+	// 	await this.userService.createUser(user);
+	// 	return res.status(HttpStatus.OK).json({message: 'User registered', user: user});
+	// }
 
 	@Get('/name/:id')
 	@UseGuards(JwtGuard)
