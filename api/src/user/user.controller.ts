@@ -24,7 +24,7 @@ export class UserController {
 		const user = await this.userService.findUserById(req.user.id);
 		return user;
 	}
-	
+
 	// @Get(':id')
 	// @UseGuards(JwtGuard)
 	// async findUserById(@Req() req, @Param('id') id: string) {
@@ -53,8 +53,9 @@ export class UserController {
 	@UseGuards(JwtGuard)
 	async getAvatar(@Req() req, @Res() res) {
 		const user = await this.userService.findUserById(req.user.id);
+		if (!user)
+			return res.status(HttpStatus.NOT_FOUND).json({message: 'User not found', avatar: user.avatar});
 		const file = createReadStream(join(process.cwd(), user.avatar));
-
 		// Return error 404 if the avatar doesn't exist
 		file.on('error', () => {
 			return res.status(HttpStatus.NOT_FOUND).json({message: 'Avatar not found', avatar: user.avatar});
@@ -67,8 +68,9 @@ export class UserController {
 	@UseGuards(JwtGuard)
 	async getAvatarById(@Req() req, @Res() res, @Param('id') id: string) {
 		const user = await this.userService.findUserById(id);
+		if (!user)
+			return res.status(HttpStatus.NOT_FOUND).json({message: 'User not found', avatar: user.avatar});
 		const file = createReadStream(join(process.cwd(), user.avatar));
-
 		// Return error 404 if the avatar doesn't exist
 		file.on('error', () => {
 			return res.status(HttpStatus.NOT_FOUND).json({message: 'Avatar not found', avatar: user.avatar});
@@ -92,5 +94,22 @@ export class UserController {
 		this.userService.updateAvatar(req.user.id, file.path);
 		console.log("MY DATA: ", file);
 		return ;
+	}
+
+	@Post('register')
+	@UseGuards(JwtGuard)
+	//@UseGuards(AuthGuard('fortytwo'))
+	async register(@Req() req, @Res() res, @Body() body: {nickname : string}) {
+		console.log("NEW NAME:", body.nickname);
+		const user: CreateUserDto = {id: req.user.id, nickname: body.nickname};
+
+		if (await this.userService.findUserById(user.id))
+			return res.status(HttpStatus.FORBIDDEN).json({message: 'User already registered'});
+
+		if (await this.userService.findUserByName(body.nickname))
+			return res.status(HttpStatus.FORBIDDEN).json({message: 'Name is already taken'});
+
+		await this.userService.createUser(user);
+		return res.status(HttpStatus.OK).json({message: 'User registered', user: user});
 	}
 }
