@@ -75,19 +75,6 @@ export class AuthController {
 		}
 	}
 
-	@Get('/isnametaken/:nickname')
-	@UseGuards(JwtGuard)
-	async findUserByName(@Req() req, @Param('nickname') name: string) {
-		let taken : boolean = false;
-		if (await this.userService.findUserByName(name)) {
-			taken = true;
-		}
-		console.log("TAKEN : " + taken);
-		return (taken);
-		// const user = await this.userService.findUserByName(name);
-		// return user;
-	}
-
 	@Post('logout')
 	@UseGuards(JwtGuard)
 	async logout(@Req() req, @Res() res) {
