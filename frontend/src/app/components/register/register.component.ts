@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ReactiveFormsModule, FormControl, FormGroup, Validators, ValidatorFn, AbstractControl, ValidationErrors, AsyncValidator} from '@angular/forms';
+import { ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { NgIf, NgOptimizedImage } from '@angular/common';
@@ -25,6 +25,7 @@ export class RegisterComponent implements OnInit{
 				this.nameValidator.validate.bind(this.nameValidator),
 			],
 			updateOn: 'change',
+
 		}),
 	});
 
