@@ -26,7 +26,6 @@ export class AccountComponent implements OnInit {
 	constructor(private userService: UserService){}
 
 	ngOnInit(): void {
-
 		this.userService.getUser().subscribe((userData) => (
 			this.user = userData,
 			this.passuser = {
@@ -36,13 +35,10 @@ export class AccountComponent implements OnInit {
 				status: this.user.status,
 			})
 		);
-		// if (this.user)	{
-		// 	this.passuser = {
-		// 		id: Number(this.user.id),
-		// 		nickname: this.user.nickname,
-		// 	};
-		// }
-		this.avatarInfo = this.userService.getAvatar();
+
+
+
+		this.avatarInfo = this.userService.getAvatar(null);
 		this.avatarInfo.subscribe({
 			next : (data) => {
 				console.log("avatar:", this.avatar),
@@ -57,59 +53,3 @@ export class AccountComponent implements OnInit {
 		}
 	};
 }
-
-	// user : UserInterface = {
-	// 	id: '0',
-	// 	nickname: 'Gary',
-	// 	status: 'online',
-	// 	avatar: new FormData,
-	// };
-	// user ?: User;
-
-	// testuser : User = {
-	// 	id: 1,
-	// 	nickname: 'Gary',
-	// 	avatar: '',
-	// 	status: '',
-	// };
-
-	// // passuser : User = {
-	// 	id : Number(this.user.id),
-	// 	name: this.user.nickname,
-	// }
-
-	// passuser?: User;
-
-	// ngOnInit() {
-
-	// 	// this.userService.getUser().subscribe((userData) => (
-	// 	// 	this.user = userData,
-	// 	// 	this.passuser = {
-	// 	// 		id: Number(this.user.id),
-	// 	// 		nickname: this.user.nickname,
-	// 	// 		avatar: '',
-	// 	// 		status: this.user.status,
-	// 	// 	})
-	// 	// );
-	// 	// if (this.user)	{
-	// 	// 	this.passuser = {
-	// 	// 		id: Number(this.user.id),
-	// 	// 		name: this.user.nickname,
-	// 	// 	};
-	// 	// }
-
-	// 	// this.passuser.id = Number(this.user.id);
-
-
-	// 	this.avatarInfo = this.userService.getAvatar();
-	// 	this.avatarInfo.subscribe(data => {
-	// 		console.log("info:", data);
-	// 		this.avatar = URL.createObjectURL(data);
-	// 	});
-
-	
-	// 	// if (this.avatar && this.passuser) {
-	// 	// 	this.passuser.avatar = this.avatar;
-	// 	// }
-	// 	// this.user.avatar.append('file', this.userService.getAvatar().subscribe());
-	// };
