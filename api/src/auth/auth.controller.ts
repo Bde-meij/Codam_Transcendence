@@ -16,6 +16,11 @@ import { UserService } from 'src/user/user.service';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from 'src/user/entities/user.entity';
 import { JwtGuard } from './guard/jwt.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
+import { CallbackAuthDto } from './dto/callback-auth.dto';
+import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import * as speakeasy from 'speakeasy';
 import * as QRCode from 'qrcode';
 
@@ -38,9 +43,20 @@ export class AuthController {
 	@Get('callback')
 	@UseGuards(AuthGuard('fortytwo'))
 	async callback(@Req() req: Request, @Res() res: Response) {
-	const user : User = {id: (req.user as any).id, nickname: (req.user as any).nickname, status: "online", avatar: "api/uploads/default_avatar.png", twoFASecret: null, isTwoFAEnabled: false};
-	const token = await this.authService.getJwtAccessToken(user);
-	res.cookie("access_token", token.access_token);
+		const user: CallbackAuthDto = {
+			id: (req.user as any).id,
+			// nickname: (req.user as any).nickname,
+		}
+		// const user: User = {
+		// 	id: (req.user as any).id,
+		// 	nickname: (req.user as any).nickname,
+		// 	status: "online",
+		// 	avatar: "",
+		// 	friendIn: [],
+		// 	friendOut: [],
+		// };
+		const token = await this.authService.getJwtAccessToken(user);
+		res.cookie("access_token", token.access_token);
 		if (!await this.userService.userExists(user.id)) {
 			console.log("user not found");
 			res.status(HttpStatus.FOUND).redirect(`http://${req.hostname}:4200/register`);
@@ -76,7 +92,8 @@ export class AuthController {
 	//@UseGuards(AuthGuard('fortytwo'))
 	async register(@Req() req, @Res() res: Response, @Body() body: {nickname : string}) {
 		console.log("NEW NAME:", body.nickname);
-		const user: any = {id: req.user.id, nickname: body.nickname, avatar: "/uploads/default_avatar.png", status: "online"};
+		const user: CreateUserDto = {id: req.user.id, nickname: body.nickname};
+
 		if (await this.userService.findUserById(user.id))
 			return res.status(HttpStatus.FORBIDDEN).json({message: 'User already registered'});
 
@@ -96,7 +113,7 @@ export class AuthController {
 	@Get('2fasetup')
 	@UseGuards(JwtGuard)
 	async setupTwoFA(@Req() req, @Res() res) {
-		const user = await this.userService.findUserById(req.user.id);
+		const user: User = await this.userService.findUserById(req.user.id);
 		const secret = await this.authService.generateTwoFASecret(user.id);
 		const otpauthUrl = speakeasy.otpauthURL({
 			secret: secret.ascii,
@@ -111,7 +128,7 @@ export class AuthController {
 	@Post('2faverify')
 	@UseGuards(JwtGuard)
 	async verifyTwoFA(@Req() req, @Res() res, @Body() body) {
-		const user = await this.userService.findUserById(req.user.id);
+		const user: User = await this.userService.findUserById(req.user.id);
 		if (!user.isTwoFAEnabled) {
 			await this.userService.enableTwoFA(user.id);
 		}
