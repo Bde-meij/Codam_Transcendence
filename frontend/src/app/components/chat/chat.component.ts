@@ -33,6 +33,7 @@ export class ChatComponent implements OnInit {
 	
 	onSelect(room: Rooms): void {
 		this.selectedRoom = room;
+		console.log(room);
   	};
 
 	constructor(private chatService: ChatService) {};

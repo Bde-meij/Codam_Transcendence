@@ -10,7 +10,7 @@ services:
     volumes:
       - ./api:/src/app
       - /src/app/node_modules
-    command: npm run start:dev
+    command: npm run start
     depends_on:
       - postgres
     environment:
