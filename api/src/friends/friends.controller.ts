@@ -12,8 +12,8 @@ export class FriendsController {
 	// @UseGuards(JwtGuard)
 	create(@Req() req, @Param('target') target: string) {
 		const friendRequest: CreateFriendRequestDto = {
-			// sender: req.user.id,
-			sender: "89433",
+			sender: req.user.id,
+			// sender: "89433", // Emily's intraId for testing outside browser
 			target:	target
 		}
 		return this.friendsService.create(friendRequest);
