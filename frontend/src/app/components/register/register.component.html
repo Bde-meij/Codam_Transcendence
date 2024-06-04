@@ -30,12 +30,26 @@
 	<img ngSrc="/assets/gifs/gary_spongebob.gif" height="100" width="100" /> 
 </div>
 
+<div *ngIf="profileForm.errors">
+	<p> oh no, it's {{profileForm.errors}} </p>
+</div>
+
+
+<div *ngIf="errorMessage">
+	<p> {{ this.errorMessage }} </p>
+</div>
 
 
 @if (errorMessage) {
 	<div>
 		<p>
 			{{ errorMessage }}
+		</p>
+	</div>
+} @else {
+	<div>
+		<p>
+			nice
 		</p>
 	</div>
 }
