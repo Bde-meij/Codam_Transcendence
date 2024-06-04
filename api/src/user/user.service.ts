@@ -52,6 +52,10 @@ export class UserService {
 		return await this.userRepo.find();
 	}
 
+	async updateName(id: string, newName: string) {
+		await this.userRepo.update(id, {nickname: newName});
+	}
+
 	async updateStatus(id: string, newStatus: string) {
 		await this.userRepo.update(id, {status: newStatus});
 	}

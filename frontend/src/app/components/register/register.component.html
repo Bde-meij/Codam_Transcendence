@@ -12,12 +12,28 @@
 	<h1 *ngIf="this.profileForm.value.nickname">Hi {{ this.profileForm.value.nickname }}!</h1>
 	<h1 *ngIf="!this.profileForm.value.nickname">Hey you!</h1>
 	<label>
-		<p>
-			How do you want Gary to call you?
-		</p>
-		<p>
-			<input type="text" formControlName="nickname" placeholder="Gary's cutie 😘"/>
-		</p>
+		<div class="registername">
+			<p>
+				How do you want Gary to call you?
+			</p>
+			<p>
+				<input type="text" formControlName="nickname" maxlength="13" placeholder="Gary's cutie 😘"/>
+			</p>
+			@if (profileForm.value.nickname == '') {
+			} @else if (profileForm.pending) {
+				<p>
+					Let Gary think about it...
+				</p>
+			} @else if (profileForm.invalid) {
+				<p>
+					nooo Gary hates that!
+				</p>
+			} @else {
+				<p>
+					Such a pretty name 😏
+				</p>
+			}
+		</div>
 	</label>
 	<p>
 		<button type="submit" [disabled]="!profileForm.valid">
@@ -26,16 +42,15 @@
 	</p>
 </form>
 
-<div *ngIf="profileForm.pending">
+<!-- <div *ngIf="profileForm.pending">
 	<img ngSrc="/assets/gifs/gary_spongebob.gif" height="100" width="100" /> 
+</div> -->
+
+<!-- <div *ngIf="profileForm.invalid">
+	<p> oh no, it's {{profileForm.errors}} </p>
+</div> -->
+
+
+<div *ngIf="errorMessage">
+	<p> Gary has a problem : {{ this.errorMessage }} </p>
 </div>
-
-
-
-@if (errorMessage) {
-	<div>
-		<p>
-			{{ errorMessage }}
-		</p>
-	</div>
-}
