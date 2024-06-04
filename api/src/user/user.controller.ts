@@ -100,6 +100,20 @@ export class UserController {
 		file.pipe(res);
 	}
 
+	@Get('getAvatar/:id')
+	@UseGuards(JwtGuard)
+	async getAvatarById(@Req() req, @Res() res, @Param('id') id: string) {
+		const user = await this.userService.findUserById(id);
+		const file = createReadStream(join(process.cwd(), user.avatar));
+
+		// Return error 404 if the avatar doesn't exist
+		file.on('error', () => {
+			return res.status(HttpStatus.NOT_FOUND).json({message: 'Avatar not found', avatar: user.avatar});
+		})
+		
+		file.pipe(res);
+	}
+
 	@Post('uploadAvatar')
 	@UseGuards(JwtGuard)
 	@UseInterceptors(FileInterceptor('file', {
