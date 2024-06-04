@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AsyncPipe, NgFor } from '@angular/common';
-import { ChatService } from '../../services/sock/chat/chat.service';
+
 import { FormsModule } from '@angular/forms';
+import { ChatService } from '../../../services/sock/chat/chat.service';
 
 export interface MessageInterface {
 	sender: string,

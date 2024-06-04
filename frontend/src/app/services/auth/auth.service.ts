@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -16,6 +17,10 @@ export class AuthService {
 	register(nickname : string) {
 		console.log("authservice.register called");
 		return this.http.post(this.authUrL + '/register', {nickname});
+	}
+
+	isNameTaken (nickname: string) : Observable<boolean> {
+		return this.http.get<boolean>(this.authUrL + '/isnametaken/' + nickname);
 	}
 
 	login() : void {
