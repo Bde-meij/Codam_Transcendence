@@ -38,7 +38,7 @@ export class AccountComponent implements OnInit {
 
 
 
-		this.avatarInfo = this.userService.getAvatar(null);
+		this.avatarInfo = this.userService.getAvatar();
 		this.avatarInfo.subscribe({
 			next : (data) => {
 				console.log("avatar:", this.avatar),

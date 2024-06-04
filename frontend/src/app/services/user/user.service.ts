@@ -10,7 +10,17 @@ import { User } from '../../models/user.class';
 })
 export class UserService {
 	private userUrl = "/api/user";
+
 	constructor(private http: HttpClient, private router: Router) { };
+
+	register(nickname : string) {
+		console.log("authservice.register called");
+		return this.http.post(this.userUrl + '/register', {nickname});
+	}
+
+	isNameTaken (nickname: string) : Observable<boolean> {
+		return this.http.get<boolean>(this.userUrl + '/isnametaken/' + nickname);
+	}
 
 	getUser() : Observable<User>{
 		return this.http.get<User>(this.userUrl + '/current');
@@ -26,7 +36,7 @@ export class UserService {
 	getAvatar() : Observable<Blob> {
 		console.log("getavatar called");
 		return this.http.get(this.userUrl + '/getAvatar/', {responseType: 'blob'});
-	} 
+	}
 
 	// getAvatarOf(userid : string) : Observable<Blob> {
 	// 	console.log("getavatar called");

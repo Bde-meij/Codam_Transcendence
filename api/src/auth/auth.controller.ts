@@ -59,7 +59,7 @@ export class AuthController {
 	}
 
 	@Get('/isnametaken/:nickname')
-	// @UseGuards(JwtGuard)
+	@UseGuards(JwtGuard)
 	async findUserByName(@Req() req, @Param('nickname') name: string) {
 		let taken : boolean = false;
 		if (await this.userService.findUserByName(name)) {
@@ -67,8 +67,15 @@ export class AuthController {
 		}
 		console.log("TAKEN : " + taken);
 		return (taken);
-		// const user = await this.userService.findUserByName(name);
-		// return user;
+	}
+
+	@Post('changename')
+	@UseGuards(JwtGuard)
+	async changeName(@Req() req, @Res() res: Response, @Body() body: {nickname : string}) {
+		console.log("NEW NAME:", body.nickname);
+		if (await this.userService.findUserByName(body.nickname))
+			return res.status(HttpStatus.FORBIDDEN).json({message: 'Name is already taken'});
+		
 	}
 
 	@Post('register')

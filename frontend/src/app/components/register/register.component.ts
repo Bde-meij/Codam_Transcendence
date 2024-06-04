@@ -5,6 +5,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { NgIf, NgOptimizedImage } from '@angular/common';
 import { AuthService } from '../../services/auth/auth.service';
 import { UniqueNameValidator, forbiddenNameValidator } from '../../services/validator/name-validator.service';
+import { UserService } from '../../services/user/user.service';
 
 @Component({
   selector: 'app-register',
@@ -32,7 +33,7 @@ export class RegisterComponent implements OnInit{
 	newName : string = '';
 	errorMessage = "";
 
-	constructor(private authService: AuthService, private router: Router, private nameValidator: UniqueNameValidator) {};
+	constructor(private userService: UserService, private router: Router, private nameValidator: UniqueNameValidator) {};
 
 	ngOnInit(): void {
 	}
@@ -40,7 +41,7 @@ export class RegisterComponent implements OnInit{
 	register() {
 		console.log(this.profileForm.value.nickname);
 		if (this.profileForm.value.nickname) {
-			this.authService.register(this.profileForm.value.nickname).subscribe({
+			this.userService.register(this.profileForm.value.nickname).subscribe({
 				next: (data) => {
 					console.log(data),
 					this.router.navigate(['/dashboard/home']);
