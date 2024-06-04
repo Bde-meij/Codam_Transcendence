@@ -3,17 +3,10 @@ import {
 	Get,
 	Post,
 	Body,
-	Patch,
-	Param,
-	Delete,
 	UseGuards,
 	Req,
 	Res,
-	Redirect,
 	HttpStatus,
-	Session,
-	UseInterceptors,
-	UploadedFile,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Request, Response, Express } from 'express';
@@ -27,6 +20,8 @@ import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { CallbackAuthDto } from './dto/callback-auth.dto';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import * as speakeasy from 'speakeasy';
+import * as QRCode from 'qrcode';
 
 @Controller('auth')
 export class AuthController {
@@ -34,7 +29,7 @@ export class AuthController {
 
 	// Checks whether the user is authorized using the jwtguard
 	// Returns: {loggedIn: true} on success - 401 Unauthorized on failure
-	@Get('check')
+	@Get('isloggedin')
 	@UseGuards(JwtGuard)
 	async checkLoggedIn() {
 		return {loggedIn: true};
@@ -42,7 +37,7 @@ export class AuthController {
 
 	@Get('login')
 	@UseGuards(AuthGuard('fortytwo'))
-	async login() {console.log("It hereee");}
+	async login() {}
 
 	@Get('callback')
 	@UseGuards(AuthGuard('fortytwo'))
@@ -68,13 +63,19 @@ export class AuthController {
 		else
 		{
 			console.log("user found");
-			this.userService.updateStatus(user.id, "online");
-			res.status(HttpStatus.FOUND).redirect(`http://${req.hostname}:4200/dashboard`);
+			//if ((await this.userService.findUserById(user.id)).isTwoFAEnabled) {
+				//res.status(HttpStatus.FOUND).redirect(`http://${req.hostname}:4200/2fa`);
+			//}
+			//else {
+				this.userService.updateStatus(user.id, 'online');
+				res.status(HttpStatus.FOUND).redirect(`http://${req.hostname}:4200/dashboard`);
+			//}
 		}
 	}
 
 	@Post('register')
 	@UseGuards(JwtGuard)
+	//@UseGuards(AuthGuard('fortytwo'))
 	async register(@Req() req, @Res() res: Response, @Body() body: {nickname : string}) {
 		console.log("NEW NAME:", body.nickname);
 		const user: CreateUserDto = {id: req.user.id, nickname: body.nickname};
@@ -92,6 +93,52 @@ export class AuthController {
 	@Post('logout')
 	@UseGuards(JwtGuard)
 	async logout(@Req() req) {
-		await this.userService.updateStatus(req.user.id, "offline");
+		await this.userService.updateStatus(req.user.id, 'offline');
+	}
+
+	@Get('2fasetup')
+	@UseGuards(JwtGuard)
+	async setupTwoFA(@Req() req, @Res() res) {
+		const user: User = await this.userService.findUserById(req.user.id);
+		const secret = await this.authService.generateTwoFASecret(user.id);
+		const otpauthUrl = speakeasy.otpauthURL({
+			secret: secret.ascii,
+			label: `Transcendence (${user.id})`,
+			issuer: 'Transcendence',
+		});
+		const qrCodeUrl = await QRCode.toDataURL(otpauthUrl);
+
+		res.json({qrCode: qrCodeUrl, secret: secret.base32});
+	}
+
+	@Post('2faverify')
+	@UseGuards(JwtGuard)
+	async verifyTwoFA(@Req() req, @Res() res, @Body() body) {
+		const user: User = await this.userService.findUserById(req.user.id);
+		if (!user.isTwoFAEnabled) {
+			await this.userService.enableTwoFA(user.id);
+		}
+		const secret = user.twoFASecret;
+		const isValid = await this.authService.verifyTwoFAToken(secret, body.userInput);
+		if (isValid) {
+			res.json({message: 'Google 2FA verified'});
+			await this.userService.updateStatus(user.id, 'online');
+		}
+		else
+			res.json({message: 'Invalid authentication code'});
+	}
+
+	@Post('2fadisable')
+	@UseGuards(JwtGuard)
+	async disableTwoFA(@Req() req) {
+		this.userService.disableTwoFA(req.user.id);
+		this.userService.updateTwoFASecret(req.user.id, {base32: null});
+	}
+
+	@Get('is2faenabled')
+	@UseGuards(JwtGuard)
+	async isTwoFAEnabled(@Req() req, @Res() res) {
+		const isEnabled = (await this.userService.findUserById(req.user.id)).isTwoFAEnabled;
+		res.json({isTwoFAEnabled: isEnabled});
 	}
 }

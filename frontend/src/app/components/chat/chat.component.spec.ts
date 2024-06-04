@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ChatComponent } from './chat.component';
+import { ChatRoomComponent } from './chat-room.component';
 
-describe('ChatComponent', () => {
-  let component: ChatComponent;
-  let fixture: ComponentFixture<ChatComponent>;
+describe('ChatRoomComponent', () => {
+  let component: ChatRoomComponent;
+  let fixture: ComponentFixture<ChatRoomComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ChatComponent]
+      imports: [ChatRoomComponent]
     })
     .compileComponents();
     
-    fixture = TestBed.createComponent(ChatComponent);
+    fixture = TestBed.createComponent(ChatRoomComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -21,3 +21,28 @@ describe('ChatComponent', () => {
     expect(component).toBeTruthy();
   });
 });
+
+
+// import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+// import { ChatComponent } from './chat.component';
+
+// describe('ChatComponent', () => {
+//   let component: ChatComponent;
+//   let fixture: ComponentFixture<ChatComponent>;
+
+//   beforeEach(async () => {
+//     await TestBed.configureTestingModule({
+//       imports: [ChatComponent]
+//     })
+//     .compileComponents();
+    
+//     fixture = TestBed.createComponent(ChatComponent);
+//     component = fixture.componentInstance;
+//     fixture.detectChanges();
+//   });
+
+//   it('should create', () => {
+//     expect(component).toBeTruthy();
+//   });
+// });

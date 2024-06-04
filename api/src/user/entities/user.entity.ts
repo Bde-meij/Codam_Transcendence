@@ -10,6 +10,9 @@ export class User {
 	@Column()
 	nickname: string;
 
+	// @Column("text", { array: true, default: "{}" })
+	// rooms: string[];
+	
 	@Column({default: "online"})
 	status: string;
 
@@ -21,4 +24,10 @@ export class User {
 
 	@OneToMany(() => Friend, (friend) => friend.target)
 	friendIn: Friend[];
+	
+	@Column({nullable: true})
+	twoFASecret: string;
+
+	@Column({default: false})
+	isTwoFAEnabled: boolean;
 }

@@ -7,6 +7,7 @@ import { UserService } from 'src/user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { CallbackAuthDto } from './dto/callback-auth.dto';
+import * as speakeasy from 'speakeasy';
 
 @Injectable()
 export class AuthService {
@@ -29,5 +30,19 @@ export class AuthService {
 		);
 		// console.log('token verified: payload:', payload)
 		return payload;
+	}
+
+	async verifyTwoFAToken(userSecret: string, token: string) {
+		return speakeasy.totp.verify({
+			secret: userSecret,
+			encoding: 'base32',
+			token,
+		});
+	}
+
+	async generateTwoFASecret(id: string) {
+		const secret = speakeasy.generateSecret();
+		await this.userService.updateTwoFASecret(id, secret)
+		return secret;
 	}
 }
