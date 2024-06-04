@@ -24,7 +24,7 @@ export class UserController {
 		const user = await this.userService.findUserById(req.user.id);
 		return user;
 	}
-	
+
 	// @Get(':id')
 	// @UseGuards(JwtGuard)
 	// async findUserById(@Req() req, @Param('id') id: string) {
@@ -107,8 +107,9 @@ export class UserController {
 	@UseGuards(JwtGuard)
 	async getAvatar(@Req() req, @Res() res) {
 		const user = await this.userService.findUserById(req.user.id);
+		if (!user)
+			return res.status(HttpStatus.NOT_FOUND).json({message: 'User not found', avatar: user.avatar});
 		const file = createReadStream(join(process.cwd(), user.avatar));
-
 		// Return error 404 if the avatar doesn't exist
 		file.on('error', () => {
 			return res.status(HttpStatus.NOT_FOUND).json({message: 'Avatar not found', avatar: user.avatar});
@@ -121,8 +122,9 @@ export class UserController {
 	@UseGuards(JwtGuard)
 	async getAvatarById(@Req() req, @Res() res, @Param('id') id: string) {
 		const user = await this.userService.findUserById(id);
+		if (!user)
+			return res.status(HttpStatus.NOT_FOUND).json({message: 'User not found', avatar: user.avatar});
 		const file = createReadStream(join(process.cwd(), user.avatar));
-
 		// Return error 404 if the avatar doesn't exist
 		file.on('error', () => {
 			return res.status(HttpStatus.NOT_FOUND).json({message: 'Avatar not found', avatar: user.avatar});

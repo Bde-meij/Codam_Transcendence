@@ -16,8 +16,8 @@ export class AuthService {
 	async getJwtTokens(user: CallbackAuthDto): Promise<{access_token: string, refresh_token: string}> {
 		const payload = {id: user.id};
 		return {
-			access_token : await this.jwtService.signAsync(payload, {expiresIn: '15m'}),
-			refresh_token : await this.jwtService.signAsync(payload, {expiresIn: '7d'}),
+			access_token : await this.jwtService.signAsync(payload, {expiresIn: this.configService.getOrThrow("JWT_ACCESS_TIME"), secret: this.configService.getOrThrow('JWT_ACCESS_SECRET')}),
+			refresh_token : await this.jwtService.signAsync(payload, {expiresIn: this.configService.getOrThrow("JWT_REFRESH_TIME"), secret: this.configService.getOrThrow('JWT_REFRESH_SECRET')}),
 		};
 	}
 
@@ -27,7 +27,7 @@ export class AuthService {
 			const payload = await this.jwtService.verifyAsync(
 				token,
 				{
-					secret: this.configService.getOrThrow("JWT_SECRET"),
+					secret: this.configService.getOrThrow("JWT_ACCESS_SECRET"),
 				}
 			);
 			// console.log('token verified: payload:', payload)
@@ -38,15 +38,15 @@ export class AuthService {
 		}
 	}
 
-	async refreshJwtToken(token: string) {
+	async refreshJwtToken(refreshToken: string) {
 		try {
 			const payload = await this.jwtService.verifyAsync(
-				token,
+				refreshToken,
 				{
-					secret: this.configService.getOrThrow("JWT_SECRET"),
+					secret: this.configService.getOrThrow("JWT_REFRESH_SECRET"),
 				}
 			);
-			const newAccessToken = this.jwtService.sign({ username: payload.username, sub: payload.sub }, { expiresIn: '15m' });
+			const newAccessToken = this.jwtService.sign({ username: payload.username, sub: payload.sub }, { expiresIn: this.configService.getOrThrow("JWT_ACCESS_TIME"), secret: this.configService.getOrThrow('JWT_ACCESS_SECRET')});
       		return newAccessToken;
 		}
 		catch(error) {

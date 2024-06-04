@@ -75,4 +75,8 @@ export class UserService {
 	async disableTwoFA(id: string) {
 		await this.userRepo.update(id, {isTwoFAEnabled: false});
 	}
+
+	async updateNickname(id: string, newName: string) {
+		await this.userRepo.update(id, {nickname: newName});
+	}
 }
