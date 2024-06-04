@@ -6,12 +6,13 @@ import { Request, Response } from 'express';
 import { UserService } from 'src/user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { CallbackAuthDto } from './dto/callback-auth.dto';
 
 @Injectable()
 export class AuthService {
 	constructor(private readonly userService: UserService, private jwtService: JwtService, private configService: ConfigService){}
 
-	async getJwtAccessToken(user: User): Promise<{access_token: string}> {
+	async getJwtAccessToken(user: CallbackAuthDto): Promise<{access_token: string}> {
 		const payload = {id: user.id};
 		return {
 			access_token : await this.jwtService.signAsync(payload),

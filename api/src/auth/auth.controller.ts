@@ -25,6 +25,8 @@ import { JwtGuard } from './guard/jwt.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import { CallbackAuthDto } from './dto/callback-auth.dto';
+import { CreateUserDto } from 'src/user/dto/create-user.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -45,9 +47,20 @@ export class AuthController {
 	@Get('callback')
 	@UseGuards(AuthGuard('fortytwo'))
 	async callback(@Req() req: Request, @Res() res: Response) {
-		const user = {id: (req.user as any).id, nickname: (req.user as any).nickname, status: "online", avatar: ""};
-	const token = await this.authService.getJwtAccessToken(user);
-	res.cookie("access_token", token.access_token);
+		const user: CallbackAuthDto = {
+			id: (req.user as any).id,
+			// nickname: (req.user as any).nickname,
+		}
+		// const user: User = {
+		// 	id: (req.user as any).id,
+		// 	nickname: (req.user as any).nickname,
+		// 	status: "online",
+		// 	avatar: "",
+		// 	friendIn: [],
+		// 	friendOut: [],
+		// };
+		const token = await this.authService.getJwtAccessToken(user);
+		res.cookie("access_token", token.access_token);
 		if (!await this.userService.userExists(user.id)) {
 			console.log("user not found");
 			res.status(HttpStatus.FOUND).redirect(`http://${req.hostname}:4200/register`);
@@ -64,7 +77,7 @@ export class AuthController {
 	@UseGuards(JwtGuard)
 	async register(@Req() req, @Res() res: Response, @Body() body: {nickname : string}) {
 		console.log("NEW NAME:", body.nickname);
-		const user: any = {id: req.user.id, nickname: body.nickname, avatar: "/uploads/default_avatar.png", status: "online"};
+		const user: CreateUserDto = {id: req.user.id, nickname: body.nickname};
 
 		if (await this.userService.findUserById(user.id))
 			return res.status(HttpStatus.FORBIDDEN).json({message: 'User already registered'});

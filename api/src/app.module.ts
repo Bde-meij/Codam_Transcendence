@@ -8,6 +8,7 @@ import { ChatGateway } from './chat/chat.gateway';
 import { DatabaseModule } from './database/database.module';
 import { ConfigModule } from '@nestjs/config';
 import { TestingModule } from './testing/testing.module';
+import { FriendsModule } from './friends/friends.module';
 
 @Module({
 	imports: [
@@ -21,6 +22,7 @@ import { TestingModule } from './testing/testing.module';
 		GameModule,
 		DatabaseModule,
 		TestingModule,
+		FriendsModule,
 	],
 	controllers: [],
 	providers: [GameModule, ChatGateway],
