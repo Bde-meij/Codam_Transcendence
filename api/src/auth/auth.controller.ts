@@ -58,42 +58,6 @@ export class AuthController {
 		}
 	}
 
-	@Get('/isnametaken/:nickname')
-	@UseGuards(JwtGuard)
-	async findUserByName(@Req() req, @Param('nickname') name: string) {
-		let taken : boolean = false;
-		if (await this.userService.findUserByName(name)) {
-			taken = true;
-		}
-		console.log("TAKEN : " + taken);
-		return (taken);
-	}
-
-	@Post('changename')
-	@UseGuards(JwtGuard)
-	async changeName(@Req() req, @Res() res: Response, @Body() body: {nickname : string}) {
-		console.log("NEW NAME:", body.nickname);
-		if (await this.userService.findUserByName(body.nickname))
-			return res.status(HttpStatus.FORBIDDEN).json({message: 'Name is already taken'});
-		
-	}
-
-	@Post('register')
-	@UseGuards(JwtGuard)
-	//@UseGuards(AuthGuard('fortytwo'))
-	async register(@Req() req, @Res() res: Response, @Body() body: {nickname : string}) {
-		console.log("NEW NAME:", body.nickname);
-		const user: any = {id: req.user.id, nickname: body.nickname, avatar: "/uploads/default_avatar.png", status: "online"};
-		if (await this.userService.findUserById(user.id))
-			return res.status(HttpStatus.FORBIDDEN).json({message: 'User already registered'});
-
-		if (await this.userService.findUserByName(body.nickname))
-			return res.status(HttpStatus.FORBIDDEN).json({message: 'Name is already taken'});
-
-		await this.userService.createUser(user);
-		return res.status(HttpStatus.OK).json({message: 'User registered', user: user});
-	}
-
 	@Post('logout')
 	@UseGuards(JwtGuard)
 	async logout(@Req() req) {

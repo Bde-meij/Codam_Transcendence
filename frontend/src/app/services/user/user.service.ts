@@ -14,8 +14,11 @@ export class UserService {
 	constructor(private http: HttpClient, private router: Router) { };
 
 	register(nickname : string) {
-		console.log("authservice.register called");
-		return this.http.post(this.userUrl + '/register', {nickname});
+		return this.http.post(this.userUrl + '/register', { nickname });
+	}
+
+	changeName(nickname: string) {
+		return this.http.post(this.userUrl + '/changename', { nickname })
 	}
 
 	isNameTaken (nickname: string) : Observable<boolean> {
