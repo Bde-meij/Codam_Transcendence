@@ -20,7 +20,7 @@ export class UserController {
 
 	@Get('current')
 	@UseGuards(JwtGuard)
-	async getUsername(@Req() req) {
+	async getUser(@Req() req) {
 		const user = await this.userService.findUserById(req.user.id);
 		return user;
 	}
