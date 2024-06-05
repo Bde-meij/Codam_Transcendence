@@ -1,4 +1,4 @@
-import { Friend } from "src/friends/entities/friend.entity";
+import { FriendRequest } from "src/friends/entities/friend.entity";
 import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
 
 @Entity('user')
@@ -19,11 +19,11 @@ export class User {
 	@Column({default: "/uploads/default_avatar.png"})
 	avatar: string;
 
-	@OneToMany(() => Friend, (friend) => friend.sender)
-	friendOut: Friend[];
+	@OneToMany(() => FriendRequest, (friend) => friend.sender)
+	friendOut: FriendRequest[];
 
-	@OneToMany(() => Friend, (friend) => friend.target)
-	friendIn: Friend[];
+	@OneToMany(() => FriendRequest, (friend) => friend.target)
+	friendIn: FriendRequest[];
 	
 	@Column({nullable: true})
 	twoFASecret: string;
