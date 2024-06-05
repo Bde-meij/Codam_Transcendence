@@ -5,7 +5,7 @@ import { Request } from 'express';
 import { AuthService } from "../auth.service";
 
 @Injectable()
-export class JwtGuard implements CanActivate {
+export class JwtGuardIgnore2fa implements CanActivate {
 	constructor(private jwtService: JwtService, private configService: ConfigService, private authService: AuthService) {};
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -18,16 +18,12 @@ export class JwtGuard implements CanActivate {
 		}
 		try {
 			const payload = await this.authService.verifyJwtAccessToken(accessToken);
-			if (!payload.is2faVerified)
-				throw new UnauthorizedException();
 			request['user'] = payload;
 		} catch(err) {
 			console.log('Access token validation failed: ', err);
 			if (refreshToken) {
 				try {
 					const tokenAndPlayload = await this.authService.refreshJwtToken(refreshToken);
-					if (!tokenAndPlayload.payload.is2faVerified)
-						throw new UnauthorizedException();
 					response.cookie('access_token', tokenAndPlayload.newAccessToken, {httpOnly: true});
 					request.user = await this.authService.verifyJwtAccessToken(tokenAndPlayload.newAccessToken);
 				}

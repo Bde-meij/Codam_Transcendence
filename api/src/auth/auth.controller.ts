@@ -16,11 +16,8 @@ import { UserService } from 'src/user/user.service';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from 'src/user/entities/user.entity';
 import { JwtGuard } from './guard/jwt.guard';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
+import { JwtGuardIgnore2fa } from './guard/jwtIgnore2fa.guard';
 import { CallbackAuthDto } from './dto/callback-auth.dto';
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import * as speakeasy from 'speakeasy';
 import * as QRCode from 'qrcode';
 
@@ -43,35 +40,32 @@ export class AuthController {
 	@Get('callback')
 	@UseGuards(AuthGuard('fortytwo'))
 	async callback(@Req() req: Request, @Res() res: Response) {
-		const user: CallbackAuthDto = {
+		const potentialNewUser: CallbackAuthDto = {
 			id: (req.user as any).id,
-			// nickname: (req.user as any).nickname,
+			is2faVerified: true,
 		}
-		// const user: User = {
-		// 	id: (req.user as any).id,
-		// 	nickname: (req.user as any).nickname,
-		// 	status: "online",
-		// 	avatar: "",
-		// 	friendIn: [],
-		// 	friendOut: [],
-		// };
-		const tokens = await this.authService.getJwtTokens(user);
+		const userExists: boolean = await this.userService.userExists(potentialNewUser.id);
+		if (userExists) {
+			if ((await this.userService.findUserById(potentialNewUser.id)).isTwoFAEnabled)
+				potentialNewUser.is2faVerified = false;
+		}
+		const tokens = await this.authService.getJwtTokens(potentialNewUser);
 		res.cookie('access_token', tokens.access_token);
 		res.cookie('refresh_token', tokens.refresh_token);
-		if (!await this.userService.userExists(user.id)) {
+		if (!userExists) {
 			console.log("user not found");
 			res.status(HttpStatus.FOUND).redirect(`http://${req.hostname}:4200/register`);
 		}
 		else
 		{
 			console.log("user found");
-			//if ((await this.userService.findUserById(user.id)).isTwoFAEnabled) {
-				//res.status(HttpStatus.FOUND).redirect(`http://${req.hostname}:4200/2fa`);
-			//}
-			//else {
-				this.userService.updateStatus(user.id, 'online');
+			if ((await this.userService.findUserById(potentialNewUser.id)).isTwoFAEnabled) {
+				res.status(HttpStatus.FOUND).redirect(`http://${req.hostname}:4200/twofa`);
+			}
+			else {
+				this.userService.updateStatus(potentialNewUser.id, 'online');
 				res.status(HttpStatus.FOUND).redirect(`http://${req.hostname}:4200/dashboard`);
-			//}
+			}
 		}
 	}
 
@@ -100,20 +94,27 @@ export class AuthController {
 	}
 
 	@Post('2faverify')
-	@UseGuards(JwtGuard)
+	@UseGuards(JwtGuardIgnore2fa)
 	async verifyTwoFA(@Req() req, @Res() res, @Body() body) {
 		const user: User = await this.userService.findUserById(req.user.id);
 		const secret = user.twoFASecret;
 		const isValid = await this.authService.verifyTwoFAToken(secret, body.userInput);
 		if (isValid) {
-			res.json({message: 'Google 2FA verified'});
+			const potentialNewUser: CallbackAuthDto = {
+				id: (req.user as any).id,
+				is2faVerified: true,
+			}
+			const tokens = await this.authService.getJwtTokens(potentialNewUser);
+			res.cookie('access_token', tokens.access_token);
+			res.cookie('refresh_token', tokens.refresh_token);
+			res.json({message: 'Google 2FA verified', status: true});
 			if (!user.isTwoFAEnabled)
 				await this.userService.enableTwoFA(user.id);
 			if (user.status == 'offline')
 				await this.userService.updateStatus(user.id, 'online');
 		}
 		else
-			res.json({message: 'Invalid authentication code'});
+			res.json({message: 'Invalid authentication code', status: false});
 	}
 
 	@Post('2fadisable')

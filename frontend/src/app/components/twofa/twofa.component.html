@@ -1,0 +1,6 @@
+<p>Enter the one-time password from your Google authenticator app</p>
+<input type="text" [(ngModel)]="userInput">
+<p></p>
+<button (click)="verifyUserInput()">Verify</button>
+<p>{{this.verificationRes.message}}</p>
+<button (click)="cancel()">Cancel</button>
