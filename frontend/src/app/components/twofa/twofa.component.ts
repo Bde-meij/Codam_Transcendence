@@ -17,10 +17,6 @@ export class TwofaComponent {
   userInput: string = "";
   verificationRes: {message: string, status: boolean} = {message: "", status: false};
 
-  ngOnInit(): void {
-    this.verificationRes.message = "";
-  }
-
   verifyUserInput() {
     this.http.post<any>('/api/auth/2faverify', { userInput: this.userInput }).subscribe(response => {
       this.verificationRes = response;
