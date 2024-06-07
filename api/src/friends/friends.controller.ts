@@ -9,12 +9,12 @@ import { FriendStatus } from './entities/friend.entity';
 export class FriendsController {
 	constructor(private readonly friendsService: FriendsService) {}
 	
-	@Post('new-request/:target')
+	@Post('new-request/:targetid')
 	@UseGuards(JwtGuard)
-	async create(@Req() req, @Param('target') target: string) {
+	async create(@Req() req, @Param('targetid') targetId: string) {
 		const friendRequest: CreateFriendRequestDto = {
 			sender: req.user.id,
-			target:	target
+			target:	targetId
 		}
 		return await this.friendsService.create(friendRequest);
 	}
@@ -25,22 +25,16 @@ export class FriendsController {
 		return await this.friendsService.deleteByRequestId(req.user.id, requestId);
 	}
 	
-	@Delete('delete-request-user/:targetuserid')
+	@Delete('delete-request-user/:targetid')
 	@UseGuards(JwtGuard)
-	async deleteByUserId(@Req() req, @Param('targetuserid') targetUserId: string) {
-		return await this.friendsService.deleteByUserId(req.user.id, targetUserId);
+	async deleteByUserId(@Req() req, @Param('targetid') targetId: string) {
+		return await this.friendsService.deleteByUserId(req.user.id, targetId);
 	}
 	
-	@Post('accept-request/:id')
+	@Post('accept-request/:requestid')
 	@UseGuards(JwtGuard)
-	async accept(@Req() req, @Param('id') requestId: string) {
+	async accept(@Req() req, @Param('requestid') requestId: string) {
 		return await this.friendsService.updateStatus(req.user.id, requestId, FriendStatus.ACCEPTED);
-	}
-
-	@Post('decline-request/:id')
-	@UseGuards(JwtGuard)
-	async decline(@Req() req, @Param('id') requestId: string) {
-		return await this.friendsService.updateStatus(req.user.id, requestId, FriendStatus.DECLINED);
 	}
 
 	@Get('incoming')
@@ -61,10 +55,10 @@ export class FriendsController {
 		return await this.friendsService.findFriends(req.user.id);
 	}
 	
-	@Get('is-friends/:targetuserid')
+	@Get('is-friends/:targetid')
 	@UseGuards(JwtGuard)
-	async isFriends(@Req() req, @Param('targetuserid') targetUserId: string) {
-		return await this.friendsService.isFriendsUserId(req.user.id, targetUserId);
+	async isFriends(@Req() req, @Param('targetid') targetId: string) {
+		return await this.friendsService.isFriendsUserId(req.user.id, targetId);
 	}
 	
 	// -------------------------------------------------------------------------------------------------------------
@@ -91,19 +85,14 @@ export class FriendsController {
 		return await this.friendsService.deleteByRequestId(userId, requestId);
 	}
 	
-	@Delete('delete-request-user/:userid/:targetuserid')
-	async deleteByUserId_NoCookie(@Req() req, @Param('targetuserid') targetUserId: string, @Param('userid') userId: string) {
-		return await this.friendsService.deleteByUserId(userId, targetUserId);
+	@Delete('delete-request-user/:userid/:targetid')
+	async deleteByUserId_NoCookie(@Req() req, @Param('targetid') targetId: string, @Param('userid') userId: string) {
+		return await this.friendsService.deleteByUserId(userId, targetId);
 	}
 	
-	@Post('accept-request/:userid/:id')
-	async accept_NoCookie(@Req() req, @Param('id') requestId: string, @Param('userid') userId: string) {
+	@Post('accept-request/:userid/:requestid')
+	async accept_NoCookie(@Req() req, @Param('requestid') requestId: string, @Param('userid') userId: string) {
 		return await this.friendsService.updateStatus(userId, requestId, FriendStatus.ACCEPTED);
-	}
-
-	@Post('decline-request/:userid/:id')
-	async decline_NoCookie(@Req() req, @Param('id') requestId: string, @Param('userid') userId: string) {
-		return await this.friendsService.updateStatus(userId, requestId, FriendStatus.DECLINED);
 	}
 
 	@Get('incoming/:userid')
@@ -121,8 +110,8 @@ export class FriendsController {
 		return await this.friendsService.findFriends(userId);
 	}
 
-	@Get('is-friends/:userid/:targetuserid')
-	async isFriends_NoCookie(@Req() req, @Param('targetuserid') targetUserId: string, @Param('userid') userId: string) {
-		return await this.friendsService.isFriendsUserId(userId, targetUserId);
+	@Get('is-friends/:userid/:targetid')
+	async isFriends_NoCookie(@Req() req, @Param('targetid') targetId: string, @Param('userid') userId: string) {
+		return await this.friendsService.isFriendsUserId(userId, targetId);
 	}
 }

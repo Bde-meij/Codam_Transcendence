@@ -4,7 +4,6 @@ import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 export enum FriendStatus {
 	PENDING = "pending",
 	ACCEPTED = "accepted",
-	DECLINED = "declined",
 }
 
 @Entity('friendRequest')

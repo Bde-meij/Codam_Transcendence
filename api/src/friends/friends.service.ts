@@ -23,6 +23,8 @@ export class FriendsService {
 		if (!target) {
 			throw new HttpException('Target id not found', 404);
 		}
+		// Add check for if target has sender blocked. blocking should also delete any request between the 2 users
+		// (not required by subject)
 		const alreadyExists: FriendRequest = await this.friendRepo.findOne({
 			where: [
 				{sender: sender, target: target},
@@ -35,9 +37,6 @@ export class FriendsService {
 			}
 			if (alreadyExists.status === FriendStatus.ACCEPTED) {
 				throw new HttpException('Request already accepted', 400);
-			}
-			if (alreadyExists.status === FriendStatus.DECLINED) {
-				throw new HttpException('Request already declined', 400);
 			}
 		}
 		const request = await this.friendRepo.save({
@@ -73,11 +72,11 @@ export class FriendsService {
 		await this.friendRepo.delete({id: requestId});
 	}
 	
-	async deleteByUserId(userId: string, targetUserId: string) {
+	async deleteByUserId(userId: string, targetId: string) {
 		const request: FriendRequest = await this.friendRepo.findOne({
 			where: [
-				{sender: {id: userId}, target: {id: targetUserId}},
-				{target: {id: userId}, sender: {id: targetUserId}},
+				{sender: {id: userId}, target: {id: targetId}},
+				{target: {id: userId}, sender: {id: targetId}},
 			],
 		});
 		if (!request) {
@@ -89,18 +88,12 @@ export class FriendsService {
 	async updateStatus(userId: string, requestId: string, status: FriendStatus) {
 		const updatedRequests: FriendRequest = await this.friendRepo.findOne({
 			where: {
-				id: requestId
-			},
-			relations: {
-				sender: true,
-				target: true
+				id: requestId,
+				target: {id: userId}
 			}
 		});
 		if (!updatedRequests) {
 			throw new HttpException('Friend request not found', 404);
-		}
-		if (updatedRequests.target.id !== userId) {
-			throw new HttpException('This friend request is not yours', 401);
 		}
 		await this.friendRepo.update(
 			{id: requestId},
