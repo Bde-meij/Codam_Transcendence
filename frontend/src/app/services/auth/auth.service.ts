@@ -1,33 +1,38 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-	private loggedin = false;
+	// private loggedin = false;
 	private authUrL = "/api/auth";
-	private hostname: string;
+	// private hostname: string;
 	
 	constructor(private http: HttpClient) {
-		this.hostname = window.location.hostname;
+		// this.hostname = window.location.hostname;
 	};
 
-	register(nickname : string) {
-		console.log("authservice.register called");
-		return this.http.post(this.authUrL + '/register', {nickname});
-	}
+	// register(nickname : string) {
+	// 	console.log("authservice.register called");
+	// 	return this.http.post(this.authUrL + '/register', {nickname});
+	// }
+
+	// isNameTaken (nickname: string) : Observable<boolean> {
+	// 	return this.http.get<boolean>(this.authUrL + '/isnametaken/' + nickname);
+	// }
 
 	login() : void {
 		this.http.get(this.authUrL + '/login', { }).subscribe();
 		console.log("authservice.login called");
-		this.loggedin = true;
+		// this.loggedin = true;
 	};
 
 	logout() : void {
 		this.http.post(this.authUrL + '/logout', { }).subscribe();
 		console.log("authservice.logout called");
-		this.loggedin = false;
+		// this.loggedin = false;
 	}	
 	
 	getLogStatus() {

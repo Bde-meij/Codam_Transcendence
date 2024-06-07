@@ -7,9 +7,10 @@ import {
 	Req,
 	Res,
 	HttpStatus,
+	Param,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { Request, Response, Express } from 'express';
+import { Request, Response, Express, response } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { UserService } from 'src/user/user.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -54,8 +55,9 @@ export class AuthController {
 		// 	friendIn: [],
 		// 	friendOut: [],
 		// };
-		const token = await this.authService.getJwtAccessToken(user);
-		res.cookie("access_token", token.access_token);
+		const tokens = await this.authService.getJwtTokens(user);
+		res.cookie('access_token', tokens.access_token);
+		res.cookie('refresh_token', tokens.refresh_token);
 		if (!await this.userService.userExists(user.id)) {
 			console.log("user not found");
 			res.status(HttpStatus.FOUND).redirect(`http://${req.hostname}:4200/register`);
@@ -73,27 +75,13 @@ export class AuthController {
 		}
 	}
 
-	@Post('register')
-	@UseGuards(JwtGuard)
-	//@UseGuards(AuthGuard('fortytwo'))
-	async register(@Req() req, @Res() res: Response, @Body() body: {nickname : string}) {
-		console.log("NEW NAME:", body.nickname);
-		const user: CreateUserDto = {id: req.user.id, nickname: body.nickname};
-
-		if (await this.userService.findUserById(user.id))
-			return res.status(HttpStatus.FORBIDDEN).json({message: 'User already registered'});
-
-		if (await this.userService.findUserByName(body.nickname))
-			return res.status(HttpStatus.FORBIDDEN).json({message: 'Name is already taken'});
-
-		await this.userService.createUser(user);
-		return res.status(HttpStatus.OK).json({message: 'User registered', user: user});
-	}
-
 	@Post('logout')
 	@UseGuards(JwtGuard)
-	async logout(@Req() req) {
+	async logout(@Req() req, @Res() res) {
 		await this.userService.updateStatus(req.user.id, 'offline');
+		res.clearCookie('access_token');
+		res.clearCookie('refresh_token');
+		res.status(200).send({message: 'Logged out successfully'});
 	}
 
 	@Get('2fasetup')
@@ -115,14 +103,14 @@ export class AuthController {
 	@UseGuards(JwtGuard)
 	async verifyTwoFA(@Req() req, @Res() res, @Body() body) {
 		const user: User = await this.userService.findUserById(req.user.id);
-		if (!user.isTwoFAEnabled) {
-			await this.userService.enableTwoFA(user.id);
-		}
 		const secret = user.twoFASecret;
 		const isValid = await this.authService.verifyTwoFAToken(secret, body.userInput);
 		if (isValid) {
 			res.json({message: 'Google 2FA verified'});
-			await this.userService.updateStatus(user.id, 'online');
+			if (!user.isTwoFAEnabled)
+				await this.userService.enableTwoFA(user.id);
+			if (user.status == 'offline')
+				await this.userService.updateStatus(user.id, 'online');
 		}
 		else
 			res.json({message: 'Invalid authentication code'});

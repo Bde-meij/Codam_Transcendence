@@ -10,28 +10,39 @@ import { User } from '../../models/user.class';
 })
 export class UserService {
 	private userUrl = "/api/user";
-	// user$ : Observable<UserInterface>;
+
 	constructor(private http: HttpClient, private router: Router) { };
+
+	register(nickname : string) {
+		return this.http.post(this.userUrl + '/register', { nickname });
+	}
+
+	changeName(nickname: string) {
+		return this.http.post(this.userUrl + '/changename', { nickname })
+	}
+
+	isNameTaken (nickname: string) : Observable<boolean> {
+		return this.http.get<boolean>(this.userUrl + '/isnametaken/' + nickname);
+	}
 
 	getUser() : Observable<User>{
 		return this.http.get<User>(this.userUrl + '/current');
 	};
 
-	// registerUser(newUser: UserInterface) {
-	// 	// TODO : link auth service properly
-	// 	// return this.http.post<any>("/api/auth/register", newUser);
-	// }
-
 	uploadAvatar(file: File) : Observable<any> {
 		const formData : FormData = new FormData();
 
 		formData.append('file', file);
-
 		return this.http.post<File>(this.userUrl + '/uploadAvatar', formData);
 	}
 
 	getAvatar() : Observable<Blob> {
 		console.log("getavatar called");
-		return this.http.get(this.userUrl + '/getAvatar', {responseType: 'blob'});
-	} 
+		return this.http.get(this.userUrl + '/getAvatar/', {responseType: 'blob'});
+	}
+
+	// getAvatarOf(userid : string) : Observable<Blob> {
+	// 	console.log("getavatar called");
+	// 	return this.http.get(this.userUrl + '/getAvatar/' + userid, {responseType: 'blob'});
+	// } 
 }

@@ -1,6 +1,6 @@
-import { Session, HttpStatus, Injectable, Req, Res } from '@nestjs/common';
+import { Session, HttpStatus, Injectable, Req, Res, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { MongoExpiredSessionError, Repository } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { Request, Response } from 'express';
 import { UserService } from 'src/user/user.service';
@@ -13,23 +13,45 @@ import * as speakeasy from 'speakeasy';
 export class AuthService {
 	constructor(private readonly userService: UserService, private jwtService: JwtService, private configService: ConfigService){}
 
-	async getJwtAccessToken(user: CallbackAuthDto): Promise<{access_token: string}> {
+	async getJwtTokens(user: CallbackAuthDto): Promise<{access_token: string, refresh_token: string}> {
 		const payload = {id: user.id};
 		return {
-			access_token : await this.jwtService.signAsync(payload),
+			access_token : await this.jwtService.signAsync(payload, {expiresIn: this.configService.getOrThrow("JWT_ACCESS_TIME"), secret: this.configService.getOrThrow('JWT_ACCESS_SECRET')}),
+			refresh_token : await this.jwtService.signAsync(payload, {expiresIn: this.configService.getOrThrow("JWT_REFRESH_TIME"), secret: this.configService.getOrThrow('JWT_REFRESH_SECRET')}),
 		};
 	}
 
 	async verifyJwtAccessToken(token: string) {
 		console.log('verifying token...')
-		const payload = await this.jwtService.verifyAsync(
-			token,
-			{
-				secret: this.configService.getOrThrow("JWT_SECRET"),
-			}
-		);
-		// console.log('token verified: payload:', payload)
-		return payload;
+		try {
+			const payload = await this.jwtService.verifyAsync(
+				token,
+				{
+					secret: this.configService.getOrThrow("JWT_ACCESS_SECRET"),
+				}
+			);
+			// console.log('token verified: payload:', payload)
+			return payload;
+		}
+		catch(error) {
+			throw new UnauthorizedException('Invalid access token');
+		}
+	}
+
+	async refreshJwtToken(refreshToken: string) {
+		try {
+			const payload = await this.jwtService.verifyAsync(
+				refreshToken,
+				{
+					secret: this.configService.getOrThrow("JWT_REFRESH_SECRET"),
+				}
+			);
+			const newAccessToken = this.jwtService.sign({ username: payload.username, sub: payload.sub }, { expiresIn: this.configService.getOrThrow("JWT_ACCESS_TIME"), secret: this.configService.getOrThrow('JWT_ACCESS_SECRET')});
+      		return newAccessToken;
+		}
+		catch(error) {
+			throw new UnauthorizedException('Invalid refresh token');
+		}
 	}
 
 	async verifyTwoFAToken(userSecret: string, token: string) {
