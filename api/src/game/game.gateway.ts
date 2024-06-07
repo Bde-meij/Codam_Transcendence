@@ -14,6 +14,7 @@ import { CreateGameDto } from './dto/create-game.dto';
 import { UpdateGameDto } from './dto/update-game.dto';
 import { Room} from './Room';
 
+var colCheck: boolean = false;
 var numOfRooms: number = 0;
 var roomMap = new Map<string, Room>();
 
@@ -71,10 +72,11 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		if (room != null)
 		{
 			console.log(room.name, "has ended");
-			if (client.id == room.rightPlayer)
-				this.server.in(room.name).emit("playerwin", room.leftPlayer);
-			if (client.id == room.leftPlayer)
-				this.server.in(room.name).emit("playerwin", room.rightPlayer);
+			clearInterval(room.stopInterval);
+			if ((client == room.rightPlayer) && (room.leftPlayer != null))
+				room.leftPlayer.emit("playerwin", room.leftPlayer.id);
+			if ((client == room.leftPlayer) && (room.rightPlayer != null))
+				room.rightPlayer.emit("playerwin", room.rightPlayer.id);
 			roomMap.delete(room.name);
 		}
 		console.log(client.id, "has disconnected");
@@ -90,11 +92,22 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		roomMap.forEach((roomObj, roomName) =>{
 		if ((inviteKey == roomObj.roomKey) && (roomObj.hasStarted == false) && (stop == false))
 		{
-			client.emit("assignPlayerNum", 2);
+			client.emit("assignNumber", 2);
 			client.join(roomName);
 			client.data.room = roomName;
+			client.in(roomName).emit("assignNumber", 1)
 			roomObj.hasStarted = true;
-			roomObj.rightPlayer = client.id;
+			roomObj.rightPlayer = client;
+			roomObj.serverRef = this.server;
+
+			roomObj.serverRef.in(roomName).emit("assignNames", 
+				// [roomObj.leftPlayer.id, client.id]
+				["Emily", "David"]
+			);
+			roomObj.serverRef.in(roomName).emit("startSignal");
+			setTimeout(() =>{{
+			roomObj.stopInterval = setInterval(this.updateBall, 20, roomObj);
+		}},4000);
 			stop = true;
 		}})
 		if (stop == false)
@@ -103,14 +116,13 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	createRoom(client: Socket, inviteKey: number)
 	{
-		client.emit("assignPlayerNum", 1);
 		client.join("room"+numOfRooms);
 		client.data.room = "room"+numOfRooms;
 		roomMap.set("room"+numOfRooms, new Room);
 		var room = roomMap.get(client.data.room)
 		room.roomKey = inviteKey;
 		room.name = "room"+numOfRooms;
-		room.leftPlayer = client.id;
+		room.leftPlayer = client;
 
 		numOfRooms++;
 	}
@@ -118,64 +130,37 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@SubscribeMessage("updatePlayer")
 	updatePlayer(client: Socket, yPos: number)
 	{
-		client.in(client.data.room).emit("updatePlayerPos", yPos);
+		var room = roomMap.get(client.data.room)
+		if (client.id == room.leftPlayer.id)
+			room.LpyPos = yPos;
+		if (client.id == room.rightPlayer.id)
+			room.RpyPos = yPos;
+		if (colCheck == false)
+		{
+			colCheck = true;
+			room.checkPlayerCollision();
+			colCheck = false;
+		}
+		client.in(room.name).emit("updatePlayerPos", yPos);
 	}
 	
 	// BALLS
-	@SubscribeMessage('updateBall')
-	updateBall(client: Socket)
+	updateBall(room: Room)
 	{
-		var room = roomMap.get(client.data.room)
 		if (room != null)
 		{
 			room.moveBall();
-			if ((room.ballPos[0] < 0) || (room.ballPos[0] > 800))
-				this.checkScore(client);
-			if ((room.ballPos[1] < 5) || (room.ballPos[1] > 595))
-				room.wallBounce();
-			this.server.in(client.data.room).emit("updateBallPos", room.ballPos);
-		}
-	}
-
-	checkScore(client: Socket)
-	{
-		var room = roomMap.get(client.data.room)
-		if (room != null)
-		{
-			if (room.ballPos[0] < 0)
+			if (colCheck == false)
 			{
-				room.rScore+=1;
-				this.server.in(client.data.room).emit("updateScore", [room.lScore, room.rScore]);
-				room.resetBall(-1);
-				if (room.rScore == 11)
-				{
-					this.server.in(room.name).emit("playerwin", room.rightPlayer);
-					roomMap.delete(room.name);
-				}
+				colCheck = true;
+				room.checkPlayerCollision();
+				colCheck = false;
 			}
-			else if  (room.ballPos[0] > 800)
-			{
-				room.lScore+=1;
-				this.server.in(client.data.room).emit("updateScore", [room.lScore, room.rScore]);
-				room.resetBall(1);
-				if (room.lScore == 11)
-				{
-					this.server.in(room.name).emit("playerwin", room.leftPlayer);
-					roomMap.delete(room.name);
-				}
-			}
+			room.checkWallBounce();
+			if (room.checkScoring())
+				roomMap.delete(room.name);
+			else
+				room.serverRef.in(room.name).emit("updateBallPos", room.ballPos);
 		}
-	}
-
-	@SubscribeMessage('playerbounce')
-	playerbounce(client: Socket, mod: number)
-	{
-		roomMap.get(client.data.room).playerBounce(mod);
 	}
 }
-
-// 	setTimeout(()=> {
-		// roomMap.forEach((ball,room) =>{
-		// 	ball.move();
-		// 	this.server.in(room).emit("updateBallPos", ball.ballPos);
-// 		})
