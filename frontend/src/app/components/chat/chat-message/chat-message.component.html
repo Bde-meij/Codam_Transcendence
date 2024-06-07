@@ -5,16 +5,60 @@
 		<li *ngFor="let message of room.messages" [ngClass]="{'blue-text': message.senderId === 77600, 'black-text': message.senderId !== 77600}">
 			{{ message.created}} --- {{ message.message}} --- {{ message.senderId}}
 		</li>
-		
 	</ul>
 	
 	<h4>Userlist:  {{ room.users.join(', ') }}</h4>
-	
+
+
 	<input #messageInput [(ngModel)]="message" (keydown.enter)="sendMessage()" type="text" [class.chat_input]="message" > 
 	<button (click)="sendMessage()"> SendMessage </button>
 	<button (click)="leaveRoom(room.name, 'David')"> leaveRoom </button>
 
 </div>
+
+<div class="chat_columns">
+	<mat-form-field>
+		<mat-label>Select User</mat-label>
+		<mat-select [(value)]="selectedUser">
+			<mat-option *ngFor="let user of room.users" [value]="user">
+				{{ user}}
+			</mat-option>
+		  </mat-select>
+	</mat-form-field>
+	
+	<button *ngIf="selectedUser" mat-raised-button color="primary" (click)="battle(selectedUser)">
+		Battle
+	</button>
+</div>
+
+<h4>wrong Userlist: </h4>
+<ul>
+	<li *ngFor="let user of room.users">
+		 {{user}}
+	</li>
+</ul>
+
+<form>
+	<h4>mat-select</h4>
+	<mat-form-field>
+	  <mat-label>Users</mat-label>
+	  <mat-select [(ngModel)]="selectedUser" name="user">
+		<mat-option *ngFor="let user of room.users" [value]="user">{{ user }}</mat-option>
+	  </mat-select>
+	</mat-form-field>
+	<p> Selected user: {{ selectedUser }} </p>
+	<button *ngIf="selectedUser" mat-raised-button color="primary" (click)="battle(selectedUser)">
+	  Battle
+	</button>
+  </form>
+  
+  <h4>Basic mat-select</h4>
+  <mat-form-field>
+	<mat-label>Ess</mat-label>
+	<mat-select>
+	  <mat-option *ngFor="let user of room.users" [value]="user"> user = {{ user }}</mat-option>
+	</mat-select>
+  </mat-form-field>
 
 <!-- <li *ngFor="let message of room.users">
 		<h3> Userlist: </h3> {{ room.users.join(', ') }}{{ message}}

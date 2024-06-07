@@ -4,7 +4,7 @@ export interface Rooms {
 	owner: string;
 	admins: string[];
 	banned?: string[];
-	
+	users: string[];
 	muted?: string[];
 	status: string; //public, private
 	password: string; //true or false?
