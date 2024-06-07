@@ -30,7 +30,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	chatRoomList: Record<string, Rooms>;
   	userList: Record<string, userDto>;
 	private connectedUsers: string[] = [];
-
+	
 	constructor(private authService: AuthService, private userService: UserService, private passwordList: PasswordService) {
 		this.chatRoomList = {};
 		this.userList = {};
@@ -64,6 +64,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			if (!user.nickname){
 				user.nickname = "Empty nickname Error";
 			}
+			
 			client.data.nickname = user.nickname;
 			client.data.userid = user.id;
 
