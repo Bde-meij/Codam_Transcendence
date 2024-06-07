@@ -8,6 +8,7 @@ import { ChatGateway } from './chat/chat.gateway';
 import { DatabaseModule } from './database/database.module';
 import { ConfigModule } from '@nestjs/config';
 import { TestingModule } from './testing/testing.module';
+import { PasswordService } from './password/password.service';
 
 @Module({
 	imports: [
@@ -23,6 +24,6 @@ import { TestingModule } from './testing/testing.module';
 		TestingModule,
 	],
 	controllers: [],
-	providers: [GameModule, ChatGateway],
+	providers: [GameModule, ChatGateway, PasswordService],
 })
 export class AppModule {}

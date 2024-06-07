@@ -1,50 +1,45 @@
 <h2> Chat Rooms </h2>
 
-<div class = chat-room_container>
+<div class="chat-room_container">
 
-	<div class = chat-room_column>
-		<h3> Your chats </h3>
-		<ul class="rooms"></ul>
-			<li *ngFor="let room of rooms">
-				{{ room}}
-			<button [class.selected]="room === selectedRoom" type="button" (click)="onSelect(room)"></button>
-			<button (click)="joinRoom(room.name)"> Send </button>
-			<button (click)="sendUserList(room.name)"> Send </button>
-			</li>
-	</div>
-	<div class = chat-room_columns>
-		<h3> Your Rooms chats </h3>
-		<ul class="rooms"></ul>
-			<li *ngFor="let r of roomss">
-				{{ r.name}}
-				{{r.id}}
-			</li>
-	</div>
+  <div class="create-room-column">
+    <h3>Create a room:</h3>
+    <input [(ngModel)]="roomName" (keydown.enter)="createRoom(roomName!)" type="text">
+    <button (click)="createRoom(roomName!)">Send</button>
+  </div>
 
+  <div class="chat-room_column">
+    <h3> Your chats </h3>
+    <ul>
+      <li *ngFor="let roomName of getRoomNames()">
+        {{ roomName }}
+        <button [class.selected]="roomsList[roomName] === selectedRoom" type="button" (click)="onSelect(roomsList[roomName])">Select</button>
+        <button (click)="joinRoom(roomName)"> joinRoom </button>
+        <button (click)="sendUserList(roomName)"> sendUserList(old)</button>
+      </li>
+    </ul>
+  </div>
 
-	<div class="chat-room_column" *ngIf="selectedRoom">
-		<app-chat-message [room]="selectedRoom"></app-chat-message>
-	</div>
+  <div class="chat-room_column" *ngIf="selectedRoom">
+    <app-chat-message [room]="selectedRoom"></app-chat-message>
+  </div>
 
-	<div class="chat_column">
-		<h3>Create a room:</h3>
-		<input [(ngModel)]="roomName" (keydown.enter)="createRoom(roomName!)" type="text">
-		<button (click)="createRoom(roomName!)">Send</button>
-	  </div>
-	  
+  <div class="user-list-column">
+    <h3> List of connected users: </h3>
+    <ul>
+      <li *ngFor="let m of userss">
+        {{ m }}
+      </li>
+    </ul>
+  </div>
 
-	<div class = chat_column>
-		<h3> List of connected users:  </h3>
-		<ul>
-			<li *ngFor="let m of userss">
-				{{ m }}
-			</li>
-		</ul>
-	
-		<input [(ngModel)]="message" (keydown.enter)="sendMessage()" type="text" > 
-		<button (click)="sendMessage()"> Send </button>
-	</div>
+  <!-- <div class="chat-column">
+    <input [(ngModel)]="message" (keydown.enter)="sendMessage()" type="text">
+    <button (click)="sendMessage()"> Send </button>
+  </div> -->
 </div>
+
+
 
 
 <!-- <p>chat works!</p>

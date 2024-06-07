@@ -4,9 +4,10 @@ export interface Rooms {
 	owner: string;
 	admins: string[];
 	banned?: string[];
-	muted?: string[];
-	status: string;
-	password: string | null;
+	muted?: Record<string, Date>;
+	users: string[];
+	status: string; //public, private
+	password: string; //true or false?
 	created?: Date;
 	updated?: Date;
 	messages?: MessageInterface[];
@@ -23,7 +24,7 @@ export interface MessageInterface {
 	message: string;
 	roomId: string;
 	senderId: number;
-	created?: Date;
+	created: string;
 	updated?: Date;
 }
 

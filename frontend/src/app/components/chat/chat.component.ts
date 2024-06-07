@@ -21,46 +21,66 @@ export interface MessageInterface {
 export class ChatComponent implements OnInit {
 	message: string | undefined;
 	messages: string[] = [];
+
 	rooms: Rooms[] = []; 
-	roomss: Rooms[] = []; 
+	roomsList: Record<string, Rooms> = {};
 
 	userList: string[] | undefined;
 	userss: string[] | undefined;
 	roomName: string | undefined;
 	test: string[] | undefined;
 	
-	selectedRoom?: Rooms;
+	selectedRoom: Rooms | undefined;
 	
 	onSelect(room: Rooms): void {
 		this.selectedRoom = room;
-		console.log(room);
-  	};
+		console.log(room.messages);
+	};
 
 	constructor(private chatService: ChatService) {};
 	
 	ngOnInit() {
 		this.chatService.getMessages().subscribe((newmessage: any ) => {
-			this.messages.push(newmessage.message);
-		})
+			if (this.roomsList[newmessage.roomId]?.messages) {
+				this.roomsList[newmessage.roomId].messages?.push(newmessage);
+				this.messages.push(newmessage.message);
+				console.log("Room: " + newmessage.roomId + ", got a new message");
+				console.log(newmessage);
+			} else {
+				console.error("Room or messages array not found:", newmessage.roomId);
+			}
+		});
+
 		this.chatService.getRooms().subscribe((roomList: any) => {
 			this.rooms.push(roomList);
-			console.log("getRooms frontend");
+			// console.log("getRooms frontend");
 		})
-		this.chatService.getRoomss().subscribe((roomList: any) => {
-			this.roomss.push(roomList);
-			console.log("getRoomss frontend");
-			console.log(this.roomss);
 
-		})
+		this.chatService.getRoomsss().subscribe((chatRoomList: Record<string, Rooms>) => {
+			console.log("getRoomss record");
+			this.roomsList = chatRoomList;
+			if (!this.selectedRoom && Object.keys(this.roomsList).length > 0) {
+				const firstRoomName = Object.keys(this.roomsList)[0];
+				console.log("getrooms select")
+				console.log(this.roomsList[firstRoomName]);
+				this.onSelect(this.roomsList[firstRoomName]);
+			  }
+			console.log(this.roomsList);
+		});
+
 		this.chatService.getConnectedUsers().subscribe((userList: any) => {
 			this.userss = userList;
 		})
+
 		this.createRoom("Global Chats");
 		this.createRoom("test2");
-		this.joinRoom("Global Chat");
-		this.joinRoom("test1");
+		this.joinRoom("Global Chats");
+		this.joinRoom("test2");
 		console.log("rooms: " + this.rooms);
 		
+		// Check if there are any rooms available
+		console.log("chatcomponent: " + this.getRoomNames()[0]);
+
 	};
 
 	sendMessage() {
@@ -99,6 +119,10 @@ export class ChatComponent implements OnInit {
 		console.log("sendUserList: " + data);
 		this.chatService.sendUserList(data);
 	}
+
+	getRoomNames(): string[] {
+		return Object.keys(this.roomsList);
+	  }
 }
 
 

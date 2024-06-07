@@ -1,57 +1,6 @@
-1.	Verschillende componenten chat dashboard
-	- dashboard
-		- chats
-		- room
-			- messages
-
-	html + css + typescripts fixen
-	interfaces
-
-2. Selector informatie room werkend. + max aantal pagina's
-
-3. Alle ingelogde users weergeven - nieuwe naam proberen mee te geven.
-
-4. Berichten naar elkaar sturen, chatroom voor de andere aanmaken bij ontvangst bericht.
-
-5. inviten op basis van dropdown menu, search?
-
-6. knop createRoom met opties.
-
-7. knoppen (un)ban/(un)mute/kick/ leaveRoom - 
-
-8. settings per room - admins - owner
-
-9. entity's + database
-
-
-
-<h2> Friends! </h2>
-<div class="friend_container">
-	<div class="friend_column">
-		<h3> Your friends </h3>
-
-		<ul class="friends">
-			<li *ngFor="let friend of friends">
-			<button [class.selected]="friend === selectedFriend" type="button" (click)="onSelect(friend)">
-				<!-- <app-user-detail [user]="selectedFriend"></app-user-detail> -->
-				<span class="badge">{{ friend.id }}</span>
-				<span class="name">{{ friend.nickname }}</span>
-			</button>
-			</li>
-		</ul>
-	</div>
-
-	<div class="friend_column" *ngIf="selectedFriend">
-		<app-user-detail [user]="selectedFriend"></app-user-detail>
-	</div>
-
-	<div class="friend_column">
-		<h3> incoming requests </h3>
-		<p> ... </p>
-	</div>
-
-	<div class="friend_column">
-		<h3> outgoing requests </h3>
-		<p> ... </p>
-	</div>
-</div>
+Berichten naar elkaar sturen, chatroom voor de andere aanmaken bij ontvangst bericht.
+inviten op basis van dropdown menu, search?
+knop createRoom met opties.
+knoppen (un)ban/(un)mute/kick/ leaveRoom - 
+settings per room - admins - owner
+entity's + database

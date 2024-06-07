@@ -14,6 +14,7 @@ export class UserService {
 	constructor(private http: HttpClient, private router: Router) { };
 
 	getUser() : Observable<User>{
+		console.log("getUser called");
 		return this.http.get<User>(this.userUrl + '/current');
 	};
 

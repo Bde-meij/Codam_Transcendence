@@ -14,6 +14,7 @@ export class ChatService{
 	private chatSocket = io("/chat");
 	private unread = true;
 	user$ : Observable<User> | undefined;
+	userId?: number;
 	userss: string[] = [];
 	rooms: Rooms[] = []; 
 	roomss: Rooms[] = []; 
@@ -28,6 +29,9 @@ export class ChatService{
 	}
 	ngOnInit(): void {
 		this.user$ = this.userService.getUser();
+		this.user$.subscribe(user => {
+			this.userId = user.id; // Assuming 'id' is the user ID field
+		});
 	}
 
 	// sendMessage(message: string): void {
@@ -41,15 +45,14 @@ export class ChatService{
 	// 	});
 	// }
 
-	sendMessage(message: string, room: string): void {
+	sendMessage(message: string, room: string): void {		
 		this.user$ = this.userService.getUser();
-		const sender = this.user$;
+		console.log("sender: " + this.userId + "sendmessage sender ID hardcoded");
 		const messageObj = {
 			message : message,
-			sender : sender,
+			sender : "senderID",
 			room : room,
 		}
-		console.log
 		this.chatSocket.emit('message', messageObj, (err: any) => {
 			if (err) {
 				console.log("chat-sock error: ");
@@ -75,10 +78,10 @@ export class ChatService{
 	}
 
 	joinRoom(message: string): void {
-		const room = message;
+		const id = message;
 		const password = "";
 		console.log("joinRoom: " + message + ", password: " + password);
-		this.chatSocket.emit('joinRoom', {room, password}, (err: any) => {
+		this.chatSocket.emit('joinRoom', {id, password}, (err: any) => {
 			if (err) {
 				console.log("joinRoom chat-sock error: ");
 				console.log(err);
@@ -87,9 +90,9 @@ export class ChatService{
 		});
 		
 	}
-
-	leaveRoom(room: string) {
-		this.chatSocket.emit('leaveRoom', room, (err: any) => {
+	
+	leaveRoom(room: string, userid: string) {
+		this.chatSocket.emit('leaveRoom', {room, userid}, (err: any) => {
 			if (err) {
 				console.log("leaveRoom chat-sock error: ");
 				console.log(err);
@@ -147,6 +150,14 @@ export class ChatService{
 		});
 	  }
 	
+	  getRoomsss(): Observable<Record<string, Rooms>> {
+		return new Observable<Record<string, Rooms>>((observer) => {
+		  this.chatSocket.on('getRoomss', (chatRoomList: Record<string, Rooms>) => {
+			observer.next(chatRoomList);
+		  });
+		});
+	  }
+
 	getConnectedUsers(): Observable<string[]> {
 		return new Observable((observer) => {
 			this.chatSocket.on('getConnectedUsers', (userss) => {
