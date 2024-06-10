@@ -1,9 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { GameService } from '../../services/sock/game/game.service';
-import{Actor,Engine,Color,Keys,vec,ExcaliburGraphicsContext,Vector}from "excalibur";
+import{Actor,Engine,Color,Keys, Label, Font, ExcaliburGraphicsContext,Vector, Handler, Graphic, TextAlign}from "excalibur";
 import{Player,Ball,addAfterImage}from "./gameActors";
 import{makeLines,drawScore,leftScorePos,rightScorePos}from "./lineDrawing";
 import { NgIf } from '@angular/common';
+import {Router } from "@angular/router";
 
 @Component({
 	selector: 'app-game',
@@ -18,6 +19,7 @@ export class GameComponent implements OnInit, OnDestroy
 
 	height = 600;
 	width = this.height/3 * 4;
+	lines = makeLines();
 	leftPlayer = (new Player(this.width*0.1, this.height/2)).returnAct();
 	rightPlayer = (new Player(this.width*0.9, this.height/2)).returnAct();
 	squareBall = (new Ball(this.width/2, this.height/2).returnAct());
@@ -26,7 +28,7 @@ export class GameComponent implements OnInit, OnDestroy
 	hitYWall: boolean = false;
 	hitPlayer: boolean = false;
 
-	winner:string = "none";
+	name:string = "none";
 	playernum: number = 0;
 
 	lScore: number = 0;
@@ -35,6 +37,7 @@ export class GameComponent implements OnInit, OnDestroy
 	inviteKey: number = 0;
 
 	READY: boolean = false;
+	router= new Router;
 
 	constructor(private gameSrv: GameService){};
 
@@ -44,19 +47,119 @@ export class GameComponent implements OnInit, OnDestroy
 		height: this.height,
 		backgroundColor: Color.Black,
 	});
+
+	leftPNameText = new Label({
+		color: Color.White,
+		x: 200,
+		y: 20,
+		font: new Font({
+			textAlign: TextAlign.Center,
+			size: 25,
+		  }),
+	})
+
+	rightPNameText = new Label({
+		color: Color.White,
+		x: 600,
+		y: 20,
+		font: new Font({
+			textAlign: TextAlign.Center,
+			size: 25,
+		  }),
+	})
+
+	timerText = new Label({
+		color: Color.White,
+		x: 400,
+		y: 250,
+		text: "3",
+		font: new Font({
+			textAlign: TextAlign.Center,
+			size: 80,
+		  }),
+	})
+
+	waitText = new Label({
+		color: Color.White,
+		x: 400,
+		y: 250,
+		text: "Awaiting other player...",
+		font: new Font({
+			textAlign: TextAlign.Center,
+			size: 40,
+		  }),
+	})
+
+	winText = new Label({
+		color: Color.White,
+		x: 400,
+		y: 250,
+		font: new Font({
+			textAlign: TextAlign.Center,
+			size: 40,
+		  }),
+	})
 	
 	ngOnInit()
 	{
+		this.game.add(this.waitText);
+		this.game.add(this.leftPNameText);
+		this.game.add(this.rightPNameText);
+		this.game.start();
+
 		this.gameSrv.connect();
 
 		// if (client invited someone, or is invited)
 		// 	invitekey = unique number
 		this.gameSrv.joinRoom(this.inviteKey);
 
-		this.gameSrv.assignPlayer().subscribe((playnum) => {
+		this.gameSrv.assignNumber().subscribe((playnum: number) => {
 			console.log(playnum);
 			this.playernum = playnum;
 		});
+		
+		this.gameSrv.assignNames().subscribe((names: string[]) => {
+			this.leftPNameText.text = names[0];
+			this.rightPNameText.text = names[1];
+			this.game.remove(this.waitText);
+		});
+
+		this.gameSrv.startSignal().subscribe(() => {
+			this.game.add(this.timerText);
+				setTimeout(() =>{{
+					setTimeout(() =>{{
+						setTimeout(() =>{{
+							setTimeout(() =>{{
+								this.game.remove(this.timerText);
+								this.startGame();
+							}},1000);
+						this.timerText.text = "GO!"
+					}},1000);
+					this.timerText.text = "1";
+				}},1000);
+				this.timerText.text = "2";
+			}},1000);
+		});
+	}
+
+	startGame()
+	{
+		var score = new Actor;
+		score.graphics.onPreDraw = 
+		(ctx: ExcaliburGraphicsContext) =>
+		{
+			drawScore(ctx, this.lScore, leftScorePos);
+			drawScore(ctx, this.rScore, rightScorePos);
+		}
+		this.game.add(this.lines);
+		this.game.add(this.leftPlayer);
+		this.game.add(this.rightPlayer);
+		this.game.add(this.squareBall);
+		this.game.add(this.ballShadows[2]);
+		this.game.add(this.ballShadows[1]);
+		this.game.add(this.ballShadows[0]);
+		this.game.add(score);
+
 		console.log("frontend game initiated");
 
 		this.game.on("postupdate", () => 
@@ -90,7 +193,10 @@ export class GameComponent implements OnInit, OnDestroy
 					this.rightPlayer.pos.y += this.height*0.025;
 					this.gameSrv.emitYPos(this.rightPlayer.pos.y);
 				}
-				this.gameSrv.updateBall();
+
+				// TESTBOT
+				// this.rightPlayer.pos.y = this.squareBall.pos.y;
+				// this.gameSrv.emitYPos(this.rightPlayer.pos.y);
 			}
 		});
 
@@ -110,37 +216,6 @@ export class GameComponent implements OnInit, OnDestroy
 			if (this.playernum == 2)
 				this.leftPlayer.pos.y = ypos;
 		});
-
-		
-		this.leftPlayer.on("collisionstart", () => 
-		{
-			if ((this.playernum == 1) && (!this.hitPlayer))
-				{
-				this.hitPlayer = true;
-				if (this.game.input.keyboard.isHeld(Keys.ArrowUp))
-					this.gameSrv.emitPlayerBounce(-2);
-				else if (this.game.input.keyboard.isHeld(Keys.ArrowDown))
-					this.gameSrv.emitPlayerBounce(2);
-				else
-					this.gameSrv.emitPlayerBounce(0);
-				setTimeout(()=>{this.hitPlayer = false;},500);
-			}
-		});
-		
-		this.rightPlayer.on("collisionstart", () => 
-		{
-			if ((this.playernum == 2) && (!this.hitPlayer))
-				{
-					this.hitPlayer = true;
-				if (this.game.input.keyboard.isHeld(Keys.ArrowUp))
-					this.gameSrv.emitPlayerBounce(-2);
-				else if (this.game.input.keyboard.isHeld(Keys.ArrowDown))
-					this.gameSrv.emitPlayerBounce(2);
-				else
-					this.gameSrv.emitPlayerBounce(0);
-				setTimeout(()=>{this.hitPlayer = false;},500);
-			}
-		});
 	
 		this.gameSrv.getScores().subscribe((scores) =>
 		{
@@ -150,28 +225,20 @@ export class GameComponent implements OnInit, OnDestroy
 
 		this.gameSrv.playerWin().subscribe((pName: string) => 
 		{
-			this.winner = pName;
-			alert(pName+" is the winner!");
-			this.ngOnDestroy();
+			this.game.remove(this.lines);
+			this.game.remove(this.leftPlayer);
+			this.game.remove(this.rightPlayer);
+			this.game.remove(this.squareBall);
+			this.game.remove(this.ballShadows[2]);
+			this.game.remove(this.ballShadows[1]);
+			this.game.remove(this.ballShadows[0]);
+			// this.winner = pName;
+			this.winText.text = pName+"\nis the winner!";
+			setTimeout(() =>{{this.ngOnDestroy();}},2000);
+			this.game.add(this.winText);
 		});
 			
-		var score = new Actor;
-		score.graphics.onPostDraw = 
-		(ctx: ExcaliburGraphicsContext) =>
-		{
-			drawScore(ctx, this.lScore, leftScorePos);
-			drawScore(ctx, this.rScore, rightScorePos);
-		}
-		
-		this.game.add(makeLines());
-		this.game.add(this.leftPlayer);
-		this.game.add(this.rightPlayer);
-		this.game.add(this.squareBall);
-		this.game.add(this.ballShadows[2]);
-		this.game.add(this.ballShadows[1]);
-		this.game.add(this.ballShadows[0]);
-		this.game.add(score);
-		this.game.start();
+		// this.game.start();
 	}
 
 	ngOnDestroy() 
@@ -180,5 +247,6 @@ export class GameComponent implements OnInit, OnDestroy
 		this.game?.canvas.remove();
 		// delete this.game;
 		this.gameSrv.disconnect();
+		this.router.navigate(['/dashboard/game-menu']);
 	}
 }
