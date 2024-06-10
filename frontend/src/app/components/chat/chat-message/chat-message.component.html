@@ -29,9 +29,15 @@
 	<button *ngIf="selectedUser" mat-raised-button color="primary" (click)="battle(selectedUser)">
 		Battle
 	</button>
+	<button *ngIf="selectedUser" mat-raised-button color="primary" (click)="mute(selectedUser)">
+		Mute
+	</button>
+	<button *ngIf="selectedUser" mat-raised-button color="primary" (click)="ban(selectedUser)">
+		Ban
+	</button>
 </div>
 
-<h4>wrong Userlist: </h4>
+<!-- <h4>wrong Userlist: </h4>
 <ul>
 	<li *ngFor="let user of room.users">
 		 {{user}}
@@ -58,7 +64,7 @@
 	<mat-select>
 	  <mat-option *ngFor="let user of room.users" [value]="user"> user = {{ user }}</mat-option>
 	</mat-select>
-  </mat-form-field>
+  </mat-form-field> -->
 
 <!-- <li *ngFor="let message of room.users">
 		<h3> Userlist: </h3> {{ room.users.join(', ') }}{{ message}}

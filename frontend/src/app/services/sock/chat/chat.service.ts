@@ -189,6 +189,27 @@ export class ChatService{
 		});
 	}
 
+	muteUser(room: string, userid: string){
+		this.chatSocket.emit('mute', {room, userid}, (err: any) => {
+			if (err) {
+				console.log("leaveRoom chat-sock error: ");
+				console.log(err);
+				console.log(err.message);
+			}
+		});
+	}
+
+	banUser(room: string, userid: string){
+		this.chatSocket.emit('ban', {room, userid}, (err: any) => {
+			if (err) {
+				console.log("banUser chat-sock error: ");
+				console.log(err);
+				console.log(err.message);
+			}
+		});
+	}
+
+
 	isUnread() {
 		return this.unread;
 	}

@@ -65,7 +65,18 @@ export class ChatMessageComponent implements AfterViewInit{
 
 	battle(userid: string){
 		// console.log("FIGHTING------FIGHTING");
+
 		this.router.navigate(['/dashboard', 'game']);
+	}
+
+	mute(userid: string){
+		// console.log("FIGHTING------FIGHTING");
+		this.chatService.muteUser(this.room.id, userid);
+	}
+
+	ban(userid: string){
+		// console.log("FIGHTING------FIGHTING");
+		this.chatService.banUser(this.room.id, userid);
 	}
 
 	time(created: Date | undefined){
