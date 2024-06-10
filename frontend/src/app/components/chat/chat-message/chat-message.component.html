@@ -23,7 +23,7 @@
 			<mat-option *ngFor="let user of room.users" [value]="user">
 				{{ user}}
 			</mat-option>
-		  </mat-select>
+		</mat-select>
 	</mat-form-field>
 	
 	<button *ngIf="selectedUser" mat-raised-button color="primary" (click)="battle(selectedUser)">
