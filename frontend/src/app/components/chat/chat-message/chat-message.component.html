@@ -19,7 +19,7 @@
 <div class="chat_columns">
 	<mat-form-field>
 		<mat-label>Select User</mat-label>
-		<mat-select [(value)]="selectedUser">
+		<mat-select [(value)]="selectedUser">  <!--- div forces the whole screen orange --->
 			<mat-option *ngFor="let user of room.users" [value]="user">
 				{{ user}}
 			</mat-option>
