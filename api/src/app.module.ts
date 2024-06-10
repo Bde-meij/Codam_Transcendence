@@ -9,6 +9,7 @@ import { DatabaseModule } from './database/database.module';
 import { ConfigModule } from '@nestjs/config';
 import { TestingModule } from './testing/testing.module';
 import { PasswordService } from './password/password.service';
+import { FriendsModule } from './friends/friends.module';
 
 @Module({
 	imports: [
@@ -22,6 +23,7 @@ import { PasswordService } from './password/password.service';
 		GameModule,
 		DatabaseModule,
 		TestingModule,
+		FriendsModule,
 	],
 	controllers: [],
 	providers: [GameModule, ChatGateway, PasswordService],

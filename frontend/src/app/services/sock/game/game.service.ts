@@ -37,14 +37,25 @@ export class GameService{
 		return this.gameSocket.disconnect();
 	}
 
-	assignPlayer(): Observable<number>
+	assignNumber(): Observable<number>
 	{
 		return new Observable((observ) => 
 		{
-			this.gameSocket.on('assignPlayerNum', (playNum: number) =>
+			this.gameSocket.on('assignNumber', (playNum: number) =>
 			{
 				console.log("player assigned with", playNum);
 				observ.next(playNum);
+			});
+		});
+	}
+	assignNames(): Observable<string[]>
+	{
+		return new Observable((observ) => 
+		{
+			this.gameSocket.on('assignNames', (playNames: string[]) =>
+			{
+				console.log("player assigned with", playNames);
+				observ.next(playNames);
 			});
 		});
 	}
@@ -83,6 +94,17 @@ export class GameService{
 		});
 	}
 
+	startSignal()
+	{
+		return new Observable((observ) => 
+		{
+			this.gameSocket.on("startSignal", () =>
+			{
+				observ.next();
+			});
+		});
+	}
+
 	playerWin(): Observable<string>
 	{
 		return new Observable((observ) => 
@@ -99,23 +121,8 @@ export class GameService{
 		this.gameSocket.emit("joinRoom", key);
 	}
 
-	updateBall()
-	{
-		this.gameSocket.emit("updateBall");
-	}
-
 	emitYPos(playerPos :number)
 	{
 		this.gameSocket.emit("updatePlayer", playerPos);
-	}
-
-	emitPlayerBounce(effect :number)
-	{
-		this.gameSocket.emit("playerbounce", effect);
-	}
-
-	emitResetBall(direction: any)
-	{
-		this.gameSocket.emit("resetball", direction);
 	}
 }

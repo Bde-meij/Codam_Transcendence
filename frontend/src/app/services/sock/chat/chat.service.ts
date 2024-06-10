@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { io, Socket } from 'socket.io-client';
+import { io } from 'socket.io-client';
 import { SockService } from '../sock.service';
 import { UserService } from '../../user/user.service';
 import { User } from '../../../models/user.class';
@@ -10,7 +10,7 @@ import { Rooms } from '../../../models/rooms.class';
 @Injectable({
   providedIn: 'root'
 })
-export class ChatService{
+export class ChatService {
 	private chatSocket = io("/chat");
 	private unread = true;
 	user$ : Observable<User> | undefined;

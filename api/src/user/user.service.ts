@@ -1,4 +1,4 @@
-import { Injectable, Res, HttpStatus } from '@nestjs/common';
+import { Injectable, Res, HttpStatus, HttpException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -17,9 +17,24 @@ export class UserService {
 		return false;
 	} 
 
-	async createUser(userData: any) {
-		const savedUser = await this.userRepo.save(userData);
+	async createUser(userData: CreateUserDto): Promise<User> {
+		const userIdExists = await this.userRepo.findOne({where: {id: userData.id}})
+		if (userIdExists) {
+			throw new HttpException('Id already in use!', 400);
+		}
+		const userNameExists = await this.userRepo.findOne({where: {nickname: userData.nickname}})
+		if (userNameExists) {
+			throw new HttpException('Nickname already in use!', 400);
+		}
+		const savedUser = await this.userRepo.save({
+			id: userData.id,
+			nickname: userData.nickname,
+		});
 		return savedUser;
+	}
+
+	async createUsers(users: CreateUserDto[]): Promise<User[]> {
+		return await this.userRepo.save(users);
 	}
 
 	async findUserById(id: string) {
@@ -35,6 +50,10 @@ export class UserService {
 
 	async findAllUsers(): Promise<User[]> {
 		return await this.userRepo.find();
+	}
+
+	async updateName(id: string, newName: string) {
+		await this.userRepo.update(id, {nickname: newName});
 	}
 
 	async updateStatus(id: string, newStatus: string) {
@@ -55,5 +74,9 @@ export class UserService {
 
 	async disableTwoFA(id: string) {
 		await this.userRepo.update(id, {isTwoFAEnabled: false});
+	}
+
+	async updateNickname(id: string, newName: string) {
+		await this.userRepo.update(id, {nickname: newName});
 	}
 }
