@@ -34,8 +34,6 @@ export class GameComponent implements OnInit, OnDestroy
 	lScore: number = 0;
 	rScore: number = 0;
 
-	inviteKey: number = 0;
-
 	READY: boolean = false;
 	router= new Router;
 
@@ -111,7 +109,7 @@ export class GameComponent implements OnInit, OnDestroy
 
 		// if (client invited someone, or is invited)
 		// 	invitekey = unique number
-		this.gameSrv.joinRoom(this.inviteKey);
+		this.gameSrv.joinRoom();
 
 		this.gameSrv.assignNumber().subscribe((playnum: number) => {
 			console.log(playnum);
@@ -126,19 +124,13 @@ export class GameComponent implements OnInit, OnDestroy
 
 		this.gameSrv.startSignal().subscribe(() => {
 			this.game.add(this.timerText);
-				setTimeout(() =>{{
-					setTimeout(() =>{{
-						setTimeout(() =>{{
-							setTimeout(() =>{{
-								this.game.remove(this.timerText);
-								this.startGame();
-							}},1000);
-						this.timerText.text = "GO!"
-					}},1000);
-					this.timerText.text = "1";
-				}},1000);
-				this.timerText.text = "2";
-			}},1000);
+			setTimeout(() =>{{this.timerText.text = "2"}},2000);
+			setTimeout(() =>{{this.timerText.text = "1"}},3000);
+			setTimeout(() =>{{this.timerText.text = "GO!"}},4000);
+			setTimeout(() =>{{
+				this.game.remove(this.timerText);
+				this.startGame();
+				}},5000);
 		});
 	}
 
