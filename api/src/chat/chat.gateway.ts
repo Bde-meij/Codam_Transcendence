@@ -174,8 +174,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		  return;
 		sockets.forEach((obj) => {
 			users.push(obj.data.nickname);
-			console.log("channelUserList: " + obj.data.nickname);
 		});
+		console.log("channelUserList: " + users);
+
 		this.io.to(id).emit('userList', users);
 	}
 
@@ -193,7 +194,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@MessageBody() data: { id: string, password: string },
 	@ConnectedSocket() socket: Socket,
 	) {
-		console.log("joinRoom: " + data.id);
+		console.log("joinRoom: " + data.id + ", socketid: " + socket.data.id + socket.data.nickname);
 		const id = data.id;
 		// const Room = Object.values(this.chatRoomList).find(
 		// 	(room) => room.id === id,
@@ -206,8 +207,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		socket.data.id = id;
 		socket.data.name = id;
 		socket.join(id);
-		console.log("joinedRoom: " + id);
-		this.chatRoomList[id].users.push(id);
+		console.log("joinedRoom: " + socket.data.nickname);
+		this.chatRoomList[id].users.push(socket.data.nickname);
+		console.log(this.chatRoomList[id].users)
 		this.channelUserList(id);
 	}
 	
@@ -330,7 +332,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		@MessageBody() {},
 		@ConnectedSocket() client: Socket) 
 		{	
-			joinInvRoom(77600, 1);
+			console.log("joinbattle: " + 1);
+			joinInvRoom(89413, 1);
 			// console.log("invitegame: " + client.data.id + ", userid: " + data.userid);
 			// console.log(data.room + ", " + client.data.id)
 			// const message: MessageInterface = {

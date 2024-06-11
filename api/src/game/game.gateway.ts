@@ -65,6 +65,8 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			if (!user)
 				throw new NotAcceptableException();
 			client.data.nickname = user.nickname;
+			client.data.id = user.id;
+
 			console.log("nickname: " + client.data.nickname)
 			console.log("useriD: " + user.id)
 		} catch {
@@ -127,7 +129,9 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@SubscribeMessage("joinRoom")
 	joinRoom(client: Socket)
 	{
+		console.log("joinroom game: " + client.data.id);
 		var roomName = this.findRoomByPlayer(client.data.id)
+		console.log("roomname:" + roomName);
 		if (roomName != null)
 		{
 			var room = roomMap.get(roomName);
@@ -249,12 +253,12 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 export function setInvRoom(userID: number)
 {
+	numOfRooms++;
 	roomMap.set("room"+numOfRooms, new Room);
 	var room = roomMap.get("room"+numOfRooms)
 	room.name = "room"+numOfRooms;
 	room.leftId = userID;
 	console.log(userID, "reserved spot in", room.name);
-	numOfRooms++;
 	return (numOfRooms);
 }
 

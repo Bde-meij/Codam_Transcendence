@@ -9,7 +9,7 @@ services:
       target: development
     volumes:
       - ./api:/src/app
-      - /src/app/node_modules
+      - /api/src/app/node_modules
     command: npm run start
     depends_on:
       - postgres

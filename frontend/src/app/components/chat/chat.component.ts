@@ -69,6 +69,7 @@ export class ChatComponent implements OnInit {
 		});
 
 		this.chatService.getConnectedUsers().subscribe((userList: any) => {
+			console.log("getconnectedusers subscribe");
 			this.userss = userList;
 		})
 

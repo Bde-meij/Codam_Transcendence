@@ -118,6 +118,7 @@ export class GameService{
 
 	joinRoom()
 	{
+		console.log("joinroom");
 		this.gameSocket.emit("joinRoom");
 	}
 
