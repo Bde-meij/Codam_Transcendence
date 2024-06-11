@@ -209,6 +209,25 @@ export class ChatService {
 		});
 	}
 
+	battle(room: string, userid: string){
+		this.chatSocket.emit('inviteGame', {room, userid}, (err: any) => {
+			if (err) {
+				console.log("inviteGame chat-sock error: ");
+				console.log(err);
+				console.log(err.message);
+			}
+		});
+	}
+
+	joinBattle(){
+		this.chatSocket.emit('joinBattle', {}, (err: any) => {
+			if (err) {
+				console.log("joinBattle chat-sock error: ");
+				console.log(err);
+				console.log(err.message);
+			}
+		});
+	}
 
 	isUnread() {
 		return this.unread;

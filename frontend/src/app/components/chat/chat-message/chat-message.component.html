@@ -13,28 +13,30 @@
 	<input #messageInput [(ngModel)]="message" (keydown.enter)="sendMessage()" type="text" [class.chat_input]="message" > 
 	<button (click)="sendMessage()"> SendMessage </button>
 	<button (click)="leaveRoom(room.name, 'David')"> leaveRoom </button>
+	<button (click)="joinBattle()"> joinBattle </button>
 
 </div>
 
 <div class="chat_columns">
 	<mat-form-field>
 		<mat-label>Select User</mat-label>
-		<mat-select [(value)]="selectedUser">  <!--- div forces the whole screen orange --->
+		<mat-select [(value)]="selectedUserID">  <!--- div forces the whole screen orange --->
 			<mat-option *ngFor="let user of room.users" [value]="user">
 				{{ user}}
 			</mat-option>
 		</mat-select>
 	</mat-form-field>
 	
-	<button *ngIf="selectedUser" mat-raised-button color="primary" (click)="battle(selectedUser)">
+	<button *ngIf="selectedUserID" mat-raised-button color="primary" (click)="battle(selectedUserID)">
 		Battle
 	</button>
-	<button *ngIf="selectedUser" mat-raised-button color="primary" (click)="mute(selectedUser)">
+	<button *ngIf="selectedUserID" mat-raised-button color="primary" (click)="mute(selectedUserID)">
 		Mute
 	</button>
-	<button *ngIf="selectedUser" mat-raised-button color="primary" (click)="ban(selectedUser)">
+	<button *ngIf="selectedUserID" mat-raised-button color="primary" (click)="ban(selectedUserID)">
 		Ban
 	</button>
+	
 </div>
 
 <!-- <h4>wrong Userlist: </h4>

@@ -15,6 +15,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { UserService } from 'src/user/user.service';
 import { Injectable } from '@nestjs/common';
 import { PasswordService } from 'src/password/password.service';
+import { setInvRoom, joinInvRoom } from 'src/game/game.gateway';
 
 @Injectable()
 @WebSocketGateway({
@@ -102,8 +103,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	// console.log(chatRoom.users);
 	@SubscribeMessage('message')
 	async handleMessage(
-		@MessageBody() data: { message: string, sender: string, room: string },
-		@ConnectedSocket() socket: Socket,
+	@MessageBody() data: { message: string, sender: string, room: string },
+	@ConnectedSocket() socket: Socket,
 	) {
 		const nickname = socket.data.nickname;
 		const message: MessageInterface = {
@@ -215,12 +216,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	async leaveRoom(
 	@MessageBody() data: { room: string; userid: string },
 	@ConnectedSocket() client: Socket) {
-		console.log("LEAVEROOM:-----")
+		console.log("-------LEAVEROOM:")
 		console.log(client.rooms);
 		for (const value of client.rooms) {
 			console.log(value);
 			// console.log(value.data.id);
-
 		}
 		// const sockets = this.io.sockets.adapter.rooms.get(data.room);
 		// console.log(sockets);
@@ -307,6 +307,43 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		//check if owner
 		//kick user
 	}
+
+	@SubscribeMessage('inviteGame') async inviteGame(
+	@MessageBody() data: { room: string; userid: string },
+	@ConnectedSocket() client: Socket) 
+	{	
+		
+		const numroom = setInvRoom(77600);
+		console.log("invitegame: " + client.data.id + ", userid: " + data.userid);
+		console.log(data.room + ", " + client.data.id)
+		const message: MessageInterface = {
+			message: numroom.toString(),
+			roomId: data.room,
+			senderId: client.data.userid,  // check 
+			created: this.addDate(),
+		};
+		this.io.in(data.room).emit('message', message);
+		// this.io.to(client.data.id).emit('message', "hello");
+	}
+
+	@SubscribeMessage('joinBattle') async joinBattle(
+		@MessageBody() {},
+		@ConnectedSocket() client: Socket) 
+		{	
+			joinInvRoom(77600, 1);
+			// console.log("invitegame: " + client.data.id + ", userid: " + data.userid);
+			// console.log(data.room + ", " + client.data.id)
+			// const message: MessageInterface = {
+			// 	message: numroom.toString(),
+			// 	roomId: data.room,
+			// 	senderId: client.data.userid,  // check 
+			// 	created: this.addDate(),
+			// };
+			// this.io.in(data.room).emit('message', message);
+			// this.io.to(client.data.id).emit('message', "hello");
+		}
+
+
 	
 	private addMessageToRoom(message: MessageInterface): void {
 		const roomId = message.roomId;

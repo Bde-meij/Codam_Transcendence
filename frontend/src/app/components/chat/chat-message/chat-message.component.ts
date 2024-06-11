@@ -27,6 +27,8 @@ export class ChatMessageComponent implements AfterViewInit{
 	@ViewChild('messageInput') messageInput!: ElementRef;
 	@Input() room: any;
 	selectedUser: any;
+	selectedUserID: any;
+
 	
 	message: string | undefined;
 	// messages: string[] = [];
@@ -65,8 +67,12 @@ export class ChatMessageComponent implements AfterViewInit{
 
 	battle(userid: string){
 		// console.log("FIGHTING------FIGHTING");
-
-		this.router.navigate(['/dashboard', 'game']);
+		console.log("userid: " + userid);
+		this.chatService.battle(this.room.name, userid)
+		// this.router.navigate(['/dashboard', 'game']);
+	}
+	joinBattle(){
+		this.chatService.joinBattle();
 	}
 
 	mute(userid: string){
@@ -76,6 +82,7 @@ export class ChatMessageComponent implements AfterViewInit{
 
 	ban(userid: string){
 		// console.log("FIGHTING------FIGHTING");
+		
 		this.chatService.banUser(this.room.id, userid);
 	}
 
