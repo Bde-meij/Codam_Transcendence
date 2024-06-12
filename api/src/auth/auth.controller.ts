@@ -50,8 +50,8 @@ export class AuthController {
 				potentialNewUser.is2faVerified = false;
 		}
 		const tokens = await this.authService.getJwtTokens(potentialNewUser);
-		res.cookie('access_token', tokens.access_token);
-		res.cookie('refresh_token', tokens.refresh_token);
+		res.cookie('access_token', tokens.access_token, {httpOnly: true});
+		res.cookie('refresh_token', tokens.refresh_token, {httpOnly: true});
 		if (!userExists) {
 			console.log("user not found");
 			res.status(HttpStatus.FOUND).redirect(`http://${req.hostname}:4200/register`);
@@ -67,6 +67,18 @@ export class AuthController {
 				res.status(HttpStatus.FOUND).redirect(`http://${req.hostname}:4200/dashboard`);
 			}
 		}
+	}
+
+	//makes jwt tokens that never expire for testing purposes
+	@Get('foreverCokkies')
+	async foreverCokkies(@Req() req: Request, @Res() res: Response) {
+		const fakeUser: CallbackAuthDto = {
+			id: (req.user as any).id,
+			is2faVerified: true,
+		}
+		const tokens = await this.authService.getForeverJwtTokens(fakeUser);
+		res.cookie('access_token', tokens.access_token, {httpOnly: true});
+		res.cookie('refresh_token', tokens.refresh_token, {httpOnly: true});
 	}
 
 	@Post('logout')

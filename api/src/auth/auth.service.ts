@@ -25,6 +25,19 @@ export class AuthService {
 		};
 	}
 
+	//returns jwt tokens that never expire for testing purposes
+	async getForeverJwtTokens(user: CallbackAuthDto): Promise<{access_token: string, refresh_token: string}> {
+		const payload = {id: user.id, is2faVerified: user.is2faVerified};
+		return {
+			access_token : await this.jwtService.signAsync(payload,
+				{expiresIn: 'none',
+				secret: this.configService.getOrThrow('JWT_ACCESS_SECRET')}),
+			refresh_token : await this.jwtService.signAsync(payload,
+				{expiresIn: 'none',
+				secret: this.configService.getOrThrow('JWT_REFRESH_SECRET')}),
+		};
+	}
+
 	async verifyJwtAccessToken(token: string) {
 		console.log('verifying token...')
 		try {
@@ -41,7 +54,7 @@ export class AuthService {
 		}
 	}
 
-	async refreshJwtToken(refreshToken: string) {
+	async refreshJwtToken(refreshToken: string): Promise<{newAccessToken: string, payload: any}> {
 		try {
 			const payload = await this.jwtService.verifyAsync(
 				refreshToken,
@@ -50,7 +63,7 @@ export class AuthService {
 				}
 			);
 			const newAccessToken = this.jwtService.sign({
-				username: payload.username, sub: payload.sub },
+				username: payload.username, is2faVerified: payload.is2faVerified },
 				{expiresIn: this.configService.getOrThrow("JWT_ACCESS_TIME"),
 				secret: this.configService.getOrThrow('JWT_ACCESS_SECRET')});
       		return {newAccessToken: newAccessToken, payload: payload};
