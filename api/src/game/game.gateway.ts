@@ -139,3 +139,4 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				room.serverRef.in(room.name).emit("updateBallPos", room.ballPos);
 		}
 	}
+}
