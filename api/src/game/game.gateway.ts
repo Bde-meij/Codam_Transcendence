@@ -9,9 +9,9 @@ import {
 	WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from "socket.io";
-import { GameService } from './game.service';
-import { CreateGameDto } from './dto/create-game.dto';
-import { UpdateGameDto } from './dto/update-game.dto';
+import { MatchService } from './match.service';
+import { CreateMatchDto } from './dto/create-match.dto';
+import { UpdateMatchDto } from './dto/update-match.dto';
 import { Room} from './Room';
 
 var colCheck: boolean = false;
@@ -24,7 +24,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@WebSocketServer()
 	server: Server;
 
-	constructor(private readonly gameService: GameService) {}
+	constructor(private readonly matchService: MatchService) {}
 	
 	afterInit(server: any) 
 	{
@@ -34,36 +34,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	handleConnection(client: Socket)
 	{
 		console.log("gameGateway: ", client.id, " has connected");
-	}
-
-	@SubscribeMessage('createGame')
-	create(@MessageBody() createGameDto: CreateGameDto)
-	{
-		return this.gameService.create(createGameDto);
-	}
-
-	@SubscribeMessage('findAllGame')
-	findAll()
-	{
-		return this.gameService.findAll();
-	}
-
-	@SubscribeMessage('findOneGame')
-	findOne(@MessageBody() id: number)
-	{
-		return this.gameService.findOne(id);
-	}
-
-	@SubscribeMessage('updateGame')
-	update(@MessageBody() updateGameDto: UpdateGameDto)
-	{
-		return this.gameService.update(updateGameDto.id, updateGameDto);
-	}
-
-	@SubscribeMessage('removeGame')
-	remove(@MessageBody() id: number) 
-	{
-		return this.gameService.remove(id);
 	}
 
 	handleDisconnect(client: Socket)

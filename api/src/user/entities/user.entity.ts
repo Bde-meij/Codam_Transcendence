@@ -1,4 +1,5 @@
 import { FriendRequest } from "src/friends/entities/friend.entity";
+import { Match } from "src/game/entities/match.entity";
 import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
 
 @Entity('user')
@@ -24,6 +25,15 @@ export class User {
 
 	@OneToMany(() => FriendRequest, (friend) => friend.target)
 	friendIn: FriendRequest[];
+
+	@OneToMany(() => Match, (match) => match.winningPlayer)
+	matchWinningPlayer: Match[];
+
+	@OneToMany(() => Match, (match) => match.leftPlayer)
+	matchLeftPlayer: Match[];
+
+	@OneToMany(() => Match, (match) => match.rightPlayer)
+	matchRightPlayer: Match[];
 	
 	@Column({nullable: true})
 	twoFASecret: string;
