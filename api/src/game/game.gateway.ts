@@ -9,9 +9,9 @@ import {
 	WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from "socket.io";
-import { GameService } from './game.service';
-import { CreateGameDto } from './dto/create-game.dto';
-import { UpdateGameDto } from './dto/update-game.dto';
+import { MatchService } from './match.service';
+import { CreateMatchDto } from './dto/create-match.dto';
+import { UpdateMatchDto } from './dto/update-match.dto';
 import { Room} from './Room';
 
 import { AuthService } from 'src/auth/auth.service';
@@ -31,79 +31,16 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@WebSocketServer()
 	server: Server;
 
-	constructor(private authService: AuthService, private userService: UserService, private gameService: GameService) {}
-	
+	constructor(private readonly matchService: MatchService) {}
+
 	afterInit(server: any) 
 	{
 		console.log("server started");
 	}
 
-	// handleConnection(client: Socket)
-	// {
-	// 	console.log("gameGateway: ", client.id, " has connected");
-	// }
-
-	async handleConnection(client: Socket) {
-		try {
-			console.log("handleConnection: " + client.id + "connecting...");
-			const cookies = client.handshake.headers.cookie?.split('; ');
-			if (!cookies)
-				throw new NotAcceptableException();
-			var token: string;
-			for (var cookie of cookies) {
-				const [key, value] = cookie.split('=');
-				// console.log(value);
-				if (key === 'access_token') {
-					token = value;
-					break;
-				}
-			}
-			if (!token)
-				throw new NotAcceptableException();
-			const payload = await this.authService.verifyJwtAccessToken(token);
-			const user = await this.userService.findUserById(payload.id);
-			if (!user)
-				throw new NotAcceptableException();
-			client.data.nickname = user.nickname;
-			console.log("nickname: " + client.data.nickname)
-			console.log("useriD: " + user.id)
-		} catch {
-			console.log(client.id, "connection refused");
-			client.disconnect();
-			return;
-		}
-		
-	}
-	
-
-	@SubscribeMessage('createGame')
-	create(@MessageBody() createGameDto: CreateGameDto)
+	handleConnection(client: Socket)
 	{
-		return this.gameService.create(createGameDto);
-	}
-
-	@SubscribeMessage('findAllGame')
-	findAll()
-	{
-		return this.gameService.findAll();
-	}
-
-	@SubscribeMessage('findOneGame')
-	findOne(@MessageBody() id: number)
-	{
-		return this.gameService.findOne(id);
-	}
-
-	@SubscribeMessage('updateGame')
-	update(@MessageBody() updateGameDto: UpdateGameDto)
-	{
-		return this.gameService.update(updateGameDto.id, updateGameDto);
-	}
-
-	@SubscribeMessage('removeGame')
-	remove(@MessageBody() id: number) 
-	{
-		return this.gameService.remove(id);
+		console.log("gameGateway: ", client.id, " has connected");
 	}
 
 	handleDisconnect(client: Socket)
@@ -127,38 +64,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@SubscribeMessage("joinRoom")
 	joinRoom(client: Socket)
 	{
-		var roomName = this.findRoomByPlayer(client.data.id)
-		if (roomName != null)
-		{
-			var room = roomMap.get(roomName);
-			if (room.leftId == client.data.id)
-			{
-				client.join(roomName)
-				client.data.room = roomName;
-				room.leftPlayer = client;
-				room.serverRef = this.server;
-			}
-			else if(room.rightId == client.data.id)
-			{
-				client.emit("assignNumber", 2);
-				client.join(roomName);
-				client.data.room = roomName;
-				client.in(roomName).emit("assignNumber", 1)
-				room.hasStarted = true;
-				room.rightPlayer = client;
-				room.serverRef = this.server;
-	
-				room.serverRef.in(roomName).emit("assignNames", 
-					[room.leftId, room.rightId]
-				);
-				room.serverRef.in(roomName).emit("startSignal");
-				setTimeout(() =>{{
-				room.stopInterval = setInterval(this.updateBall, 20, room);
-				}},4000);
-			}
-		}
-		else
-		{
 			var stop: boolean = false;
 			roomMap.forEach((roomObj, roomName) =>{
 			if ((roomObj.hasStarted == false) && (stop == false))
@@ -183,7 +88,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			}})
 			if (stop == false)
 				this.createRoom(client);
-		}
 	}
 
 	createRoom(client: Socket)
@@ -235,32 +139,3 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				room.serverRef.in(room.name).emit("updateBallPos", room.ballPos);
 		}
 	}
-
-	findRoomByPlayer(userID: number) : string
-	{
-		roomMap.forEach((roomObj, roomName) =>
-		{
-			if ((userID == roomObj.leftId) || (userID == roomObj.leftId))
-				return (roomName);
-		});
-		return (null);
-	}
-}
-
-export function setInvRoom(userID: number)
-{
-	roomMap.set("room"+numOfRooms, new Room);
-	var room = roomMap.get("room"+numOfRooms)
-	room.name = "room"+numOfRooms;
-	room.leftId = userID;
-	console.log(userID, "reserved spot in", room.name);
-	numOfRooms++;
-	return (numOfRooms);
-}
-
-export function joinInvRoom(useriD: number, roomNum: number)
-{
-	var room = roomMap.get("room"+roomNum);
-	room.rightId = useriD;
-	console.log(useriD, "reserved spot in", "room"+roomNum);
-}
