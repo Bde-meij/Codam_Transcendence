@@ -5,6 +5,7 @@ import{Player,Ball,addAfterImage}from "./gameActors";
 import{makeLines,drawScore,leftScorePos,rightScorePos}from "./lineDrawing";
 import { NgIf } from '@angular/common';
 import {Router } from "@angular/router";
+import { SockService } from '../../services/sock/sock.service';
 
 @Component({
 	selector: 'app-game',
@@ -13,6 +14,7 @@ import {Router } from "@angular/router";
 	templateUrl: './game.component.html',
 	styleUrl: './game.component.scss'
 })
+
 export class GameComponent implements OnInit, OnDestroy
 {
 	title = "1v1 PONG";
@@ -35,9 +37,7 @@ export class GameComponent implements OnInit, OnDestroy
 	rScore: number = 0;
 
 	READY: boolean = false;
-	router= new Router;
-
-	constructor(private gameSrv: GameService){};
+	router = new Router;
 
 	game = new Engine(
 	{
@@ -97,22 +97,47 @@ export class GameComponent implements OnInit, OnDestroy
 			size: 40,
 		  }),
 	})
-	
+
+	abortText = new Label({
+		color: Color.White,
+		x: 400,
+		y: 125,
+		font: new Font({
+			textAlign: TextAlign.Center,
+			size: 40,
+		  }),
+	})
+	gameSrv: any
 	ngOnInit()
 	{
-		this.game.add(this.waitText);
-		this.game.add(this.leftPNameText);
-		this.game.add(this.rightPNameText);
-		this.game.start();
+		this.gameSrv = new GameService();
+		// this.gameSrv.connect();
+		console.log("NOTICE ME SENPAI");
+		// setTimeout(() =>{{
+		// }},1000);
+		
+		this.gameSrv.connectSignal().subscribe(() => 
+		{
+			this.game.add(this.waitText);
+			this.game.add(this.leftPNameText);
+			this.game.add(this.rightPNameText);
+			this.game.start();
+			this.gameSrv.joinGame();
+		});
 
-		this.gameSrv.connect();
-
-		// if (client invited someone, or is invited)
-		// 	invitekey = unique number
-		this.gameSrv.joinRoom();
+		this.gameSrv.abortGame().subscribe(() => 
+		{
+			console.log("join game called");
+			this.game.remove(this.waitText);
+			this.game.remove(this.leftPNameText);
+			this.game.remove(this.rightPNameText);
+			this.abortText.text = "game aborted";
+			setTimeout(() =>{{this.ngOnDestroy();}},2000);
+			this.game.add(this.abortText);
+		});
 
 		this.gameSrv.assignNumber().subscribe((playnum: number) => {
-			console.log(playnum);
+			console.log("number", playnum, "was assigned");
 			this.playernum = playnum;
 		});
 		
@@ -124,18 +149,19 @@ export class GameComponent implements OnInit, OnDestroy
 
 		this.gameSrv.startSignal().subscribe(() => {
 			this.game.add(this.timerText);
-			setTimeout(() =>{{this.timerText.text = "2"}},2000);
-			setTimeout(() =>{{this.timerText.text = "1"}},3000);
-			setTimeout(() =>{{this.timerText.text = "GO!"}},4000);
+			setTimeout(() =>{{this.timerText.text = "2"}},1000);
+			setTimeout(() =>{{this.timerText.text = "1"}},2000);
+			setTimeout(() =>{{this.timerText.text = "GO!"}},3000);
 			setTimeout(() =>{{
 				this.game.remove(this.timerText);
 				this.startGame();
-				}},5000);
+			}},4000);
 		});
 	}
 
 	startGame()
 	{
+		console.log("startGame called");
 		var score = new Actor;
 		score.graphics.onPreDraw = 
 		(ctx: ExcaliburGraphicsContext) =>
@@ -185,14 +211,24 @@ export class GameComponent implements OnInit, OnDestroy
 					this.rightPlayer.pos.y += this.height*0.025;
 					this.gameSrv.emitYPos(this.rightPlayer.pos.y);
 				}
-
 				// TESTBOT
 				// this.rightPlayer.pos.y = this.squareBall.pos.y;
 				// this.gameSrv.emitYPos(this.rightPlayer.pos.y);
 			}
 		});
 
-		this.gameSrv.getBallPos().subscribe((ballPos) =>
+		this.gameSrv.abortGame().subscribe(() => 
+			{
+				console.log("join game called");
+				this.game.remove(this.waitText);
+				this.game.remove(this.leftPNameText);
+				this.game.remove(this.rightPNameText);
+				this.abortText.text = "game aborted";
+				setTimeout(() =>{{this.ngOnDestroy();}},2000);
+				this.game.add(this.abortText);
+			});
+
+		this.gameSrv.getBallPos().subscribe((ballPos: number[]) =>
 		{
 			this.ballShadows[2].pos = this.ballShadows[1].pos;
 			this.ballShadows[1].pos = this.ballShadows[0].pos;
@@ -201,7 +237,7 @@ export class GameComponent implements OnInit, OnDestroy
 			this.squareBall.pos.y = ballPos[1];
 		})
 
-		this.gameSrv.getPlayerPos().subscribe((ypos) => 
+		this.gameSrv.getPlayerPos().subscribe((ypos: number) => 
 		{
 			if (this.playernum == 1)
 				this.rightPlayer.pos.y = ypos;
@@ -209,7 +245,7 @@ export class GameComponent implements OnInit, OnDestroy
 				this.leftPlayer.pos.y = ypos;
 		});
 	
-		this.gameSrv.getScores().subscribe((scores) =>
+		this.gameSrv.getScores().subscribe((scores: number []) =>
 		{
 			this.lScore = scores[0];
 			this.rScore = scores[1];
@@ -224,21 +260,19 @@ export class GameComponent implements OnInit, OnDestroy
 			this.game.remove(this.ballShadows[2]);
 			this.game.remove(this.ballShadows[1]);
 			this.game.remove(this.ballShadows[0]);
-			// this.winner = pName;
 			this.winText.text = pName+"\nis the winner!";
 			setTimeout(() =>{{this.ngOnDestroy();}},2000);
 			this.game.add(this.winText);
 		});
-			
-		// this.game.start();
 	}
 
 	ngOnDestroy() 
 	{
-		this.game?.stop();
-		this.game?.canvas.remove();
-		// delete this.game;
+		console.log("game is destroyed");
+		this.game.stop();
+		this.game.canvas.remove();
 		this.gameSrv.disconnect();
+		this.gameSrv.ngOnDestroy();
 		this.router.navigate(['/dashboard/game-menu']);
 	}
 }

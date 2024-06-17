@@ -20,5 +20,4 @@ export class GameMenuComponent {
     inviteGame() {
       this.router.navigate(['/dashboard/game'])
     }
-
 }

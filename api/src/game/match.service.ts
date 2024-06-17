@@ -13,9 +13,9 @@ export class MatchService {
 	
 	async createMatch(createMatchDto: CreateMatchDto) {
 		// Games should only be create by the backend, these errors should never happen
-		if (createMatchDto.leftPlayerId === createMatchDto.rightPlayerId) {
-			throw new HttpException('Cannot create game with yourself', 400);
-		}
+		// if (createMatchDto.leftPlayerId === createMatchDto.rightPlayerId) {
+		// 	throw new HttpException('Cannot create game with yourself', 400);
+		// }
 		const leftPlayer: User = await this.userService.findUserById(createMatchDto.leftPlayerId);
 		if (!leftPlayer) {
 			throw new HttpException('Left player not found', 404);
