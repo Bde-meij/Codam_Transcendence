@@ -1,11 +1,11 @@
-import { CanActivate, ExecutionContext, HttpStatus, Injectable, Req, UnauthorizedException } from "@nestjs/common";
+import { CanActivate, ExecutionContext, Injectable, Req, UnauthorizedException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { AuthService } from "../auth.service";
 
 @Injectable()
-export class JwtGuard implements CanActivate {
+export class JwtGuardIgnore2fa implements CanActivate {
 	constructor(private jwtService: JwtService, private configService: ConfigService, private authService: AuthService) {};
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -18,25 +18,18 @@ export class JwtGuard implements CanActivate {
 		}
 		try {
 			const payload = await this.authService.verifyJwtAccessToken(accessToken);
-			if (!payload.is2faVerified)
-				throw new UnauthorizedException('2FA not verified');
 			request['user'] = payload;
 		} catch(err) {
-			console.log('Access token validation failed (JWT guard): ', err);
+			console.log('Access token validation failed: ', err);
 			if (refreshToken) {
 				try {
 					const tokenAndPlayload = await this.authService.refreshJwtToken(refreshToken);
-					if (!tokenAndPlayload.payload.is2faVerified)
-						throw new UnauthorizedException('2FA not verified');
-					request.user = await this.authService.verifyJwtAccessToken(tokenAndPlayload.newAccessToken);
 					response.cookie('access_token', tokenAndPlayload.newAccessToken, {httpOnly: true});
-					console.log('New access token issued');
+					request.user = await this.authService.verifyJwtAccessToken(tokenAndPlayload.newAccessToken);
 				}
 				catch(error) {
-					console.error('Refresh token validation failed:', error);
-					response.clearCookie('access_token');
-					response.clearCookie('refresh_token');
-					throw new UnauthorizedException(error);
+					console.error('Refresh token validation failed: ', error);
+					throw new UnauthorizedException('Invalid refresh token');
 				}
 			}
 			else {

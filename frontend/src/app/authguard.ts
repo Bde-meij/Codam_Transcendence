@@ -1,8 +1,9 @@
 import { Injectable } from "@angular/core";
 import { Router } from "@angular/router";
 import { AuthService } from "./services/auth/auth.service";
-import { Observable } from "rxjs";
-import { map } from 'rxjs/operators';
+import { Observable, throwError, of } from "rxjs";
+import { catchError, map } from 'rxjs/operators';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Injectable ({
 	providedIn: 'root'
@@ -10,12 +11,27 @@ import { map } from 'rxjs/operators';
 export class AuthGuard{
 	constructor(private router: Router, private authService: AuthService) {}
 
-	canActivate(): boolean {
-		if (this.authService.getLogStatus()) {
-			return true;
-		} else {
-			// this.router.navigate(['/welcome']);
-			return true;
-		}
+	isLoggedIn: boolean = false;
+
+	canActivate(): Observable<boolean> {
+		return this.authService.getLogStatus().pipe(
+		  map(data => {
+			if (data.loggedIn) {
+			  return true;
+			} else {
+			  this.router.navigate(['/welcome']);
+			  return false;
+			}
+		  }),
+		  catchError(error => {
+			this.handleError(error);
+			this.router.navigate(['/welcome']);
+			return of(false);
+		  })
+		);
+	  }
+
+	private handleError(error: HttpErrorResponse): void{
+		console.error('Unauthorized exception');
 	}
 }

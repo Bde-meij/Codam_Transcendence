@@ -1,22 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, Redirect, HttpStatus, Session, UseGuards, Req, HttpCode, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Res, HttpStatus, UseGuards, Req, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtGuard } from 'src/auth/guard/jwt.guard';
 import { Express } from 'express'
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
-import { createReadStream } from 'fs';
+import { createReadStream, existsSync, unlinkSync } from 'fs';
+import * as path from 'path';
 
 @Controller('user')
 export class UserController {
 	constructor(private readonly userService: UserService) {}
-
-	@Post()
-	create(@Body() createUserDto: CreateUserDto) {
-		//return this.userService.create(createUserDto);
-	}
 
 	@Get('current')
 	@UseGuards(JwtGuard)
@@ -24,13 +19,6 @@ export class UserController {
 		const user = await this.userService.findUserById(req.user.id);
 		return user;
 	}
-
-	// @Get(':id')
-	// @UseGuards(JwtGuard)
-	// async findUserById(@Req() req, @Param('id') id: string) {
-	// 	const user = await this.userService.findUserById(id);
-	// 	return user;
-	// }
 
 	@Get('/isnametaken/:nickname')
 	@UseGuards(JwtGuard)
@@ -55,7 +43,6 @@ export class UserController {
 
 	@Post('register')
 	@UseGuards(JwtGuard)
-	//@UseGuards(AuthGuard('fortytwo'))
 	async register(@Req() req, @Res() res, @Body() body: {nickname : string}) {
 		console.log("NEW NAME:", body.nickname);
 		const user: CreateUserDto = {id: req.user.id, nickname: body.nickname};
@@ -70,37 +57,19 @@ export class UserController {
 		return res.status(HttpStatus.OK).json({message: 'User registered', user: user});
 	}
 
-	// @Post('register')
-	// @UseGuards(JwtGuard)
-	// //@UseGuards(AuthGuard('fortytwo'))
-	// async register(@Req() req, @Res() res, @Body() body: {nickname : string}) {
-	// 	console.log("NEW NAME:", body.nickname);
-	// 	const user: any = {id: req.user.id, nickname: body.nickname, avatar: "/uploads/default_avatar.png", status: "online"};
-	// 	if (await this.userService.findUserById(user.id))
-	// 		return res.status(HttpStatus.FORBIDDEN).json({message: 'User already registered'});
-
-	// 	if (await this.userService.findUserByName(body.nickname))
-	// 		return res.status(HttpStatus.FORBIDDEN).json({message: 'Name is already taken'});
-
-	// 	await this.userService.createUser(user);
-	// 	return res.status(HttpStatus.OK).json({message: 'User registered', user: user});
-	// }
-
 	@Get('/name/:id')
 	@UseGuards(JwtGuard)
-	async findUserByName(@Req() req, @Param('name') name: string) {
-		const user = await this.userService.findUserByName(name);
+	async findUserByName(@Req() req, @Param('id') id: string) {
+		const user = await this.userService.findUserById(id);
 		return user;
 	}
 
-	@Patch(':id')
-	update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-		//return this.userService.update(+id, updateUserDto);
-	}
-
-	@Delete(':id')
-	remove(@Param('id') id: string) {
-		//return this.userService.remove(+id);
+	@Get('partial/name/:id')
+	@UseGuards(JwtGuard)
+	async returnPartialUser(@Param('id') id: string) {
+		const fullUser = await this.userService.findUserById(id);
+		const {status, avatar, friendIn, friendOut, twoFASecret, isTwoFAEnabled, ...rest} = fullUser;
+		return rest as CreateUserDto;
 	}
 
 	@Get('getAvatar')
@@ -145,6 +114,11 @@ export class UserController {
 		}),
 	}))
 	async uploadAvatar(@Req() req, @UploadedFile() file: Express.Multer.File) {
+		const currentAvatarPath = (await this.userService.findUserById(req.user.id)).avatar;
+		const resolvedAvatarPath = path.resolve(currentAvatarPath);
+		//deletes old image if there was one
+		if (existsSync(resolvedAvatarPath))
+			unlinkSync(resolvedAvatarPath);
 		this.userService.updateAvatar(req.user.id, file.path);
 		console.log("MY DATA: ", file);
 		return ;

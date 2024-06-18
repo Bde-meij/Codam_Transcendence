@@ -79,4 +79,10 @@ export class UserService {
 	async updateNickname(id: string, newName: string) {
 		await this.userRepo.update(id, {nickname: newName});
 	}
+
+	async updateRoomKey(userId: string, roomKey: number) {
+		if (!await this.userExists(userId))
+			throw new HttpException("User not found!", 404);
+		await this.userRepo.update({id: userId}, {roomKey: roomKey});
+	}
 }

@@ -11,6 +11,7 @@ import { ChatComponent } from './components/chat/chat.component';
 import { RegisterComponent } from './components/register/register.component';
 import { HomeComponent } from './components/home/home.component';
 import { GameMenuComponent } from './components/game-menu/game-menu.component';
+import { TwofaComponent } from './components/twofa/twofa.component';
 
 export const routes: Routes = [
 	{
@@ -29,6 +30,10 @@ export const routes: Routes = [
 		component: RegisterComponent,
 	},
 	{
+		path: 'twofa',
+		component: TwofaComponent,
+	},
+	{
 		path: 'dashboard',
 		component: DashboardComponent,
 		canActivate: [AuthGuard],
@@ -36,30 +41,37 @@ export const routes: Routes = [
 			{
 				path: 'home',
 				component: HomeComponent,
+				canActivate: [AuthGuard],
 			},
 			{
 				path: 'settings',
 				component: SettingsComponent,
+				canActivate: [AuthGuard],
 			},
 			{
 				path: 'game',
 				component: GameComponent,
+				canActivate: [AuthGuard],
 			},
 			{
 				path: 'game-menu',
 				component: GameMenuComponent,
+				canActivate: [AuthGuard],
 			},
 			{
 				path: 'friends',
 				component: FriendsComponent,
+				canActivate: [AuthGuard],
 			},
 			{
 				path: 'account',
 				component: AccountComponent,
+				canActivate: [AuthGuard],
 			},
 			{
 				path: 'chat',
 				component: ChatComponent,
+				canActivate: [AuthGuard],
 			},
 		],
 	},
