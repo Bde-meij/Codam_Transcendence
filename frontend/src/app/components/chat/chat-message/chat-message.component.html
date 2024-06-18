@@ -2,8 +2,14 @@
 	<!-- <div *ngIf="room" ></div> -->
 	<h3> the messages in room: {{ room.name}} </h3>
 	<ul>
-		<li *ngFor="let message of room.messages" [ngClass]="{'blue-text': message.senderId === 77600, 'black-text': message.senderId !== 77600}">
-			{{ message.created}} --- {{ message.message}} --- {{ message.senderId}}
+		<li *ngFor="let message of room.messages" 
+			[ngClass]="{'blue-text': message.senderId === 77600, 'black-text': message.senderId !== 77600}">
+			<button *ngIf="message.game" mat-raised-button color="primary" (click)="battle(selectedUserID)">
+				Battlekey {{ message.message }}
+			</button>
+			<span *ngIf="!message.game">
+				{{ message.created }} --- {{ message.message }} --- {{ message.senderId }}
+			</span>
 		</li>
 	</ul>
 	

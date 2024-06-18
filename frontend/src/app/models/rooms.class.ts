@@ -19,4 +19,5 @@ export interface MessageInterface {
 	senderId: number;
 	created: string;
 	updated?: Date;
+	game?: boolean;
 }

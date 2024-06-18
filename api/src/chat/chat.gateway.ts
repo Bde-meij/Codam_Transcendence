@@ -68,6 +68,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			
 			client.data.nickname = user.nickname;
 			client.data.userid = user.id;
+            // client.data.key = user.roomKey;
 
 			// client.data.id = user.id;
 			this.connectedUsers.push(user.id);
@@ -322,24 +323,27 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@ConnectedSocket() client: Socket) 
 	{	
 		
-		const numroom = setInvRoom(77600);
+		// client.data.userid = user.id;
+        //     client.data.key = user.roomKey;
+		const numroom = setInvRoom(77600); // nummer
+		// this.userService.updateRoomKey(77600, 0);
 		console.log("invitegame: " + client.data.id + ", userid: " + data.userid);
-		console.log(data.room + ", " + client.data.id)
+		// console.log(data.room + ", " + client.data.id)
 		const message: MessageInterface = {
 			message: numroom.toString(),
 			roomId: data.room,
 			senderId: client.data.userid,  // check 
 			created: this.addDate(),
+			game: true
 		};
 		this.io.in(data.room).emit('message', message);
-		// this.io.to(client.data.id).emit('message', "hello");
 	}
 
 	@SubscribeMessage('joinBattle') async joinBattle(
-		@MessageBody() {},
+		@MessageBody() data: { roomkey: string; userid: string },
 		@ConnectedSocket() client: Socket) 
 		{	
-			console.log("joinbattle: " + 1);
+			console.log("joinbattle: " + data.roomkey + " uderid: " + data.userid);
 			joinInvRoom(89413, 1);
 			// console.log("invitegame: " + client.data.id + ", userid: " + data.userid);
 			// console.log(data.room + ", " + client.data.id)
