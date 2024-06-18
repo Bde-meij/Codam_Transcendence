@@ -209,6 +209,16 @@ export class ChatService {
 		});
 	}
 
+	kickUser(room: string, userid: string){
+		this.chatSocket.emit('kick', {room, userid}, (err: any) => {
+			if (err) {
+				console.log("kickUser chat-sock error: ");
+				console.log(err);
+				console.log(err.message);
+			}
+		});
+	}
+
 	battle(room: string, userid: string){
 		this.chatSocket.emit('inviteGame', {room, userid}, (err: any) => {
 			if (err) {

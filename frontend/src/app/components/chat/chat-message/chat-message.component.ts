@@ -82,8 +82,12 @@ export class ChatMessageComponent implements AfterViewInit{
 
 	ban(userid: string){
 		// console.log("FIGHTING------FIGHTING");
-		
 		this.chatService.banUser(this.room.id, userid);
+	}
+
+	kick(userid: string){
+		// console.log("FIGHTING------FIGHTING");
+		this.chatService.kickUser(this.room.id, userid);
 	}
 
 	time(created: Date | undefined){
