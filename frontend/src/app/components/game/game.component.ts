@@ -1,8 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { GameService } from '../../services/sock/game/game.service';
-import{Actor,Engine,Color,Keys, Label, Font, ExcaliburGraphicsContext,Vector, Handler, Graphic, TextAlign}from "excalibur";
+import{Actor,Engine,Color,Keys, ExcaliburGraphicsContext,Vector, Handler, Graphic, TextAlign}from "excalibur";
 import{Player,Ball,addAfterImage}from "./gameActors";
 import{makeLines,drawScore,leftScorePos,rightScorePos}from "./lineDrawing";
+import {leftPNameText, rightPNameText, timerText, waitText, winText, abortText} from './texts';
 import { NgIf } from '@angular/common';
 import {Router } from "@angular/router";
 import { SockService } from '../../services/sock/sock.service';
@@ -26,18 +27,16 @@ export class GameComponent implements OnInit, OnDestroy
 	rightPlayer = (new Player(this.width*0.9, this.height/2)).returnAct();
 	squareBall = (new Ball(this.width/2, this.height/2).returnAct());
 	ballShadows = addAfterImage(this.squareBall);
+	router = new Router;
+
 	hitXWall: boolean = false;
 	hitYWall: boolean = false;
 	hitPlayer: boolean = false;
+	READY: boolean = false;
 
-	name:string = "none";
 	playernum: number = 0;
-
 	lScore: number = 0;
 	rScore: number = 0;
-
-	READY: boolean = false;
-	router = new Router;
 
 	game = new Engine(
 	{
@@ -46,95 +45,21 @@ export class GameComponent implements OnInit, OnDestroy
 		backgroundColor: Color.Black,
 	});
 
-	leftPNameText = new Label({
-		color: Color.White,
-		x: 200,
-		y: 20,
-		font: new Font({
-			textAlign: TextAlign.Center,
-			size: 25,
-		  }),
-	})
-
-	rightPNameText = new Label({
-		color: Color.White,
-		x: 600,
-		y: 20,
-		font: new Font({
-			textAlign: TextAlign.Center,
-			size: 25,
-		  }),
-	})
-
-	timerText = new Label({
-		color: Color.White,
-		x: 400,
-		y: 250,
-		text: "3",
-		font: new Font({
-			textAlign: TextAlign.Center,
-			size: 80,
-		  }),
-	})
-
-	waitText = new Label({
-		color: Color.White,
-		x: 400,
-		y: 250,
-		text: "Awaiting other player...",
-		font: new Font({
-			textAlign: TextAlign.Center,
-			size: 40,
-		  }),
-	})
-
-	winText = new Label({
-		color: Color.White,
-		x: 400,
-		y: 250,
-		font: new Font({
-			textAlign: TextAlign.Center,
-			size: 40,
-		  }),
-	})
-
-	abortText = new Label({
-		color: Color.White,
-		x: 400,
-		y: 125,
-		font: new Font({
-			textAlign: TextAlign.Center,
-			size: 40,
-		  }),
-	})
 	gameSrv: any
 	ngOnInit()
 	{
 		this.gameSrv = new GameService();
-		// this.gameSrv.connect();
-		console.log("NOTICE ME SENPAI");
-		// setTimeout(() =>{{
-		// }},1000);
 		
 		this.gameSrv.connectSignal().subscribe(() => 
 		{
-			this.game.add(this.waitText);
-			this.game.add(this.leftPNameText);
-			this.game.add(this.rightPNameText);
+			this.game.add(waitText);
+			this.game.add(leftPNameText);
+			this.game.add(rightPNameText);
 			this.game.start();
 			this.gameSrv.joinGame();
 		});
 
-		this.gameSrv.abortGame().subscribe(() => 
-		{
-			console.log("join game called");
-			this.game.remove(this.waitText);
-			this.game.remove(this.leftPNameText);
-			this.game.remove(this.rightPNameText);
-			this.abortText.text = "game aborted";
-			setTimeout(() =>{{this.ngOnDestroy();}},2000);
-			this.game.add(this.abortText);
-		});
+		this.checkEarlyDisconnect();
 
 		this.gameSrv.assignNumber().subscribe((playnum: number) => {
 			console.log("number", playnum, "was assigned");
@@ -142,18 +67,19 @@ export class GameComponent implements OnInit, OnDestroy
 		});
 		
 		this.gameSrv.assignNames().subscribe((names: string[]) => {
-			this.leftPNameText.text = names[0];
-			this.rightPNameText.text = names[1];
-			this.game.remove(this.waitText);
+			leftPNameText.text = names[0];
+			rightPNameText.text = names[1];
+			this.game.remove(waitText);
 		});
 
 		this.gameSrv.startSignal().subscribe(() => {
-			this.game.add(this.timerText);
-			setTimeout(() =>{{this.timerText.text = "2"}},1000);
-			setTimeout(() =>{{this.timerText.text = "1"}},2000);
-			setTimeout(() =>{{this.timerText.text = "GO!"}},3000);
+			this.game.add(timerText);
+			timerText.text = "3"
+			setTimeout(() =>{{timerText.text = "2"}},1000);
+			setTimeout(() =>{{timerText.text = "1"}},2000);
+			setTimeout(() =>{{timerText.text = "GO!"}},3000);
 			setTimeout(() =>{{
-				this.game.remove(this.timerText);
+				this.game.remove(timerText);
 				this.startGame();
 			}},4000);
 		});
@@ -161,7 +87,7 @@ export class GameComponent implements OnInit, OnDestroy
 
 	startGame()
 	{
-		console.log("startGame called");
+		// console.log("startGame called");
 		var score = new Actor;
 		score.graphics.onPreDraw = 
 		(ctx: ExcaliburGraphicsContext) =>
@@ -178,55 +104,20 @@ export class GameComponent implements OnInit, OnDestroy
 		this.game.add(this.ballShadows[0]);
 		this.game.add(score);
 
-		console.log("frontend game initiated");
-
 		this.game.on("postupdate", () => 
 		{
+			// TESTBOT
+			// this.rightPlayer.pos.y = this.squareBall.pos.y;
+			// this.gameSrv.emitYPos(this.rightPlayer.pos.y);
 			if (this.playernum == 1)
-			{
-				if (this.game.input.keyboard.isHeld(Keys.Up) && 
-				this.leftPlayer.pos.y > this.leftPlayer.height / 2)
-				{
-					this.leftPlayer.pos.y -= this.height*0.025;
-					this.gameSrv.emitYPos(this.leftPlayer.pos.y);
-				}
-				if (this.game.input.keyboard.isHeld(Keys.Down) && 
-				this.leftPlayer.pos.y < this.height - this.leftPlayer.height / 2)
-				{
-					this.leftPlayer.pos.y += this.height*0.025;
-					this.gameSrv.emitYPos(this.leftPlayer.pos.y);
-				}
-			}
+				this.playerMovement(this.leftPlayer);
 			if (this.playernum == 2)
-			{
-				if (this.game.input.keyboard.isHeld(Keys.Up) && 
-				this.rightPlayer.pos.y > this.rightPlayer.height / 2)
-				{
-					this.rightPlayer.pos.y -= this.height*0.025;
-					this.gameSrv.emitYPos(this.rightPlayer.pos.y);
-				}
-				if (this.game.input.keyboard.isHeld(Keys.Down) && 
-				this.rightPlayer.pos.y < this.height - this.rightPlayer.height / 2)
-				{
-					this.rightPlayer.pos.y += this.height*0.025;
-					this.gameSrv.emitYPos(this.rightPlayer.pos.y);
-				}
-				// TESTBOT
-				// this.rightPlayer.pos.y = this.squareBall.pos.y;
-				// this.gameSrv.emitYPos(this.rightPlayer.pos.y);
-			}
+				this.playerMovement(this.rightPlayer);
+			if (this.playernum == 3)
+				this.flappyMovement(this.leftPlayer);
+			if (this.playernum == 4)
+				this.flappyMovement(this.rightPlayer);
 		});
-
-		this.gameSrv.abortGame().subscribe(() => 
-			{
-				console.log("join game called");
-				this.game.remove(this.waitText);
-				this.game.remove(this.leftPNameText);
-				this.game.remove(this.rightPNameText);
-				this.abortText.text = "game aborted";
-				setTimeout(() =>{{this.ngOnDestroy();}},2000);
-				this.game.add(this.abortText);
-			});
 
 		this.gameSrv.getBallPos().subscribe((ballPos: number[]) =>
 		{
@@ -239,9 +130,9 @@ export class GameComponent implements OnInit, OnDestroy
 
 		this.gameSrv.getPlayerPos().subscribe((ypos: number) => 
 		{
-			if (this.playernum == 1)
+			if ((this.playernum == 1) || (this.playernum == 3))
 				this.rightPlayer.pos.y = ypos;
-			if (this.playernum == 2)
+			if ((this.playernum == 2) || (this.playernum == 4))
 				this.leftPlayer.pos.y = ypos;
 		});
 	
@@ -260,9 +151,53 @@ export class GameComponent implements OnInit, OnDestroy
 			this.game.remove(this.ballShadows[2]);
 			this.game.remove(this.ballShadows[1]);
 			this.game.remove(this.ballShadows[0]);
-			this.winText.text = pName+"\nis the winner!";
+			winText.text = pName+"\nis the winner!";
 			setTimeout(() =>{{this.ngOnDestroy();}},2000);
-			this.game.add(this.winText);
+			this.game.add(winText);
+		});
+	}
+
+	playerMovement(player: Actor)
+	{
+		if (this.game.input.keyboard.isHeld(Keys.Up) && 
+		player.pos.y > player.height / 2)
+		{
+			player.pos.y -= this.height*0.025;
+			this.gameSrv.emitYPos(player.pos.y);
+		}
+		if (this.game.input.keyboard.isHeld(Keys.Down) && 
+		player.pos.y < this.height - player.height / 2)
+		{
+			player.pos.y += this.height*0.025;
+			this.gameSrv.emitYPos(player.pos.y);
+		}
+	}
+
+	flappyMovement(player: Actor)
+	{
+		if (this.game.input.keyboard.wasPressed(Keys.Space) && 
+		player.pos.y > player.height / 2)
+		{
+			player.pos.y -= this.height*0.175;
+			this.gameSrv.emitYPos(player.pos.y);
+		}
+		else if (player.pos.y < this.height - player.height / 2)
+		{
+			player.pos.y += this.height*0.0125;
+			this.gameSrv.emitYPos(player.pos.y);
+		}
+	}
+
+	checkEarlyDisconnect()
+	{
+		this.gameSrv.abortGame().subscribe(() => 
+		{
+			this.game.remove(waitText);
+			this.game.remove(leftPNameText);
+			this.game.remove(rightPNameText);
+			abortText.text = "game aborted";
+			setTimeout(() =>{{this.ngOnDestroy();}},2000);
+			this.game.add(abortText);
 		});
 	}
 

@@ -109,39 +109,39 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	joinGame(client: Socket)
 	{
 		// console.log("joingame called");
-		if (!this.findReservation(client))
-		{
+		// if (!this.findReservation(client))
+		// {
 			if (this.findRoom(client))
 				this.startGame(roomMap.get(client.data.room));
 			else
 				this.createRoom(client);
-		}
+		// }
 	}
 	
-	findReservation(client: Socket): boolean
-	{
-		roomMap.forEach((roomObj, roomName) =>
-		{
-			if ((roomObj.leftPlayer == null) && (client.data.userid == roomObj.leftId))
-			{
-				// console.log(client.id, "found left reservation");
-				roomObj.leftPlayer = client;
-				client.join(roomName);
-				client.data.room = roomName;
-				return (true);
-			}
-			if ((roomObj.rightPlayer == null) && (client.data.userid == roomObj.rightId))
-			{
-				// console.log(client.id, "found right reservation");
-				roomObj.rightPlayer = client;
-				client.join(roomName);
-				client.data.room = roomName;
-				this.startGame(roomObj);
-				return (true);
-			}
-		});
-		return (false);
-	}
+	// findReservation(client: Socket): boolean
+	// {
+	// 	roomMap.forEach((roomObj, roomName) =>
+	// 	{
+	// 		if ((roomObj.leftPlayer == null) && (client.data.userid == roomObj.leftId))
+	// 		{
+	// 			// console.log(client.id, "found left reservation");
+	// 			roomObj.leftPlayer = client;
+	// 			client.join(roomName);
+	// 			client.data.room = roomName;
+	// 			return (true);
+	// 		}
+	// 		if ((roomObj.rightPlayer == null) && (client.data.userid == roomObj.rightId))
+	// 		{
+	// 			// console.log(client.id, "found right reservation");
+	// 			roomObj.rightPlayer = client;
+	// 			client.join(roomName);
+	// 			client.data.room = roomName;
+	// 			this.startGame(roomObj);
+	// 			return (true);
+	// 		}
+	// 	});
+	// 	return (false);
+	// }
 
 	// && (roomObj.key == 0) && (roomObj.leftPlayer != null)
 	// && roomObj.rightPlayer == null)
@@ -151,6 +151,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		var stop = false;
 		roomMap.forEach((roomObj, roomName) =>
 		{
+			//ADD: checkRoomKey
 			if ((roomObj.hasStarted == false) && (stop == false))
 			{
 				// console.log(client.id, "joined room", roomName);
@@ -181,8 +182,8 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	startGame(room: Room)
 	{
 		// console.log(room.name, "has started");
-		room.leftPlayer.emit("assignNumber", 1);
-		room.rightPlayer.emit("assignNumber", 2);
+		room.leftPlayer.emit("assignNumber", 3);
+		room.rightPlayer.emit("assignNumber", 4);
 		room.hasStarted = true;
 		room.serverRef.in(room.name).emit("assignNames", 
 		[room.leftPlayer.id, room.rightPlayer.id]);
@@ -237,22 +238,22 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 }
 
-export function setReservedRoom(userID: number)
-{
-	roomKey++;
-	roomMap.set("reservedRoom"+roomKey, new Room);
-	var room = roomMap.get("reservedRoom"+roomKey)
-	room.name = "reservedRoom"+roomKey;
-	room.leftId = userID;
-	room.key = roomKey;
-	return (roomKey);
-}
+// export function setReservedRoom(userID: number)
+// {
+// 	roomKey++;
+// 	roomMap.set("reservedRoom"+roomKey, new Room);
+// 	var room = roomMap.get("reservedRoom"+roomKey)
+// 	room.name = "reservedRoom"+roomKey;
+// 	room.leftId = userID;
+// 	room.key = roomKey;
+// 	return (roomKey);
+// }
 
-export function joinReservedRoom(userID: number, key: number): boolean
-{
-	var room = roomMap.get("reservedRoom"+key);
-	if (room == null)
-		return (false);
-	room.rightId = userID;
-	return (true);
-}
+// export function joinReservedRoom(userID: number, key: number): boolean
+// {
+// 	var room = roomMap.get("reservedRoom"+key);
+// 	if (room == null)
+// 		return (false);
+// 	room.rightId = userID;
+// 	return (true);
+// }

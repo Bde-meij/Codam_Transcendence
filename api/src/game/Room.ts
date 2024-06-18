@@ -91,7 +91,7 @@ export class Room
 			this.rScore+=1;
 			this.serverRef.in(this.name).emit("updateScore", [this.lScore, this.rScore]);
 			this.resetBall(-1);
-			if (this.rScore == 3)
+			if (this.rScore == 500)
 			setTimeout(() =>{
 			{
 				clearInterval(this.stopInterval);
@@ -104,7 +104,7 @@ export class Room
 			this.lScore+=1;
 			this.serverRef.in(this.name).emit("updateScore", [this.lScore, this.rScore]);
 			this.resetBall(1);
-			if (this.lScore == 3)
+			if (this.lScore == 500)
 			setTimeout(() =>{
 			{
 				clearInterval(this.stopInterval);
