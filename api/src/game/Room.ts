@@ -4,6 +4,7 @@ import { Server, Socket } from "socket.io";
 export class Room
 {
 	//ROOM
+	id: string;
 	name:string;
 	leftPlayer: Socket = null;
 	rightPlayer: Socket = null;
@@ -91,7 +92,7 @@ export class Room
 			this.rScore+=1;
 			this.serverRef.in(this.name).emit("updateScore", [this.lScore, this.rScore]);
 			this.resetBall(-1);
-			if (this.rScore == 500)
+			if (this.rScore == 3)
 			setTimeout(() =>{
 			{
 				clearInterval(this.stopInterval);
@@ -104,7 +105,7 @@ export class Room
 			this.lScore+=1;
 			this.serverRef.in(this.name).emit("updateScore", [this.lScore, this.rScore]);
 			this.resetBall(1);
-			if (this.lScore == 500)
+			if (this.lScore == 3)
 			setTimeout(() =>{
 			{
 				clearInterval(this.stopInterval);

@@ -1,5 +1,5 @@
-// import { CreateMatchDto } from './dto/create-match.dto';
-// import { UpdateMatchDto } from './dto/update-match.dto';
+import { CreateMatchDto } from './dto/create-match.dto';
+import { UpdateMatchDto } from './dto/update-match.dto';
 
 import {
 	ConnectedSocket,
@@ -21,7 +21,7 @@ import { UserService } from 'src/user/user.service';
 import { NotAcceptableException, Req } from '@nestjs/common';
 import { Injectable } from '@nestjs/common';
 
-import { MatchType } from "./entities/match.entity";
+import { Match, MatchType } from "./entities/match.entity";
 
 var colCheck: boolean = false;
 var numOfRooms: number = 0;
@@ -73,6 +73,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			if (!user)
 				throw new NotAcceptableException();
 			client.data.userid = user.id;
+			client.data.key = user.roomKey;
 			client.emit("connectSignal");
 		}
 		catch
@@ -91,16 +92,30 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			if (room.hasStarted == true)
 				clearInterval(room.stopInterval);
 			if ((room.lScore == 0) && (room.rScore == 0))
+			{
+				this.matchService.deleteMatch(room.id);
 				room.serverRef.in(room.name).emit("abortGame", client.id);
+			}
 			else
 			{
-				if (client.id == room.leftPlayer.id)
+				var updateMatchDto: UpdateMatchDto = {
+					id: room.id,
+					leftPlayerScore: room.lScore,
+					rightPlayerScore: room.rScore
+				};
+				if (client.id == room.leftPlayer.id) {
+					updateMatchDto.leftPlayerScore = -1;
 					room.rightPlayer.emit("playerwin", room.rightPlayer.id);
-				if (client.id == room.rightPlayer.id)
+				}
+				if (client.id == room.rightPlayer.id) {
+					updateMatchDto.rightPlayerScore = -1;
 					room.leftPlayer.emit("playerwin", room.leftPlayer.id);
+				}
+				this.matchService.updateMatch(updateMatchDto);
 			}
 			roomMap.delete(room.name);
 		}
+		this.userService.updateRoomKey(client.data.userid, 0);
 		// console.log(client.id, "called handleDisconnect");
 	}
 
@@ -108,50 +123,43 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@SubscribeMessage("joinGame")
 	joinGame(client: Socket)
 	{
-		// console.log("joingame called");
-		// if (!this.findReservation(client))
-		// {
+		if (client.data.key == 0)
+		{
 			if (this.findRoom(client))
 				this.startGame(roomMap.get(client.data.room));
 			else
 				this.createRoom(client);
-		// }
+		}
+		else
+		{
+			var room = roomMap.get("inviteRoom"+client.data.key)
+			if (room == null)
+				client.emit("abortGame", client.id);
+			else if (room.leftPlayer == null)
+			{
+				room.leftPlayer = client;
+				room.leftId = client.data.userid;
+				client.join(room.name);
+				client.data.room = room.name;
+			}
+			else if (room.rightPlayer == null)
+			{
+				room.rightPlayer = client;
+				room.rightId = client.data.userid;
+				client.join(room.name);
+				client.data.room = room.name;
+			}
+			else
+				this.startGame(room);
+		}
 	}
-	
-	// findReservation(client: Socket): boolean
-	// {
-	// 	roomMap.forEach((roomObj, roomName) =>
-	// 	{
-	// 		if ((roomObj.leftPlayer == null) && (client.data.userid == roomObj.leftId))
-	// 		{
-	// 			// console.log(client.id, "found left reservation");
-	// 			roomObj.leftPlayer = client;
-	// 			client.join(roomName);
-	// 			client.data.room = roomName;
-	// 			return (true);
-	// 		}
-	// 		if ((roomObj.rightPlayer == null) && (client.data.userid == roomObj.rightId))
-	// 		{
-	// 			// console.log(client.id, "found right reservation");
-	// 			roomObj.rightPlayer = client;
-	// 			client.join(roomName);
-	// 			client.data.room = roomName;
-	// 			this.startGame(roomObj);
-	// 			return (true);
-	// 		}
-	// 	});
-	// 	return (false);
-	// }
 
-	// && (roomObj.key == 0) && (roomObj.leftPlayer != null)
-	// && roomObj.rightPlayer == null)
 	findRoom(client: Socket): boolean
 	{
 		// console.log(client.id, "called findRoom");
 		var stop = false;
 		roomMap.forEach((roomObj, roomName) =>
 		{
-			//ADD: checkRoomKey
 			if ((roomObj.hasStarted == false) && (stop == false))
 			{
 				// console.log(client.id, "joined room", roomName);
@@ -173,13 +181,18 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		room.serverRef = this.server;
 		room.leftPlayer = client;
 		room.leftId = client.data.userid;
+		room.key = client.data.key;
 		client.join(room.name);
 		client.data.room = room.name;
 		numOfRooms++;
 		// console.log("room", room.name, "created");
 	}
 
-	startGame(room: Room)
+	// async setMatch(room: Room)
+	// {
+	// }
+	
+	async startGame(room: Room)
 	{
 		// console.log(room.name, "has started");
 		room.leftPlayer.emit("assignNumber", 3);
@@ -187,17 +200,19 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		room.hasStarted = true;
 		room.serverRef.in(room.name).emit("assignNames", 
 		[room.leftPlayer.id, room.rightPlayer.id]);
+		
+		const match = await this.matchService.createMatch({
+			leftPlayerId: room.leftId.toString(),
+			rightPlayerId: room.rightId.toString(),
+			type: MatchType.PUBLIC
+		});
+		room.id = match.id;
+		// this.setMatch(room);
+
 		setTimeout(() =>{{
 			room.stopInterval = setInterval(this.updateBall, 15, room);
 		}},4500);
 		room.serverRef.in(room.name).emit("startSignal");
-
-		// var mdto: CreateMatchDto;
-		// mdto.leftPlayerId = room.leftId.toString();
-		// mdto.rightPlayerId = room.rightId.toString();
-		// mdto.type = MatchType.PUBLIC;
-		// // console.log(mdto.type, "dto created");
-		// this.matchService.createMatch(mdto);
 	}
 
 	@SubscribeMessage("updatePlayer")
@@ -236,6 +251,17 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				room.serverRef.in(room.name).emit("updateBallPos", room.ballPos);
 		}
 	}
+}
+
+export function getNewRoomKey(userid: number)
+{
+	roomKey++;
+	roomMap.set("inviteroom"+roomKey, new Room);
+	var room = roomMap.get("inviteroom"+roomKey);
+	room.name = "inviteroom"+roomKey;
+	room.serverRef = this.server;
+	room.key = roomKey;
+	return (roomKey);
 }
 
 // export function setReservedRoom(userID: number)
