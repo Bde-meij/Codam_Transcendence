@@ -138,4 +138,14 @@ export class MatchService {
 		};
 	}
 
+	async deleteMatch(matchId: string) {
+		const match: Match = await this.matchRepo.findOne({
+			where: {id: matchId}
+		});
+		if (!match) {
+			throw new HttpException('Match not found', 404);
+		}
+		this.matchRepo.delete({id: matchId});
+	}
+
 }

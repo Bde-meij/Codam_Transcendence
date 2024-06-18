@@ -49,6 +49,7 @@ export class GameComponent implements OnInit, OnDestroy
 	ngOnInit()
 	{
 		this.gameSrv = new GameService();
+		this.checkEarlyDisconnect();
 		
 		this.gameSrv.connectSignal().subscribe(() => 
 		{
@@ -58,8 +59,6 @@ export class GameComponent implements OnInit, OnDestroy
 			this.game.start();
 			this.gameSrv.joinGame();
 		});
-
-		this.checkEarlyDisconnect();
 
 		this.gameSrv.assignNumber().subscribe((playnum: number) => {
 			console.log("number", playnum, "was assigned");
