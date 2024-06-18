@@ -15,7 +15,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { UserService } from 'src/user/user.service';
 import { Injectable } from '@nestjs/common';
 import { PasswordService } from 'src/password/password.service';
-import { setInvRoom, joinInvRoom } from 'src/game/game.gateway';
+import { getNewRoomKey} from 'src/game/game.gateway';
 
 @Injectable()
 @WebSocketGateway({
@@ -75,7 +75,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			client.emit('getConnectedUsers', this.connectedUsers);
 			this.getRoomsEmit(client);
 			
-
+			client.emit('user', user);
 			console.log(user.nickname, "connected on socketID:", client.id);
 			console.log("ConnectedUsers: " + this.connectedUsers);
 			console.log(Array.from(client.rooms))
@@ -325,9 +325,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		
 		// client.data.userid = user.id;
         //     client.data.key = user.roomKey;
-		const numroom = setInvRoom(77600); // nummer
-		// this.userService.updateRoomKey(77600, 0);
-		console.log("invitegame: " + client.data.id + ", userid: " + data.userid);
+		const numroom = getNewRoomKey(); // nummer
+		this.userService.updateRoomKey(client.data.userid, numroom);
+		console.log("invitegame: " + client.data.userid + ", userid: " + data.userid);
 		// console.log(data.room + ", " + client.data.id)
 		const message: MessageInterface = {
 			message: numroom.toString(),
@@ -340,11 +340,12 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 	@SubscribeMessage('joinBattle') async joinBattle(
-		@MessageBody() data: { roomkey: string; userid: string },
+		@MessageBody() data: { numroom: number; userid: string },
 		@ConnectedSocket() client: Socket) 
 		{	
-			console.log("joinbattle: " + data.roomkey + " uderid: " + data.userid);
-			joinInvRoom(89413, 1);
+			console.log("joinbattle: " + data.numroom + " uderid: " + data.userid);
+			this.userService.updateRoomKey(client.data.userid, data.numroom);
+			// joinInvRoom(89413, 1);
 			// console.log("invitegame: " + client.data.id + ", userid: " + data.userid);
 			// console.log(data.room + ", " + client.data.id)
 			// const message: MessageInterface = {

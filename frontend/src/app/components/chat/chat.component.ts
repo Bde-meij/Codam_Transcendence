@@ -24,7 +24,7 @@ export class ChatComponent implements OnInit {
 
 	rooms: Rooms[] = []; 
 	roomsList: Record<string, Rooms> = {};
-
+	user: any;
 	userList: string[] | undefined;
 	userss: string[] | undefined;
 	roomName: string | undefined;
@@ -52,6 +52,11 @@ export class ChatComponent implements OnInit {
 		});
 
 		this.chatService.getRooms().subscribe((roomList: any) => {
+			this.rooms.push(roomList);
+			// console.log("getRooms frontend");
+		})
+
+		this.chatService.getUser().subscribe((roomList: any) => {
 			this.rooms.push(roomList);
 			// console.log("getRooms frontend");
 		})

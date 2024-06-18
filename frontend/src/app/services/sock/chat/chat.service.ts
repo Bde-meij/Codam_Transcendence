@@ -14,6 +14,7 @@ export class ChatService {
 	private chatSocket = io("/chat");
 	private unread = true;
 	user$ : Observable<User> | undefined;
+	user: any;
 	userId?: number;
 	userss: string[] = [];
 	rooms: Rooms[] = []; 
@@ -46,8 +47,8 @@ export class ChatService {
 	// }
 
 	sendMessage(message: string, room: string): void {		
-		this.user$ = this.userService.getUser();
-		console.log("sender: " + this.userId + "sendmessage sender ID hardcoded");
+		// this.user$ = this.userService.getUser();
+		console.log("sender: " + this.user.id + "sendmessage sender ID hardcoded");
 		const messageObj = {
 			message : message,
 			sender : "senderID",
@@ -158,6 +159,15 @@ export class ChatService {
 		});
 	  }
 
+	  getUser(): Observable<any> {
+		return new Observable<any>((observer) => {
+		  this.chatSocket.on('getUser', (user: any) => {
+			user = user
+		  });
+		});
+	  }
+
+
 	getConnectedUsers(): Observable<string[]> {
 		return new Observable((observer) => {
 			this.chatSocket.on('getConnectedUsers', (userss) => {
@@ -229,8 +239,9 @@ export class ChatService {
 		});
 	}
 
-	joinBattle(){
-		this.chatSocket.emit('joinBattle', {}, (err: any) => {
+	joinBattle(roomnum: number, userid: string){
+		console.log("joinBAttle chatservice: " + this.userId);
+		this.chatSocket.emit('joinBattle', {roomnum, userid}, (err: any) => {
 			if (err) {
 				console.log("joinBattle chat-sock error: ");
 				console.log(err);
@@ -242,5 +253,4 @@ export class ChatService {
 	isUnread() {
 		return this.unread;
 	}
-
 }

@@ -7,6 +7,7 @@ import { NgIf, CommonModule } from '@angular/common';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { Router } from '@angular/router';
+import { UserService } from '../../../services/user/user.service';
 
 export interface MessageInterface {
 	sender: string,
@@ -28,7 +29,7 @@ export class ChatMessageComponent implements AfterViewInit{
 	@Input() room: any;
 	selectedUser: any;
 	selectedUserID: any;
-
+	user: any;
 	
 	message: string | undefined;
 	// messages: string[] = [];
@@ -36,6 +37,7 @@ export class ChatMessageComponent implements AfterViewInit{
 	constructor(private chatService: ChatService, private router: Router) {};
 	
 	ngOnInit() {
+		this.user = this.chatService.getUser()
 	}
 
 	ngAfterViewInit() {
@@ -67,12 +69,12 @@ export class ChatMessageComponent implements AfterViewInit{
 
 	battle(userid: string){
 		// console.log("FIGHTING------FIGHTING");
-		console.log("userid: " + userid);
+		// console.log("userid: " + userid);
 		this.chatService.battle(this.room.name, userid)
 		// this.router.navigate(['/dashboard', 'game']);
 	}
-	joinBattle(){
-		this.chatService.joinBattle();
+	joinBattle(roomnum: number, userid: string){
+		this.chatService.joinBattle(roomnum, userid);
 	}
 
 	mute(userid: string){

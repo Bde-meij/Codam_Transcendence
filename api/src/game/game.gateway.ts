@@ -253,13 +253,13 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 }
 
-export function getNewRoomKey(userid: number)
+export function getNewRoomKey()
 {
 	roomKey++;
 	roomMap.set("inviteroom"+roomKey, new Room);
 	var room = roomMap.get("inviteroom"+roomKey);
 	room.name = "inviteroom"+roomKey;
-	room.serverRef = this.server;
+	// room.serverRef = this.server;
 	room.key = roomKey;
 	return (roomKey);
 }

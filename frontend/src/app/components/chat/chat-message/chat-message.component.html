@@ -4,8 +4,8 @@
 	<ul>
 		<li *ngFor="let message of room.messages" 
 			[ngClass]="{'blue-text': message.senderId === 77600, 'black-text': message.senderId !== 77600}">
-			<button *ngIf="message.game" mat-raised-button color="primary" (click)="battle(selectedUserID)">
-				Battlekey {{ message.message }}
+			<button *ngIf="message.game" mat-raised-button color="primary" (click)="joinBattle(message.message, '1')">
+				Battlekey {{ message.message }} 
 			</button>
 			<span *ngIf="!message.game">
 				{{ message.created }} --- {{ message.message }} --- {{ message.senderId }}
@@ -19,7 +19,7 @@
 	<input #messageInput [(ngModel)]="message" (keydown.enter)="sendMessage()" type="text" [class.chat_input]="message" > 
 	<button (click)="sendMessage()"> SendMessage </button>
 	<button (click)="leaveRoom(room.name, 'David')"> leaveRoom </button>
-	<button (click)="joinBattle()"> joinBattle </button>
+	<!-- <button (click)="joinBattle(message.message, user.id)"> joinBattle </button> -->
 
 </div>
 
