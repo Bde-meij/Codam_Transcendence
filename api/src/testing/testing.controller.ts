@@ -25,6 +25,11 @@ export class TestingController {
 		return await this.userService.createUsers(tempUsers);
 	}
 
+	@Post('user-update-roomkey/:userid/:key')
+	async updateRoomKey(@Param('userid') userId: string, @Param('key') roomKey: string) {
+		return await this.userService.updateRoomKey(userId, +roomKey);
+	}
+
 	// Gets a single user with the given id from the database
 	@Get('user/:id')
 	async getUser(@Param('id') id: string): Promise<User> {

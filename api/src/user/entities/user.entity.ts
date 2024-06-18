@@ -40,4 +40,7 @@ export class User {
 
 	@Column({default: false})
 	isTwoFAEnabled: boolean;
+
+	@Column({default: 0})
+	roomKey: number;
 }
