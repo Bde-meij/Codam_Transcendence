@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { GameService } from '../../services/sock/game/game.service';
-import{Actor,Engine,Color,Keys, ExcaliburGraphicsContext,Vector, Handler, Graphic, TextAlign}from "excalibur";
+import{Actor,Engine,Color,Keys, ExcaliburGraphicsContext,Vector, Handler, Graphic, TextAlign, GamepadDisconnectEvent}from "excalibur";
 import{Player,Ball,addAfterImage}from "./gameActors";
 import{makeLines,drawScore,leftScorePos,rightScorePos}from "./lineDrawing";
 import {leftPNameText, rightPNameText, timerText, waitText, winText, abortText} from './texts';
@@ -48,6 +48,9 @@ export class GameComponent implements OnInit, OnDestroy
 	gameSrv: any
 	ngOnInit()
 	{
+		leftPNameText.text = "";
+		rightPNameText.text = "";
+		winText.text = "";
 		this.gameSrv = new GameService();
 		this.checkEarlyDisconnect();
 		
@@ -134,6 +137,12 @@ export class GameComponent implements OnInit, OnDestroy
 			if ((this.playernum == 2) || (this.playernum == 4))
 				this.leftPlayer.pos.y = ypos;
 		});
+
+		this.gameSrv.flappyGravity().subscribe((ypos: number[]) => 
+		{
+			this.leftPlayer.pos.y = ypos[0];
+			this.rightPlayer.pos.y = ypos[1];
+		});
 	
 		this.gameSrv.getScores().subscribe((scores: number []) =>
 		{
@@ -180,11 +189,11 @@ export class GameComponent implements OnInit, OnDestroy
 			player.pos.y -= this.height*0.175;
 			this.gameSrv.emitYPos(player.pos.y);
 		}
-		else if (player.pos.y < this.height - player.height / 2)
-		{
-			player.pos.y += this.height*0.0125;
-			this.gameSrv.emitYPos(player.pos.y);
-		}
+		// else if (player.pos.y < this.height - player.height / 2)
+		// {
+		// 	player.pos.y += this.height*0.0125;
+		// 	this.gameSrv.emitYPos(player.pos.y);
+		// }
 	}
 
 	checkEarlyDisconnect()
@@ -194,7 +203,6 @@ export class GameComponent implements OnInit, OnDestroy
 			this.game.remove(waitText);
 			this.game.remove(leftPNameText);
 			this.game.remove(rightPNameText);
-			abortText.text = "game aborted";
 			setTimeout(() =>{{this.ngOnDestroy();}},2000);
 			this.game.add(abortText);
 		});

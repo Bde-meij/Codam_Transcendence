@@ -4,13 +4,14 @@ import { Server, Socket } from "socket.io";
 export class Room
 {
 	//ROOM
-	id: string;
+	id: string = null;
 	name:string;
 	leftPlayer: Socket = null;
 	rightPlayer: Socket = null;
 	serverRef: Server;
 	hasStarted = false;
 	stopInterval: NodeJS.Timeout;
+	gravityInterval: NodeJS.Timeout;
 	key: number = 0;
 
 	//LEFTPLAYER
@@ -92,11 +93,11 @@ export class Room
 			this.rScore+=1;
 			this.serverRef.in(this.name).emit("updateScore", [this.lScore, this.rScore]);
 			this.resetBall(-1);
-			if (this.rScore == 3)
+			if (this.rScore == 11)
 			setTimeout(() =>{
 			{
 				clearInterval(this.stopInterval);
-				this.serverRef.in(this.name).emit("playerwin", this.rightId);
+				this.serverRef.in(this.name).emit("playerwin", this.rightPlayer.data.nick);
 				return (1);
 			}},600)
 		}
@@ -105,11 +106,11 @@ export class Room
 			this.lScore+=1;
 			this.serverRef.in(this.name).emit("updateScore", [this.lScore, this.rScore]);
 			this.resetBall(1);
-			if (this.lScore == 3)
+			if (this.lScore == 11)
 			setTimeout(() =>{
 			{
 				clearInterval(this.stopInterval);
-				this.serverRef.in(this.name).emit("playerwin", this.leftId);
+				this.serverRef.in(this.name).emit("playerwin", this.leftPlayer.data.nick);
 				return (1);
 			}},600)
 		}

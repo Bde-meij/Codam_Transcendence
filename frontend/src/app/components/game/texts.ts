@@ -54,6 +54,7 @@ export var winText = new Label({
 
 export var abortText = new Label({
 	color: Color.White,
+	text: "game aborted",
 	x: 400,
 	y: 125,
 	font: new Font({

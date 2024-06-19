@@ -39,7 +39,7 @@ export class AuthService {
 	}
 
 	async verifyJwtAccessToken(token: string) {
-		console.log('verifying token...')
+		// console.log('verifying token...')
 		try {
 			const payload = await this.jwtService.verifyAsync(
 				token,
