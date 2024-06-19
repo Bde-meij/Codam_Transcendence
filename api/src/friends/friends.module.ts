@@ -6,10 +6,16 @@ import { FriendRequest } from './entities/friend.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from 'src/auth/auth.module';
 import { UserModule } from 'src/user/user.module';
+import { Loggary } from 'src/logger/logger.service';
 
 @Module({
 	imports: [TypeOrmModule.forFeature([FriendRequest]), AuthModule, UserModule],
 	controllers: [FriendsController],
-	providers: [FriendsService, JwtService],
+	providers: [FriendsService, JwtService,
+		{
+			provide: Loggary,
+			useFactory: () => new Loggary('FriendsModule', ['log', 'debug', 'warn', 'verbose'])
+		}
+	],
 })
 export class FriendsModule {}

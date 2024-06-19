@@ -14,6 +14,7 @@ import { Socket, Server } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { UserService } from 'src/user/user.service';
 import { Injectable } from '@nestjs/common';
+import { Loggary } from 'src/logger/logger.service';
 
 @Injectable()
 @WebSocketGateway({
