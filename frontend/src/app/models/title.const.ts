@@ -1,0 +1,1 @@
+export const constTitle = "Gary's basement"

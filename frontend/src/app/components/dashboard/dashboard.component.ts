@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, RouterLink, RouterOutlet } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink, RouterOutlet } from '@angular/router';
 import { ChatService } from '../../services/sock/chat/chat.service';
 import { LogoutComponent } from '../logout/logout.component';
 import { Observable } from 'rxjs';
@@ -18,13 +18,16 @@ import { User } from '../../models/user.class';
   styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent implements OnInit {
-	title = "Gary's basement";
+	title = '';
 
 	user$ : Observable<User> | undefined;
 
 	unread = this.chatService.isUnread();
 
-	constructor(private userService: UserService, private chatService: ChatService, private router: Router) {
+	constructor(private userService: UserService, private chatService: ChatService, private router: Router, route: ActivatedRoute) {
+		route.data.subscribe(data =>
+			this.title = data['title']
+		)
 	};
 
 	ngOnInit(): void {
