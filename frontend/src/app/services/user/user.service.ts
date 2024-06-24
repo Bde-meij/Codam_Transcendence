@@ -40,6 +40,29 @@ export class UserService {
 		console.log("getavatar called");
 		return this.http.get(this.userUrl + '/getAvatar/', {responseType: 'blob'});
 	}
+	
+	userDetails() : User {
+		let user: User = {
+			id: 0,
+			nickname : '',
+			avatar: '',
+			status: ''
+		};
+
+		this.getUser().subscribe((data) => (
+			user.id = data.id,
+			user.nickname = data.nickname,
+			user.avatar = data.avatar,
+			user.status = data.status
+		));
+		this.getAvatar().subscribe((data) => (
+			user.avatar = URL.createObjectURL(data)
+		))
+		
+		console.log('user', user);
+
+		return user;
+	}
 
 	// getAvatarOf(userid : string) : Observable<Blob> {
 	// 	console.log("getavatar called");

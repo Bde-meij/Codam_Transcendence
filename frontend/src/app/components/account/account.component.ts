@@ -22,33 +22,43 @@ export class AccountComponent implements OnInit {
 	avatarInfo?: Observable<Blob>;
 	avatar?: string;
 	user ?: User;
-	passuser?: User;
+	passuser ?: User;
+	// passuser: User = {
+	// 	id: 0,
+	// 	nickname: '',
+	// 	avatar: '',
+	// 	status: '',
+	// };
 
 	constructor(private userService: UserService){}
 
 	ngOnInit(): void {
-		this.userService.getUser().subscribe((userData) => (
-			this.user = userData,
-			this.passuser = {
-				id: Number(this.user.id),
-				nickname: this.user.nickname,
-				avatar: '',
-				status: this.user.status,
-			})
-		);
+		console.log('USER FROM ACCOUNT', this.userService.userDetails());
 
-		this.avatarInfo = this.userService.getAvatar();
-		this.avatarInfo.subscribe({
-			next : (data) => {
-				console.log("avatar:", this.avatar),
-				this.avatar = URL.createObjectURL(data),
-				console.log("avatar:", this.avatar)
-			},
-			error: (e : HttpErrorResponse) => {console.log(e.error.message)},
-			complete: () => console.info('complete')
-		})
-		if (this.avatar && this.passuser) {
-			this.passuser.avatar = this.avatar;
-		}
+		this.passuser = this.userService.userDetails();
+		// this.userService.getUser().subscribe((userData) => (
+		// 	this.user = userData,
+		// 	this.passuser = {
+		// 		id: Number(this.user.id),
+		// 		nickname: this.user.nickname,
+		// 		avatar: '',
+		// 		status: this.user.status,
+		// 	})
+		// );
+
+		// this.avatarInfo = this.userService.getAvatar();
+		// this.avatarInfo.subscribe({
+		// 	next : (data) => {
+		// 		console.log("avatar:", this.avatar),
+		// 		this.avatar = URL.createObjectURL(data),
+		// 		this.passuser.avatar = URL.createObjectURL(data);
+		// 		console.log("avatar:", this.avatar)
+		// 	},
+		// 	error: (e : HttpErrorResponse) => {console.log(e.error.message)},
+		// 	complete: () => console.info('complete')
+		// })
+		// if (this.avatar && this.passuser) {
+		// 	this.passuser.avatar = this.avatar;
+		// }
 	};
 }
