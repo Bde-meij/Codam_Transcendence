@@ -13,13 +13,21 @@
 			<input type="checkbox" [(ngModel)]="is2faEnabled" (change)="onChange()">
 		</div>
 		<div>
-			<span>
-				Nickname:
-			</span>
+			<form [formGroup]="profileForm" (ngSubmit)="submitForm()">
+				<span>
+					Nickname:
+				</span>
+				<input type="text" formControlName="nickname" maxlength="13" placeholder={{current_nickname}} />
+				@if (profileForm.value.nickname != '') {
+					<button type="submit" [disabled]="!profileForm.valid">
+						send new nickname
+					</button>
+				}
+			</form>
 		</div>
 	</div>
 	<div class="setting_column">
-		<div *ngIf="isChecked" >
+		@if (isChecked) {
 			<h3> Enable Google 2FA </h3>
 			<div>
 				Scan the QR code in your Google Authenticator:
@@ -43,36 +51,20 @@
 				Verify
 			</button>
 			{{this.verificationRes}}
-		</div>
+		}
+		@if (profileForm.value.nickname == '') {
+		} @else if (profileForm.pending) {
+			<p>
+				Let Gary think about it...
+			</p>
+		} @else if (profileForm.invalid) {
+			<p>
+				nooo Gary hates that!
+			</p>
+		} @else {
+			<p>
+				Such a pretty name 😏
+			</p>
+		}
 	</div>
-
 </div>
-
-
-
-
-<!-- <p>
-	<input type="checkbox" [(ngModel)]="is2faEnabled" (change)="onChange()"> Enable Google 2FA
-</p>
-<p *ngIf="isChecked">
-	Scan the QR code in your Google Authenticator
-</p>
-<img src="{{this.qrCode}}" *ngIf="isChecked">
-<p *ngIf="isChecked">Or enter this code: {{this.secret}}</p>
-
-<input type="text" [(ngModel)]="userInput" *ngIf="isChecked">
-
-<p *ngIf="isChecked">
-	Confirm this change by entering the one time password from your Google Authenticator
-</p>
-
-<button (click)="verifyUserInput()" *ngIf="isChecked">
-	Verify
-</button>
-
-<p *ngIf="isChecked">
-	{{this.verificationRes}}
-</p>
-<p *ngIf="!isChecked">
-
-</p> -->
