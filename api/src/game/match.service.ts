@@ -151,6 +151,7 @@ export class MatchService {
 	}
 
 	async deleteMatch(matchId: string) {
+		console.log("DELETING MATCH:", matchId);
 		const match: Match = await this.matchRepo.findOne({
 			where: {id: matchId}
 		});

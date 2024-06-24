@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { UserService } from '../../services/user/user.service';
 
 @Component({
   selector: 'app-game-menu',
@@ -9,15 +10,26 @@ import { Router } from '@angular/router';
   styleUrl: './game-menu.component.scss'
 })
 export class GameMenuComponent {
-  // roomNum = 1;
     title = "1v1 PONG";
-    constructor(private router: Router) {};
+    constructor(private router: Router, private userService: UserService) {};
 
-    startGame() {
+    pongGame() {
       this.router.navigate(['/dashboard/game'])
     }
     
-    inviteGame() {
+    flappyGame() {
+      this.userService.updateRoomKey(-1).subscribe();
       this.router.navigate(['/dashboard/game'])
     }
+
+    bossPongSingle() {
+      this.userService.updateRoomKey(-1).subscribe();
+      this.router.navigate(['/dashboard/bossPong'])
+    }
+
+    bossPongMulti() {
+      this.userService.updateRoomKey(1).subscribe();
+      this.router.navigate(['/dashboard/bossPong'])
+    }
 }
+

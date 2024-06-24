@@ -30,6 +30,10 @@ export class UserService {
 		return this.http.get<User>(this.userUrl + '/current');
 	};
 
+	updateRoomKey(roomKey: number) {
+		return this.http.post(this.userUrl + '/update-roomkey/' + roomKey.toString(), {});
+	}
+
 	uploadAvatar(file: File) : Observable<any> {
 		const formData : FormData = new FormData();
 

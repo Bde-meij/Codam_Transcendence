@@ -14,7 +14,7 @@ import {
 import { Server, Socket } from "socket.io";
 import { MatchService } from './match.service';
 
-import { Room} from './Room';
+import { Room } from './Room';
 
 import { AuthService } from 'src/auth/auth.service';
 import { UserService } from 'src/user/user.service';
@@ -27,6 +27,7 @@ import { Match, MatchType } from "./entities/match.entity";
 var colCheck: boolean = false;
 var numOfRooms: number = 0;
 var roomKey: number = 420;
+var flappyKey: number = -1;
 var roomMap = new Map<string, Room>();
 
 @Injectable()
@@ -40,7 +41,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	
 	afterInit(server: any) 
 	{
-		// console.log("server started");
+		console.log("server started");
 		// joinReservedRoom(89413, setReservedRoom(89413));
 	}
 
@@ -53,7 +54,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	{
 		try 
 		{
-			// console.log("Game connection: " + client.id);
+			console.log("Game connection: " + client.id);
 			var cookies = client.handshake.headers.cookie?.split('; ');
 			if (!cookies)
 				throw new NotAcceptableException();
@@ -74,15 +75,50 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			if (!user)
 				throw new NotAcceptableException();
 			client.data.userid = user.id;
+			client.data.nick = user.nickname;
 			client.data.key = user.roomKey;
 			client.emit("connectSignal");
 		}
 		catch
 		{
-			// console.log(client.id, "Game connection refused");
+			console.log(client.id, "Game connection refused");
 			client.disconnect();
 			return;
 		}
+	}
+
+	abortGame(room: Room)
+	{
+		if ((room.lScore == 0) && (room.rScore == 0))
+		{
+			if (room.hasStarted == true)
+				this.matchService.deleteMatch(room.id);
+			room.serverRef.in(room.name).emit("abortGame", "");
+			return (1);
+		}
+		return (0);
+	}
+
+	declareWinner(room: Room, client: Socket)
+	{
+		var updateMatchDto: UpdateMatchDto =
+		{
+			id: room.id,
+			leftPlayerScore: room.lScore,
+			rightPlayerScore: room.rScore
+		};
+		if ((room.lScore != 11) && (room.rScore != 11))
+		{
+			if (client.id == room.leftPlayer.id) {
+				updateMatchDto.leftPlayerScore = -1;
+				room.rightPlayer.emit("playerwin", room.rightPlayer.data.nick);
+			}
+			if (client.id == room.rightPlayer.id) {
+				updateMatchDto.rightPlayerScore = -1;
+				room.leftPlayer.emit("playerwin", room.leftPlayer.data.nick);
+			}
+		}
+		this.matchService.updateMatch(updateMatchDto);
 	}
 
 	handleDisconnect(client: Socket)
@@ -91,40 +127,23 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		if (room != null)
 		{
 			if (room.hasStarted == true)
+			{
 				clearInterval(room.stopInterval);
-			if ((room.lScore == 0) && (room.rScore == 0))
-			{
-				this.matchService.deleteMatch(room.id);
-				room.serverRef.in(room.name).emit("abortGame", client.id);
+				if (room.key < 0)
+					clearInterval(room.gravityInterval);
 			}
-			else
-			{
-				var updateMatchDto: UpdateMatchDto = {
-					id: room.id,
-					leftPlayerScore: room.lScore,
-					rightPlayerScore: room.rScore
-				};
-				if (client.id == room.leftPlayer.id) {
-					updateMatchDto.leftPlayerScore = -1;
-					room.rightPlayer.emit("playerwin", room.rightPlayer.id);
-				}
-				if (client.id == room.rightPlayer.id) {
-					updateMatchDto.rightPlayerScore = -1;
-					room.leftPlayer.emit("playerwin", room.leftPlayer.id);
-				}
-				this.matchService.updateMatch(updateMatchDto);
-			}
+			if (!this.abortGame(room))
+				this.declareWinner(room, client)
 			roomMap.delete(room.name);
 		}
 		this.userService.updateRoomKey(client.data.userid, 0);
-		// console.log(client.id, "called handleDisconnect");
 	}
 
 	// INITIALIZATIONS
 	@SubscribeMessage("joinGame")
 	joinGame(client: Socket)
 	{
-		if (client.data.key == 0)
+		if (client.data.key < 1)
 		{
 			if (this.findRoom(client))
 				this.startGame(roomMap.get(client.data.room));
@@ -132,38 +151,45 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				this.createRoom(client);
 		}
 		else
+			this.checkReservations(client);
+	}
+
+	checkReservations(client: Socket)
+	{
+		var room = roomMap.get("inviteRoom"+client.data.key)
+		if (room == null)
+			client.emit("abortGame", client.id);
+		else if (room.leftPlayer == null)
 		{
-			var room = roomMap.get("inviteRoom"+client.data.key)
-			if (room == null)
-				client.emit("abortGame", client.id);
-			else if (room.leftPlayer == null)
-			{
-				room.leftPlayer = client;
-				room.leftId = client.data.userid;
-				client.join(room.name);
-				client.data.room = room.name;
-			}
-			else if (room.rightPlayer == null)
-			{
-				room.rightPlayer = client;
-				room.rightId = client.data.userid;
-				client.join(room.name);
-				client.data.room = room.name;
-			}
-			else
-				this.startGame(room);
+			console.log(`checkreser left : ${client.data.userid}`)
+			room.leftPlayer = client;
+			room.leftId = client.data.userid;
+			room.serverRef = this.server;
+			client.join(room.name);
+			client.data.room = room.name;
 		}
+		else if (room.rightPlayer == null)
+		{
+			console.log(`checkreser right: ${client.data.userid}`)
+			room.rightPlayer = client;
+			room.rightId = client.data.userid;
+			client.join(room.name);
+			client.data.room = room.name;
+		}
+		if (room.rightPlayer !== null && room.leftPlayer !== null)
+			this.startGame(room);
 	}
 
 	findRoom(client: Socket): boolean
 	{
-		// console.log(client.id, "called findRoom");
+		console.log(client.id, "called findRoom");
 		var stop = false;
 		roomMap.forEach((roomObj, roomName) =>
 		{
-			if ((roomObj.hasStarted == false) && (stop == false))
+			if ((roomObj.hasStarted == false) && (stop == false)
+			&& (client.data.key == roomObj.key))
 			{
-				// console.log(client.id, "joined room", roomName);
+				console.log(client.id, "joined room", roomName);
 				roomObj.rightPlayer = client;
 				roomObj.rightId = client.data.userid;
 				client.join(roomName);
@@ -186,21 +212,25 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		client.join(room.name);
 		client.data.room = room.name;
 		numOfRooms++;
-		// console.log("room", room.name, "created");
+		console.log("room", room.name, "created");
 	}
-
-	// async setMatch(room: Room)
-	// {
-	// }
 	
 	async startGame(room: Room)
 	{
-		// console.log(room.name, "has started");
-		room.leftPlayer.emit("assignNumber", 3);
-		room.rightPlayer.emit("assignNumber", 4);
+		console.log(room.name, "has started");
+		if ((((room.key < 0) != true) == false) == true)
+		{
+			room.leftPlayer.emit("assignNumber", 3);
+			room.rightPlayer.emit("assignNumber", 4);
+		}
+		else 
+		{
+			room.leftPlayer.emit("assignNumber", 1);
+			room.rightPlayer.emit("assignNumber", 2);
+		}
 		room.hasStarted = true;
 		room.serverRef.in(room.name).emit("assignNames", 
-		[room.leftPlayer.id, room.rightPlayer.id]);
+		[room.leftPlayer.data.nick, room.rightPlayer.data.nick]);
 		
 		const match = await this.matchService.createMatch({
 			leftPlayerId: room.leftId.toString(),
@@ -208,7 +238,13 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			type: MatchType.PUBLIC
 		});
 		room.id = match.id;
-		// this.setMatch(room);
+
+		if (room.key < 0)
+		{
+			setTimeout(() =>{{
+				room.gravityInterval = setInterval(this.flappyGravity, 20, room);
+			}},4500);
+		}
 
 		setTimeout(() =>{{
 			room.stopInterval = setInterval(this.updateBall, 15, room);
@@ -220,17 +256,29 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	updatePlayer(client: Socket, yPos: number)
 	{
 		var room = roomMap.get(client.data.room)
-		if (client.id == room.leftPlayer.id)
-			room.leftPos = yPos;
-		if (client.id == room.rightPlayer.id)
-			room.rightPos = yPos;
-		if (colCheck == false)
+		if (room != null)
 		{
-			colCheck = true;
-			room.checkPlayerCollision();
-			colCheck = false;
+			if (client.id == room.leftPlayer.id)
+				room.leftPos = yPos;
+			if (client.id == room.rightPlayer.id)
+				room.rightPos = yPos;
+			if (colCheck == false)
+			{
+				colCheck = true;
+				room.checkPlayerCollision();
+				colCheck = false;
+			}
+			client.in(room.name).emit("updatePlayerPos", yPos);
 		}
-		client.in(room.name).emit("updatePlayerPos", yPos);
+	}
+
+	flappyGravity(room: Room)
+	{
+		if (room.leftPos < 565)
+			room.leftPos += 7.5;
+		if (room.rightPos < 565)
+			room.rightPos += 7.5;
+		room.serverRef.in(room.name).emit("flappyGravity", [room.leftPos, room.rightPos]);
 	}
 	
 	// BALLS
@@ -257,30 +305,20 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 export function getNewRoomKey()
 {
 	roomKey++;
-	roomMap.set("inviteroom"+roomKey, new Room);
-	var room = roomMap.get("inviteroom"+roomKey);
-	room.name = "inviteroom"+roomKey;
-	// room.serverRef = this.server;
+	roomMap.set("inviteRoom"+roomKey, new Room);
+	var room = roomMap.get("inviteRoom"+roomKey);
+	room.name = "inviteRoom"+roomKey;
 	room.key = roomKey;
+	console.log(`getnewroomkey ${room} en ${room.key} ${room.name}`)
 	return (roomKey);
 }
 
-// export function setReservedRoom(userID: number)
-// {
-// 	roomKey++;
-// 	roomMap.set("reservedRoom"+roomKey, new Room);
-// 	var room = roomMap.get("reservedRoom"+roomKey)
-// 	room.name = "reservedRoom"+roomKey;
-// 	room.leftId = userID;
-// 	room.key = roomKey;
-// 	return (roomKey);
-// }
-
-// export function joinReservedRoom(userID: number, key: number): boolean
-// {
-// 	var room = roomMap.get("reservedRoom"+key);
-// 	if (room == null)
-// 		return (false);
-// 	room.rightId = userID;
-// 	return (true);
-// }
+export function getNewFlappyKey()
+{
+	flappyKey--;
+	roomMap.set("inviteRoom"+flappyKey, new Room);
+	var room = roomMap.get("inviteRoom"+flappyKey);
+	room.name = "inviteRoom"+flappyKey;
+	room.key = flappyKey;
+	return (flappyKey);
+}

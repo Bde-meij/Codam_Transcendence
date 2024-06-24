@@ -216,8 +216,13 @@ export class ChatService{
 		});
 	}
 
-	battle(room: string, userid: string){
-		this.chatSocket.emit('inviteGame', {room, userid}, (err: any) => {
+	battle(roomname: string, roomid: number, userid: number){
+		const data = {
+			roomid : roomid,
+			room_name : roomname,
+			userid: userid,
+		}
+		this.chatSocket.emit('inviteGame', data, (err: any) => {
 			if (err) {
 				console.log("inviteGame chat-sock error: ");
 				console.log(err);
@@ -226,12 +231,15 @@ export class ChatService{
 		});
 	}
 
-	joinBattle(roomnum: number, userid: string){
+	joinBattle(roomnum: string){
+		const data = {
+			numroom: roomnum
+		}
 		if (this.user)
-			console.log("joinBAttle chatservice: " + this.user.id);
+			console.log("joinBAttle chatservice: " + this.user.id + ", data.roomnum: " + data.numroom);
 		else
 			console.log("joinbattle nouser")
-		this.chatSocket.emit('joinBattle', {roomnum, userid}, (err: any) => {
+		this.chatSocket.emit('joinBattle', data, (err: any) => {
 			if (err) {
 				console.log("joinBattle chat-sock error: ");
 				console.log(err);

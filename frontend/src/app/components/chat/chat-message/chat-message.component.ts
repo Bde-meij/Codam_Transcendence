@@ -72,14 +72,16 @@ export class ChatMessageComponent implements AfterViewInit{
 		// //console.log("chat-message sendmessage: " + this.room.name);
 	}
 
-	battle(userid: string){
+	battle(userid: number){
 		// //console.log("FIGHTING------FIGHTING");
-		// //console.log("userid: " + userid);
-		this.chatService.battle(this.room.name, userid)
-		// this.router.navigate(['/dashboard', 'game']);
+		console.log("chat-message.component userid: " + userid + ", room name: " + this.room.name);
+		this.chatService.battle(this.room.name, this.room.id, userid)
+		this.router.navigate(['/dashboard', 'game']);
 	}
-	joinBattle(roomnum: number, userid: string){
-		this.chatService.joinBattle(roomnum, userid);
+	joinBattle(roomnum: string){
+		console.log(`chat-message.component ${roomnum}`)
+		this.chatService.joinBattle(roomnum);
+		this.router.navigate(['/dashboard', 'game']);
 	}
 
 	mute(userid: string){

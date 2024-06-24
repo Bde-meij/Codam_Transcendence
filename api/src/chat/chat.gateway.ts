@@ -33,7 +33,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   	room_info: Record<string, RoomInfo>;
 	private connectedUsers: string[] = [];
 	gateway_roomid: number;
-	fake_userid: number = 77000;
+	// fake_userid: number = 77000;
 	// loggary: Loggary;
 	constructor(private authService: AuthService, private userService: UserService, private passwordList: PasswordService) {
 		this.chatRoomList = {};
@@ -73,8 +73,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			}
 			
 			client.data.nickname = user.nickname;
-			client.data.userid = this.fake_userid;
-			this.fake_userid++;
+			client.data.userid = user.id;
+			// this.fake_userid++;
             // client.data.key = user.roomKey;
 			
 			this.joinArrayChats(client, client.data.nickname, client.data.userid);
@@ -168,6 +168,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		//frontendimplemen
 		socket.emit('joinRoom', { room_id: socket.data.id, room_name: data.room_name });
 		//msg get messages?
+		socket.emit('getRoomss', this.chatRoomList);
 		
 		this.channelUserList(data.room_name);	
 		//change this for UUID counter
@@ -425,21 +426,19 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 
 	@SubscribeMessage('inviteGame') async inviteGame(
-	@MessageBody() data: { roomid: number; room_name: string, userid: string },
+	@MessageBody() data: { roomid: number; room_name: string, userid: number },
 	@ConnectedSocket() client: Socket) 
 	{	
-		
-		// client.data.userid = user.id;
-        //     client.data.key = user.roomKey;
-		const numroom = getNewRoomKey(); // nummer
-		this.userService.updateRoomKey(client.data.userid, numroom);
+		const roomKey = getNewRoomKey(); // nummer
+		console.log(`InviteGame ${data.roomid} en ${roomKey}`)
+		this.userService.updateRoomKey(client.data.userid, roomKey);
 		console.log("invitegame: " + client.data.userid + ", userid: " + data.userid);
 		// console.log(data.room + ", " + client.data.id)
 		const message: MessageInterface = {
-			message: numroom.toString(),
+			message: roomKey.toString(),
 			roomId: data.roomid,
 			room_name: data.room_name,
-			senderId: client.data.userid,  // check 
+			senderId: data.userid,  // check 
 			created: new Date(),
 			game: true
 		};
@@ -447,11 +446,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 	@SubscribeMessage('joinBattle') async joinBattle(
-	@MessageBody() data: { numroom: number; userid: string },
+	@MessageBody() data: { numroom: string },
 	@ConnectedSocket() client: Socket) 
 	{	
-		console.log("joinbattle: " + data.numroom + " uderid: " + data.userid);
-		this.userService.updateRoomKey(client.data.userid, data.numroom);
+		console.log("joinbattle: " + data.numroom);
+		this.userService.updateRoomKey(client.data.userid.toString(), Number(data.numroom));
 		// joinInvRoom(89413, 1);
 		// console.log("invitegame: " + client.data.id + ", userid: " + data.userid);
 		// console.log(data.room + ", " + client.data.id)

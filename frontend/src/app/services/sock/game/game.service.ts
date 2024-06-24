@@ -28,6 +28,7 @@ export class GameService implements OnDestroy{
 			});
 		});
 	}
+
 	assignNames(): Observable<string[]>
 	{
 		return new Observable((observ) => 
@@ -45,6 +46,18 @@ export class GameService implements OnDestroy{
 		return new Observable((observ) => 
 		{
 			this.gameSocket.on("updatePlayerPos", (yPos: number) =>
+			{
+				// console.log("receive playerpos");
+				observ.next(yPos);
+			});
+		});
+	}
+
+	flappyGravity(): Observable<number[]>
+	{
+		return new Observable((observ) => 
+		{
+			this.gameSocket.on("flappyGravity", (yPos: number[]) =>
 			{
 				// console.log("receive playerpos");
 				observ.next(yPos);

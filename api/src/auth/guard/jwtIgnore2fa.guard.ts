@@ -42,7 +42,7 @@ export class JwtGuardIgnore2fa implements CanActivate {
 
 	private extractTokenFromHeader(request: Request, token_name: string): string | undefined {
 		const token = request.cookies[token_name]
-		console.log("jwt guard: extractTokenFromHeader():", token);
+		// console.log("jwt guard: extractTokenFromHeader():", token);
 		return (token);
 	}
 }

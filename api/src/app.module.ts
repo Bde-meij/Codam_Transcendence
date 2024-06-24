@@ -2,6 +2,7 @@ import { Logger, Module } from '@nestjs/common';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { GameModule } from './game/game.module';
+import { BossGameModule } from './bossPong/BossGame.module';
 import { ChatGateway } from './chat/chat.gateway';
 import { DatabaseModule } from './database/database.module';
 import { ConfigModule } from '@nestjs/config';
@@ -22,6 +23,7 @@ import { ChannelModule } from './chat/chat.module';
 		DatabaseModule,
 		UserModule,
 		GameModule,
+		BossGameModule,
 		DatabaseModule,
 		TestingModule,
 		FriendsModule,
@@ -29,11 +31,7 @@ import { ChannelModule } from './chat/chat.module';
 		BlockModule,
 	],
 	controllers: [],
-	providers: [
-		GameModule, 
-		ChatGateway, 
-		// ChannelModule,
-
+	providers: [BossGameModule, GameModule, ChatGateway,
 		PasswordService,
 		{
 			provide: Logger,
