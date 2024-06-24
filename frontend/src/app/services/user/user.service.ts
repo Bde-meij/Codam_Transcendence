@@ -25,9 +25,11 @@ export class UserService {
 		return this.http.get<boolean>(this.userUrl + '/isnametaken/' + nickname);
 	}
 
-	getUser() : Observable<User>{
-		console.log("getUser called");
-		return this.http.get<User>(this.userUrl + '/current');
+	// to request your own info, use '0', otherwise use the userID.
+	getUser(id : number) : Observable<User>{
+		if (id == 0)
+			return this.http.get<User>(this.userUrl + '/current');
+		return this.http.get<User>(this.userUrl + '/name/' + id);
 	};
 
 	updateRoomKey(roomKey: number) {
@@ -41,13 +43,10 @@ export class UserService {
 		return this.http.post<File>(this.userUrl + '/uploadAvatar', formData);
 	}
 
-	getAvatar() : Observable<Blob> {
-		console.log("getavatar called");
-		return this.http.get(this.userUrl + '/getAvatar/', {responseType: 'blob'});
+	getAvatar(id: number) : Observable<Blob> {
+		if (id == 0)
+			return this.http.get(this.userUrl + '/getAvatar/current', {responseType: 'blob'});
+		// console.log("getavatar called");
+		return this.http.get(this.userUrl + '/getAvatar/' + id, {responseType: 'blob'});
 	}
-
-	// getAvatarOf(userid : string) : Observable<Blob> {
-	// 	console.log("getavatar called");
-	// 	return this.http.get(this.userUrl + '/getAvatar/' + userid, {responseType: 'blob'});
-	// } 
 }

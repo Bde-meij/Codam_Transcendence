@@ -6,7 +6,9 @@ import { FormsModule } from '@angular/forms';
 import { Rooms } from '../../models/rooms.class';
 import { ChatMessageComponent } from './chat-message/chat-message.component';
 import { User } from '../../models/user.class';
-
+import { UserDetailComponent } from '../user-detail/user-detail.component';
+import { AfterViewInit, AfterViewChecked } from '@angular/core';
+import { ViewChild } from '@angular/core';
 
 export interface MessageInterface {
 	sender: string,
@@ -16,13 +18,13 @@ export interface MessageInterface {
 @Component({
   selector: 'app-chat',
   standalone: true,
-  imports: [NgFor, FormsModule, AsyncPipe, ChatMessageComponent, NgIf, CommonModule],
+  imports: [NgFor, FormsModule, AsyncPipe, ChatMessageComponent, NgIf, CommonModule, UserDetailComponent],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss'
 })
 
-export class ChatComponent implements OnInit {
-	user?: User;
+export class ChatComponent implements OnInit, AfterViewChecked, AfterViewInit {
+	user!: User;
 	message: string | undefined;
 	messages: string[] = [];
 
@@ -40,14 +42,19 @@ export class ChatComponent implements OnInit {
 	constructor(private chatService: ChatService, private userService: UserService) {};
 	
 	ngOnInit() {
-		this.userService.getUser().subscribe((userData) => (
+		this.userService.getUser(0).subscribe((userData) => (
 			this.user = userData
 		));
 	
 		this.chatService.getMessages().subscribe((newmessage: any ) => {
 			if (this.roomsList[newmessage.room_name]?.messages) {
+				
+				this.userService.getAvatar(newmessage.senderId).subscribe((data) => (
+					newmessage.sender_avatar = URL.createObjectURL(data)
+				))
 				this.roomsList[newmessage.room_name].messages?.push(newmessage);
 				this.messages.push(newmessage.message);
+				
 				//console.log("Room: " + newmessage.roomId + ", got a new message");
 				//console.log(newmessage);
 			} else {
@@ -94,12 +101,27 @@ export class ChatComponent implements OnInit {
 
 	};
 
+	@ViewChild(ChatMessageComponent) viewChild!: ChatMessageComponent;
+
+	ngAfterViewInit() {
+		this.chatService.updatePage(this.selectedRoom!.name);
+	}
+
+	ngAfterViewChecked() {
+		if (!this.selectedRoom)
+			this.chatService.updatePage(this.selectedRoom!.name);
+	}
+
 	sendMessage() {
 		if (this.message) {
 			this.chatService.sendMessage(this.message, "sendmessageall");
 			// this.messages.push(this.message);
 		}
 		this.message = '';
+	}
+
+	makenum(str: string){
+		return Number(str);
 	}
 
 	createRoom(roomName: string, status: string, password: string) {
@@ -133,5 +155,9 @@ export class ChatComponent implements OnInit {
 
 	getRoomNames(): string[] {
 		return Object.keys(this.roomsList);
+	}
+
+	updatePage(roomname: string){
+		this.chatService.updatePage(roomname);
 	}
 }

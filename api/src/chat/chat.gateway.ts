@@ -90,7 +90,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			// this.chatRoomList["Help"].users.push(client.data.nickname);
 			// client.join("Help");
 			console.log(user.nickname, "connected on socketID:", client.id);
-			this.updateUserRooms(client.data.userid, client.data.nickname);
+			// this.updateUserRooms(client.data.userid, client.data.nickname);
 			console.log("ConnectedUsers: " + this.connectedUsers);
 			console.log(Array.from(client.rooms))
 			client.emit('getRoomss', this.chatRoomList);
@@ -606,13 +606,17 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		return room;
 	}
 
-	private updateUserRooms(user_id: number, user_name: string){
-		const myRooms: string[] = [];
+	@SubscribeMessage('updateRoom') async updateRoom(
+	@MessageBody() data: {user_id: number, user_name: string },
+	@ConnectedSocket() client: Socket) 
+	{	
+		var temp : Record<string, Rooms> = {};
 		Object.values(this.chatRoomList).forEach(room => {
-			if (room.users.includes(user_id) || room.status == "public")
-				myRooms.push(room.name);
-		})
-		console.log(myRooms);
+			if (room.users.includes(data.user_id) || room.status == "public")
+				temp[room.name] = room;
+		});
+		client.emit('getRoomss', temp);
+		temp = {};
 	}
 
 	private createTestRooms() {

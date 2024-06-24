@@ -10,12 +10,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { Router } from '@angular/router';
 import { UserService } from '../../../services/user/user.service';
 
-export interface MessageInterface {
-	sender: string,
-	room: string,
-	message: string
-}
-
 @Component({
   selector: 'app-chat-message',
   standalone: true,
@@ -28,18 +22,22 @@ export class ChatMessageComponent implements AfterViewInit{
 	@ViewChild('messageContainer') messageContainer!: ElementRef;
 	@ViewChild('messageInput') messageInput!: ElementRef;
 	@Input() room: any;
-	@Input() user?: User;
+	@Input() user!: User;
 	selectedUser: any;
 	selectedUserID: any;
 	
 	message: string | undefined;
 	// messages: string[] = [];
 
-	constructor(private chatService: ChatService, private router: Router) {};
+	constructor(private chatService: ChatService, private router: Router, private userService :UserService) {};
 	
 	ngOnInit() {
 		console.log("user message:")
 		console.log(this.user)
+		// this.user.avatar = 
+		// this.userService.getAvatar(this.senderID).subscribe((data) => (
+		// 	this.user.avatar = URL.createObjectURL(data)
+		// ))
 	}
 
 	ngAfterViewInit() {
@@ -116,5 +114,7 @@ export class ChatMessageComponent implements AfterViewInit{
 
 	isEven(senderId: number): boolean {
 		return senderId % 2 === 0;
-	  }
+	}
+
+	
 }

@@ -12,12 +12,9 @@ import { UserDetailComponent } from '../user-detail/user-detail.component';
 })
 export class FriendsComponent {
 	friends = FAKE_FRIENDS;
-
 	selectedFriend?: User;
 
 	onSelect(friend: User): void {
   		this.selectedFriend = friend;
 	};
-
-
 }

@@ -7,7 +7,7 @@
 				Battlekey {{ message.message }} 
 			</button>
 			<span *ngIf="!message.game">
-				{{ message.created }} --- {{ message.message }} --- {{ message.senderId }}
+				<img src="{{message.sender_avatar}}" height="80px" />{{ message.created }} --- {{ message.message }} --- {{ message.senderId }}
 			</span>
 		</li>
 	

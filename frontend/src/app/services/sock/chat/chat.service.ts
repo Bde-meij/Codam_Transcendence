@@ -20,7 +20,7 @@ export class ChatService{
 	roomss: Rooms[] = []; 
 
 	constructor(sockService: SockService, private userService: UserService) {
-		this.userService.getUser().subscribe((userData) => {
+		this.userService.getUser(0).subscribe((userData) => {
 			this.user = userData;
 			console.log("User loaded in ChatService:", this.user);
 		});
@@ -31,16 +31,24 @@ export class ChatService{
 		});
 		sockService.newSocketRegister("chatSocket");
 	}
+	ngOnInit(): void {
+		// this.user$ = this.userService.getUser(0);
+	}
 
-	sendMessage(message: string, room: string): void {		
-		var id = 0;
-		if (this.user){
-			id = this.user.id;
-			console.log("senderid: " + this.user.id);
-		}
-		else{
-			console.log("sendmessage nousersss and senderid == 0");
-		}
+	// sendMessage(message: string): void {
+	// 	// this.user$ = this.userService.getUser();
+	// 	this.chatSocket.emit('message', message, (err: any) => {
+	// 		if (err) {
+	// 			console.log("chat-sock error: ");
+	// 			console.log(err);
+	// 			console.log(err.message);
+	// 		}
+	// 	});
+	// }
+
+	sendMessage(message: string, room: string): void {
+		// this.user$ = this.userService.getUser(0);
+		// const sender = this.user$;
 		const messageObj = {
 			message : message,
 			sender : this.user?.nickname,
@@ -242,6 +250,20 @@ export class ChatService{
 		this.chatSocket.emit('joinBattle', data, (err: any) => {
 			if (err) {
 				console.log("joinBattle chat-sock error: ");
+				console.log(err);
+				console.log(err.message);
+			}
+		});
+	}
+
+	updatePage(roomnum: string){
+		const data = {
+			user_id : this.user?.id,
+			user_name : this.user?.nickname,
+		}
+		this.chatSocket.emit('updateRoom', data, (err: any) => {
+			if (err) {
+				console.log("updateRoom chat-sock error: ");
 				console.log(err);
 				console.log(err.message);
 			}

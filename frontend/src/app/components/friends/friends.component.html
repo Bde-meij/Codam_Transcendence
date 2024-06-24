@@ -15,7 +15,7 @@
 	</div>
 
 	<div class="friend_column" *ngIf="selectedFriend">
-		<app-user-detail [user]="selectedFriend"></app-user-detail>
+		<app-user-detail [id]="selectedFriend.id"></app-user-detail>
 	</div>
 
 	<div class="friend_column">
@@ -28,13 +28,3 @@
 		<p> ... </p>
 	</div>
 </div>
-
-
-<!-- <div *ngIf="selectedHero">
-	<h2>{{selectedHero.name | uppercase}} Details</h2>
-	<div>id: {{selectedHero.id}}</div>
-	<div>
-	  <label for="hero-name">Hero name: </label>
-	  <input id="hero-name" [(ngModel)]="selectedHero.name" placeholder="name">
-	</div>
-  </div> -->

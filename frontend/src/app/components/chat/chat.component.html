@@ -33,7 +33,7 @@
   <div class="user-list-column">
     <h3> List of connected users: </h3>
       <li *ngFor="let m of userss">
-        {{ m }}
+		<app-user-detail [id]=makenum(m)></app-user-detail>
       </li>
   </div>
 

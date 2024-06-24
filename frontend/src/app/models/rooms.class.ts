@@ -22,4 +22,5 @@ export interface MessageInterface {
 	created: string;
 	updated?: Date;
 	game?: boolean;
+	sender_avatar?: string;
 }
