@@ -9,6 +9,7 @@ import { DatabaseModule } from './database/database.module';
 import { ConfigModule } from '@nestjs/config';
 import { TestingModule } from './testing/testing.module';
 import { FriendsModule } from './friends/friends.module';
+import { CookieMiddleware } from './auth/middleware/cookie.middleware';
 
 @Module({
 	imports: [
@@ -27,4 +28,10 @@ import { FriendsModule } from './friends/friends.module';
 	controllers: [],
 	providers: [GameModule, ChatGateway],
 })
-export class AppModule {}
+export class AppModule implements NestModule{
+	configure(consumer: MiddlewareConsumer) {
+		consumer
+			.apply(CookieMiddleware)
+			.forRoutes('*');
+	}
+}

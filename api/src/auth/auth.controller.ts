@@ -20,6 +20,7 @@ import { JwtGuardIgnore2fa } from './guard/jwtIgnore2fa.guard';
 import { CallbackAuthDto } from './dto/callback-auth.dto';
 import * as speakeasy from 'speakeasy';
 import * as QRCode from 'qrcode';
+import { JwtRefreshGuard } from './guard/jwtRefresh.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -141,5 +142,19 @@ export class AuthController {
 	async isTwoFAEnabled(@Req() req, @Res() res) {
 		const isEnabled = (await this.userService.findUserById(req.user.id)).isTwoFAEnabled;
 		res.json({isTwoFAEnabled: isEnabled});
+	}
+
+	@Post('refresh')
+	@UseGuards(JwtRefreshGuard)
+	async refreshToken(@Req() req, @Res() res) {
+		await this.authService.invalidateRefreshToken(req.refresh_token);
+		const user: CallbackAuthDto = {
+			id: (req.user as any).id,
+			is2faVerified: (req.user as any).is2faVerified,
+		}
+		const tokens = await this.authService.getJwtTokens(user);
+		res.cookie('access_token', tokens.access_token, {httpOnly: true});
+		res.cookie('refresh_token', tokens.refresh_token, {httpOnly: true});
+		res.json({message: "Tokens refreshed"});
 	}
 }

@@ -1,27 +1,29 @@
-import { CanActivate, ExecutionContext, HttpStatus, Injectable, Req, UnauthorizedException } from "@nestjs/common";
+import { CanActivate, ExecutionContext, Injectable, Req, UnauthorizedException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { AuthService } from "../auth.service";
 
 @Injectable()
-export class JwtGuard implements CanActivate {
+export class JwtRefreshGuard implements CanActivate {
 	constructor(private jwtService: JwtService, private configService: ConfigService, private authService: AuthService) {};
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
 		const request = context.switchToHttp().getRequest();
-		const accessToken = this.extractTokenFromHeader(request, 'access_token');
-		if (!accessToken) {
-			throw new UnauthorizedException('Access token not found');
+		const response = context.switchToHttp().getResponse();
+		const refreshToken = this.extractTokenFromHeader(request, 'refresh_token');
+		if (!refreshToken) {
+			throw new UnauthorizedException('Refresh token not found');
 		}
 		try {
-			const payload = await this.authService.verifyJwtAccessToken(accessToken);
-			if (!payload.is2faVerified)
-				throw new UnauthorizedException('2FA not verified');
+			const payload = await this.authService.verifyJwtRefreshToken(refreshToken);
 			request['user'] = payload;
+			request['refresh_token'] = refreshToken;
 		} catch(err) {
-			console.log('Access token validation failed (JWT guard): ', err);
-			throw new UnauthorizedException('Invalid access token');
+			response.clearCookie('access_token');
+			response.clearCookie('refresh_token');
+			console.log('Refresh token validation failed (JWT refresh guard): ', err);
+			throw new UnauthorizedException('Invalid refresh token');
 		}
 		return true;
 	}
