@@ -30,7 +30,7 @@
 // 		})
 // 		this.chatService.getRooms().subscribe((roomList) => {
 // 			this.rooms = roomList;
-// 			console.log("getRooms frontend");
+// 			//console.log("getRooms frontend");
 // 		})
 // 		this.chatService.getUserList().subscribe((userList) => {
 // 			this.userList = userList;
@@ -57,12 +57,12 @@
 // 	}
 
 // 	joinRoom(data: string) {
-// 		console.log("joinroom component: " + data);
+// 		//console.log("joinroom component: " + data);
 // 		this.chatService.joinRoom(data);
 // 	}
 
 // 	sendUserList(data: string) {
-// 		console.log("sendUserList: " + data);
+// 		//console.log("sendUserList: " + data);
 // 		this.chatService.sendUserList(data);
 // 	}
 // }

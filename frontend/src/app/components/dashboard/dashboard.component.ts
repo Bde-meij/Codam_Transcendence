@@ -17,23 +17,25 @@ import { User } from '../../models/user.class';
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent {
 	title = "Gary's basement";
 
-	user$ : Observable<User> | undefined;
+	// user$ : Observable<User> | undefined;
 
 	unread = this.chatService.isUnread();
 
 	constructor(private userService: UserService, private chatService: ChatService, private router: Router) {
 	};
 
-	ngOnInit(): void {
-		this.user$ = this.userService.getUser();
+	// ngOnInit(): void {
+		// this.user$ = this.userService.getUser();
+		// console.log("dashboard user:");
+		// console.log(this.user$);
 		// this.user$.subscribe((user: UserInterface) => {
 		// 	this.title = "Gary's basement with: " + user.nickname;
 		// 	// console.log(user.nickname);
 		//   });
-	}
+	// }
 
 	isNotHomeRoute() {
 		return (!(this.router.url === '/dashboard/home'));

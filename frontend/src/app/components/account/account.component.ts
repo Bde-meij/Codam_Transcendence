@@ -20,7 +20,7 @@ export class AccountComponent implements OnInit {
 	message = "";
 	avatarInfo?: Observable<Blob>;
 	avatar?: string;
-	user ?: User;
+	user?: User;
 	passuser?: User;
 
 	constructor(private userService: UserService){}

@@ -3,7 +3,7 @@
 	<h3> the messages in room: {{ room.name}} </h3>
 	<ul>
 		<li *ngFor="let message of room.messages" 
-			[ngClass]="{'blue-text': message.senderId === 77600, 'black-text': message.senderId !== 77600}">
+			[ngClass]="{'blue-text': message.senderId === 77000, 'black-text': message.senderId !== 77000}">
 			<button *ngIf="message.game" mat-raised-button color="primary" (click)="joinBattle(message.message, '1')">
 				Battlekey {{ message.message }} 
 			</button>

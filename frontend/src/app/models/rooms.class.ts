@@ -15,8 +15,10 @@ export interface Rooms {
 
 export interface MessageInterface {
 	message: string;
-	roomId: string;
+	roomId: number;
+	room_name: string;
 	senderId: number;
+	sender_name: string;
 	created: string;
 	updated?: Date;
 	game?: boolean;

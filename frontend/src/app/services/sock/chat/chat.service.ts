@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { io } from 'socket.io-client';
 import { SockService } from '../sock.service';
@@ -10,48 +10,41 @@ import { Rooms } from '../../../models/rooms.class';
 @Injectable({
   providedIn: 'root'
 })
-export class ChatService {
+export class ChatService{
 	private chatSocket = io("/chat");
 	private unread = true;
-	user$ : Observable<User> | undefined;
-	user: any;
-	userId?: number;
+	user?: User;
+
 	userss: string[] = [];
 	rooms: Rooms[] = []; 
 	roomss: Rooms[] = []; 
 
 	constructor(sockService: SockService, private userService: UserService) {
-		
+		this.userService.getUser().subscribe((userData) => {
+			this.user = userData;
+			console.log("User loaded in ChatService:", this.user);
+		});
+
 		this.chatSocket.onAny((event, ...args) => {
 			console.log("CHAT-SOCK EVENT: ");
 			console.log(event, args);
 		});
 		sockService.newSocketRegister("chatSocket");
 	}
-	ngOnInit(): void {
-		this.user$ = this.userService.getUser();
-		this.user$.subscribe(user => {
-			this.userId = user.id; // Assuming 'id' is the user ID field
-		});
-	}
-
-	// sendMessage(message: string): void {
-	// 	// this.user$ = this.userService.getUser();
-	// 	this.chatSocket.emit('message', message, (err: any) => {
-	// 		if (err) {
-	// 			console.log("chat-sock error: ");
-	// 			console.log(err);
-	// 			console.log(err.message);
-	// 		}
-	// 	});
-	// }
 
 	sendMessage(message: string, room: string): void {		
-		// this.user$ = this.userService.getUser();
-		console.log("sender: " + this.user.id + "sendmessage sender ID hardcoded");
+		var id = 0;
+		if (this.user){
+			id = this.user.id;
+			console.log("senderid: " + this.user.id);
+		}
+		else{
+			console.log("sendmessage nousersss and senderid == 0");
+		}
 		const messageObj = {
 			message : message,
-			sender : "senderID",
+			sender : this.user?.nickname,
+			sender_id: this.user?.id,
 			room : room,
 		}
 		this.chatSocket.emit('message', messageObj, (err: any) => {
@@ -63,13 +56,9 @@ export class ChatService {
 		});
 	}
 
-	createRoom(message: string): void {
-		// console.log("createRoom called: " + message);
-		const id = message;
-		const password = "";
-		const user = this.user$;
-		console.log("createRoom called: " + message + ", user: " + this.user$);
-		this.chatSocket.emit('createRoom', { id, password}, (err: any) => {
+	createRoom(room_name: string, status: string, password: string): void {
+		console.log("createRoom called: " + room_name + ", status: " + status + ", password: " + password);
+		this.chatSocket.emit('createRoom', { room_name, status, password}, (err: any) => {
 			if (err) {
 				console.log("createRoom chat-sock error: ");
 				console.log(err);
@@ -78,11 +67,9 @@ export class ChatService {
 		});
 	}
 
-	joinRoom(message: string): void {
-		const id = message;
-		const password = "";
-		console.log("joinRoom: " + message + ", password: " + password);
-		this.chatSocket.emit('joinRoom', {id, password}, (err: any) => {
+	joinRoom(room_name: string, password: string): void {
+		console.log("joinRoom name: " + room_name + ", password: " + password);
+		this.chatSocket.emit('joinRoom', {room_name, password}, (err: any) => {
 			if (err) {
 				console.log("joinRoom chat-sock error: ");
 				console.log(err);
@@ -159,13 +146,13 @@ export class ChatService {
 		});
 	  }
 
-	  getUser(): Observable<any> {
-		return new Observable<any>((observer) => {
-		  this.chatSocket.on('getUser', (user: any) => {
-			user = user
-		  });
-		});
-	  }
+	//   getUser(): Observable<any> {
+	// 	return new Observable<any>((observer) => {
+	// 	  this.chatSocket.on('getUser', (user: any) => {
+	// 		user = user
+	// 	  });
+	// 	});
+	//   }
 
 
 	getConnectedUsers(): Observable<string[]> {
@@ -240,7 +227,10 @@ export class ChatService {
 	}
 
 	joinBattle(roomnum: number, userid: string){
-		console.log("joinBAttle chatservice: " + this.userId);
+		if (this.user)
+			console.log("joinBAttle chatservice: " + this.user.id);
+		else
+			console.log("joinbattle nouser")
 		this.chatSocket.emit('joinBattle', {roomnum, userid}, (err: any) => {
 			if (err) {
 				console.log("joinBattle chat-sock error: ");
