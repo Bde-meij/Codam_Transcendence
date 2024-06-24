@@ -20,7 +20,7 @@ import { User } from '../../models/user.class';
 export class DashboardComponent implements OnInit {
 	title = '';
 
-	user$ : Observable<User> | undefined;
+	// user$ : Observable<User> | undefined;
 
 	unread = this.chatService.isUnread();
 
@@ -31,7 +31,7 @@ export class DashboardComponent implements OnInit {
 	};
 
 	ngOnInit(): void {
-		this.user$ = this.userService.getUser();
+		// this.user$ = this.userService.getUser();
 		// this.user$.subscribe((user: UserInterface) => {
 		// 	this.title = "Gary's basement with: " + user.nickname;
 		// 	// console.log(user.nickname);

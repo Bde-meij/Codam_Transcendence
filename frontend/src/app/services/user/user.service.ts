@@ -25,8 +25,14 @@ export class UserService {
 		return this.http.get<boolean>(this.userUrl + '/isnametaken/' + nickname);
 	}
 
-	getUser() : Observable<User>{
-		return this.http.get<User>(this.userUrl + '/current');
+	// whoAmI() : Observable<User>{
+	// 	return this.http.get<User>(this.userUrl + '/current');
+	// };
+
+	getUser(id : number) : Observable<User>{
+		if (id == 0)
+			return this.http.get<User>(this.userUrl + '/current');
+		return this.http.get<User>(this.userUrl + '/name/' + id);
 	};
 
 	uploadAvatar(file: File) : Observable<any> {
@@ -41,28 +47,28 @@ export class UserService {
 		return this.http.get(this.userUrl + '/getAvatar/', {responseType: 'blob'});
 	}
 	
-	userDetails() : User {
-		let user: User = {
-			id: 0,
-			nickname : '',
-			avatar: '',
-			status: ''
-		};
+	// userDetails() : User {
+	// 	let user: User = {
+	// 		id: 0,
+	// 		nickname : '',
+	// 		avatar: '',
+	// 		status: ''
+	// 	};
 
-		this.getUser().subscribe((data) => (
-			user.id = data.id,
-			user.nickname = data.nickname,
-			user.avatar = data.avatar,
-			user.status = data.status
-		));
-		this.getAvatar().subscribe((data) => (
-			user.avatar = URL.createObjectURL(data)
-		))
+	// 	this.getUser().subscribe((data) => (
+	// 		user.id = data.id,
+	// 		user.nickname = data.nickname,
+	// 		user.avatar = data.avatar,
+	// 		user.status = data.status
+	// 	));
+	// 	this.getAvatar().subscribe((data) => (
+	// 		user.avatar = URL.createObjectURL(data)
+	// 	))
 		
-		console.log('user', user);
+	// 	console.log('user', user);
 
-		return user;
-	}
+	// 	return user;
+	// }
 
 	// getAvatarOf(userid : string) : Observable<Blob> {
 	// 	console.log("getavatar called");

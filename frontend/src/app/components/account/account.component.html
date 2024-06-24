@@ -22,7 +22,9 @@
 
 <h3> Your account details: </h3>
 <p>|</p>
-<app-user-detail [user]="passuser"></app-user-detail>
+<div *ngIf="user">
+	<app-user-detail [id]="user.id"></app-user-detail>
+</div>
 <p>|</p>
 
 <h3> To change your details, go to settings: </h3>

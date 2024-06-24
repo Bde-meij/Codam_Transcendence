@@ -21,7 +21,7 @@ export class AccountComponent implements OnInit {
 	message = "";
 	avatarInfo?: Observable<Blob>;
 	avatar?: string;
-	user ?: User;
+	user?: User;
 	passuser ?: User;
 	// passuser: User = {
 	// 	id: 0,
@@ -33,9 +33,19 @@ export class AccountComponent implements OnInit {
 	constructor(private userService: UserService){}
 
 	ngOnInit(): void {
-		console.log('USER FROM ACCOUNT', this.userService.userDetails());
+		// console.log('USER FROM ACCOUNT', this.userService.userDetails());
 
-		this.passuser = this.userService.userDetails();
+		// this.passuser = this.userService.userDetails();
+		this.userService.getUser(0).subscribe((data) => (
+			this.user = {
+				id : data.id,
+				nickname : data.nickname,
+				avatar : data.avatar,
+				status : data.status
+			}
+		));
+		
+		
 		// this.userService.getUser().subscribe((userData) => (
 		// 	this.user = userData,
 		// 	this.passuser = {
