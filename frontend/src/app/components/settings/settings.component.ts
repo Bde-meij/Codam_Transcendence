@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
-import { AsyncPipe, NgIf, UpperCasePipe } from '@angular/common';
+import { AsyncPipe, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../services/auth/auth.service';
 
 @Component({
@@ -12,7 +11,7 @@ import { AuthService } from '../../services/auth/auth.service';
   styleUrl: './settings.component.scss'
 })
 export class SettingsComponent {
-  constructor(private http: HttpClient, private authService: AuthService) {};
+  constructor(private authService: AuthService) {};
 
   isChecked: boolean = false;
   is2faEnabled: boolean = false;
