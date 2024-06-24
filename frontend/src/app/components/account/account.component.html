@@ -20,10 +20,11 @@
 
 <img src="{{this.avatar}}" height="80px" />
 
-
+<h3> Your account details: </h3>
 <app-user-detail [user]="passuser"></app-user-detail>
 
-
+<h3> To change your details, go to settings: </h3>
+<button [routerLink]="['/dashboard/settings']"> settings </button>
 
 <!-- <div *ngIf="passuser">
 	<app-user-detail [user]="passuser"></app-user-detail>

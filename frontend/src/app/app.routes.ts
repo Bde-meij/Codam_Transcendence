@@ -12,18 +12,19 @@ import { RegisterComponent } from './components/register/register.component';
 import { HomeComponent } from './components/home/home.component';
 import { GameMenuComponent } from './components/game-menu/game-menu.component';
 import { TwofaComponent } from './components/twofa/twofa.component';
+import { constTitle } from './models/title.const';
 
 export const routes: Routes = [
 	{
 		path: '',
-		title: "Gary's basement",
 		redirectTo: 'dashboard',
 		pathMatch: "full"
 	},
 	{
 		path: 'welcome',
 		component: WelcomeComponent,
-		data: { title: "Gary's basement" }
+		// data: { title: "Gary's basement" }
+		data: {title: constTitle}
 	},
 	{
 		path: 'register',
@@ -36,6 +37,7 @@ export const routes: Routes = [
 	{
 		path: 'dashboard',
 		component: DashboardComponent,
+		data: { title: constTitle },
 		canActivate: [AuthGuard],
 		children: [
 			{
