@@ -1,11 +1,16 @@
 import { Module } from '@nestjs/common';
 import { ChatGateway } from './chat.gateway';
 import { AuthModule } from 'src/auth/auth.module';
-import { UserModule } from 'src/user/user.module';
+import { Loggary } from 'src/logger/logger.service';
 
 @Module({
-  imports: [AuthModule, UserModule],
-  providers: [ChatGateway],
+  imports: [AuthModule],
+  providers: [ChatGateway,
+	{
+		provide: Loggary,
+		useFactory: () => new Loggary('ChannelModule', ['log', 'debug', 'warn', 'verbose'])
+	}
+],
   exports: [ChatGateway]
 })
 export class ChannelModule {}

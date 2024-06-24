@@ -8,10 +8,11 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { CallbackAuthDto } from './dto/callback-auth.dto';
 import * as speakeasy from 'speakeasy';
+import { Loggary } from 'src/logger/logger.service';
 
 @Injectable()
 export class AuthService {
-	constructor(private readonly userService: UserService, private jwtService: JwtService, private configService: ConfigService){}
+	constructor(private readonly userService: UserService, private jwtService: JwtService, private configService: ConfigService, private loggary: Loggary){}
 
 	async getJwtTokens(user: CallbackAuthDto): Promise<{access_token: string, refresh_token: string}> {
 		const payload = {id: user.id, is2faVerified: user.is2faVerified};

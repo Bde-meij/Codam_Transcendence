@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, RouterLink, RouterOutlet } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink, RouterOutlet } from '@angular/router';
 import { ChatService } from '../../services/sock/chat/chat.service';
 import { LogoutComponent } from '../logout/logout.component';
 import { Observable } from 'rxjs';
@@ -24,7 +24,10 @@ export class DashboardComponent {
 
 	unread = this.chatService.isUnread();
 
-	constructor(private userService: UserService, private chatService: ChatService, private router: Router) {
+	constructor(private userService: UserService, private chatService: ChatService, private router: Router, route: ActivatedRoute) {
+		route.data.subscribe(data =>
+			this.title = data['title']
+		)
 	};
 
 	// ngOnInit(): void {

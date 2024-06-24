@@ -1,5 +1,8 @@
 @import '../../../styles/helpers/constants.scss';
 
+.friend_container {
+	display: flex;
+}
 .friend_column {
 	flex: 33.33%;
 	min-height: 200px;
@@ -9,9 +12,6 @@
 	background-color: $column-color;
 	// background-color: $background-color;
 	text-align: center;
-}
-.friend_container {
-	display: flex;
 }
 
 .friends {

@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { Block } from 'src/block/entities/block.entity';
 import { FriendRequest } from 'src/friends/entities/friend.entity';
 import { Match } from 'src/game/entities/match.entity';
 import { User } from 'src/user/entities/user.entity';
@@ -22,6 +23,7 @@ import { User } from 'src/user/entities/user.entity';
 				entities: [
 					User,
 					FriendRequest,
+					Block,
 					Match,
 				],
 			})
