@@ -3,6 +3,7 @@ import { WelcomeComponent } from './components/welcome/welcome.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { SettingsComponent } from './components/settings/settings.component';
 import { GameComponent } from './components/game/game.component';
+import { BossGameComponent } from './components/bossGame/bossGame.component';
 import { FriendsComponent } from './components/friends/friends.component';
 import { AccountComponent } from './components/account/account.component';
 import { AuthGuard } from './authguard';
@@ -51,6 +52,11 @@ export const routes: Routes = [
 			{
 				path: 'game',
 				component: GameComponent,
+				canActivate: [AuthGuard],
+			},
+			{
+				path: 'bossPong',
+				component: BossGameComponent,
 				canActivate: [AuthGuard],
 			},
 			{

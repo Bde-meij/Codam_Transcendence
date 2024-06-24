@@ -14,7 +14,7 @@ import {
 import { Server, Socket } from "socket.io";
 import { MatchService } from './match.service';
 
-import { Room} from './Room';
+import { Room } from './Room';
 
 import { AuthService } from 'src/auth/auth.service';
 import { UserService } from 'src/user/user.service';
@@ -90,7 +90,8 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	{
 		if ((room.lScore == 0) && (room.rScore == 0))
 		{
-			this.matchService.deleteMatch(room.id);
+			if (room.hasStarted == true)
+				this.matchService.deleteMatch(room.id);
 			room.serverRef.in(room.name).emit("abortGame", "");
 			return (1);
 		}

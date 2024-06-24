@@ -21,5 +21,15 @@ export class GameMenuComponent {
       this.userService.updateRoomKey(-1).subscribe();
       this.router.navigate(['/dashboard/game'])
     }
+
+    bossPongSingle() {
+      this.userService.updateRoomKey(-1).subscribe();
+      this.router.navigate(['/dashboard/bossPong'])
+    }
+
+    bossPongMulti() {
+      this.userService.updateRoomKey(1).subscribe();
+      this.router.navigate(['/dashboard/bossPong'])
+    }
 }
 
