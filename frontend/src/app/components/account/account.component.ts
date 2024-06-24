@@ -16,59 +16,13 @@ import { RouterLink } from '@angular/router';
   styleUrl: './account.component.scss'
 })
 export class AccountComponent implements OnInit {
-	// defaultAvatar = new File(["default_avatar"], "assets/images/avatar_default.png");
-	// currentavatar?: File = new File(["default_avatar"], "assets/images/avatar_default.png"); // default
-	message = "";
-	avatarInfo?: Observable<Blob>;
-	avatar?: string;
-	user?: User;
-	passuser ?: User;
-	// passuser: User = {
-	// 	id: 0,
-	// 	nickname: '',
-	// 	avatar: '',
-	// 	status: '',
-	// };
+	my_id?: number;
 
 	constructor(private userService: UserService){}
 
 	ngOnInit(): void {
-		// console.log('USER FROM ACCOUNT', this.userService.userDetails());
-
-		// this.passuser = this.userService.userDetails();
-		this.userService.getUser(0).subscribe((data) => (
-			this.user = {
-				id : data.id,
-				nickname : data.nickname,
-				avatar : data.avatar,
-				status : data.status
-			}
-		));
-		
-		
-		// this.userService.getUser().subscribe((userData) => (
-		// 	this.user = userData,
-		// 	this.passuser = {
-		// 		id: Number(this.user.id),
-		// 		nickname: this.user.nickname,
-		// 		avatar: '',
-		// 		status: this.user.status,
-		// 	})
-		// );
-
-		// this.avatarInfo = this.userService.getAvatar();
-		// this.avatarInfo.subscribe({
-		// 	next : (data) => {
-		// 		console.log("avatar:", this.avatar),
-		// 		this.avatar = URL.createObjectURL(data),
-		// 		this.passuser.avatar = URL.createObjectURL(data);
-		// 		console.log("avatar:", this.avatar)
-		// 	},
-		// 	error: (e : HttpErrorResponse) => {console.log(e.error.message)},
-		// 	complete: () => console.info('complete')
-		// })
-		// if (this.avatar && this.passuser) {
-		// 	this.passuser.avatar = this.avatar;
-		// }
+		this.userService.getUser(0).subscribe(data => 
+			this.my_id = data.id
+		);		
 	};
 }

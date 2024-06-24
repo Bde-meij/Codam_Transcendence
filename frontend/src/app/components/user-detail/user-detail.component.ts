@@ -11,7 +11,6 @@ import { UserService } from '../../services/user/user.service';
   styleUrl: './user-detail.component.scss'
 })
 export class UserDetailComponent implements OnInit {
-	// @Input() user?: User;
 	@Input()id!: number;
 	my_user?: User;
 
