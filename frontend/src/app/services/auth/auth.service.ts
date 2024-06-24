@@ -10,14 +10,14 @@ export class AuthService {
 	constructor(private http: HttpClient) {
 	};
 
-	login() : void {
-		this.http.get(this.authUrL + '/login', { }).subscribe();
-		console.log("authservice.login called");
-	};
+	// login() {
+	// 	console.log("authservice.login called");
+	// 	this.http.get(this.authUrL + '/login', { });
+	// };
 
-	logout() : void {
-		this.http.post(this.authUrL + '/logout', { }).subscribe();
+	logout() {
 		console.log("authservice.logout called");
+		return this.http.post(this.authUrL + '/logout', { });
 	}	
 	
 	getLogStatus() {
