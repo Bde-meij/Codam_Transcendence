@@ -9,8 +9,6 @@ import { Loggary } from 'src/logger/logger.service';
 	{
 		provide: Loggary,
 		useFactory: () => new Loggary('ChannelModule', ['log', 'debug', 'warn', 'verbose'])
-	}
-],
-  exports: [ChatGateway]
+	}],
 })
 export class ChannelModule {}

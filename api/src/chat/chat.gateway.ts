@@ -34,7 +34,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	private connectedUsers: string[] = [];
 	gateway_roomid: number;
 	fake_userid: number = 77000;
-
+	// loggary: Loggary;
 	constructor(private authService: AuthService, private userService: UserService, private passwordList: PasswordService) {
 		this.chatRoomList = {};
 		this.room_info = {};

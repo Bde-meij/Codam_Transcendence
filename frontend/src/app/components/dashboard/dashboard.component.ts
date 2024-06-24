@@ -18,7 +18,7 @@ import { User } from '../../models/user.class';
   styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent {
-	title = "Gary's basement";
+	title = '';
 
 	// user$ : Observable<User> | undefined;
 

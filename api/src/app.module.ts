@@ -10,6 +10,7 @@ import { PasswordService } from './password/password.service';
 import { FriendsModule } from './friends/friends.module';
 import { BlockModule } from './block/block.module';
 import { Loggary } from 'src/logger/logger.service';
+import { ChannelModule } from './chat/chat.module';
 
 @Module({
 	imports: [
@@ -24,12 +25,15 @@ import { Loggary } from 'src/logger/logger.service';
 		DatabaseModule,
 		TestingModule,
 		FriendsModule,
+		// ChannelModule,
 		BlockModule,
 	],
 	controllers: [],
 	providers: [
 		GameModule, 
 		ChatGateway, 
+		// ChannelModule,
+
 		PasswordService,
 		{
 			provide: Logger,
