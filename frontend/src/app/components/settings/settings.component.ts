@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { AsyncPipe, NgIf, UpperCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { AuthService } from '../../services/auth/auth.service';
 
 @Component({
   selector: 'app-settings',
@@ -11,7 +12,7 @@ import { HttpClient } from '@angular/common/http';
   styleUrl: './settings.component.scss'
 })
 export class SettingsComponent {
-  constructor(private http: HttpClient) {};
+  constructor(private http: HttpClient, private authService: AuthService) {};
 
   isChecked: boolean = false;
   is2faEnabled: boolean = false;
@@ -21,31 +22,34 @@ export class SettingsComponent {
   verificationRes: string = "";
 
   ngOnInit(): void {
-    this.http.get<any>("/api/auth/is2faenabled").subscribe(data => {
-      this.is2faEnabled = data.isTwoFAEnabled;
-    })
+	this.authService.is2FAEnabled().subscribe(data => {
+		this.is2faEnabled = data.isTwoFAEnabled;
+	})
   }
 
   onChange() {
     if (this.is2faEnabled) {
-      this.isChecked = true;
-      this.http.get<any>("/api/auth/2fasetup").subscribe( data => {
-        this.qrCode = data.qrCode;
-        this.secret = data.secret;
-    });
+		this.isChecked = true;
+		this.authService.setUp2FA().subscribe( data => {
+			this.qrCode = data.qrCode;
+			this.secret = data.secret;
+		});
     }
     else {
-      this.isChecked = false;
-      this.http.post<any>('/api/auth/2fadisable', {}).subscribe();
+		this.isChecked = false;
+		this.authService.disable2FA().subscribe();
     }
   }
 
   verifyUserInput() {
-    this.http.post<any>('/api/auth/2faverify', { userInput: this.userInput }).subscribe(response => {
-      this.verificationRes = response.message;
-      console.log('Verification response:', response);
-    }, error => {
-      console.error('Error verifying user input:', error);
-    });
-  }
+		this.authService.verify2FA(this.userInput).subscribe({
+			next: (response) => {
+				this.verificationRes = response.message;
+				console.log('Verification response:', response);
+			},
+			error: (e) => { 
+				console.error('Error verifying user input:', e);
+			}
+		});
+  	}
 }
