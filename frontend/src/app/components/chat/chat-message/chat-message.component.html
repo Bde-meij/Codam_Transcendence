@@ -1,9 +1,8 @@
 <div class="chat_columns" #messageContainer>
 	<!-- <div *ngIf="room" ></div> -->
 	<h3> the messages in room: {{ room.name}} </h3>
-	<ul>
 		<li *ngFor="let message of room.messages" 
-			[ngClass]="{'blue-text': message.senderId === 77000, 'black-text': message.senderId !== 77000}">
+		[ngClass]="{'blue-text': isEven(message.senderId), 'black-text': !isEven(message.senderId)}">
 			<button *ngIf="message.game" mat-raised-button color="primary" (click)="joinBattle(message.message, '1')">
 				Battlekey {{ message.message }} 
 			</button>
@@ -11,7 +10,6 @@
 				{{ message.created }} --- {{ message.message }} --- {{ message.senderId }}
 			</span>
 		</li>
-	</ul>
 	
 	<h4>Userlist:  {{ room.users.join(', ') }}</h4>
 

@@ -14,29 +14,27 @@
     <button (click)="createRoom(roomName!, 'public', '')">Send</button>
   </div>
 
-  <div class="chat-room_column">
+<div class="chat-room_column">
     <h3> Your chats </h3>
-    <ul>
+    <!-- <ul> -->
       <li *ngFor="let roomName of getRoomNames()">
-        {{ roomName }}
-        <button [class.selected]="roomsList[roomName] === selectedRoom" type="button" (click)="onSelect(roomsList[roomName])">Select</button>
+        <!-- {{ roomName }} -->
+        <button [class.selected]="roomsList[roomName] === selectedRoom" type="button" (click)="onSelect(roomsList[roomName])"> {{ roomName }} </button>
         <button (click)="joinRoom(roomName, '')"> joinRoom </button>
-        <button (click)="sendUserList(roomName)"> sendUserList(old)</button>
+        <!-- <button (click)="sendUserList(roomName)"> sendUserList(old)</button> -->
       </li>
-    </ul>
-  </div>
+    <!-- </ul> -->
+</div>
 
-  <div class="chat-room_column" *ngIf="selectedRoom">
+  <div class="chat-room_columns" *ngIf="selectedRoom">
     <app-chat-message [room]="selectedRoom" [user]="user"></app-chat-message>
   </div>
 
   <div class="user-list-column">
     <h3> List of connected users: </h3>
-    <ul>
       <li *ngFor="let m of userss">
         {{ m }}
       </li>
-    </ul>
   </div>
 
   <!-- <div class="chat-column">

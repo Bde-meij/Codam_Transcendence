@@ -4,8 +4,8 @@ export interface Rooms {
 	owner: number;
 	admins: number[];
 	banned?: number[];
-	muted?: Record<string, Date>;
-	users: string[];
+	muted?: Record<number, Date>;
+	users: number[];
 	status: string; //public, private
 	password: string; //true or false?
 	created?: Date;

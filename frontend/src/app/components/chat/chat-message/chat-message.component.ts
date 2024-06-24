@@ -111,4 +111,8 @@ export class ChatMessageComponent implements AfterViewInit{
 		}
 		// return (time);
 	}
+
+	isEven(senderId: number): boolean {
+		return senderId % 2 === 0;
+	  }
 }
