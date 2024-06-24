@@ -2,10 +2,11 @@ import { Body, Controller, Get, Param, Patch, Post, Req } from "@nestjs/common";
 import { MatchService } from "./match.service";
 import { CreateMatchDto } from "./dto/create-match.dto";
 import { UpdateMatchDto } from "./dto/update-match.dto";
+import { Loggary } from "src/logger/logger.service";
 
 @Controller('match')
 export class MatchController {
-	constructor(private readonly matchService: MatchService) {};
+	constructor(private readonly matchService: MatchService, private loggary: Loggary) {};
 
 	@Post('create')
 	async createMatch(@Req() req, @Body() data: CreateMatchDto) {

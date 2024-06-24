@@ -10,6 +10,7 @@ import { Repository } from 'typeorm';
 import { FortyTwoStrategy } from './guard/fortytwo.stratergy';
 import { UserService } from 'src/user/user.service';
 import { JwtModule } from '@nestjs/jwt';
+import { Loggary } from 'src/logger/logger.service';
 
 @Module({
 	controllers: [AuthController],
@@ -18,7 +19,11 @@ import { JwtModule } from '@nestjs/jwt';
 		SessionSerializer,
 		Repository,
 		FortyTwoStrategy,
-		UserService
+		UserService,
+		{
+			provide: Loggary,
+			useFactory: () => new Loggary('AuthModule', ['log', 'debug', 'warn', 'verbose'])
+		}
 	],
 	imports: [
 		PassportModule.register({defaultStratergy: 'fortytwo'}),

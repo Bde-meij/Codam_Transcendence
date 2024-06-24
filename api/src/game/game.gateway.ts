@@ -18,6 +18,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { UserService } from 'src/user/user.service';
 import { NotAcceptableException, Req } from '@nestjs/common';
 import { Injectable } from '@nestjs/common';
+import { Loggary } from 'src/logger/logger.service';
 
 
 var colCheck: boolean = false;
@@ -31,7 +32,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@WebSocketServer()
 	server: Server;
 
-	constructor(private readonly matchService: MatchService) {}
+	constructor(private readonly matchService: MatchService, private loggary: Loggary) {}
 
 	afterInit(server: any) 
 	{
