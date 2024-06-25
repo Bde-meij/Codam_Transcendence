@@ -14,6 +14,6 @@ export const appConfig: ApplicationConfig = {
 		{ provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
 		{ provide: AuthService },
 		{ provide: CookieService },
-		provideAnimationsAsync(),
+		provideAnimationsAsync(), provideAnimationsAsync(),
 	]
 };
