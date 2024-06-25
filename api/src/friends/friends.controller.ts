@@ -1,13 +1,13 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
 import { FriendsService } from './friends.service';
 import { CreateFriendRequestDto } from './dto/create-friend.dto';
-import { UpdateFriendDto } from './dto/update-friend.dto';
 import { JwtGuard } from 'src/auth/guard/jwt.guard';
 import { FriendStatus } from './entities/friend.entity';
+import { Loggary } from "src/logger/logger.service";
 
 @Controller('friends')
 export class FriendsController {
-	constructor(private readonly friendsService: FriendsService) {}
+	constructor(private readonly friendsService: FriendsService, private loggary: Loggary) {}
 	
 	@Post('new-request/:targetid')
 	@UseGuards(JwtGuard)

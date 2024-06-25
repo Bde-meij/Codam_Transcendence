@@ -11,6 +11,7 @@ import { FortyTwoStrategy } from './guard/fortytwo.stratergy';
 import { UserService } from 'src/user/user.service';
 import { JwtModule } from '@nestjs/jwt';
 import { refreshToken } from './entities/refreshToken.entity';
+import { Loggary } from 'src/logger/logger.service';
 
 @Module({
 	controllers: [AuthController],
@@ -19,7 +20,11 @@ import { refreshToken } from './entities/refreshToken.entity';
 		SessionSerializer,
 		Repository,
 		FortyTwoStrategy,
-		UserService
+		UserService,
+		{
+			provide: Loggary,
+			useFactory: () => new Loggary('AuthModule', ['log', 'debug', 'warn', 'verbose'])
+		}
 	],
 	imports: [
 		PassportModule.register({defaultStratergy: 'fortytwo'}),
