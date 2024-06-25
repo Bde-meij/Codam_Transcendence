@@ -10,6 +10,8 @@ import { FriendsModule } from './friends/friends.module';
 import { CookieMiddleware } from './auth/middleware/cookie.middleware';
 import { BlockModule } from './block/block.module';
 import { Loggary } from 'src/logger/logger.service';
+import { NestModule } from '@nestjs/common';
+import { MiddlewareConsumer } from '@nestjs/common';
 
 @Module({
 	imports: [
