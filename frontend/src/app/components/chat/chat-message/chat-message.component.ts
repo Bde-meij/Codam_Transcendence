@@ -32,8 +32,8 @@ export class ChatMessageComponent implements AfterViewInit{
 	constructor(private chatService: ChatService, private router: Router, private userService :UserService) {};
 	
 	ngOnInit() {
-		console.log("user message:")
-		console.log(this.user)
+		//console.log("user message:")
+		//console.log(this.user)
 		// this.user.avatar = 
 		// this.userService.getAvatar(this.senderID).subscribe((data) => (
 		// 	this.user.avatar = URL.createObjectURL(data)
@@ -58,42 +58,42 @@ export class ChatMessageComponent implements AfterViewInit{
 			this.messageInput.nativeElement.focus();
 		}
 		this.message = '';
-		console.log("room users: " + this.room.users);
-		console.log(this.room.users)
+		//console.log("room users: " + this.room.users);
+		//console.log(this.room.users)
 
-		//console.log("chat-message sendmessage: " + this.room.name);
+		////console.log("chat-message sendmessage: " + this.room.name);
 	}
 
 	leaveRoom(room: string, userid: string) {
-		//console.log("chat-message component leaveRoom: " + room + ", id: " + userid);
+		////console.log("chat-message component leaveRoom: " + room + ", id: " + userid);
 		this.chatService.leaveRoom(room, userid);
-		// //console.log("chat-message sendmessage: " + this.room.name);
+		// ////console.log("chat-message sendmessage: " + this.room.name);
 	}
 
 	battle(userid: number){
-		// //console.log("FIGHTING------FIGHTING");
-		console.log("chat-message.component userid: " + userid + ", room name: " + this.room.name);
+		// ////console.log("FIGHTING------FIGHTING");
+		//console.log("chat-message.component userid: " + userid + ", room name: " + this.room.name);
 		this.chatService.battle(this.room.name, this.room.id, userid)
 		this.router.navigate(['/dashboard', 'game']);
 	}
 	joinBattle(roomnum: string){
-		console.log(`chat-message.component ${roomnum}`)
+		//console.log(`chat-message.component ${roomnum}`)
 		this.chatService.joinBattle(roomnum);
 		this.router.navigate(['/dashboard', 'game']);
 	}
 
 	mute(userid: string){
-		// //console.log("FIGHTING------FIGHTING");
+		// ////console.log("FIGHTING------FIGHTING");
 		this.chatService.muteUser(this.room.id, userid);
 	}
 
 	ban(userid: string){
-		// //console.log("FIGHTING------FIGHTING");
+		// ////console.log("FIGHTING------FIGHTING");
 		this.chatService.banUser(this.room.id, userid);
 	}
 
 	kick(userid: string){
-		// //console.log("FIGHTING------FIGHTING");
+		// ////console.log("FIGHTING------FIGHTING");
 		this.chatService.kickUser(this.room.id, userid);
 	}
 
@@ -103,11 +103,11 @@ export class ChatMessageComponent implements AfterViewInit{
 			const minutes = created.getMinutes().toString().padStart(2, '0');
 			const time = `${hours}:${minutes}`;
 			const timeString = created.toLocaleTimeString();
-			//console.log("Message time:", timeString);
-			//console.log("time: " + time);
+			////console.log("Message time:", timeString);
+			////console.log("time: " + time);
 		}
 		else{
-			console.log("Created date is undefined");
+			//console.log("Created date is undefined");
 		}
 		// return (time);
 	}
