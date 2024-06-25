@@ -25,8 +25,11 @@ export class UserService {
 		return this.http.get<boolean>(this.userUrl + '/isnametaken/' + nickname);
 	}
 
-	getUser() : Observable<User>{
-		return this.http.get<User>(this.userUrl + '/current');
+	// to request your own info, use '0', otherwise use the userID.
+	getUser(id : number) : Observable<User>{
+		if (id == 0)
+			return this.http.get<User>(this.userUrl + '/current');
+		return this.http.get<User>(this.userUrl + '/name/' + id);
 	};
 
 	uploadAvatar(file: File) : Observable<any> {
@@ -40,9 +43,4 @@ export class UserService {
 		console.log("getavatar called");
 		return this.http.get(this.userUrl + '/getAvatar/', {responseType: 'blob'});
 	}
-
-	// getAvatarOf(userid : string) : Observable<Blob> {
-	// 	console.log("getavatar called");
-	// 	return this.http.get(this.userUrl + '/getAvatar/' + userid, {responseType: 'blob'});
-	// } 
 }

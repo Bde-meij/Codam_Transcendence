@@ -4,20 +4,20 @@ import { Server, Socket } from "socket.io";
 export class Room
 {
 	name:string;
-	roomKey:number = 0;
 
-	leftPlayer: Socket;
-	rightPlayer: Socket;
+	hasStarted = false;
 
-	LpyPos: number = 300;
-	RpyPos: number = 300;
+	leftPlayer: Socket = null;
+	rightPlayer: Socket = null;
 
-	leftHidden = false;
-	rightHidden = false;
+	leftId: number;
+	rightId: number;
+
+	leftPos: number = 300;
+	rightPos: number = 300;
 
 	lScore:number = 0;
 	rScore:number =0;
-	hasStarted:boolean = false;
 
 	stopInterval: NodeJS.Timeout;
 	serverRef: Server;
@@ -69,8 +69,8 @@ export class Room
 
 	checkPlayerCollision()
 	{
-		var leftDiff = this.ballPos[1] - this.LpyPos;
-		var rightDiff = this.ballPos[1] - this.RpyPos;
+		var leftDiff = this.ballPos[1] - this.leftPos;
+		var rightDiff = this.ballPos[1] - this.rightPos;
 
 		if ((this.ballPos[0] > 86.5) && ((this.ballPos[0] + this.ballSpeed[0]) < 86.5))
 			this.checkHit(leftDiff);
@@ -94,7 +94,7 @@ export class Room
 			setTimeout(() =>{
 			{
 				clearInterval(this.stopInterval);
-				this.serverRef.in(this.name).emit("playerwin", this.rightPlayer.id);
+				this.serverRef.in(this.name).emit("playerwin", this.rightPlayer);
 				return (1);
 			}},600)
 		}
@@ -107,7 +107,7 @@ export class Room
 			setTimeout(() =>{
 			{
 				clearInterval(this.stopInterval);
-				this.serverRef.in(this.name).emit("playerwin", this.leftPlayer.id);
+				this.serverRef.in(this.name).emit("playerwin", this.leftPlayer);
 				return (1);
 			}},600)
 		}

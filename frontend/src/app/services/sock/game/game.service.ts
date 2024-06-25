@@ -116,9 +116,9 @@ export class GameService{
 		});
 	}
 
-	joinRoom(key: number)
+	joinRoom()
 	{
-		this.gameSocket.emit("joinRoom", key);
+		this.gameSocket.emit("joinRoom");
 	}
 
 	emitYPos(playerPos :number)
