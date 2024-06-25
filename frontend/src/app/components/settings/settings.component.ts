@@ -47,7 +47,7 @@ export class SettingsComponent implements OnInit {
 		this.authService.is2FAEnabled().subscribe(data =>
 			this.is2faEnabled = data.isTwoFAEnabled
 		);
-		this.userService.getUser(0).subscribe(data =>
+		this.userService.getUser('0').subscribe(data =>
 			this.current_nickname = data.nickname
 		);
 	}
@@ -84,7 +84,7 @@ export class SettingsComponent implements OnInit {
 			this.userService.changeName(this.profileForm.value.nickname).subscribe({
 				next: (data) => {
 					console.log(data);
-					this.userService.getUser(0).subscribe(data =>
+					this.userService.getUser('0').subscribe(data =>
 						this.current_nickname = data.nickname
 					);
 					// this.profileForm.invalid = true;

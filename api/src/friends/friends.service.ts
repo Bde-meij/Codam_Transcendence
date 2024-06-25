@@ -11,6 +11,15 @@ import { Loggary } from "src/logger/logger.service";
 export class FriendsService {
 	constructor(@InjectRepository(FriendRequest) private readonly friendRepo: Repository<FriendRequest>, private readonly userService: UserService, private loggary: Loggary) {}
 
+	async createNick(createFriendRequestDto: CreateFriendRequestDto): Promise<any> {
+		const target: User = await this.userService.findUserByName(createFriendRequestDto.target);
+		if (!target) {
+			throw new HttpException('Target user not found', 404);
+		}
+		createFriendRequestDto.target = target.id;
+		return await this.create(createFriendRequestDto);
+	}
+
 	async create(createFriendRequestDto: CreateFriendRequestDto): Promise<any> {
 		if (createFriendRequestDto.sender === createFriendRequestDto.target) {
 			this.loggary.warn('Friend request cannot be sent to yourself! User id:', createFriendRequestDto.sender);

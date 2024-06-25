@@ -25,7 +25,7 @@ export class ChatService {
 		sockService.newSocketRegister("chatSocket");
 	}
 	ngOnInit(): void {
-		this.user$ = this.userService.getUser(0);
+		this.user$ = this.userService.getUser('0');
 	}
 
 	// sendMessage(message: string): void {
@@ -40,7 +40,7 @@ export class ChatService {
 	// }
 
 	sendMessage(message: string, room: string): void {
-		this.user$ = this.userService.getUser(0);
+		this.user$ = this.userService.getUser('0');
 		const sender = this.user$;
 		const messageObj = {
 			message : message,

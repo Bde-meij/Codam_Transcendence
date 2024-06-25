@@ -11,7 +11,7 @@ import { UserService } from '../../services/user/user.service';
   styleUrl: './user-detail.component.scss'
 })
 export class UserDetailComponent implements OnInit {
-	@Input()id!: number;
+	@Input()id!: string;
 	my_user?: User;
 
 	constructor(private userService: UserService) {};
@@ -20,9 +20,9 @@ export class UserDetailComponent implements OnInit {
 		this.my_user = this.userDetails(this.id);
 	}
 
-	userDetails(tempID : number) : User {
+	userDetails(tempID : string) : User {
 		let tempUser: User = {
-			id: 0,
+			id: '0',
 			nickname : '',
 			avatar: '',
 			status: ''

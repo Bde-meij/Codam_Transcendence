@@ -26,8 +26,8 @@ export class UserService {
 	}
 
 	// to request your own info, use '0', otherwise use the userID.
-	getUser(id : number) : Observable<User>{
-		if (id == 0)
+	getUser(id : string) : Observable<User>{
+		if (id == '0')
 			return this.http.get<User>(this.userUrl + '/current');
 		return this.http.get<User>(this.userUrl + '/name/' + id);
 	};
