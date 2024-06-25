@@ -9,6 +9,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TestingModule } from './testing/testing.module';
 import { PasswordService } from './password/password.service';
 import { FriendsModule } from './friends/friends.module';
+import { CookieMiddleware } from './auth/middleware/cookie.middleware';
 import { BlockModule } from './block/block.module';
 import { Loggary } from 'src/logger/logger.service';
 import { ChannelModule } from './chat/chat.module';
@@ -39,4 +40,10 @@ import { ChannelModule } from './chat/chat.module';
 		}
 	],
 })
-export class AppModule {}
+export class AppModule implements NestModule{
+	configure(consumer: MiddlewareConsumer) {
+		consumer
+			.apply(CookieMiddleware)
+			.forRoutes('*');
+	}
+}

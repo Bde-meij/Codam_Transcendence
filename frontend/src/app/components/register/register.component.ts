@@ -15,6 +15,8 @@ import { UserService } from '../../services/user/user.service';
   styleUrl: './register.component.scss'
 })
 export class RegisterComponent implements OnInit{
+	constructor(private userService: UserService, private router: Router, private nameValidator: UniqueNameValidator) {};
+
 	profileForm = new FormGroup({
 		nickname: new FormControl('', {
 			validators: [
@@ -26,14 +28,11 @@ export class RegisterComponent implements OnInit{
 				this.nameValidator.validate.bind(this.nameValidator),
 			],
 			updateOn: 'change',
-
 		}),
 	});
 
-	newName : string = '';
+	// newName : string = '';
 	errorMessage = "";
-
-	constructor(private userService: UserService, private router: Router, private nameValidator: UniqueNameValidator) {};
 
 	ngOnInit(): void {
 	}
@@ -49,8 +48,7 @@ export class RegisterComponent implements OnInit{
 				error: (e : HttpErrorResponse) => {
 					this.errorMessage = e.error.message,
 					console.log(e.error.message)
-				},
-				complete: () => console.info('complete') 
+				}
 			});
 		}
 	};
