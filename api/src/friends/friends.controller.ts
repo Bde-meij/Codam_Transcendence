@@ -10,7 +10,7 @@ export class FriendsController {
 	constructor(private readonly friendsService: FriendsService, private loggary: Loggary) {}
 	
 	// send new friend request with friend nickname
-	@Post('new-request/:targetnick')
+	@Post('new-request-nick/:targetnick')
 	@UseGuards(JwtGuard)
 	async createNick(@Req() req, @Param('targetnick') targetNick: string) {
 		const friendRequest: CreateFriendRequestDto = {

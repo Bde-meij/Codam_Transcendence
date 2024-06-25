@@ -14,7 +14,7 @@ import { UserService } from '../../services/user/user.service';
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss'
 })
-export class RegisterComponent implements OnInit{
+export class RegisterComponent {
 	constructor(private userService: UserService, private router: Router, private nameValidator: UniqueNameValidator) {};
 
 	profileForm = new FormGroup({
@@ -33,9 +33,6 @@ export class RegisterComponent implements OnInit{
 
 	// newName : string = '';
 	errorMessage = "";
-
-	ngOnInit(): void {
-	}
 
 	register() {
 		console.log(this.profileForm.value.nickname);
