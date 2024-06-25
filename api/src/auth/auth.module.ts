@@ -10,6 +10,7 @@ import { Repository } from 'typeorm';
 import { FortyTwoStrategy } from './guard/fortytwo.stratergy';
 import { UserService } from 'src/user/user.service';
 import { JwtModule } from '@nestjs/jwt';
+import { refreshToken } from './entities/refreshToken.entity';
 import { Loggary } from 'src/logger/logger.service';
 
 @Module({
@@ -28,6 +29,7 @@ import { Loggary } from 'src/logger/logger.service';
 	imports: [
 		PassportModule.register({defaultStratergy: 'fortytwo'}),
 		TypeOrmModule.forFeature([User]),
+		TypeOrmModule.forFeature([refreshToken]),
 		ConfigModule,
 		JwtModule.registerAsync({
 			inject: [ConfigService],

@@ -7,6 +7,7 @@ import { DatabaseModule } from './database/database.module';
 import { ConfigModule } from '@nestjs/config';
 import { TestingModule } from './testing/testing.module';
 import { FriendsModule } from './friends/friends.module';
+import { CookieMiddleware } from './auth/middleware/cookie.middleware';
 import { BlockModule } from './block/block.module';
 import { Loggary } from 'src/logger/logger.service';
 
@@ -33,4 +34,10 @@ import { Loggary } from 'src/logger/logger.service';
 		}
 	],
 })
-export class AppModule {}
+export class AppModule implements NestModule{
+	configure(consumer: MiddlewareConsumer) {
+		consumer
+			.apply(CookieMiddleware)
+			.forRoutes('*');
+	}
+}

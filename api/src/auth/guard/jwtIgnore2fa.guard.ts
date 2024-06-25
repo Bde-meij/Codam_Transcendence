@@ -11,9 +11,7 @@ export class JwtGuardIgnore2fa implements CanActivate {
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
 		const request = context.switchToHttp().getRequest();
-		const response = context.switchToHttp().getResponse();
 		const accessToken = this.extractTokenFromHeader(request, 'access_token');
-		const refreshToken = this.extractTokenFromHeader(request, 'refresh_token');
 		if (!accessToken) {
 			throw new UnauthorizedException('Access token not found');
 		}
@@ -21,21 +19,8 @@ export class JwtGuardIgnore2fa implements CanActivate {
 			const payload = await this.authService.verifyJwtAccessToken(accessToken);
 			request['user'] = payload;
 		} catch(err) {
-			console.log('Access token validation failed:', err);
-			if (refreshToken) {
-				try {
-					const tokenAndPlayload = await this.authService.refreshJwtToken(refreshToken);
-					response.cookie('access_token', tokenAndPlayload.newAccessToken, {httpOnly: true});
-					request.user = await this.authService.verifyJwtAccessToken(tokenAndPlayload.newAccessToken);
-				}
-				catch(error) {
-					console.error('Refresh token validation failed: ', error);
-					throw new UnauthorizedException('Invalid refresh token');
-				}
-			}
-			else {
-				throw new UnauthorizedException('Refresh token not found');
-			}
+			console.log('Access token validation failed (JWT guard): ', err);
+			throw new UnauthorizedException('Invalid access token');
 		}
 		return true;
 	}
