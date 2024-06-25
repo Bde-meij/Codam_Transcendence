@@ -256,11 +256,12 @@ export class ChatService{
 		});
 	}
 
-	updatePage(roomnum: string){
+	updatePage(){
 		const data = {
 			user_id : this.user?.id,
 			user_name : this.user?.nickname,
 		}
+		console.log(`updateRoom`);
 		this.chatSocket.emit('updateRoom', data, (err: any) => {
 			if (err) {
 				console.log("updateRoom chat-sock error: ");

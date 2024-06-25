@@ -23,7 +23,7 @@ export interface MessageInterface {
   styleUrl: './chat.component.scss'
 })
 
-export class ChatComponent implements OnInit, AfterViewChecked, AfterViewInit {
+export class ChatComponent implements OnInit, AfterViewInit {
 	user!: User;
 	message: string | undefined;
 	messages: string[] = [];
@@ -93,24 +93,24 @@ export class ChatComponent implements OnInit, AfterViewChecked, AfterViewInit {
 		// this.createRoom("temp",  "public", "");
 		this.joinRoom("Global", "");
 		// this.joinRoom("temp", "");
-		
-		////console.log("rooms: " + this.rooms);
-		
-		// Check if there are any rooms available
-		// ////console.log("chatcomponent: " + this.getRoomNames()[0]);
 
 	};
 
 	@ViewChild(ChatMessageComponent) viewChild!: ChatMessageComponent;
 
 	ngAfterViewInit() {
-		this.chatService.updatePage(this.selectedRoom!.name);
+		console.log("afterviewcheckedINIT");
+		if (!this.selectedRoom)
+			this.chatService.updatePage();
 	}
 
-	ngAfterViewChecked() {
-		if (!this.selectedRoom)
-			this.chatService.updatePage(this.selectedRoom!.name);
-	}
+	// ngAfterViewChecked() {
+	// 	console.log(`afterviewchecked ${this.selectedRoom?.name}`);
+	// 	if (!this.selectedRoom){
+	// 		console.log(`WORKS?k`);
+	// 		this.chatService.updatePage();
+	// 	}
+	// }
 
 	sendMessage() {
 		if (this.message) {
@@ -157,7 +157,7 @@ export class ChatComponent implements OnInit, AfterViewChecked, AfterViewInit {
 		return Object.keys(this.roomsList);
 	}
 
-	updatePage(roomname: string){
-		this.chatService.updatePage(roomname);
+	updatePage(){
+		this.chatService.updatePage();
 	}
 }

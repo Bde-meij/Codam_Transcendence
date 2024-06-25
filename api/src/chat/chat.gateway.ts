@@ -610,6 +610,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@MessageBody() data: {user_id: number, user_name: string },
 	@ConnectedSocket() client: Socket) 
 	{	
+		console.log(`updateRoom`);
 		var temp : Record<string, Rooms> = {};
 		Object.values(this.chatRoomList).forEach(room => {
 			if (room.users.includes(data.user_id) || room.status == "public")
