@@ -13,7 +13,7 @@ import { SockService } from '../../services/sock/sock.service';
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent {
 	title = '';
 	unread = this.chatService.isUnread();
 

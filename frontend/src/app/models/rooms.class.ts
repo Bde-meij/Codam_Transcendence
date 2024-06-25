@@ -1,20 +1,26 @@
 export interface Rooms {
-	id: number;
+	id: string;
 	name: string;
-	status: string;
-	users: string[];
+	owner: string;
 	admins: string[];
-	password: string;
+	banned?: string[];
+	users: string[];
+	muted?: string[];
+	status: string; //public, private
+	password: string; //true or false?
+	created?: Date;
+	updated?: Date;
+	messages?: MessageInterface[];
 }
 
-const FAKE_ROOMS: Rooms[] = [
-	{ id: 1, name: 'testroom', status: 'public', users: [], admins: [], password: ""  },
-	{ id: 2, name: 'testroom', status: 'public', users: [], admins: [], password: ""  },
-	{ id: 3, name: 'testroom', status: 'public', users: [], admins: [], password: ""  },
-	{ id: 4, name: 'testroom', status: 'public', users: [], admins: [], password: ""  },
-	{ id: 5, name: 'testroom', status: 'public', users: [], admins: [], password: ""  },
-	{ id: 6, name: 'testroom', status: 'public', users: [], admins: [], password: ""  },
-	{ id: 7, name: 'testroom', status: 'public', users: [], admins: [], password: ""  },
-	{ id: 8, name: 'testroom', status: 'public', users: [], admins: [], password: ""  },
-	{ id: 9, name: 'testroom', status: 'public', users: [], admins: [], password: ""  }
-];
+export interface MessageInterface {
+	message: string;
+	roomId: number;
+	room_name: string;
+	senderId: number;
+	sender_name: string;
+	created: string;
+	updated?: Date;
+	game?: boolean;
+	sender_avatar?: string;
+}

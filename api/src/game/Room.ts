@@ -3,27 +3,30 @@ import { Server, Socket } from "socket.io";
 
 export class Room
 {
+	//ROOM
+	id: string = null;
 	name:string;
-
-	hasStarted = false;
-
 	leftPlayer: Socket = null;
 	rightPlayer: Socket = null;
-
-	leftId: number;
-	rightId: number;
-
-	leftPos: number = 300;
-	rightPos: number = 300;
-
-	lScore:number = 0;
-	rScore:number =0;
-
-	stopInterval: NodeJS.Timeout;
 	serverRef: Server;
+	hasStarted = false;
+	stopInterval: NodeJS.Timeout;
+	gravityInterval: NodeJS.Timeout;
+	key: number = 0;
 
+	//LEFTPLAYER
+	leftId: number = 0;
+	leftPos: number = 300;
+	rScore:number = 0;
+	
+	//RIGHTPLAYER
+	rightId: number = 0;
+	rightPos: number = 300;
+	lScore:number = 0;
+
+	//BALL
 	ballPos: number[] = [400,300];
-	ballSpeed: number[] = [10, 0];
+	ballSpeed: number[] = [8, 0];
 
 	moveBall()
 	{
@@ -53,7 +56,7 @@ export class Room
 		this.ballSpeed[1] = 0;
 		this.ballPos[0] = 400;
 		this.ballPos[1] = 300;
-		setTimeout(() =>{this.ballSpeed[0] = 10*mod;},1000)
+		setTimeout(() =>{this.ballSpeed[0] = 8*mod;},1000)
 	}
 
 	checkHit(diff: number)
@@ -94,7 +97,7 @@ export class Room
 			setTimeout(() =>{
 			{
 				clearInterval(this.stopInterval);
-				this.serverRef.in(this.name).emit("playerwin", this.rightPlayer);
+				this.serverRef.in(this.name).emit("playerwin", this.rightPlayer.data.nick);
 				return (1);
 			}},600)
 		}
@@ -107,7 +110,7 @@ export class Room
 			setTimeout(() =>{
 			{
 				clearInterval(this.stopInterval);
-				this.serverRef.in(this.name).emit("playerwin", this.leftPlayer);
+				this.serverRef.in(this.name).emit("playerwin", this.leftPlayer.data.nick);
 				return (1);
 			}},600)
 		}

@@ -14,6 +14,9 @@ export class MatchService {
 	
 	async createMatch(createMatchDto: CreateMatchDto) {
 		// Games should only be create by the backend, these errors should never happen
+		// if (createMatchDto.leftPlayerId === createMatchDto.rightPlayerId) {
+		// 	throw new HttpException('Cannot create game with yourself', 400);
+		// }
 		if (createMatchDto.leftPlayerId === createMatchDto.rightPlayerId) {
 			this.loggary.warn('Cannot create game with yourself! User id:', createMatchDto.leftPlayerId);
 			throw new HttpException('Cannot create game with yourself', 400);
@@ -145,6 +148,17 @@ export class MatchService {
 			losses: matches.length - wins,
 			winrate: (wins / matches.length * 100).toFixed(2) + "%",
 		};
+	}
+
+	async deleteMatch(matchId: string) {
+		console.log("DELETING MATCH:", matchId);
+		const match: Match = await this.matchRepo.findOne({
+			where: {id: matchId}
+		});
+		if (!match) {
+			throw new HttpException('Match not found', 404);
+		}
+		this.matchRepo.delete({id: matchId});
 	}
 
 }

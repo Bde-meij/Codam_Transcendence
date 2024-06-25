@@ -124,4 +124,10 @@ export class UserController {
 		console.log("MY DATA: ", file);
 		return ;
 	}
+
+	@Post('update-roomkey/:key')
+	@UseGuards(JwtGuard)
+	async updateRoomKey(@Req() req, @Param('key') key: string) {
+		await this.userService.updateRoomKey(req.user.id, +key);
+	}
 }

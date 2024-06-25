@@ -36,6 +36,8 @@ import { Loggary } from 'src/logger/logger.service';
 			useFactory: async (configService: ConfigService) => {
 				return {
 					global: true,
+					// secret: configService.getOrThrow('JWT_SECRET'),
+					// signOptions: {expiresIn: '10h'},
 				}
 			}
 		})

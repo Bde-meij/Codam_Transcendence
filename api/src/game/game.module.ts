@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { AuthModule } from 'src/auth/auth.module';
 import { GameGateway } from './game.gateway';
 import { Match } from './entities/match.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -8,7 +9,7 @@ import { MatchService } from './match.service';
 import { Loggary } from 'src/logger/logger.service';
 
 @Module({
-	imports: [TypeOrmModule.forFeature([Match]), UserModule],
+	imports: [TypeOrmModule.forFeature([Match]), UserModule, AuthModule, UserModule],
 	controllers: [MatchController],
 	providers: [GameGateway, MatchService,
 		{
