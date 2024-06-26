@@ -1,6 +1,0 @@
-{
-  "devDependencies": {
-    "@types/speakeasy": "^2.0.10",
-    "speakeasy": "^2.0.0"
-  }
-}
