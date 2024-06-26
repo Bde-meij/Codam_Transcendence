@@ -8,11 +8,10 @@ import { diskStorage } from 'multer';
 import { extname, join } from 'path';
 import { createReadStream, existsSync, unlinkSync } from 'fs';
 import * as path from 'path';
-import { Loggary } from 'src/logger/logger.service';
 
 @Controller('user')
 export class UserController {
-	constructor(private readonly userService: UserService, private loggary: Loggary) {}
+	constructor(private readonly userService: UserService) {}
 
 	@Get('current')
 	@UseGuards(JwtGuard)

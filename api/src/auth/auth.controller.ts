@@ -21,11 +21,10 @@ import { CallbackAuthDto } from './dto/callback-auth.dto';
 import * as speakeasy from 'speakeasy';
 import * as QRCode from 'qrcode';
 import { JwtRefreshGuard } from './guard/jwtRefresh.guard';
-import { Loggary } from 'src/logger/logger.service';
 
 @Controller('auth')
 export class AuthController {
-	constructor(private readonly authService: AuthService, private readonly configService: ConfigService, private readonly userService: UserService, private loggary: Loggary) {}
+	constructor(private readonly authService: AuthService, private readonly configService: ConfigService, private readonly userService: UserService) {}
 
 	// Checks whether the user is authorized using the jwtguard
 	// Returns: {loggedIn: true} on success - 401 Unauthorized on failure

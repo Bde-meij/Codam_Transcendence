@@ -20,7 +20,6 @@ import { AuthService } from 'src/auth/auth.service';
 import { UserService } from 'src/user/user.service';
 import { NotAcceptableException, Req } from '@nestjs/common';
 import { Injectable } from '@nestjs/common';
-import { Loggary } from 'src/logger/logger.service';
 
 import { Match, MatchType } from "./entities/match.entity";
 
@@ -37,7 +36,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@WebSocketServer()
 	server: Server;
 
-	constructor(private authService: AuthService, private userService: UserService, private readonly matchService: MatchService, private loggary: Loggary) {}
+	constructor(private authService: AuthService, private userService: UserService, private readonly matchService: MatchService) {}
 	
 	afterInit(server: any) 
 	{

@@ -3,11 +3,10 @@ import { ConfigService } from "@nestjs/config";
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { AuthService } from "../auth.service";
-import { Loggary } from "src/logger/logger.service";
 
 @Injectable()
 export class JwtGuardIgnore2fa implements CanActivate {
-	constructor(private jwtService: JwtService, private configService: ConfigService, private authService: AuthService, private loggary: Loggary) {};
+	constructor(private jwtService: JwtService, private configService: ConfigService, private authService: AuthService) {};
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
 		const request = context.switchToHttp().getRequest();

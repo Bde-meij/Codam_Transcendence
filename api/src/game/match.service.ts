@@ -6,11 +6,10 @@ import { Match, MatchStatus } from './entities/match.entity';
 import { Repository } from 'typeorm';
 import { UserService } from 'src/user/user.service';
 import { User } from 'src/user/entities/user.entity';
-import { Loggary } from "src/logger/logger.service";
 
 @Injectable()
 export class MatchService {
-	constructor(@InjectRepository(Match) private readonly matchRepo: Repository<Match>, private readonly userService: UserService, private loggary: Loggary) {}
+	constructor(@InjectRepository(Match) private readonly matchRepo: Repository<Match>, private readonly userService: UserService) {}
 	
 	async createMatch(createMatchDto: CreateMatchDto) {
 		// Games should only be create by the backend, these errors should never happen
@@ -18,17 +17,17 @@ export class MatchService {
 		// 	throw new HttpException('Cannot create game with yourself', 400);
 		// }
 		if (createMatchDto.leftPlayerId === createMatchDto.rightPlayerId) {
-			this.loggary.warn('Cannot create game with yourself! User id:', createMatchDto.leftPlayerId);
+			// console.log('Cannot create game with yourself! User id:', createMatchDto.leftPlayerId);
 			throw new HttpException('Cannot create game with yourself', 400);
 		}
 		const leftPlayer: User = await this.userService.findUserById(createMatchDto.leftPlayerId);
 		if (!leftPlayer) {
-			this.loggary.warn('Left player not found! User id:', createMatchDto.leftPlayerId);
+			// console.log('Left player not found! User id:', createMatchDto.leftPlayerId);
 			throw new HttpException('Left player not found', 404);
 		}
 		const rightPlayer: User = await this.userService.findUserById(createMatchDto.rightPlayerId);
 		if (!rightPlayer) {
-			this.loggary.warn('Right player not found! User id:', createMatchDto.rightPlayerId);
+			// console.log('Right player not found! User id:', createMatchDto.rightPlayerId);
 			throw new HttpException('Right player not found', 404);
 		}
 		const match: Match = await this.matchRepo.save({
@@ -36,7 +35,7 @@ export class MatchService {
 			rightPlayer: rightPlayer,
 			type: createMatchDto.type
 		});
-		this.loggary.verbose('Match created:\n', match);
+		// console.log('Match created:\n', match);
 		return {
 			id: match.id,
 			type: match.type,
@@ -55,7 +54,7 @@ export class MatchService {
 	
 	async updateMatch(updateMatchDto: UpdateMatchDto) {
 		if (updateMatchDto.leftPlayerScore == updateMatchDto.rightPlayerScore) {
-			this.loggary.warn('Match cannot end in a tie!');
+			// console.log('Match cannot end in a tie!');
 			throw new HttpException('Match cannot end in a tie', 400);
 		}
 		const match: Match = await this.matchRepo.findOne({
@@ -69,7 +68,7 @@ export class MatchService {
 			}
 		});
 		if (!match) {
-			this.loggary.warn('Valid match could not be found!');
+			// console.log('Valid match could not be found!');
 			throw new HttpException('Invalid match update', 400);
 		}
 		let winner: User;
@@ -91,7 +90,7 @@ export class MatchService {
 
 	async getUserMatches(targetId: string): Promise<Match[]> {
 		if (!await this.userService.userExists(targetId)) {
-			this.loggary.warn('User not found! User id:', targetId);
+			// console.log('User not found! User id:', targetId);
 			throw new HttpException('User not found', 404);
 		}
 		const matches: Match[] = await this.matchRepo.find({
@@ -125,7 +124,7 @@ export class MatchService {
 				winningPlayer: true,
 			}
 		});
-		this.loggary.verbose('User matches:\n', matches);
+		// console.log('User matches:\n', matches);
 		return matches;
 	}
 
@@ -151,7 +150,7 @@ export class MatchService {
 	}
 
 	async deleteMatch(matchId: string) {
-		console.log("DELETING MATCH:", matchId);
+		// console.log("DELETING MATCH:", matchId);
 		const match: Match = await this.matchRepo.findOne({
 			where: {id: matchId}
 		});
