@@ -11,7 +11,6 @@ import { PasswordService } from './password/password.service';
 import { FriendsModule } from './friends/friends.module';
 import { CookieMiddleware } from './auth/middleware/cookie.middleware';
 import { BlockModule } from './block/block.module';
-import { Loggary } from 'src/logger/logger.service';
 import { NestModule } from '@nestjs/common';
 import { MiddlewareConsumer } from '@nestjs/common';
 
@@ -33,12 +32,11 @@ import { MiddlewareConsumer } from '@nestjs/common';
 		BlockModule,
 	],
 	controllers: [],
-	providers: [BossGameModule, GameModule, ChatGateway,
-		PasswordService,
-		{
-			provide: Logger,
-			useClass: Loggary
-		}
+	providers: [
+		BossGameModule,
+		GameModule,
+		ChatGateway,
+		PasswordService
 	],
 })
 export class AppModule implements NestModule{
