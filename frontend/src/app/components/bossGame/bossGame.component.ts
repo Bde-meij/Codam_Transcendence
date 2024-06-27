@@ -5,7 +5,7 @@ import { SockService } from '../../services/sock/sock.service';
 import { Actor,Engine,Color,CollisionType,Keys,Vector } from "excalibur";
 import { makePlayers, playerMovement } from "./Players";
 import{ io }from "socket.io-client";
-
+import {Texts} from './texts';
 
 @Component({
 	selector: 'app-bossGame',
@@ -20,12 +20,13 @@ export class BossGameComponent implements OnInit, OnDestroy
 	fullSize = 800;
 	halfSize = this.fullSize / 2;
 	radius = ( this.halfSize / 8) * 7;
-	bossHit = false;
-	damageCounter = 0;
-	playerLives = 3;
+	bossHit: boolean = false;
+	damageCounter: number = 0;
+	playerLives: number = 0;
 
+	router = new Router;
 	bounced: boolean = false;
-
+	texts = new Texts;
 	playernum: number = 0;
 	gameSrv = io('/bossPong');
 
@@ -55,49 +56,64 @@ export class BossGameComponent implements OnInit, OnDestroy
 	});
 
 	shuriken = new Actor({
-		// this.radius: this.fullSize*0.01,
 		width:  this.halfSize/25,
 		height:  this.halfSize/25,
 		color: Color.LightGray,
-		x:  this.halfSize,
-		y: this.fullSize*0.2,
+		x: 400,
+		y: 550,
 		collisionType: CollisionType.Passive,
 	});
 
 	ngOnInit()
 	{
-		console.log("init")
-		this.game.add(this.bigBoss);
-		this.game.add(this.shuriken);
-		this.game.add(this.lifebar);
-		this.game.add(this.players[0]);
-		this.game.add(this.players[1]);
-		this.game.add(this.players[2]);
-		this.game.add(this.players[3]);
-		this.game.start();
-		
+		this.bossHit = false;
+		this.damageCounter = 0;
+		this.checkEarlyDisconnect();
 		
 		this.gameSrv.on("connectSignal", () =>
 		{
-			console.log("connected, ask join")
+			// console.log("connected, ask join")
+			this.game.add(this.texts.wait);
+			this.game.start();
 			this.gameSrv.emit("joinGame");
 		});
-		
+	
 		this.gameSrv.on('assignNumber', (playNum)  =>
 		{
-			console.log("number assigned", playNum);
+			// console.log("number assigned", playNum);
 			this.playernum = playNum;
 		});
 
 		this.gameSrv.on("startSignal", () =>
 		{
-			console.log("should start")
-			this.startGame();
+			this.game.remove(this.texts.wait);
+			this.texts.timer.text = "3"
+			this.game.add(this.texts.timer);
+			setTimeout(() =>{{this.texts.timer.text = "2"}},1000);
+			setTimeout(() =>{{this.texts.timer.text = "1"}},2000);
+			setTimeout(() =>{{this.texts.timer.text = "GO!"}},3000);
+			setTimeout(() =>{{
+				this.game.remove(this.texts.timer);
+				this.startGame();
+			}},4000);
 		})
+
 	}
 
 	startGame()
 	{
+		this.game.add(this.texts.lives);
+		this.game.add(this.bigBoss);
+		this.game.add(this.lifebar);
+		this.game.add(this.shuriken);
+		this.game.add(this.players[0]);
+		this.game.add(this.players[1]);
+		this.game.add(this.players[2]);
+		this.game.add(this.players[3]);
+
+		this.gameSrv.emit("startGameLoop");
+		
+		// gameloop
 		this.game.on("postupdate", ()=>
 		{
 			this.shuriken.rotation += 0.27;
@@ -113,12 +129,11 @@ export class BossGameComponent implements OnInit, OnDestroy
 
 		this.gameSrv.on('updatePlayerPos', (args) =>
 		{
-			console.log("player", args[2], "should be updated");
+			// console.log("player", args[2], "should be updated");
 			this.players[args[2]].pos.x = args[0];
 			this.players[args[2]].pos.y = args[1];
 			this.players[args[2]].rotation = args[3];
 		});
-
 
 		this.gameSrv.on("updateShurikenPos", (position: number[])=>
 		{
@@ -128,25 +143,49 @@ export class BossGameComponent implements OnInit, OnDestroy
 
 		this.gameSrv.on("bossDMG", ()=>
 		{
-			console.log("bossDMG")
-			this.lifebar.actions.scaleBy(new Vector(-0.1, 0), 2);
+			// console.log("bossDMG")
+			this.lifebar.actions.scaleBy(new Vector(-0.2, 0), 2);
 			this.damageCounter+=1;
-			if (this.damageCounter > 8)
+			if (this.damageCounter > 3)
 				this.lifebar.color = Color.Red;
-			else if (this.damageCounter > 4)
+			else if (this.damageCounter > 1)
 				this.lifebar.color = Color.Orange;
 			this.game.currentScene.camera.shake( this.halfSize*0.05,  this.halfSize*0.05, 350);
 		});
-		this.gameSrv.on("bossColor", (colNum: number)=>
+
+		this.gameSrv.on("setBossColor", (indication: number)=>
 		{
-			if (colNum == 1)
-				this.bigBoss.color = Color.Red;
-			if (colNum == 2)
+			if (indication == 1)
+				this.bigBoss.color = Color.Black;
+			if (indication == 2)
 				this.bigBoss.color = Color.Gray;
 		});
 
 		for (var i = 0; i < 4; i++)
 			this.checkPlayerCollision(i);
+
+		this.gameSrv.on("playersWin", () =>
+		{
+			this.removeAssets();
+			this.texts.win.text = "PLAYERS WON!"
+			this.game.add(this.texts.win);
+			setTimeout(() => {this.ngOnDestroy()}, 2000);
+		})
+		
+		this.gameSrv.on("playersLose", () =>
+		{
+			this.removeAssets();
+			this.game.currentScene.camera.shake( this.halfSize*0.5,  this.halfSize*0.5, 600);
+			this.texts.win.text = "YOU GOT REKT!"
+			this.game.add(this.texts.win);
+			setTimeout(() => {this.ngOnDestroy()}, 2000);
+		})
+
+		this.gameSrv.on("outOfBounds", (lives: number) =>
+		{
+			this.texts.lives.text = lives.toString();
+			// console.log("lives left", lives);
+		})
 	}
 
 	singleplayerMovement()
@@ -199,19 +238,41 @@ export class BossGameComponent implements OnInit, OnDestroy
 				if ((this.playernum == i+1) || (this.playernum == 8))
 				{
 					this.gameSrv.emit("bouncePlayer", 
-					[this.players[i].pos.x, this.players[i].pos.y],);
+					[this.players[i].pos.x, this.players[i].pos.y]);
 				}
 			}
 		});
-	}	
+	}
+
+	checkEarlyDisconnect()
+	{
+		this.gameSrv.on("abortGame", () =>
+		{
+			this.game.remove(this.texts.wait);
+			this.game.remove(this.texts.timer);
+			setTimeout(() =>{{this.ngOnDestroy();}},2000);
+			this.game.add(this.texts.abort);
+		});
+	}
+
+	removeAssets()
+	{
+		this.game.remove(this.bigBoss);
+		this.game.remove(this.lifebar);
+		this.game.remove(this.shuriken);
+		this.game.remove(this.players[0]);
+		this.game.remove(this.players[1]);
+		this.game.remove(this.players[2]);
+		this.game.remove(this.players[3]);
+		this.game.remove(this.texts.lives);
+	}
 	
 	ngOnDestroy() 
 	{
-		console.log("game is destroyed");
+		// console.log("game is destroyed");
 		this.game.stop();
 		this.game.canvas.remove();
 		this.gameSrv.disconnect();
-		// this.gameSrv.ngOnDestroy();
-		// this.router.navigate(['/dashboard/game-menu']);
+		this.router.navigate(['/dashboard/game-menu']);
 	}
 }
