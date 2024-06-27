@@ -32,7 +32,7 @@ export function plusVec(vecA: number[], vecB: number[]): number[]
 
 export function bounce(vecA: number[], vecB:number[],  vecC:number[])
 {
-	console.log("bounceInfo", "speed", vecA[0], vecA[1], "player", vecB[0], vecB[1], "boss", vecC[0], vecC[1]);
+	// console.log("bounceInfo", "speed", vecA[0], vecA[1], "player", vecB[0], vecB[1], "boss", vecC[0], vecC[1]);
 	var n = unitVec(surfDir(vecC, vecB));
 	var dot = dotPro(n, vecA);
 	var three = multiVec(n, dot);
@@ -40,16 +40,12 @@ export function bounce(vecA: number[], vecB:number[],  vecC:number[])
 	return(multiVec(unitVec(plusVec(four, vecA)), 7));
 }
 
-// export function bossSurfDir(vecB: number[]): number[]
-// {
-// 	vecB[0] = shuriken.pos.x - vecB[0]; 
-// 	vecB[1] = shuriken.pos.y - vecB[1];
-// 	return (vecB);
-// }
-
-// export function paddleSurfDir(vecB: number[]): number[]
-// {
-// 	vecB[0] = bigBoss.pos.x - vecB[0]; 
-// 	vecB[1] = bigBoss.pos.y - vecB[1];
-// 	return (vecB);
-// }
+export function rotateVec(vec: number[], ang: number)
+{
+	ang = -ang * (Math.PI/180);
+	var cos = Math.cos(ang);
+	var sin = Math.sin(ang);
+	return(
+	[(Math.round(10000*(vec[0] * cos - vec[1] * sin))/10000), 
+	(Math.round(10000*(vec[0] * sin + vec[1] * cos))/10000)]);
+};

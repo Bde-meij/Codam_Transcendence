@@ -16,10 +16,6 @@ export class MatchService {
 		// if (createMatchDto.leftPlayerId === createMatchDto.rightPlayerId) {
 		// 	throw new HttpException('Cannot create game with yourself', 400);
 		// }
-		if (createMatchDto.leftPlayerId === createMatchDto.rightPlayerId) {
-			// console.log('Cannot create game with yourself! User id:', createMatchDto.leftPlayerId);
-			throw new HttpException('Cannot create game with yourself', 400);
-		}
 		const leftPlayer: User = await this.userService.findUserById(createMatchDto.leftPlayerId);
 		if (!leftPlayer) {
 			// console.log('Left player not found! User id:', createMatchDto.leftPlayerId);

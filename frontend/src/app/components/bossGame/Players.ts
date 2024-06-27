@@ -7,11 +7,6 @@ var mod = 1;
 var playerSpeed = fullSize*0.02;
 var dirSpeed = 0;
 var startPosMod = Math.sqrt((radius*radius)/2);
-var shurikenSpeed = fullSize*0.5;
-var playerNum = 0;
-var bossHit = false;
-var damageCounter = 0;
-var playerLives = 3;
 
 export function makePlayers(): Actor[]
 {
@@ -20,37 +15,41 @@ export function makePlayers(): Actor[]
 		new Actor({
 		x: halfSize - startPosMod,
 		y: halfSize - startPosMod,
-		width: fullSize/12,
+		width: fullSize/10,
 		height: halfSize/25,
 		color: Color.Blue,
-		collisionType: CollisionType.Fixed
+		collisionType: CollisionType.Fixed,
+		rotation: Math.asin((halfSize - (halfSize - startPosMod)) / radius)*-1
 		}),
 
 		new Actor({
 		x: halfSize + startPosMod,
 		y: halfSize - startPosMod,
-		width: fullSize/12,
+		width: fullSize/10,
 		height: halfSize/25,
 		color: Color.Yellow,
-		collisionType: CollisionType.Fixed
+		collisionType: CollisionType.Fixed,
+		rotation: Math.asin((halfSize - (halfSize + startPosMod)) / radius)*-1
 		}),
 
 		new Actor({
 		x: halfSize - startPosMod,
 		y: halfSize + startPosMod,
-		width: fullSize/12,
+		width: fullSize/10,
 		height: halfSize/25,
 		color: Color.Red,
-		collisionType: CollisionType.Fixed
+		collisionType: CollisionType.Fixed,
+		rotation: Math.asin((halfSize - (halfSize - startPosMod)) / radius)
 		}),
 
 		new Actor({
 		x: halfSize + startPosMod,
 		y: halfSize + startPosMod,
-		width: fullSize/12,
+		width: fullSize/10,
 		height: halfSize/25,
 		color: Color.White,
-		collisionType: CollisionType.Fixed
+		collisionType: CollisionType.Fixed,
+		rotation: Math.asin((halfSize - (halfSize + startPosMod)) / radius)
 		})
 	]
 	return (players);
