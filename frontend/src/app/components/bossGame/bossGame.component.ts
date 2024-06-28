@@ -3,7 +3,7 @@ import { NgIf } from '@angular/common';
 import { Router } from "@angular/router";
 import { SockService } from '../../services/sock/sock.service';
 import { Actor,Engine,Color,CollisionType,Keys,Vector } from "excalibur";
-import { makePlayers, playerMovement } from "./Players";
+import { makePlayers, playerMovement, addPlayerShadows, addShurikenShadows, updateShadows } from "./Players";
 import{ io }from "socket.io-client";
 import {Texts} from './texts';
 
@@ -24,6 +24,8 @@ export class BossGameComponent implements OnInit, OnDestroy
 	damageCounter: number = 0;
 	playerLives: number = 0;
 
+	updateHack: number = 0;
+
 	router = new Router;
 	bounced: boolean = false;
 	texts = new Texts;
@@ -37,12 +39,13 @@ export class BossGameComponent implements OnInit, OnDestroy
 	});
 
 	players: Actor[] = makePlayers();
+	playerShadows: Actor[] = addPlayerShadows(this.players[0],this.players[1],this.players[2],this.players[3]);
 
 	bigBoss = new Actor({
 		x:  this.halfSize,
 		y:  this.halfSize,
 		radius: this.fullSize*0.1,
-		color: Color.DarkGray,
+		color: Color.Violet,
 		collisionType: CollisionType.Fixed
 	});
 
@@ -63,6 +66,7 @@ export class BossGameComponent implements OnInit, OnDestroy
 		y: 550,
 		collisionType: CollisionType.Passive,
 	});
+	shurikenShadows = addShurikenShadows(this.shuriken);
 
 	ngOnInit()
 	{
@@ -78,7 +82,7 @@ export class BossGameComponent implements OnInit, OnDestroy
 			this.gameSrv.emit("joinGame");
 		});
 	
-		this.gameSrv.on('assignNumber', (playNum)  =>
+		this.gameSrv.on('assignNumber', (playNum: number)  =>
 		{
 			// console.log("number assigned", playNum);
 			this.playernum = playNum;
@@ -102,34 +106,33 @@ export class BossGameComponent implements OnInit, OnDestroy
 
 	startGame()
 	{
-		this.game.add(this.texts.lives);
-		this.game.add(this.bigBoss);
-		this.game.add(this.lifebar);
-		this.game.add(this.shuriken);
-		this.game.add(this.players[0]);
-		this.game.add(this.players[1]);
-		this.game.add(this.players[2]);
-		this.game.add(this.players[3]);
-
+		this.addAssets();
 		this.gameSrv.emit("startGameLoop");
 		
 		// gameloop
 		this.game.on("postupdate", ()=>
 		{
+			this.updateHack++;
+			if (this.updateHack > 10000)
+				this.updateHack = 0;
+			if ((this.updateHack % 4) == 0)
+			{
+				updateShadows(this.players[0], this.playerShadows, 0);
+				updateShadows(this.players[1], this.playerShadows, 3);
+				updateShadows(this.players[2], this.playerShadows, 6);
+				updateShadows(this.players[3], this.playerShadows, 9);
+			}
 			this.shuriken.rotation += 0.27;
-
 			if (this.playernum == 8)
 				this.singleplayerMovement();
 			else
 				this.multiplayerMovement();
-			
 			if (this.bounced == true)
 				setTimeout(() => {this.bounced = false}, 500);
 		});
 
-		this.gameSrv.on('updatePlayerPos', (args) =>
+		this.gameSrv.on('updatePlayerPos', (args: number[]) =>
 		{
-			// console.log("player", args[2], "should be updated");
 			this.players[args[2]].pos.x = args[0];
 			this.players[args[2]].pos.y = args[1];
 			this.players[args[2]].rotation = args[3];
@@ -137,6 +140,11 @@ export class BossGameComponent implements OnInit, OnDestroy
 
 		this.gameSrv.on("updateShurikenPos", (position: number[])=>
 		{
+			// updateShadows(this.players[0], this.playerShadows, 0);
+			// updateShadows(this.players[1], this.playerShadows, 3);
+			// updateShadows(this.players[2], this.playerShadows, 6);
+			// updateShadows(this.players[3], this.playerShadows, 9);
+			updateShadows(this.shuriken, this.shurikenShadows, 0);
 			this.shuriken.pos.x = position[0];
 			this.shuriken.pos.y = position[1];
 		});
@@ -156,9 +164,9 @@ export class BossGameComponent implements OnInit, OnDestroy
 		this.gameSrv.on("setBossColor", (indication: number)=>
 		{
 			if (indication == 1)
-				this.bigBoss.color = Color.Black;
+				this.bigBoss.color = Color.Violet.darken(0.9);
 			if (indication == 2)
-				this.bigBoss.color = Color.Gray;
+				this.bigBoss.color = Color.Violet;
 		});
 
 		for (var i = 0; i < 4; i++)
@@ -175,8 +183,7 @@ export class BossGameComponent implements OnInit, OnDestroy
 		this.gameSrv.on("playersLose", () =>
 		{
 			this.removeAssets();
-			this.game.currentScene.camera.shake( this.halfSize*0.5,  this.halfSize*0.5, 600);
-			this.texts.win.text = "YOU GOT REKT!"
+			this.texts.win.text = "YOU LOST!"
 			this.game.add(this.texts.win);
 			setTimeout(() => {this.ngOnDestroy()}, 2000);
 		})
@@ -255,16 +262,38 @@ export class BossGameComponent implements OnInit, OnDestroy
 		});
 	}
 
+	addAssets()
+	{
+		this.game.add(this.texts.lives);
+		this.game.add(this.bigBoss);
+		this.game.add(this.lifebar);
+		this.game.add(this.shurikenShadows[2]);
+		this.game.add(this.shurikenShadows[1]);
+		this.game.add(this.shurikenShadows[0]);
+		this.game.add(this.shuriken);
+		for (var i = 11; i >= 0; i--)
+			this.game.add(this.playerShadows[i]);
+		this.game.add(this.players[0]);
+		this.game.add(this.players[1]);
+		this.game.add(this.players[2]);
+		this.game.add(this.players[3]);
+	}
+
 	removeAssets()
 	{
+		this.game.remove(this.texts.lives);
 		this.game.remove(this.bigBoss);
 		this.game.remove(this.lifebar);
 		this.game.remove(this.shuriken);
+		this.game.remove(this.shurikenShadows[2]);
+		this.game.remove(this.shurikenShadows[1]);
+		this.game.remove(this.shurikenShadows[0]);
+		for (var i = 11; i >= 0; i--)
+			this.game.remove(this.playerShadows[i]);
 		this.game.remove(this.players[0]);
 		this.game.remove(this.players[1]);
 		this.game.remove(this.players[2]);
 		this.game.remove(this.players[3]);
-		this.game.remove(this.texts.lives);
 	}
 	
 	ngOnDestroy() 

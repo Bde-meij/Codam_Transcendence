@@ -48,7 +48,7 @@ export class Texts
 	
 	lives = new Label({
 		color: Color.White,
-		text: "4",
+		text: "6",
 		x: 100,
 		y: 700,
 		font: new Font({

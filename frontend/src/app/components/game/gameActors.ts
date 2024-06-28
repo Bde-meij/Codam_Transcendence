@@ -74,10 +74,6 @@ export function addAfterImage(squareBall: Actor): Actor[]
 		collisionType: CollisionType.PreventCollision
 		})
 	]
-		
-	afterImages[0].actions.follow(squareBall, 5);
-	afterImages[1].actions.follow(afterImages[0], 3);
-	afterImages[2].actions.follow(afterImages[1], 2);
 
 	return (afterImages);
 }

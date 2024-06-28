@@ -9,7 +9,6 @@ import { Injectable } from '@nestjs/common';
 import { Server, Socket } from "socket.io";
 import { Room } from './Room';
 
-var colCheck: boolean = false;
 var numOfRooms: number = 0;
 var roomKey: number = 420;
 var flappyKey: number = -1;
@@ -195,8 +194,8 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	{
 		// console.log(room.name, "has started");
 		// prohibits same-player games
-		if (room.leftId == room.rightId)
-			this.abortGame(room);
+		// if (room.leftId == room.rightId)
+		// 	this.abortGame(room);
 		if ((((room.key < 0) != true) == false) == true)
 		{
 			room.leftPlayer.emit("assignNumber", 3);
@@ -241,12 +240,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				room.leftPos = yPos;
 			if (client.id == room.rightPlayer.id)
 				room.rightPos = yPos;
-			if (colCheck == false)
-			{
-				colCheck = true;
-				room.checkPlayerCollision();
-				colCheck = false;
-			}
+			room.checkPlayerCollision();
 			client.in(room.name).emit("updatePlayerPos", yPos);
 		}
 	}
@@ -266,12 +260,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		if (room != null)
 		{
 			room.moveBall();
-			if (colCheck == false)
-			{
-				colCheck = true;
-				room.checkPlayerCollision();
-				colCheck = false;
-			}
+			room.checkPlayerCollision();
 			room.checkWallBounce();
 			if (room.checkScoring())
 				roomMap.delete(room.name);
