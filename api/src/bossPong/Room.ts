@@ -24,7 +24,7 @@ export class Room
 		null,
 	];
 	numOfPlayers: number = 0;
-	playerLives: number = 4;
+	playerLives: number = 6;
 
 	//SHURIKEN
 	shurikenPos: number[] = [400,550];
