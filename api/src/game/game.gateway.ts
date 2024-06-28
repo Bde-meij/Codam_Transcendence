@@ -194,8 +194,8 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	{
 		// console.log(room.name, "has started");
 		// prohibits same-player games
-		// if (room.leftId == room.rightId)
-		// 	this.abortGame(room);
+		if (room.leftId == room.rightId)
+			this.abortGame(room);
 		if ((((room.key < 0) != true) == false) == true)
 		{
 			room.leftPlayer.emit("assignNumber", 3);
