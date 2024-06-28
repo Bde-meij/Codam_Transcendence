@@ -1,30 +1,14 @@
-import { CreateMatchDto } from './dto/create-match.dto';
+import { OnGatewayConnection,OnGatewayDisconnect,OnGatewayInit,SubscribeMessage,WebSocketGateway,WebSocketServer } from '@nestjs/websockets';
+import { NotAcceptableException, Req } from '@nestjs/common';
 import { UpdateMatchDto } from './dto/update-match.dto';
-
-import {
-	ConnectedSocket,
-	MessageBody,
-	OnGatewayConnection,
-	OnGatewayDisconnect,
-	OnGatewayInit,
-	SubscribeMessage,
-	WebSocketGateway,
-	WebSocketServer,
-} from '@nestjs/websockets';
-import { Server, Socket } from "socket.io";
-import { MatchService } from './match.service';
-
-import { Room } from './Room';
-
 import { AuthService } from 'src/auth/auth.service';
 import { UserService } from 'src/user/user.service';
-import { NotAcceptableException, Req } from '@nestjs/common';
+import { MatchType } from "./entities/match.entity";
+import { MatchService } from './match.service';
 import { Injectable } from '@nestjs/common';
-import { Loggary } from 'src/logger/logger.service';
+import { Server, Socket } from "socket.io";
+import { Room } from './Room';
 
-import { Match, MatchType } from "./entities/match.entity";
-
-var colCheck: boolean = false;
 var numOfRooms: number = 0;
 var roomKey: number = 420;
 var flappyKey: number = -1;
@@ -37,24 +21,18 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@WebSocketServer()
 	server: Server;
 
-	constructor(private authService: AuthService, private userService: UserService, private readonly matchService: MatchService, private loggary: Loggary) {}
+	constructor(private authService: AuthService, private userService: UserService, private readonly matchService: MatchService) {}
 	
 	afterInit(server: any) 
 	{
-		console.log("server started");
-		// joinReservedRoom(89413, setReservedRoom(89413));
+		// console.log("server started");
 	}
-
-	// handleConnection(client: Socket)
-	// {
-		// console.log("gameGateway: ", client.id, " has connected");
-	// }
 
 	async handleConnection(client: Socket)
 	{
 		try 
 		{
-			console.log("Game connection: " + client.id);
+			// console.log("Game connection: " + client.id);
 			var cookies = client.handshake.headers.cookie?.split('; ');
 			if (!cookies)
 				throw new NotAcceptableException();
@@ -81,7 +59,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		}
 		catch
 		{
-			console.log(client.id, "Game connection refused");
+			// console.log(client.id, "Game connection refused");
 			client.disconnect();
 			return;
 		}
@@ -161,7 +139,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			client.emit("abortGame", client.id);
 		else if (room.leftPlayer == null)
 		{
-			console.log(`checkreser left : ${client.data.userid}`)
 			room.leftPlayer = client;
 			room.leftId = client.data.userid;
 			room.serverRef = this.server;
@@ -170,26 +147,24 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		}
 		else if (room.rightPlayer == null)
 		{
-			console.log(`checkreser right: ${client.data.userid}`)
 			room.rightPlayer = client;
 			room.rightId = client.data.userid;
 			client.join(room.name);
 			client.data.room = room.name;
-		}
-		if (room.rightPlayer !== null && room.leftPlayer !== null)
 			this.startGame(room);
+		}
 	}
 
 	findRoom(client: Socket): boolean
 	{
-		console.log(client.id, "called findRoom");
+		// console.log(client.id, "called findRoom");
 		var stop = false;
 		roomMap.forEach((roomObj, roomName) =>
 		{
 			if ((roomObj.hasStarted == false) && (stop == false)
 			&& (client.data.key == roomObj.key))
 			{
-				console.log(client.id, "joined room", roomName);
+				// console.log(client.id, "joined room", roomName);
 				roomObj.rightPlayer = client;
 				roomObj.rightId = client.data.userid;
 				client.join(roomName);
@@ -212,12 +187,15 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		client.join(room.name);
 		client.data.room = room.name;
 		numOfRooms++;
-		console.log("room", room.name, "created");
+		// console.log("room", room.name, "created");
 	}
 	
 	async startGame(room: Room)
 	{
-		console.log(room.name, "has started");
+		// console.log(room.name, "has started");
+		// prohibits same-player games
+		if (room.leftId == room.rightId)
+			this.abortGame(room);
 		if ((((room.key < 0) != true) == false) == true)
 		{
 			room.leftPlayer.emit("assignNumber", 3);
@@ -262,12 +240,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				room.leftPos = yPos;
 			if (client.id == room.rightPlayer.id)
 				room.rightPos = yPos;
-			if (colCheck == false)
-			{
-				colCheck = true;
-				room.checkPlayerCollision();
-				colCheck = false;
-			}
+			room.checkPlayerCollision();
 			client.in(room.name).emit("updatePlayerPos", yPos);
 		}
 	}
@@ -287,12 +260,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		if (room != null)
 		{
 			room.moveBall();
-			if (colCheck == false)
-			{
-				colCheck = true;
-				room.checkPlayerCollision();
-				colCheck = false;
-			}
+			room.checkPlayerCollision();
 			room.checkWallBounce();
 			if (room.checkScoring())
 				roomMap.delete(room.name);
@@ -309,7 +277,6 @@ export function getNewRoomKey()
 	var room = roomMap.get("inviteRoom"+roomKey);
 	room.name = "inviteRoom"+roomKey;
 	room.key = roomKey;
-	console.log(`getnewroomkey ${room} en ${room.key} ${room.name}`)
 	return (roomKey);
 }
 

@@ -14,6 +14,7 @@ export class GameMenuComponent {
     constructor(private router: Router, private userService: UserService) {};
 
     pongGame() {
+      this.userService.updateRoomKey(0).subscribe();
       this.router.navigate(['/dashboard/game'])
     }
     

@@ -1,21 +1,11 @@
-import {
-	ConnectedSocket,
-	MessageBody,
-	OnGatewayConnection,
-	OnGatewayDisconnect,
-	OnGatewayInit,
-	SubscribeMessage,
-	WebSocketGateway,
-	WebSocketServer,
-} from '@nestjs/websockets';
-import { Server, Socket } from "socket.io";
-import { Room} from './Room';
+import {OnGatewayConnection,OnGatewayDisconnect,OnGatewayInit,SubscribeMessage,WebSocketGateway,WebSocketServer,} from '@nestjs/websockets';
+import { NotAcceptableException } from '@nestjs/common';
 import { AuthService } from 'src/auth/auth.service';
 import { UserService } from 'src/user/user.service';
-import { NotAcceptableException, Req } from '@nestjs/common';
 import { Injectable } from '@nestjs/common';
-
-import {pointDiff, bounce} from "./vectorMath";
+import { Server, Socket } from "socket.io";
+import {bounce} from "./vectorMath";
+import { Room} from './Room';
 
 var numOfRooms: number = 0;
 var roomMap = new Map<string, Room>();
@@ -32,7 +22,7 @@ export class BossGameGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 
 	afterInit(server: any) 
 	{
-		console.log("server started");
+		// console.log("server started");
 	}
 
 	async handleConnection(client: Socket)
@@ -61,8 +51,8 @@ export class BossGameGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 				throw new NotAcceptableException();
 			client.data.userid = user.id;
 			client.data.nick = user.nickname;
-			client.data.key = -1;//user.roomKey;
-			console.log(client.data.key);
+			client.data.key = user.roomKey;
+			// console.log(client.data.key);
 			client.emit("connectSignal");
 		}
 		catch
@@ -76,10 +66,8 @@ export class BossGameGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 	@SubscribeMessage("joinGame")
 	joinGame(client: Socket)
 	{
-		console.log("ONE", client.data.key);
 		if (client.data.key < 0)
 		{
-			console.log("TWO");
 			this.createRoom(client);
 			this.startGame(client);
 		}
@@ -87,35 +75,44 @@ export class BossGameGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 			this.createRoom(client);
 		else if (roomMap.get(client.data.room).numOfPlayers == 4)
 			this.startGame(client);
-		console.log("THREE");
+	}
+
+	@SubscribeMessage("startGameLoop")
+	startGameLoop(client: Socket)
+	{
+		var room = roomMap.get(client.data.room);
+		if ((room != null) && (room.hasStarted == false))
+		{
+			setTimeout(() =>{{
+			room.shurikenInterval = setInterval(this.updateShuriken, 15, room)
+			}}, 1500);
+			room.hasStarted = true;
+		}
+	}
+
+	@SubscribeMessage("resetBoss")
+	resetBoss(client: Socket)
+	{
+		var room = roomMap.get(client.data.room);
+		room.bossHit = false;
 	}
 
 	startGame(client: Socket)
 	{
-		console.log("STARTGAME1");
 		var room = roomMap.get(client.data.room);
 		if (room != null)
 		{
-			console.log("STARTGAME2");
 			if (room.key < 0)
 				room.players[0].emit("assignNumber", 8);
 			else
 			{
-				console.log("STARTGAME3");
 				room.players[0].emit("assignNumber", 1);
 				room.players[1].emit("assignNumber", 2);
 				room.players[2].emit("assignNumber", 3);
 				room.players[3].emit("assignNumber", 4);
 			}
-			
-			setTimeout(() =>{{
-				room.shurikenInterval = setInterval(this.updateShuriken, 15, room);
-			}},4500);
-	
 			room.serverRef.in(room.name).emit("startSignal");
-			room.hasStarted = true;
 		}
-
 	}
 
 	findRoom(client: Socket): boolean
@@ -148,13 +145,21 @@ export class BossGameGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 		room.key = client.data.key;
 		client.join(room.name);
 		client.data.room = room.name;
+		// console.log("room", room.name, "created");
 		numOfRooms++;
 	}
 
-
 	handleDisconnect(client: Socket)
 	{
-
+		var room = roomMap.get(client.data.room);
+		if (room != null)
+		{
+			// if (room.hasStarted == true)
+			room.serverRef.in(room.name).emit("abortGame");
+			clearInterval(room.shurikenInterval);
+			// console.log("deleting", room.name);
+			roomMap.delete(room.name);
+		}
 	}
 
 	// shuriken

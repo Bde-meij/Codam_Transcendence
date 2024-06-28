@@ -1,12 +1,11 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { GameService } from '../../services/sock/game/game.service';
-import{Actor,Engine,Color,Keys, ExcaliburGraphicsContext,Vector, Handler, Graphic, TextAlign, GamepadDisconnectEvent}from "excalibur";
-import{Player,Ball,addAfterImage}from "./gameActors";
+import{Actor,Engine,Color,Keys, ExcaliburGraphicsContext }from "excalibur";
 import{makeLines,drawScore,leftScorePos,rightScorePos}from "./lineDrawing";
-import {leftPNameText, rightPNameText, timerText, waitText, winText, abortText} from './texts';
-import { NgIf } from '@angular/common';
+import { GameService } from '../../services/sock/game/game.service';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import{Player,Ball,addAfterImage}from "./gameActors";
 import {Router } from "@angular/router";
-import { SockService } from '../../services/sock/sock.service';
+import { NgIf } from '@angular/common';
+import { Texts } from './texts';
 
 @Component({
 	selector: 'app-game',
@@ -28,6 +27,7 @@ export class GameComponent implements OnInit, OnDestroy
 	squareBall = (new Ball(this.width/2, this.height/2).returnAct());
 	ballShadows = addAfterImage(this.squareBall);
 	router = new Router;
+	texts = new Texts;
 
 	hitXWall: boolean = false;
 	hitYWall: boolean = false;
@@ -48,40 +48,40 @@ export class GameComponent implements OnInit, OnDestroy
 	gameSrv: any
 	ngOnInit()
 	{
-		leftPNameText.text = "";
-		rightPNameText.text = "";
-		winText.text = "";
+		this.texts.leftPNameText.text = "";
+		this.texts.rightPNameText.text = "";
+		this.texts.winText.text = "";
 		this.gameSrv = new GameService();
 		this.checkEarlyDisconnect();
 		
 		this.gameSrv.connectSignal().subscribe(() => 
 		{
-			this.game.add(waitText);
-			this.game.add(leftPNameText);
-			this.game.add(rightPNameText);
+			this.game.add(this.texts.waitText);
+			this.game.add(this.texts.leftPNameText);
+			this.game.add(this.texts.rightPNameText);
 			this.game.start();
 			this.gameSrv.joinGame();
 		});
 
 		this.gameSrv.assignNumber().subscribe((playnum: number) => {
-			console.log("number", playnum, "was assigned");
+			// console.log("number", playnum, "was assigned");
 			this.playernum = playnum;
 		});
 		
 		this.gameSrv.assignNames().subscribe((names: string[]) => {
-			leftPNameText.text = names[0];
-			rightPNameText.text = names[1];
-			this.game.remove(waitText);
+			this.texts.leftPNameText.text = names[0];
+			this.texts.rightPNameText.text = names[1];
+			this.game.remove(this.texts.waitText);
 		});
 
 		this.gameSrv.startSignal().subscribe(() => {
-			this.game.add(timerText);
-			timerText.text = "3"
-			setTimeout(() =>{{timerText.text = "2"}},1000);
-			setTimeout(() =>{{timerText.text = "1"}},2000);
-			setTimeout(() =>{{timerText.text = "GO!"}},3000);
+			this.game.add(this.texts.timerText);
+			this.texts.timerText.text = "3"
+			setTimeout(() =>{{this.texts.timerText.text = "2"}},1000);
+			setTimeout(() =>{{this.texts.timerText.text = "1"}},2000);
+			setTimeout(() =>{{this.texts.timerText.text = "GO!"}},3000);
 			setTimeout(() =>{{
-				this.game.remove(timerText);
+				this.game.remove(this.texts.timerText);
 				this.startGame();
 			}},4000);
 		});
@@ -159,9 +159,9 @@ export class GameComponent implements OnInit, OnDestroy
 			this.game.remove(this.ballShadows[2]);
 			this.game.remove(this.ballShadows[1]);
 			this.game.remove(this.ballShadows[0]);
-			winText.text = pName+"\nis the winner!";
+			this.texts.winText.text = pName+"\nis the winner!";
 			setTimeout(() =>{{this.ngOnDestroy();}},2000);
-			this.game.add(winText);
+			this.game.add(this.texts.winText);
 		});
 	}
 
@@ -189,28 +189,23 @@ export class GameComponent implements OnInit, OnDestroy
 			player.pos.y -= this.height*0.175;
 			this.gameSrv.emitYPos(player.pos.y);
 		}
-		// else if (player.pos.y < this.height - player.height / 2)
-		// {
-		// 	player.pos.y += this.height*0.0125;
-		// 	this.gameSrv.emitYPos(player.pos.y);
-		// }
 	}
 
 	checkEarlyDisconnect()
 	{
 		this.gameSrv.abortGame().subscribe(() => 
 		{
-			this.game.remove(waitText);
-			this.game.remove(leftPNameText);
-			this.game.remove(rightPNameText);
+			this.game.remove(this.texts.waitText);
+			this.game.remove(this.texts.leftPNameText);
+			this.game.remove(this.texts.rightPNameText);
 			setTimeout(() =>{{this.ngOnDestroy();}},2000);
-			this.game.add(abortText);
+			this.game.add(this.texts.abortText);
 		});
 	}
 
 	ngOnDestroy() 
 	{
-		console.log("game is destroyed");
+		// console.log("game is destroyed");
 		this.game.stop();
 		this.game.canvas.remove();
 		this.gameSrv.disconnect();

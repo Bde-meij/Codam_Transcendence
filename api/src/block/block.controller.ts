@@ -2,11 +2,10 @@ import { Controller, Get, Post, Param, Delete, Req } from '@nestjs/common';
 import { BlockService } from './block.service';
 import { CreateBlockDto } from './dto/create-block.dto';
 import { DeleteBlockDto } from './dto/delete-block.dto';
-import { Loggary } from "src/logger/logger.service";
 
 @Controller('block')
 export class BlockController {
-	constructor(private readonly blockService: BlockService, private loggary: Loggary) {}
+	constructor(private readonly blockService: BlockService) {}
 	
 	@Get('all-blocked')
 	async getAllBlocked(@Req() req) {
