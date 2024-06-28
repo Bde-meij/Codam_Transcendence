@@ -3,11 +3,10 @@ import { FriendsService } from './friends.service';
 import { CreateFriendRequestDto } from './dto/create-friend.dto';
 import { JwtGuard } from 'src/auth/guard/jwt.guard';
 import { FriendStatus } from './entities/friend.entity';
-import { Loggary } from "src/logger/logger.service";
 
 @Controller('friends')
 export class FriendsController {
-	constructor(private readonly friendsService: FriendsService, private loggary: Loggary) {}
+	constructor(private readonly friendsService: FriendsService) {}
 	
 	// send new friend request with friend nickname
 	@Post('new-request-nick/:targetnick')

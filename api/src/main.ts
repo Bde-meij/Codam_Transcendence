@@ -1,19 +1,14 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import * as cookieParser from 'cookie-parser';
-import { Loggary } from './logger/logger.service';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
-	const app = await NestFactory.create(AppModule, {
-		logger: false
-	});
-	const loggary = new Loggary('AppModule');
-	app.useLogger(loggary);
+	const app = await NestFactory.create(AppModule);
 	app.setGlobalPrefix('api');
 
 	app.enableCors({
 		origin: ["http://localhost:4200"],
-		credentials: false,
+		credentials: true,
 	})
 
 	app.use(cookieParser());

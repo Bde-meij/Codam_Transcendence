@@ -1,34 +1,14 @@
-import { Injectable } from '@angular/core';
-import { io } from 'socket.io-client';
+import { Injectable, OnDestroy } from '@angular/core';
+import { Socket, io } from 'socket.io-client';
 import { SockService } from '../sock.service';
 import { Observable } from 'rxjs';
-
 @Injectable({
   providedIn: 'root'
 })
 
-export class GameService{
-	private gameSocket = io("/game", {
-		autoConnect: false
-	});
-
-	constructor(sockService: SockService) {
-		// for debugging:
-		this.gameSocket.on("connect", () => {
-			console.log(this.gameSocket.connected); // true
-		});
-
-		this.gameSocket.on("disconnect", () => {
-			console.log(this.gameSocket.connected); // false
-		});
-
-		this.gameSocket.onAny((event, ...args) => {
-			console.log("GAME-SOCK EVENT: ");
-			console.log(event, args);
-		});
-		sockService.newSocketRegister("gameSocket");
-	}
-
+export class GameService implements OnDestroy{
+	gameSocket = io("/game");
+	
 	connect() {
 		return this.gameSocket.connect();
 	}
@@ -43,18 +23,19 @@ export class GameService{
 		{
 			this.gameSocket.on('assignNumber', (playNum: number) =>
 			{
-				console.log("player assigned with", playNum);
+				// console.log("player assigned with", playNum);
 				observ.next(playNum);
 			});
 		});
 	}
+
 	assignNames(): Observable<string[]>
 	{
 		return new Observable((observ) => 
 		{
 			this.gameSocket.on('assignNames', (playNames: string[]) =>
 			{
-				console.log("player assigned with", playNames);
+				// console.log("player assigned with", playNames);
 				observ.next(playNames);
 			});
 		});
@@ -66,7 +47,19 @@ export class GameService{
 		{
 			this.gameSocket.on("updatePlayerPos", (yPos: number) =>
 			{
-				console.log("receive playerpos");
+				// console.log("receive playerpos");
+				observ.next(yPos);
+			});
+		});
+	}
+
+	flappyGravity(): Observable<number[]>
+	{
+		return new Observable((observ) => 
+		{
+			this.gameSocket.on("flappyGravity", (yPos: number[]) =>
+			{
+				// console.log("receive playerpos");
 				observ.next(yPos);
 			});
 		});
@@ -105,6 +98,17 @@ export class GameService{
 		});
 	}
 
+	connectSignal()
+	{
+		return new Observable((observ) => 
+		{
+			this.gameSocket.on("connectSignal", () =>
+			{
+				observ.next();
+			});
+		});
+	}
+
 	playerWin(): Observable<string>
 	{
 		return new Observable((observ) => 
@@ -116,13 +120,30 @@ export class GameService{
 		});
 	}
 
-	joinRoom()
+	abortGame(): Observable<string>
 	{
-		this.gameSocket.emit("joinRoom");
+		return new Observable((observ) => 
+		{
+			this.gameSocket.on("abortGame", (playerName: string) =>
+			{
+				console.log("abortGame service called");
+				observ.next(playerName);
+			});
+		});
+	}
+
+	joinGame()
+	{
+		console.log("joining gaime");
+		this.gameSocket.emit("joinGame");
 	}
 
 	emitYPos(playerPos :number)
 	{
 		this.gameSocket.emit("updatePlayer", playerPos);
+	}
+
+	ngOnDestroy() 
+	{
 	}
 }

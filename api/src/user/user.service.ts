@@ -5,11 +5,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import * as speakeasy from 'speakeasy';
-import { Loggary } from 'src/logger/logger.service';
 
 @Injectable()
 export class UserService {
-	constructor(@InjectRepository(User) private readonly userRepo: Repository<User>, private loggary: Loggary) {}
+	constructor(@InjectRepository(User) private readonly userRepo: Repository<User>) {}
 
   	async userExists(id: string) {
 		const user = await this.userRepo.findOne({where: {id}});
@@ -79,5 +78,11 @@ export class UserService {
 
 	async updateNickname(id: string, newName: string) {
 		await this.userRepo.update(id, {nickname: newName});
+	}
+
+	async updateRoomKey(userId: string, roomKey: number) {
+		if (!await this.userExists(userId))
+			throw new HttpException("User not found!", 404);
+		await this.userRepo.update({id: userId}, {roomKey: roomKey});
 	}
 }

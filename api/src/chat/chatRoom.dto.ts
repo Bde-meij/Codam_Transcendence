@@ -1,30 +1,34 @@
 export interface Rooms {
-	id: string;
+	id: number;
 	name: string;
-	owner: string;
-	admins: string[];
-	banned?: string[];
-	muted?: string[];
-	status: string;
-	password: string | null;
+	owner: number;
+	admins: number[];
+	banned?: number[];
+	muted?: Record<number, Date>;
+	users: number[];
+	status: string; //public, private
+	password: string; //true or false?
 	created?: Date;
 	updated?: Date;
 	messages?: MessageInterface[];
 }
 
-export interface userDto {
-	roomId: string;
+export interface RoomInfo {
+	room_id: number;
 	nickname: string;
-	socketId: string;
-	isAdmin: boolean;
+	Owner: boolean;
+	Admin: boolean;
+	socket_id: string;
 }
 
 export interface MessageInterface {
 	message: string;
-	roomId: string;
+	roomId: number;
+	room_name: string;
 	senderId: number;
-	created?: Date;
+	created: Date;
 	updated?: Date;
+	game?: boolean;
 }
 
 // export interface ConnectedInterface {

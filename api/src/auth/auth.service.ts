@@ -8,11 +8,11 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { CallbackAuthDto } from './dto/callback-auth.dto';
 import * as speakeasy from 'speakeasy';
-import { Loggary } from 'src/logger/logger.service';
+import { refreshToken } from './entities/refreshToken.entity';
 
 @Injectable()
 export class AuthService {
-	constructor(private readonly userService: UserService, private jwtService: JwtService, private configService: ConfigService, private loggary: Loggary){}
+	constructor(private readonly userService: UserService, private jwtService: JwtService, private configService: ConfigService, @InjectRepository(refreshToken) private readonly tokenRepo: Repository<refreshToken>){}
 
 	async getJwtTokens(user: CallbackAuthDto): Promise<{access_token: string, refresh_token: string}> {
 		const payload = {id: user.id, is2faVerified: user.is2faVerified};
@@ -40,7 +40,7 @@ export class AuthService {
 	}
 
 	async verifyJwtAccessToken(token: string) {
-		console.log('verifying token...')
+		// console.log('verifying access token...')
 		try {
 			const payload = await this.jwtService.verifyAsync(
 				token,
@@ -55,23 +55,27 @@ export class AuthService {
 		}
 	}
 
-	async refreshJwtToken(refreshToken: string): Promise<{newAccessToken: string, payload: any}> {
+	async verifyJwtRefreshToken(token: string) {
+		console.log('verifying refresh token...')
+		const invalidatedToken = await this.tokenRepo.findOne({where: {token: token}});
+		if (invalidatedToken)
+			throw new UnauthorizedException('Old refresh token (verify)');
 		try {
 			const payload = await this.jwtService.verifyAsync(
-				refreshToken,
+				token,
 				{
 					secret: this.configService.getOrThrow("JWT_REFRESH_SECRET"),
 				}
 			);
-			const newAccessToken = this.jwtService.sign({
-				username: payload.username, is2faVerified: payload.is2faVerified },
-				{expiresIn: this.configService.getOrThrow("JWT_ACCESS_TIME"),
-				secret: this.configService.getOrThrow('JWT_ACCESS_SECRET')});
-      		return {newAccessToken: newAccessToken, payload: payload};
+			return payload;
 		}
 		catch(error) {
-			throw new UnauthorizedException('Invalid refresh token');
+			throw new UnauthorizedException('Invalid refresh token (verify)');
 		}
+	}
+
+	async invalidateRefreshToken(refreshToken: string) {
+		return await this.tokenRepo.save({token: refreshToken});
 	}
 
 	async verifyTwoFAToken(userSecret: string, token: string) {

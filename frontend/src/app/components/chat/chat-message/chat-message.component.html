@@ -1,13 +1,80 @@
-
-<div class = chat_column>
+<div class="chat_columns" #messageContainer>
 	<!-- <div *ngIf="room" ></div> -->
-	<h3> the messages in room: {{ room}}   </h3>
-	<ul>
-		<li *ngFor="let message of messages">
-			{{ message }}
+	<h3> the messages in room: {{ room.name}} </h3>
+		<li *ngFor="let message of room.messages" 
+		[ngClass]="{'blue-text': isEven(message.senderId), 'black-text': !isEven(message.senderId)}">
+			<button *ngIf="message.game" mat-raised-button color="primary" (click)="joinBattle(message.message)">
+				Battlekey {{ message.message }} 
+			</button>
+			<span *ngIf="!message.game">
+				<img src="{{message.sender_avatar}}" height="80px" />{{ message.created }} --- {{ message.message }} --- {{ message.senderId }}
+			</span>
 		</li>
-	</ul>
+	
+	<h4>Userlist:  {{ room.users.join(', ') }}</h4>
 
-	<input [(ngModel)]="message" (keydown.enter)="sendMessage()" type="text" > 
-	<button (click)="sendMessage()"> Send </button>
+
+	<input #messageInput [(ngModel)]="message" (keydown.enter)="sendMessage()" type="text" [class.chat_input]="message" > 
+	<button (click)="sendMessage()"> SendMessage </button>
+	<button (click)="leaveRoom(room.name, 'David')"> leaveRoom </button>
+	<!-- <button (click)="joinBattle(message.message, user.id)"> joinBattle </button> -->
+
 </div>
+
+<div class="chat_columns">
+	<mat-form-field>
+		<mat-label>Select User</mat-label>
+		<mat-select [(value)]="selectedUserID">  <!--- div forces the whole screen orange --->
+			<mat-option *ngFor="let user of room.users" [value]="user">
+				{{ user}}
+			</mat-option>
+		</mat-select>
+	</mat-form-field>
+	
+	<button *ngIf="selectedUserID" mat-raised-button color="primary" (click)="battle(selectedUserID)">
+		Battle
+	</button>
+	<button *ngIf="selectedUserID" mat-raised-button color="primary" (click)="mute(selectedUserID)">
+		Mute
+	</button>
+	<button *ngIf="selectedUserID" mat-raised-button color="primary" (click)="ban(selectedUserID)">
+		Ban
+	</button>
+	<button *ngIf="selectedUserID" mat-raised-button color="primary" (click)="kick(selectedUserID)">
+		Kick
+	</button>
+	
+</div>
+
+<!-- <h4>wrong Userlist: </h4>
+<ul>
+	<li *ngFor="let user of room.users">
+		 {{user}}
+	</li>
+</ul>
+
+<form>
+	<h4>mat-select</h4>
+	<mat-form-field>
+	  <mat-label>Users</mat-label>
+	  <mat-select [(ngModel)]="selectedUser" name="user">
+		<mat-option *ngFor="let user of room.users" [value]="user">{{ user }}</mat-option>
+	  </mat-select>
+	</mat-form-field>
+	<p> Selected user: {{ selectedUser }} </p>
+	<button *ngIf="selectedUser" mat-raised-button color="primary" (click)="battle(selectedUser)">
+	  Battle
+	</button>
+  </form>
+  
+  <h4>Basic mat-select</h4>
+  <mat-form-field>
+	<mat-label>Ess</mat-label>
+	<mat-select>
+	  <mat-option *ngFor="let user of room.users" [value]="user"> user = {{ user }}</mat-option>
+	</mat-select>
+  </mat-form-field> -->
+
+<!-- <li *ngFor="let message of room.users">
+		<h3> Userlist: </h3> {{ room.users.join(', ') }}{{ message}}
+	</li> -->

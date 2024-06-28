@@ -1,9 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { AsyncPipe, NgFor, NgIf, CommonModule } from '@angular/common';
 import { ChatService } from '../../services/sock/chat/chat.service';
+import { UserService } from '../../services/user/user.service';
 import { FormsModule } from '@angular/forms';
 import { Rooms } from '../../models/rooms.class';
 import { ChatMessageComponent } from './chat-message/chat-message.component';
+import { User } from '../../models/user.class';
+import { UserDetailComponent } from '../user-detail/user-detail.component';
+import { AfterViewInit, AfterViewChecked } from '@angular/core';
+import { ViewChild } from '@angular/core';
 
 export interface MessageInterface {
 	sender: string,
@@ -13,52 +18,99 @@ export interface MessageInterface {
 @Component({
   selector: 'app-chat',
   standalone: true,
-  imports: [NgFor, FormsModule, AsyncPipe, ChatMessageComponent, NgIf, CommonModule],
+  imports: [NgFor, FormsModule, AsyncPipe, ChatMessageComponent, NgIf, CommonModule, UserDetailComponent],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss'
 })
 
-export class ChatComponent implements OnInit {
+export class ChatComponent implements OnInit, AfterViewChecked, AfterViewInit {
+	user!: User;
 	message: string | undefined;
 	messages: string[] = [];
-	rooms: Rooms[] = []; 
-	roomss: Rooms[] = []; 
 
-	userList: string[] | undefined;
+	roomsList: Record<string, Rooms> = {};
 	userss: string[] | undefined;
 	roomName: string | undefined;
-	test: string[] | undefined;
 	
-	selectedRoom?: Rooms;
+	selectedRoom: Rooms | undefined;
 	
 	onSelect(room: Rooms): void {
 		this.selectedRoom = room;
-  	};
+		//console.log(room.messages);
+	};
 
-	constructor(private chatService: ChatService) {};
+	constructor(private chatService: ChatService, private userService: UserService) {};
 	
 	ngOnInit() {
+		this.userService.getUser('0').subscribe((userData) => (
+			this.user = userData
+		));
+	
 		this.chatService.getMessages().subscribe((newmessage: any ) => {
-			this.messages.push(newmessage.message);
-		})
-		this.chatService.getRooms().subscribe((roomList: any) => {
-			this.rooms.push(roomList);
-			console.log("getRooms frontend");
-		})
-		this.chatService.getRoomss().subscribe((roomList: any) => {
-			this.roomss.push(roomList);
-			console.log("getRooms frontend");
-		})
+			if (this.roomsList[newmessage.room_name]?.messages) {
+				
+				this.userService.getAvatar(newmessage.senderId).subscribe((data) => (
+					newmessage.sender_avatar = URL.createObjectURL(data)
+				))
+				this.roomsList[newmessage.room_name].messages?.push(newmessage);
+				this.messages.push(newmessage.message);
+				
+				////console.log("Room: " + newmessage.roomId + ", got a new message");
+				////console.log(newmessage);
+			} else {
+				//console.error("Room or messages array not found:", newmessage.roomId);
+			}
+		});
+
+		// this.chatService.getRooms().subscribe((roomList: any) => {
+		// 	this.rooms.push(roomList);
+		// 	// ////console.log("getRooms frontend");
+		// })
+
+		// this.chatService.getUser().subscribe((roomList: any) => {
+		// 	this.rooms.push(roomList);
+		// 	// ////console.log("getRooms frontend");
+		// })
+
+		this.chatService.getRoomsss().subscribe((chatRoomList: Record<string, Rooms>) => {
+			// ////console.log("getRoomss record");
+			this.roomsList = chatRoomList;
+			if (!this.selectedRoom && Object.keys(this.roomsList).length > 0) {
+				const firstRoomName = Object.keys(this.roomsList)[0];
+				// ////console.log("getrooms select")
+				////console.log(this.roomsList[firstRoomName]);
+				this.onSelect(this.roomsList[firstRoomName]);
+			  }
+			////console.log(this.roomsList);
+		});
+
 		this.chatService.getConnectedUsers().subscribe((userList: any) => {
+			// ////console.log("getconnectedusers subscribe");
 			this.userss = userList;
 		})
-		this.createRoom("Global Chats");
-		this.createRoom("test2");
-		this.joinRoom("Global Chat");
-		this.joinRoom("test1");
-		console.log("rooms: " + this.rooms);
+
+		this.createRoom("Global", "public", "");
+		// this.createRoom("temp",  "public", "");
+		this.joinRoom("Global", "");
+		// this.joinRoom("temp", "");
 		
+		////console.log("rooms: " + this.rooms);
+		
+		// Check if there are any rooms available
+		// ////console.log("chatcomponent: " + this.getRoomNames()[0]);
+
 	};
+
+	@ViewChild(ChatMessageComponent) viewChild!: ChatMessageComponent;
+
+	ngAfterViewInit() {
+		this.chatService.updatePage(this.selectedRoom!.name);
+	}
+
+	ngAfterViewChecked() {
+		if (!this.selectedRoom)
+			this.chatService.updatePage(this.selectedRoom!.name);
+	}
 
 	sendMessage() {
 		if (this.message) {
@@ -68,9 +120,13 @@ export class ChatComponent implements OnInit {
 		this.message = '';
 	}
 
-	createRoom(roomName: string) {
+	makenum(str: string){
+		return Number(str);
+	}
+
+	createRoom(roomName: string, status: string, password: string) {
 		if (roomName) {
-		  this.chatService.createRoom(roomName);
+		  this.chatService.createRoom(roomName, status, password);
 		  this.roomName = '';
 		}
 	}
@@ -82,10 +138,10 @@ export class ChatComponent implements OnInit {
 	getRoomss() {
 		this.chatService.getRoomss();
 	}
-	
-	joinRoom(data: string) {
-		console.log("joinroom component: " + data);
-		this.chatService.joinRoom(data);
+
+	joinRoom(data: string, password: string) {
+		////console.log("joinroom component: " + data);
+		this.chatService.joinRoom(data, password);
 	}
 
 	getConnectedUsers() {
@@ -93,77 +149,15 @@ export class ChatComponent implements OnInit {
 	}
 	
 	sendUserList(data: string) {
-		console.log("sendUserList: " + data);
+		////console.log("sendUserList: " + data);
 		this.chatService.sendUserList(data);
 	}
+
+	getRoomNames(): string[] {
+		return Object.keys(this.roomsList);
+	}
+
+	updatePage(roomname: string){
+		this.chatService.updatePage(roomname);
+	}
 }
-
-
-// import { Component, OnInit } from '@angular/core';
-// import { AsyncPipe, NgFor } from '@angular/common';
-// import { ChatService } from '../../services/sock/chat/chat.service';
-// import { FormsModule } from '@angular/forms';
-// import { ChatRoomComponent } from './chat-room/chat-room.component';
-
-// export interface MessageInterface {
-// 	sender: string,
-// 	message: string
-// }
-
-// @Component({
-//   selector: 'app-chat',
-//   standalone: true,
-//   imports: [NgFor, FormsModule, AsyncPipe],
-//   templateUrl: './chat.component.html',
-//   styleUrl: './chat.component.scss'
-// })
-// export class ChatComponent implements OnInit {
-// 	message: string | undefined;
-// 	messages: string[] = [];
-// 	rooms: string | undefined;
-// 	userList: string | undefined;
-// 	roomName: string | undefined;
-// 	constructor(private chatService: ChatService) {};
-	
-// 	ngOnInit() {
-// 		this.chatService.getMessages().subscribe((newmessage ) => {
-// 			this.messages.push(newmessage);
-// 		})
-// 		this.chatService.getRooms().subscribe((roomList) => {
-// 			this.rooms = roomList;
-// 			console.log("getRooms frontend");
-// 		})
-// 		this.chatService.getUserList().subscribe((userList) => {
-// 			this.userList = userList;
-// 		})
-// 	};
-
-// 	sendMessage() {
-// 		if (this.message) {
-// 			this.chatService.sendMessage(this.message);
-// 			this.messages.push(this.message);
-// 		}
-// 		this.message = '';
-// 	}
-
-// 	createRoom(roomName: string) {
-// 		if (roomName) {
-// 		  this.chatService.createRoom(roomName);
-// 		  this.roomName = '';
-// 		}
-// 	}
-
-// 	getRooms() {
-// 		this.chatService.getRooms();
-// 	}
-
-// 	joinRoom(data: string) {
-// 		console.log("joinroom component: " + data);
-// 		this.chatService.joinRoom(data);
-// 	}
-
-// 	sendUserList(data: string) {
-// 		console.log("sendUserList: " + data);
-// 		this.chatService.sendUserList(data);
-// 	}
-// }

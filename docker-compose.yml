@@ -14,13 +14,13 @@ services:
     depends_on:
       - postgres
     environment:
-      #DATABASE_URL: postgress://postgres:password@postgres:5432/app
+      DATABASE_URL: postgress://postgres:password@postgres:5432/app
       NODE_ENV: development
       # PORT: 3000
     # ports:
       # - 3000:3000
       # - 9229:9229
-
+      
   #frontend
   frontend:
     build:

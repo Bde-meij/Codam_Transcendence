@@ -32,6 +32,10 @@ export class UserService {
 		return this.http.get<User>(this.userUrl + '/name/' + id);
 	};
 
+	updateRoomKey(roomKey: number) {
+		return this.http.post(this.userUrl + '/update-roomkey/' + roomKey.toString(), {});
+	}
+
 	uploadAvatar(file: File) : Observable<any> {
 		const formData : FormData = new FormData();
 
@@ -39,8 +43,10 @@ export class UserService {
 		return this.http.post<File>(this.userUrl + '/uploadAvatar', formData);
 	}
 
-	getAvatar() : Observable<Blob> {
-		console.log("getavatar called");
-		return this.http.get(this.userUrl + '/getAvatar/', {responseType: 'blob'});
+	getAvatar(id: string) : Observable<Blob> {
+		if (id == '0')
+			return this.http.get(this.userUrl + '/getAvatar/current', {responseType: 'blob'});
+		// console.log("getavatar called");
+		return this.http.get(this.userUrl + '/getAvatar/' + id, {responseType: 'blob'});
 	}
 }

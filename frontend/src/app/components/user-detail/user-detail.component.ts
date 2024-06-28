@@ -34,7 +34,7 @@ export class UserDetailComponent implements OnInit {
 			tempUser.avatar = data.avatar,
 			tempUser.status = data.status
 		));
-		this.userService.getAvatar().subscribe((data) => (
+		this.userService.getAvatar(tempID).subscribe((data) => (
 			tempUser.avatar = URL.createObjectURL(data)
 		))
 		
