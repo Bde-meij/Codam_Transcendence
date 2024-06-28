@@ -42,11 +42,10 @@ export class FriendsComponent implements OnInit {
 				console.log("all friends: ", data)
 			),
 			error: (e) => (
-				console.error(e))
+				console.error("all friends error: " + e))
 		});
 	}
 
-	// friends = FAKE_FRIENDS;
 	selectedFriend?: Friend;
 
 	onSelect(friend: Friend): void {
@@ -54,21 +53,17 @@ export class FriendsComponent implements OnInit {
 	};
 
 	sendRequest(): void {
-		console.log(this.friendForm.value.friendName);
 		if (this.friendForm.value.friendName) {
+			console.log("sending this name: ", this.friendForm.value.friendName);
 			this.friendsService.addFriend(this.friendForm.value.friendName).subscribe({
 				next: (data) => {
-					console.log(data)
+					console.log("send friendrequest data: " + data)
 				},
 				error: (e : HttpErrorResponse) => {
-					this.errorMessage = e.error.message,
-					console.log(e.error.message)
+					this.errorMessage = e.message,
+					console.log("send friendrequesterror: " + e.message)
 				}
 			});
 		}
-	}
-
-	submitForm() {
-		this.sendRequest();
 	}
 }

@@ -126,7 +126,7 @@ export class GameService implements OnDestroy{
 		{
 			this.gameSocket.on("abortGame", (playerName: string) =>
 			{
-				console.log("abortGame service called");
+				// console.log("abortGame service called");
 				observ.next(playerName);
 			});
 		});
@@ -134,7 +134,7 @@ export class GameService implements OnDestroy{
 
 	joinGame()
 	{
-		console.log("joining gaime");
+		// console.log("joining gaime");
 		this.gameSocket.emit("joinGame");
 	}
 

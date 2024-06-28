@@ -8,6 +8,7 @@ import { diskStorage } from 'multer';
 import { extname, join } from 'path';
 import { createReadStream, existsSync, unlinkSync } from 'fs';
 import * as path from 'path';
+import { User } from './entities/user.entity';
 
 @Controller('user')
 export class UserController {
@@ -16,7 +17,7 @@ export class UserController {
 	@Get('current')
 	@UseGuards(JwtGuard)
 	async getUser(@Req() req) {
-		const user = await this.userService.findUserById(req.user.id);
+		const user : User = await this.userService.findUserById(req.user.id);
 		return user;
 	}
 
@@ -60,7 +61,7 @@ export class UserController {
 	@Get('/name/:id')
 	@UseGuards(JwtGuard)
 	async findUserByName(@Req() req, @Param('id') id: string) {
-		const user = await this.userService.findUserById(id);
+		const user: User = await this.userService.findUserById(id);
 		return user;
 	}
 

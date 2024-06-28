@@ -35,16 +35,16 @@ export class RegisterComponent {
 	errorMessage = "";
 
 	register() {
-		console.log(this.profileForm.value.nickname);
+		console.log("registered name: ", this.profileForm.value.nickname);
 		if (this.profileForm.value.nickname) {
 			this.userService.register(this.profileForm.value.nickname).subscribe({
 				next: (data) => {
-					console.log(data),
+					console.log("registered name data: ", data),
 					this.router.navigate(['/dashboard/home']);
 				},
 				error: (e : HttpErrorResponse) => {
-					this.errorMessage = e.error.message,
-					console.log(e.error.message)
+					this.errorMessage = e.message,
+					console.log("registered name error: ", e.message)
 				}
 			});
 		}

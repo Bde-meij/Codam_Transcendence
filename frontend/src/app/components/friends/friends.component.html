@@ -27,7 +27,7 @@
 	<div class="friend_column">
 		<h3> outgoing requests </h3>
 		<div>
-			<form [formGroup]="friendForm" (ngSubmit)="submitForm()">
+			<form [formGroup]="friendForm" (ngSubmit)="sendRequest()">
 				<p>
 					invite someone new:
 					<input type="text" formControlName="friendName" maxlength="13" placeholder="your friend"/>

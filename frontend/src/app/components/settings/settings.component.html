@@ -4,6 +4,11 @@
 
 <div class="setting_container">
 	<h3 class="setting_header"> Set things right! </h3>
+	<div class="setting_column" *ngIf="current_user_id">
+		<h2> This you : </h2>
+		<!-- <p> current id: {{current_user_id}} </p> -->
+		<app-user-detail [id]="current_user_id"> </app-user-detail>
+	</div>
 	<div class="setting_column">
 		<h2> The things to set: </h2>
 		<div>
@@ -53,6 +58,13 @@
 			{{this.verificationRes}}
 		}
 		@if (profileForm.value.nickname == '') {
+			@if (errorMessage) {
+				<p> Gary got a problem : {{errorMessage}}</p>
+			}
+			@if (succesMessage) {
+				<p> Gary approves : {{succesMessage}}</p>
+				<p> (reload to see changes) </p>
+			}
 		} @else if (profileForm.pending) {
 			<p>
 				Let Gary think about it...
@@ -66,5 +78,12 @@
 				Such a pretty name 😏
 			</p>
 		}
+		<!-- @if (errorMessage) {
+			<p> Gary got a problem : {{errorMessage}}</p>
+		}
+		@if (succesMessage) {
+			<p> Gary approves : {{succesMessage}}</p>
+			<p> (reload to see changes) </p>
+		} -->
 	</div>
 </div>

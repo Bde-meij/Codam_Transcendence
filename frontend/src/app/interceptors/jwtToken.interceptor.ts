@@ -36,7 +36,7 @@ export class ErrorInterceptor implements HttpInterceptor {
 			this.refreshTokenSubject.next(null);
 			return this.http.post<any>('/api/auth/refresh', {}, {withCredentials: true}).pipe(
 				switchMap((token: any) => {
-					console.log("in switch map token:", token);
+					// console.log("in switch map token:", token);
 					this.isRefreshing = false;
 					this.refreshTokenSubject.next(token);
 					return next.handle(this.addToken(req, token.access_token))

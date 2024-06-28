@@ -18,7 +18,7 @@ export class UserService {
 	}
 
 	changeName(nickname: string) {
-		return this.http.post(this.userUrl + '/changename', { nickname })
+		return this.http.post<any>(this.userUrl + '/changename', { nickname })
 	}
 
 	isNameTaken (nickname: string) : Observable<boolean> {
@@ -26,11 +26,14 @@ export class UserService {
 	}
 
 	// to request your own info, use '0', otherwise use the userID.
-	getUser(id : string) : Observable<User>{
-		if (id == '0')
-			return this.http.get<User>(this.userUrl + '/current');
-		return this.http.get<User>(this.userUrl + '/name/' + id);
+	getUser(id : string) : Observable<any> {
+		if (id === '0') {
+			console.log("ID = 0");
+			return this.http.get<any>(this.userUrl + '/current', {});
+		}
+		return this.http.get<any>(this.userUrl + '/name/' + id, {});
 	};
+
 
 	updateRoomKey(roomKey: number) {
 		return this.http.post(this.userUrl + '/update-roomkey/' + roomKey.toString(), {});
