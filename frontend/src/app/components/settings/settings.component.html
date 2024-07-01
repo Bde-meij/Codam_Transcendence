@@ -61,10 +61,6 @@
 			@if (errorMessage) {
 				<p> Gary got a problem : {{errorMessage}}</p>
 			}
-			@if (succesMessage) {
-				<p> Gary approves : {{succesMessage}}</p>
-				<p> (reload to see changes) </p>
-			}
 		} @else if (profileForm.pending) {
 			<p>
 				Let Gary think about it...
@@ -77,6 +73,10 @@
 			<p>
 				Such a pretty name 😏
 			</p>
+		}
+		@if (succesMessage) {
+			<p> Gary approves : {{succesMessage}}</p>
+			<p> (reload to see changes) </p>
 		}
 		<!-- @if (errorMessage) {
 			<p> Gary got a problem : {{errorMessage}}</p>

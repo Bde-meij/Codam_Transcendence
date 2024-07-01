@@ -99,12 +99,13 @@ export class SettingsComponent implements OnInit {
 				},
 				error: (e: HttpErrorResponse) => {
 					this.errorMessage = e.message;
-					this.succesMessage = '';
+					// this.succesMessage = '';
 					console.log("changename data error :", e.message);
 				}
 			});
 			this.profileForm.value.nickname = undefined;
 		}
+		window.location.reload();
 	}
 
 	submitForm() {

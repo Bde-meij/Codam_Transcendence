@@ -34,7 +34,6 @@ export class UserService {
 		return this.http.get<any>(this.userUrl + '/name/' + id, {});
 	};
 
-
 	updateRoomKey(roomKey: number) {
 		return this.http.post(this.userUrl + '/update-roomkey/' + roomKey.toString(), {});
 	}
@@ -47,7 +46,7 @@ export class UserService {
 	}
 
 	getAvatar(id: string) : Observable<Blob> {
-		if (id == '0')
+		if (id === '0')
 			return this.http.get(this.userUrl + '/getAvatar/current', {responseType: 'blob'});
 		// console.log("getavatar called");
 		return this.http.get(this.userUrl + '/getAvatar/' + id, {responseType: 'blob'});

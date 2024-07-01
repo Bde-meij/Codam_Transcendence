@@ -10,7 +10,7 @@ import { UserService } from '../../services/user/user.service';
   templateUrl: './user-detail.component.html',
   styleUrl: './user-detail.component.scss'
 })
-export class UserDetailComponent {
+export class UserDetailComponent implements OnInit {
 	@Input()id!: string;
 	my_user?: User;
 
@@ -27,11 +27,12 @@ export class UserDetailComponent {
 		this.userService.getUser(this.id).subscribe((data) => (
 			this.tempUser.id = data.id,
 			this.tempUser.nickname = data.nickname,
-			this.tempUser.avatar = data.avatar,
+			// this.tempUser.avatar = data.avatar,
 			this.tempUser.status = data.status
 		));
 		this.userService.getAvatar(this.id).subscribe((data) => (
 			this.tempUser.avatar = URL.createObjectURL(data)
 		))
+		this.my_user = this.tempUser;
 	}
 }
