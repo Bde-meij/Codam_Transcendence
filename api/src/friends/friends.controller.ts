@@ -8,7 +8,7 @@ import { FriendStatus } from './entities/friend.entity';
 export class FriendsController {
 	constructor(private readonly friendsService: FriendsService) {}
 	
-	//✅ send new friend request with friend nickname
+	///✅ send new friend request with friend nickname
 	@Post('new-request-nick/:targetnick')
 	@UseGuards(JwtGuard)
 	async createNick(@Req() req, @Param('targetnick') targetNick: string) {
@@ -30,7 +30,7 @@ export class FriendsController {
 		return await this.friendsService.create(friendRequest);
 	}
 	
-	// delete friend request (accepted or not) with the friend request id
+	///✅ delete friend request (accepted or not) with the friend request id
 	@Delete('delete-request-id/:requestid')
 	@UseGuards(JwtGuard)
 	async deleteByRequestId(@Req() req, @Param('requestid') requestId: string) {
@@ -44,21 +44,21 @@ export class FriendsController {
 		return await this.friendsService.deleteByUserId(req.user.id, targetId);
 	}
 	
-	// accept friend request with the friend request id (not the friend id)
+	///✅ accept friend request with the friend request id
 	@Post('accept-request/:requestid')
 	@UseGuards(JwtGuard)
 	async accept(@Req() req, @Param('requestid') requestId: string) {
 		return await this.friendsService.updateStatus(req.user.id, requestId, FriendStatus.ACCEPTED);
 	}
 
-	// list with all incoming requests
+	///✅ list with all incoming requests
 	@Get('incoming')
 	@UseGuards(JwtGuard)
 	async findIncoming(@Req() req) {
 		return await this.friendsService.findIncoming(req.user.id);
 	}
 	
-	// list with all outgoing requests
+	///✅ list with all outgoing requests
 	@Get('outgoing')
 	@UseGuards(JwtGuard)
 	async findOutgoing(@Req() req) {
