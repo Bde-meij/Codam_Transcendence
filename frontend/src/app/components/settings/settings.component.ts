@@ -39,7 +39,6 @@ export class SettingsComponent implements OnInit {
 	current_nickname = '';
 	current_user_id : string | undefined;
 
-
 	isChecked: boolean = false;
 	is2faEnabled: boolean = false;
 	qrCode: string = "";
@@ -53,7 +52,7 @@ export class SettingsComponent implements OnInit {
 		);
 		this.userService.getUser('0').subscribe({
 			next: (data ) => {
-				this.current_user_id = data.id,
+				this.current_user_id = data.id
 				this.current_nickname = data.nickname
 			},
 			error: (e) => (
@@ -105,13 +104,10 @@ export class SettingsComponent implements OnInit {
 			});
 			this.profileForm.value.nickname = undefined;
 		}
-		window.location.reload();
-	}
-
-	submitForm() {
-		this.changeName();
-		console.log("NAVIGATE")
 		// window.location.reload();
-		// this.router.navigate(['/dashboard/settings/'], {});
+		
+		this.router.navigate([this.router.url]);
+		this.router.navigate(['/dashboard/settings/'], {});
+		console.log("NAVIGATE")
 	}
 }
