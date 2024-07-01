@@ -1,5 +1,5 @@
 import { NgIf, UpperCasePipe } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit } from '@angular/core';
 import { User } from '../../models/user.class';
 import { UserService } from '../../services/user/user.service';
 
@@ -10,7 +10,7 @@ import { UserService } from '../../services/user/user.service';
   templateUrl: './user-detail.component.html',
   styleUrl: './user-detail.component.scss'
 })
-export class UserDetailComponent implements OnInit {
+export class UserDetailComponent implements OnChanges {
 	@Input()id!: string;
 	my_user?: User;
 
@@ -23,7 +23,7 @@ export class UserDetailComponent implements OnInit {
 
 	constructor(private userService: UserService) {};
 
-	ngOnInit(): void {
+	ngOnChanges(): void {
 		this.userService.getUser(this.id).subscribe((data) => (
 			this.tempUser.id = data.id,
 			this.tempUser.nickname = data.nickname,
@@ -35,4 +35,5 @@ export class UserDetailComponent implements OnInit {
 		))
 		this.my_user = this.tempUser;
 	}
+
 }
