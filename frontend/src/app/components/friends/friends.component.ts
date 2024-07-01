@@ -1,20 +1,69 @@
-import { Component } from '@angular/core';
-import { FAKE_FRIENDS, User } from '../../models/user.class';
+import { Component, OnInit } from '@angular/core';
+// import { FAKE_FRIENDS, User } from '../../models/user.class';
 import { NgFor, NgIf, UpperCasePipe } from '@angular/common';
 import { UserDetailComponent } from '../user-detail/user-detail.component';
+import { FriendsService } from '../../services/friends/friends.service';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { forbiddenNameValidator } from '../../services/validator/name-validator.service';
+import { HttpErrorResponse } from '@angular/common/http';
+
+export interface Friend {
+	id: string;
+	nickname: string;
+}
 
 @Component({
   selector: 'app-friends',
   standalone: true,
-  imports: [NgFor, NgIf, UpperCasePipe, UserDetailComponent],
+  imports: [ReactiveFormsModule, NgFor, NgIf, UpperCasePipe, UserDetailComponent],
   templateUrl: './friends.component.html',
   styleUrl: './friends.component.scss'
 })
-export class FriendsComponent {
-	friends = FAKE_FRIENDS;
-	selectedFriend?: User;
+export class FriendsComponent implements OnInit {
+	friendForm = new FormGroup({
+		friendName: new FormControl('', {
+			validators: [
+				Validators.required,
+				forbiddenNameValidator(/gary/),
+				forbiddenNameValidator(/Gary/),
+			],
+			updateOn: 'change',
+		}),
+	});
 
-	onSelect(friend: User): void {
+	constructor(private friendsService : FriendsService) {};
+
+	friends?: Friend[];
+	errorMessage?: string;
+
+	ngOnInit() {
+		this.friendsService.getFriends().subscribe({
+			next: (data) => (
+				console.log("all friends: ", data)
+			),
+			error: (e) => (
+				console.error("all friends error: " + e))
+		});
+	}
+
+	selectedFriend?: Friend;
+
+	onSelect(friend: Friend): void {
   		this.selectedFriend = friend;
 	};
+
+	sendRequest(): void {
+		if (this.friendForm.value.friendName) {
+			console.log("sending this name: ", this.friendForm.value.friendName);
+			this.friendsService.addFriend(this.friendForm.value.friendName).subscribe({
+				next: (data) => {
+					console.log("send friendrequest data: " + data)
+				},
+				error: (e : HttpErrorResponse) => {
+					this.errorMessage = e.message,
+					console.log("send friendrequesterror: " + e.message)
+				}
+			});
+		}
+	}
 }

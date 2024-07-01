@@ -11,35 +11,28 @@ import { UserService } from '../../services/user/user.service';
   styleUrl: './user-detail.component.scss'
 })
 export class UserDetailComponent implements OnInit {
-	@Input()id!: number;
+	@Input()id!: string;
 	my_user?: User;
+
+	tempUser = {
+		id: '',
+		nickname : '',
+		avatar: '',
+		status: ''
+	};
 
 	constructor(private userService: UserService) {};
 
 	ngOnInit(): void {
-		this.my_user = this.userDetails(this.id);
-	}
-
-	userDetails(tempID : number) : User {
-		let tempUser: User = {
-			id: 0,
-			nickname : '',
-			avatar: '',
-			status: ''
-		};
-
-		this.userService.getUser(tempID).subscribe((data) => (
-			tempUser.id = data.id,
-			tempUser.nickname = data.nickname,
-			tempUser.avatar = data.avatar,
-			tempUser.status = data.status
+		this.userService.getUser(this.id).subscribe((data) => (
+			this.tempUser.id = data.id,
+			this.tempUser.nickname = data.nickname,
+			// this.tempUser.avatar = data.avatar,
+			this.tempUser.status = data.status
 		));
-		this.userService.getAvatar(tempID).subscribe((data) => (
-			tempUser.avatar = URL.createObjectURL(data)
+		this.userService.getAvatar(this.id).subscribe((data) => (
+			this.tempUser.avatar = URL.createObjectURL(data)
 		))
-		
-		console.log('user', tempUser);
-
-		return tempUser;
+		this.my_user = this.tempUser;
 	}
 }

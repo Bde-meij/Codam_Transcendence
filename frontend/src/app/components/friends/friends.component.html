@@ -1,12 +1,12 @@
-<h2> Friends! </h2>
+<h2> Gary's family zone </h2>
+<p> because we're so much more then 'just friends' </p>
 <div class="friend_container">
 	<div class="friend_column">
-		<h3> Your friends </h3>
+		<h3> The fam </h3>
 
 		<ul class="friends">
 			<li *ngFor="let friend of friends">
 			<button [class.selected]="friend === selectedFriend" type="button" (click)="onSelect(friend)">
-				<!-- <app-user-detail [user]="selectedFriend"></app-user-detail> -->
 				<span class="badge">{{ friend.id }}</span>
 				<span class="name">{{ friend.nickname }}</span>
 			</button>
@@ -21,10 +21,27 @@
 	<div class="friend_column">
 		<h3> incoming requests </h3>
 		<p> ... </p>
+		
 	</div>
 
 	<div class="friend_column">
 		<h3> outgoing requests </h3>
+		<div>
+			<form [formGroup]="friendForm" (ngSubmit)="sendRequest()">
+				<p>
+					invite someone new:
+					<input type="text" formControlName="friendName" maxlength="13" placeholder="your friend"/>
+				</p>
+				<button type="submit" [disabled]="!friendForm.valid">
+					send
+				</button>
+			</form>
+			@if (errorMessage) {
+				<p>
+					{{errorMessage}}
+				</p>
+			}
+		</div>
 		<p> ... </p>
 	</div>
 </div>
