@@ -7,6 +7,7 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { forbiddenNameValidator } from '../../services/validator/name-validator.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
+import { FriendRequest } from '../../models/friendrequest.class';
 
 export interface Friend {
 	id: string;
@@ -47,10 +48,11 @@ export class FriendsComponent implements OnInit {
 	constructor(private friendsService : FriendsService) {};
 
 	friends?: Friend[];
+	incoming?: FriendRequest[];
+	outgoing?: FriendRequest[];
 	errorMessage?: string;
 
 	ngOnInit() {
-		// this.friends= FAKE_FRIENDS;
 		this.friendsService.getFriends().subscribe({
 			next: (data) => (
 				this.friends = data,
@@ -59,15 +61,63 @@ export class FriendsComponent implements OnInit {
 			error: (e) => (
 				console.error("all friends error: " + e))
 		});
+		this.friendsService.getIncomingRequests().subscribe({
+			next: (data) => (
+				this.incoming = data,
+				console.log("all incoming: ", data)
+			),
+			error: (e) => (
+				console.error("all incoming error: " + e))
+		});
+		this.friendsService.getOutgoingRequests().subscribe({
+			next: (data) => (
+				this.outgoing = data,
+				console.log("all outgoing: ", data)
+			),
+			error: (e) => (
+				console.error("all outgoing error: " + e))
+		});
 	}
 
-	selectedFriend?: Friend;
-
-	onSelect(friend: Friend) {
+	selectedFriend: Friend | undefined;
+ 
+	selectFriend(friend: Friend) {
   		this.selectedFriend = friend;
 	};
 
-	deselect() {
+	selectedRequest: FriendRequest | undefined;
+
+	selectRequest(request: FriendRequest) {
+		this.selectedRequest = request;
+	}
+
+	acceptIncoming(request: FriendRequest) {
+		console.log("accept request: ", request);
+		this.friendsService.acceptIncomingRequest(request.id).subscribe({
+			next: (data) => {
+				console.log("accept friendrequest data: " + data)
+			},
+			error: (e : HttpErrorResponse) => {
+				this.errorMessage = e.message,
+				console.log("accept friendrequesterror: " + e.message)
+			}
+		});
+	}
+
+	denyIncoming(request: FriendRequest) {
+		console.log("deny request: ", request);
+		this.friendsService.denyIncomingRequest(request.id).subscribe({
+			next: (data) => {
+				console.log("deny friendrequest data: " + data)
+			},
+			error: (e : HttpErrorResponse) => {
+				this.errorMessage = e.message,
+				console.log("deny friendrequesterror: " + e.message)
+			}
+		});
+	}
+
+	deselectFriend() {
 		this.selectedFriend = undefined;
 	}
 

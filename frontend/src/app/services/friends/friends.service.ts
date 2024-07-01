@@ -18,6 +18,14 @@ export class FriendsService {
 		return this.http.get<any>(this.friendsUrl + '/incoming', {});
 	}
 
+	acceptIncomingRequest(requestId: string) {
+		return this.http.post<string>(this.friendsUrl + '/accept-request/' + requestId, {requestId});
+	}
+
+	denyIncomingRequest(requestId: string) {
+		return this.http.delete<string>(this.friendsUrl + '/delete-request-id/' + requestId, {});
+	}
+
 	getOutgoingRequests() {
 		return this.http.get<any>(this.friendsUrl + '/outgoing', {});
 	}

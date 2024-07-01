@@ -6,7 +6,7 @@
 
 		<ul class="friends">
 			<li *ngFor="let friend of friends">
-			<button [class.selected]="friend === selectedFriend" type="button" (click)="onSelect(friend)">
+			<button [class.selected]="friend === selectedFriend" type="button" (click)="selectFriend(friend)">
 				<span class="badge">{{ friend.id }}</span>
 				<span class="name">{{ friend.nickname }}</span>
 			</button>
@@ -20,7 +20,7 @@
 		<p>name : {{selectedFriend.nickname}} </p>
 		<app-user-detail [id]="selectedFriend.id" ></app-user-detail>
 
-		<button (click)="deselect()">deselect</button>
+		<button (click)="deselectFriend()">close</button>
 
 		<!-- <a routerLink="/dashboard/detail/{{selectedFriend.id}}">
 			<span class="badge">{{selectedFriend.id}}</span> {{selectedFriend.nickname}}
@@ -29,7 +29,44 @@
 
 	<div class="friend_column">
 		<h3> incoming requests </h3>
-		<p> ... </p>
+		<!-- <ul class="friends"> -->
+			@for (request of incoming; track request.id) {
+				@if (!request.id) {
+					<p>...</p>
+				}
+				<ul class="friends">
+					<li>
+						<button [class.selected]="request === selectedRequest" type="button" (click)="selectRequest(request)">
+							<span class="badge">{{ request.sender.id }}</span>
+							<span class="name">{{ request.sender.nickname }}</span>
+						</button>
+		
+						@if (selectedRequest) {
+							<p>
+								<button class="yesno" type="button" (click)="acceptIncoming(request)" > accept </button>
+								<button class="yesno" type="button" (click)="denyIncoming(request)"> deny </button>
+							</p>
+						}
+					</li>
+				</ul>
+			}
+			<!-- <li *ngFor="let request of incoming">
+				<button [class.selected]="request === selectedRequest" type="button" (click)="selectRequest(request)">
+					<span class="badge">{{ request.sender.id }}</span>
+					<span class="name">{{ request.sender.nickname }}</span>
+				</button>
+
+				@if (selectedRequest) {
+					<p>
+						<button class="yesno" type="button" (click)="acceptIncoming(request)" > accept </button>
+						<button class="yesno" type="button"> deny </button>
+					</p>
+				}
+
+				<!-- <span class="badge">{{ request.sender.id }}</span>
+				<span class="name">{{ request.sender.nickname }}</span>
+			</li> -->
+		<!-- </ul> -->
 		
 	</div>
 
