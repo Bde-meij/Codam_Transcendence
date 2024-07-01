@@ -6,16 +6,29 @@ import { FriendsService } from '../../services/friends/friends.service';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { forbiddenNameValidator } from '../../services/validator/name-validator.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { RouterLink } from '@angular/router';
 
 export interface Friend {
 	id: string;
 	nickname: string;
 }
 
+export const FAKE_FRIENDS: Friend[] = [
+	{ id: "12", nickname: 'Dr. Nice' },
+	{ id: "13", nickname: 'Bombasto'},
+	{ id: "14", nickname: 'Celeritas'},
+	{ id: "15", nickname: 'Magneta'},
+	{ id: "16", nickname: 'RubberMan'},
+	{ id: "17", nickname: 'Dynama'},
+	{ id: "18", nickname: 'Dr. IQ'},
+	{ id: "19", nickname: 'Magma'},
+	{ id: "20", nickname: 'Tornado'}
+];
+
 @Component({
   selector: 'app-friends',
   standalone: true,
-  imports: [ReactiveFormsModule, NgFor, NgIf, UpperCasePipe, UserDetailComponent],
+  imports: [ReactiveFormsModule, NgFor, NgIf, UpperCasePipe, UserDetailComponent, RouterLink],
   templateUrl: './friends.component.html',
   styleUrl: './friends.component.scss'
 })
@@ -37,8 +50,10 @@ export class FriendsComponent implements OnInit {
 	errorMessage?: string;
 
 	ngOnInit() {
+		// this.friends= FAKE_FRIENDS;
 		this.friendsService.getFriends().subscribe({
 			next: (data) => (
+				this.friends = data,
 				console.log("all friends: ", data)
 			),
 			error: (e) => (
@@ -48,9 +63,13 @@ export class FriendsComponent implements OnInit {
 
 	selectedFriend?: Friend;
 
-	onSelect(friend: Friend): void {
+	onSelect(friend: Friend) {
   		this.selectedFriend = friend;
 	};
+
+	deselect() {
+		this.selectedFriend = undefined;
+	}
 
 	sendRequest(): void {
 		if (this.friendForm.value.friendName) {

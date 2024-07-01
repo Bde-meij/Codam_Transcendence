@@ -36,7 +36,7 @@ export class SettingsComponent implements OnInit {
 	// newName : string = '';
 	errorMessage = "";
 	succesMessage = ""
-	current_nickname = '';
+	current_nickname : string | null | undefined;
 	current_user_id : string | undefined;
 
 	isChecked: boolean = false;
@@ -90,6 +90,7 @@ export class SettingsComponent implements OnInit {
 	changeName() {
 		console.log(this.profileForm.value.nickname);
 		if (this.profileForm.value.nickname) {
+			this.current_nickname = this.profileForm.value.nickname;
 			this.userService.changeName(this.profileForm.value.nickname).subscribe({
 				next: (data) => {
 					console.log("changename data:", data);
@@ -103,11 +104,11 @@ export class SettingsComponent implements OnInit {
 				}
 			});
 			this.profileForm.value.nickname = undefined;
-		}
+		};
 		// window.location.reload();
 		
-		this.router.navigate([this.router.url]);
-		this.router.navigate(['/dashboard/settings/'], {});
+		// this.router.navigate([this.router.url]);
+		// this.router.navigate(['/dashboard/settings/'], {});
 		console.log("NAVIGATE")
 	}
 }

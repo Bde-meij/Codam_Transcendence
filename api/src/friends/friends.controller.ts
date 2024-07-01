@@ -8,7 +8,7 @@ import { FriendStatus } from './entities/friend.entity';
 export class FriendsController {
 	constructor(private readonly friendsService: FriendsService) {}
 	
-	// send new friend request with friend nickname
+	//✅ send new friend request with friend nickname
 	@Post('new-request-nick/:targetnick')
 	@UseGuards(JwtGuard)
 	async createNick(@Req() req, @Param('targetnick') targetNick: string) {
@@ -44,7 +44,7 @@ export class FriendsController {
 		return await this.friendsService.deleteByUserId(req.user.id, targetId);
 	}
 	
-	// accept friend request with the friend request id
+	// accept friend request with the friend request id (not the friend id)
 	@Post('accept-request/:requestid')
 	@UseGuards(JwtGuard)
 	async accept(@Req() req, @Param('requestid') requestId: string) {

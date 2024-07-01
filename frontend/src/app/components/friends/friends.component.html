@@ -15,7 +15,16 @@
 	</div>
 
 	<div class="friend_column" *ngIf="selectedFriend">
-		<app-user-detail [id]="selectedFriend.id"></app-user-detail>
+		<h3> friend </h3>
+		<p>id : {{selectedFriend.id}} </p>
+		<p>name : {{selectedFriend.nickname}} </p>
+		<app-user-detail [id]="selectedFriend.id" ></app-user-detail>
+
+		<button (click)="deselect()">deselect</button>
+
+		<!-- <a routerLink="/dashboard/detail/{{selectedFriend.id}}">
+			<span class="badge">{{selectedFriend.id}}</span> {{selectedFriend.nickname}}
+		</a> -->
 	</div>
 
 	<div class="friend_column">
