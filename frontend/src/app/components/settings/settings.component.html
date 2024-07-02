@@ -59,7 +59,7 @@
 		}
 		@if (profileForm.value.nickname == '') {
 			@if (errorMessage) {
-				<p> Gary got a problem : {{errorMessage}}</p>
+				<p class="errormessage"> Gary got a problem : {{errorMessage}}</p>
 			}
 		} @else if (profileForm.pending) {
 			<p>
@@ -82,12 +82,5 @@
 			</p>
 			<p> (refresh to see changes) </p>
 		}
-		<!-- @if (errorMessage) {
-			<p> Gary got a problem : {{errorMessage}}</p>
-		}
-		@if (succesMessage) {
-			<p> Gary approves : {{succesMessage}}</p>
-			<p> (reload to see changes) </p>
-		} -->
 	</div>
 </div>

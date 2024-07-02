@@ -29,30 +29,26 @@
 
 	<div class="friend_column">
 		<h3> incoming requests </h3>
-		
 		@if ((!incoming) || (incomingLenght == 0) ) {
 			<p> zero incoming requests </p>
 		}
-
 		@for (request of incoming; track request.id) {
 			<ul class="friends">
 				<li>
-					<button [class.selected]="request === selectedRequest" type="button" (click)="selectRequest(request)">
+					<button [class.selected]="request === selectedIncomingRequest" type="button" (click)="selectIncomingRequest(request)">
 						<span class="badge">{{ request.sender.id }}</span>
 						<span class="name">{{ request.sender.nickname }}</span>
 					</button>
 	
-					@if (selectedRequest) {
+					@if (selectedIncomingRequest) {
 						<p>
 							<button class="yesno" type="button" (click)="acceptIncoming(request)" > accept </button>
-							<button class="yesno" type="button" (click)="denyIncoming(request)"> deny </button>
+							<button class="yesno" type="button" (click)="deleteRequest(request)"> deny </button>
 						</p>
 					}
 				</li>
 			</ul>
 		}
-
-		
 	</div>
 
 	<div class="friend_column">
@@ -61,18 +57,37 @@
 			<form [formGroup]="friendForm" (ngSubmit)="sendRequest()">
 				<p>
 					invite someone new:
-					<input type="text" formControlName="friendName" maxlength="13" placeholder="your friend"/>
+					<input type="text" formControlName="friendName" maxlength="13" placeholder="their nickname"/>
 				</p>
 				<button type="submit" [disabled]="!friendForm.valid">
 					send
 				</button>
 			</form>
 			@if (errorMessage) {
-				<p>
+				<p class="errormessage">
 					{{errorMessage}}
 				</p>
 			}
 		</div>
-		<p> ... </p>
+		@if ((!outgoing) || (outgoingLenght == 0) ) {
+			<p> zero outgoing requests </p>
+		}
+		@for (request of outgoing; track request.id) {
+			<ul class="friends">
+				<li>
+					<button [class.selected]="request === selectedOutgoingRequest" type="button" (click)="selectOutgoingRequest(request)">
+						<span class="badge">{{ request.sender.id }}</span>
+						<span class="name">{{ request.sender.nickname }}</span>
+					</button>
+				</li>
+
+				@if (selectedIncomingRequest) {
+					<p>
+						<!-- <button class="yesno" type="button" (click)="acceptIncoming(request)" > accept </button> -->
+						<button class="yesno" type="button" (click)="deleteRequest(request)"> cancel </button>
+					</p>
+				}
+			</ul>
+		}
 	</div>
 </div>
