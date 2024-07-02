@@ -22,6 +22,7 @@
 		<h3> friend </h3>
 		<p>id : {{selectedFriend.id}} </p>
 		<p>name : {{selectedFriend.nickname}} </p>
+		<button (click)="deleteFriend(selectedFriend)">unfriend</button>
 		<app-user-detail [id]="selectedFriend.id" ></app-user-detail>
 
 		<button (click)="deselectFriend()">close</button>

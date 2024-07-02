@@ -26,6 +26,10 @@ export class FriendsService {
 		return this.http.delete<string>(this.friendsUrl + '/delete-request-id/' + requestId, {});
 	}
 
+	deleteFriend(friendId: string) {
+		return this.http.delete<string>(this.friendsUrl + '/delete-request-user/' + friendId, {});
+	}
+
 	getOutgoingRequests() {
 		return this.http.get<any>(this.friendsUrl + '/outgoing', {});
 	}
