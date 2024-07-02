@@ -33,7 +33,7 @@ export const FAKE_FRIENDS: Friend[] = [
   templateUrl: './friends.component.html',
   styleUrl: './friends.component.scss'
 })
-export class FriendsComponent implements OnChanges {
+export class FriendsComponent implements OnInit {
 	friendForm = new FormGroup({
 		friendName: new FormControl('', {
 			validators: [
@@ -49,12 +49,10 @@ export class FriendsComponent implements OnChanges {
 
 	friends?: Friend[];
 	incoming?: FriendRequest[];
-	incomingLenght : Number = 0;
 	outgoing?: FriendRequest[];
-	outgoingLenght : Number = 0;
 	errorMessage?: string;
 
-	ngOnChanges() {
+	ngOnInit() {
 		this.friendsService.getFriends().subscribe({
 			next: (data) => (
 				this.friends = data,
@@ -66,8 +64,7 @@ export class FriendsComponent implements OnChanges {
 		this.friendsService.getIncomingRequests().subscribe({
 			next: (data) => (
 				this.incoming = data,
-				console.log("all incoming: ", data),
-				this.incomingLenght = data.length()
+				console.log("all incoming: ", data)
 			),
 			error: (e) => (
 				console.error("all incoming error: " + e))
@@ -75,8 +72,7 @@ export class FriendsComponent implements OnChanges {
 		this.friendsService.getOutgoingRequests().subscribe({
 			next: (data) => (
 				this.outgoing = data,
-				console.log("all outgoing: ", data),
-				this.outgoingLenght = data.length()
+				console.log("all outgoing: ", data)
 			),
 			error: (e) => (
 				console.error("all outgoing error: " + e))

@@ -4,6 +4,10 @@
 	<div class="friend_column">
 		<h3> The fam </h3>
 
+		@if ((!friends) || (friends.length == 0) ) {
+			<p> zero friends </p>
+		}
+
 		<ul class="friends">
 			<li *ngFor="let friend of friends">
 			<button [class.selected]="friend === selectedFriend" type="button" (click)="selectFriend(friend)">
@@ -29,7 +33,7 @@
 
 	<div class="friend_column">
 		<h3> incoming requests </h3>
-		@if ((!incoming) || (incomingLenght == 0) ) {
+		@if ((!incoming) || (incoming.length == 0) ) {
 			<p> zero incoming requests </p>
 		}
 		@for (request of incoming; track request.id) {
@@ -39,14 +43,13 @@
 						<span class="badge">{{ request.sender.id }}</span>
 						<span class="name">{{ request.sender.nickname }}</span>
 					</button>
-	
-					@if (selectedIncomingRequest) {
-						<p>
-							<button class="yesno" type="button" (click)="acceptIncoming(request)" > accept </button>
-							<button class="yesno" type="button" (click)="deleteRequest(request)"> deny </button>
-						</p>
-					}
 				</li>
+				@if (selectedIncomingRequest === request) {
+					<p>
+						<button class="yesno" type="button" (click)="acceptIncoming(request)" > accept </button>
+						<button class="yesno" type="button" (click)="deleteRequest(request)"> deny </button>
+					</p>
+				}
 			</ul>
 		}
 	</div>
@@ -69,21 +72,20 @@
 				</p>
 			}
 		</div>
-		@if ((!outgoing) || (outgoingLenght == 0) ) {
+		@if ((!outgoing) || (outgoing.length == 0) ) {
 			<p> zero outgoing requests </p>
 		}
 		@for (request of outgoing; track request.id) {
 			<ul class="friends">
 				<li>
 					<button [class.selected]="request === selectedOutgoingRequest" type="button" (click)="selectOutgoingRequest(request)">
-						<span class="badge">{{ request.sender.id }}</span>
-						<span class="name">{{ request.sender.nickname }}</span>
+						<span class="badge">{{ request.target.id }}</span>
+						<span class="name">{{ request.target.nickname }}</span>
 					</button>
 				</li>
 
-				@if (selectedIncomingRequest) {
+				@if (selectedOutgoingRequest === request) {
 					<p>
-						<!-- <button class="yesno" type="button" (click)="acceptIncoming(request)" > accept </button> -->
 						<button class="yesno" type="button" (click)="deleteRequest(request)"> cancel </button>
 					</p>
 				}
