@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnChanges, OnInit } from '@angular/core';
 // import { FAKE_FRIENDS, User } from '../../models/user.class';
 import { NgFor, NgIf, UpperCasePipe } from '@angular/common';
 import { UserDetailComponent } from '../user-detail/user-detail.component';
@@ -85,10 +85,16 @@ export class FriendsComponent implements OnInit {
   		this.selectedFriend = friend;
 	};
 
-	selectedRequest: FriendRequest | undefined;
+	selectedIncomingRequest: FriendRequest | undefined;
 
-	selectRequest(request: FriendRequest) {
-		this.selectedRequest = request;
+	selectIncomingRequest(request: FriendRequest) {
+		this.selectedIncomingRequest = request;
+	}
+
+	selectedOutgoingRequest: FriendRequest | undefined;
+
+	selectOutgoingRequest(request: FriendRequest) {
+		this.selectedOutgoingRequest = request;
 	}
 
 	acceptIncoming(request: FriendRequest) {
@@ -104,15 +110,15 @@ export class FriendsComponent implements OnInit {
 		});
 	}
 
-	denyIncoming(request: FriendRequest) {
-		console.log("deny request: ", request);
-		this.friendsService.denyIncomingRequest(request.id).subscribe({
+	deleteRequest(request: FriendRequest) {
+		console.log("delete request: ", request);
+		this.friendsService.deleteRequest(request.id).subscribe({
 			next: (data) => {
-				console.log("deny friendrequest data: " + data)
+				console.log("delete friendrequest data: " + data)
 			},
 			error: (e : HttpErrorResponse) => {
 				this.errorMessage = e.message,
-				console.log("deny friendrequesterror: " + e.message)
+				console.log("delete friendrequesterror: " + e.message)
 			}
 		});
 	}

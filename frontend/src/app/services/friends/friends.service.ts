@@ -22,7 +22,7 @@ export class FriendsService {
 		return this.http.post<string>(this.friendsUrl + '/accept-request/' + requestId, {requestId});
 	}
 
-	denyIncomingRequest(requestId: string) {
+	deleteRequest(requestId: string) {
 		return this.http.delete<string>(this.friendsUrl + '/delete-request-id/' + requestId, {});
 	}
 

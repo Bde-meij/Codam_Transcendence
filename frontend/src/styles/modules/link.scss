@@ -1,0 +1,19 @@
+a {
+	text-decoration: none;
+}
+
+a:link {
+	color: darken($background-color, 10%);
+}
+
+a:visited {
+	color: darken($background-color, 25%);
+}
+
+a:hover {
+	color: darken($button-color, 10%);
+}
+
+a:active {
+	color: darken($background-color, 10%);
+}

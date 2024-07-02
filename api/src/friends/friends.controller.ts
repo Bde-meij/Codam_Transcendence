@@ -37,7 +37,7 @@ export class FriendsController {
 		return await this.friendsService.deleteByRequestId(req.user.id, requestId);
 	}
 	
-	// delete friend request (accepted or not) with the target user id
+	///✅ delete friend request (accepted or not) with the target user id
 	@Delete('delete-request-user/:targetid')
 	@UseGuards(JwtGuard)
 	async deleteByUserId(@Req() req, @Param('targetid') targetId: string) {

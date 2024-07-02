@@ -69,7 +69,7 @@
 	display: inline-block;
 	font-size: small;
 	color: $background-color;
-	padding: 0.8em 0.7em 0 0.7em;
+	padding: 0.5em 0.5em 0 0.7em;
 	background-color: lighten($font-color, 15%);
 	line-height: 1em;
 	margin-right: .8em;
@@ -80,7 +80,15 @@
 	align-self: center;
 }
 
-.yesno {
-	text-align: center;
-	width: 8em;
+.friends .yesno {
+	width: 90%;
+	flex: 1;
+	min-width: 8em;
+	padding: 0.5em 0.5em 0 0.7em;
+	align-self: center;
+	// left: 50%;
+}
+
+.errormessage {
+	color: $contrast-color;
 }
