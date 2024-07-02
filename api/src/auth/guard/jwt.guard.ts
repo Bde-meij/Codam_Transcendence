@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Injectable, Req, UnauthorizedException } from "@nestjs/common";
+import { CanActivate, ExecutionContext, HttpStatus, Injectable, Req, UnauthorizedException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
@@ -10,22 +10,25 @@ export class JwtGuard implements CanActivate {
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
 		const request = context.switchToHttp().getRequest();
-		const token = this.extractTokenFromHeader(request);
-		if (!token) {
-			throw new UnauthorizedException();
+		const accessToken = this.extractTokenFromHeader(request, 'access_token');
+		if (!accessToken) {
+			throw new UnauthorizedException('Access token not found');
 		}
 		try {
-			const payload = await this.authService.verifyJwtAccessToken(token);
+			const payload = await this.authService.verifyJwtAccessToken(accessToken);
+			if (!payload.is2faVerified)
+				throw new UnauthorizedException('2FA not verified');
 			request['user'] = payload;
-		} catch {
-			throw new UnauthorizedException();
+		} catch(err) {
+			console.log('Access token validation failed (JWT guard): ', err);
+			throw new UnauthorizedException('Invalid access token');
 		}
 		return true;
 	}
 
-	private extractTokenFromHeader(request: Request): string | undefined {
-		const token = request.cookies['access_token']
-		console.log("jwt guard: extractTokenFromHeader():", token);
+	private extractTokenFromHeader(request: Request, token_name: string): string | undefined {
+		const token = request.cookies[token_name]
+		// console.log("jwt guard: extractTokenFromHeader():", token);
 		return (token);
 	}
 }

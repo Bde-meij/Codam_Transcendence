@@ -5,36 +5,38 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class AuthService {
-	private loggedin = false;
 	private authUrL = "/api/auth";
-	private hostname: string;
 	
 	constructor(private http: HttpClient) {
-		this.hostname = window.location.hostname;
 	};
 
-	register(nickname : string) {
-		console.log("authservice.register called");
-		return this.http.post(this.authUrL + '/register', {nickname});
-	}
+	// login() {
+	// 	console.log("authservice.login called");
+	// 	this.http.get(this.authUrL + '/login', { });
+	// };
 
-	login() : void {
-		this.http.get(this.authUrL + '/login', { }).subscribe();
-		console.log("authservice.login called");
-		this.loggedin = true;
-	};
-
-	logout() : void {
-		this.http.post(this.authUrL + '/logout', { }).subscribe();
-		console.log("authservice.logout called");
-		this.loggedin = false;
+	logout() {
+		// console.log("authservice.logout called");
+		return this.http.post(this.authUrL + '/logout', { });
 	}	
 	
-	getLogStatus() : boolean {
-		return (this.loggedin);
+	getLogStatus() {
+		return this.http.get<any>(this.authUrL + '/isloggedin', { });
 	}
 
-	// isAuthenticated() : boolean {
+	is2FAEnabled() {
+		return this.http.get<any>(this.authUrL + '/is2faenabled', {});
+	}
 
-	// }
+	setUp2FA() {
+		return this.http.get<any>(this.authUrL + '/2fasetup', {});
+	}
+
+	disable2FA() {
+		return this.http.post<any>('/api/auth/2fadisable', {});
+	}
+
+	verify2FA(userInput : string) {
+		return this.http.post<any>('/api/auth/2faverify', { userInput: userInput });
+	}
 }

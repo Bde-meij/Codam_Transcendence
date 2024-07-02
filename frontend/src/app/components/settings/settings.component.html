@@ -1,1 +1,86 @@
-<p>settings works!</p>
+
+
+<h1> Settings </h1>
+
+<div class="setting_container">
+	<h3 class="setting_header"> Set things right! </h3>
+	<div class="setting_column" *ngIf="current_user_id">
+		<h2> you </h2>
+		<!-- <p> current id: {{current_user_id}} </p> -->
+		<app-user-detail [id]="current_user_id"> </app-user-detail>
+	</div>
+	<div class="setting_column">
+		<h2> The things to set: </h2>
+		<div>
+			<span>
+				Google 2FA:
+			</span>
+			<input type="checkbox" [(ngModel)]="is2faEnabled" (change)="onChange()">
+		</div>
+		<div>
+			<form [formGroup]="profileForm" (ngSubmit)="changeName()">
+				<span>
+					Nickname:
+				</span>
+				<input type="text" formControlName="nickname" maxlength="13" placeholder={{current_nickname}} />
+				@if (profileForm.value.nickname != '') {
+					<button type="submit" [disabled]="!profileForm.valid">
+						send new nickname
+					</button>
+				}
+			</form>
+		</div>
+	</div>
+	<div class="setting_column">
+		@if (isChecked) {
+			<h3> Enable Google 2FA </h3>
+			<div>
+				Scan the QR code in your Google Authenticator:
+			</div>
+			<div>
+				<img src="{{this.qrCode}}">
+			</div>
+			<div>
+				<span>
+					Or enter this code:
+				</span>
+				{{this.secret}}
+			</div>
+			<div>
+				<span>
+					Please confirm by entering the one time password from your Google Authenticator:
+				</span>
+				<input type="text" [(ngModel)]="userInput" />
+			</div>
+			<button (click)="verifyUserInput()">
+				Verify
+			</button>
+			{{this.verificationRes}}
+		}
+		@if (profileForm.value.nickname == '') {
+			@if (errorMessage) {
+				<p class="errormessage"> Gary got a problem : {{errorMessage}}</p>
+			}
+		} @else if (profileForm.pending) {
+			<p>
+				Let Gary think about it...
+			</p>
+		} @else if (profileForm.invalid) {
+			<p>
+				nooo Gary hates that!
+			</p>
+		} @else {
+			<p>
+				Such a pretty name 😏
+			</p>
+		}
+		@if (succesMessage) {
+			<p> Gary approves : {{succesMessage}} 
+				@if (succesMessage === "Nickname changed") {
+					to: "{{this.current_nickname}}"
+				}
+			</p>
+			<p> (refresh to see changes) </p>
+		}
+	</div>
+</div>

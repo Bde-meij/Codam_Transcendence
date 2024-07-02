@@ -1,0 +1,6 @@
+Berichten naar elkaar sturen, chatroom voor de andere aanmaken bij ontvangst bericht.
+inviten op basis van dropdown menu, search?
+knop createRoom met opties.
+knoppen (un)ban/(un)mute/kick/ leaveRoom - 
+settings per room - admins - owner
+entity's + database

@@ -1,12 +1,16 @@
-<h2> Friends! </h2>
+<h2> Gary's family zone </h2>
+<p> because we're so much more then 'just friends' </p>
 <div class="friend_container">
 	<div class="friend_column">
-		<h3> Your friends </h3>
+		<h3> The fam </h3>
+
+		@if ((!friends) || (friends.length == 0) ) {
+			<p> zero friends </p>
+		}
 
 		<ul class="friends">
 			<li *ngFor="let friend of friends">
-			<button [class.selected]="friend === selectedFriend" type="button" (click)="onSelect(friend)">
-				<!-- <app-user-detail [user]="selectedFriend"></app-user-detail> -->
+			<button [class.selected]="friend === selectedFriend" type="button" (click)="selectFriend(friend)">
 				<span class="badge">{{ friend.id }}</span>
 				<span class="name">{{ friend.nickname }}</span>
 			</button>
@@ -15,26 +19,77 @@
 	</div>
 
 	<div class="friend_column" *ngIf="selectedFriend">
-		<app-user-detail [user]="selectedFriend"></app-user-detail>
+		<h3> friend </h3>
+		<p>id : {{selectedFriend.id}} </p>
+		<p>name : {{selectedFriend.nickname}} </p>
+		<app-user-detail [id]="selectedFriend.id" ></app-user-detail>
+
+		<button (click)="deselectFriend()">close</button>
+
+		<!-- <a routerLink="/dashboard/detail/{{selectedFriend.id}}">
+			<span class="badge">{{selectedFriend.id}}</span> {{selectedFriend.nickname}}
+		</a> -->
 	</div>
 
 	<div class="friend_column">
 		<h3> incoming requests </h3>
-		<p> ... </p>
+		@if ((!incoming) || (incoming.length == 0) ) {
+			<p> zero incoming requests </p>
+		}
+		@for (request of incoming; track request.id) {
+			<ul class="friends">
+				<li>
+					<button [class.selected]="request === selectedIncomingRequest" type="button" (click)="selectIncomingRequest(request)">
+						<span class="badge">{{ request.sender.id }}</span>
+						<span class="name">{{ request.sender.nickname }}</span>
+					</button>
+				</li>
+				@if (selectedIncomingRequest === request) {
+					<p>
+						<button class="yesno" type="button" (click)="acceptIncoming(request)" > accept </button>
+						<button class="yesno" type="button" (click)="deleteRequest(request)"> deny </button>
+					</p>
+				}
+			</ul>
+		}
 	</div>
 
 	<div class="friend_column">
 		<h3> outgoing requests </h3>
-		<p> ... </p>
+		<div>
+			<form [formGroup]="friendForm" (ngSubmit)="sendRequest()">
+				<p>
+					invite someone new:
+					<input type="text" formControlName="friendName" maxlength="13" placeholder="their nickname"/>
+				</p>
+				<button type="submit" [disabled]="!friendForm.valid">
+					send
+				</button>
+			</form>
+			@if (errorMessage) {
+				<p class="errormessage">
+					{{errorMessage}}
+				</p>
+			}
+		</div>
+		@if ((!outgoing) || (outgoing.length == 0) ) {
+			<p> zero outgoing requests </p>
+		}
+		@for (request of outgoing; track request.id) {
+			<ul class="friends">
+				<li>
+					<button [class.selected]="request === selectedOutgoingRequest" type="button" (click)="selectOutgoingRequest(request)">
+						<span class="badge">{{ request.target.id }}</span>
+						<span class="name">{{ request.target.nickname }}</span>
+					</button>
+				</li>
+
+				@if (selectedOutgoingRequest === request) {
+					<p>
+						<button class="yesno" type="button" (click)="deleteRequest(request)"> cancel </button>
+					</p>
+				}
+			</ul>
+		}
 	</div>
 </div>
-
-
-<!-- <div *ngIf="selectedHero">
-	<h2>{{selectedHero.name | uppercase}} Details</h2>
-	<div>id: {{selectedHero.id}}</div>
-	<div>
-	  <label for="hero-name">Hero name: </label>
-	  <input id="hero-name" [(ngModel)]="selectedHero.name" placeholder="name">
-	</div>
-  </div> -->

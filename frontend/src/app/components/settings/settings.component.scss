@@ -1,0 +1,22 @@
+@import '../../../styles/helpers/constants.scss';
+
+.setting_container {
+	display: flex;
+	padding: 3%;
+	background-color:$font-color;
+	// color:blanchedalmond
+}
+
+.setting_header {
+	position: absolute;
+	transform: translate(-50%);
+	left: 50%;
+	font-size: larger;
+}
+
+.setting_column {
+	flex: 33.33%;
+	padding: 3%;
+	background-color: $column-color;
+}
+
