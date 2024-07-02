@@ -53,6 +53,10 @@ export class FriendsComponent implements OnInit {
 	errorMessage?: string;
 
 	ngOnInit() {
+		this.getLists();
+	}
+
+	getLists() {
 		this.friendsService.getFriends().subscribe({
 			next: (data) => (
 				this.friends = data,
@@ -108,6 +112,7 @@ export class FriendsComponent implements OnInit {
 				console.log("accept friendrequesterror: " + e.message)
 			}
 		});
+		this.getLists();
 	}
 
 	deleteRequest(request: FriendRequest) {
@@ -121,6 +126,7 @@ export class FriendsComponent implements OnInit {
 				console.log("delete friendrequesterror: " + e.message)
 			}
 		});
+		this.getLists();
 	}
 
 	deselectFriend() {
@@ -140,5 +146,6 @@ export class FriendsComponent implements OnInit {
 				}
 			});
 		}
+		this.getLists();
 	}
 }
