@@ -29,44 +29,29 @@
 
 	<div class="friend_column">
 		<h3> incoming requests </h3>
-		<!-- <ul class="friends"> -->
-			@for (request of incoming; track request.id) {
-				@if (!request.id) {
-					<p>...</p>
-				}
-				<ul class="friends">
-					<li>
-						<button [class.selected]="request === selectedRequest" type="button" (click)="selectRequest(request)">
-							<span class="badge">{{ request.sender.id }}</span>
-							<span class="name">{{ request.sender.nickname }}</span>
-						</button>
 		
-						@if (selectedRequest) {
-							<p>
-								<button class="yesno" type="button" (click)="acceptIncoming(request)" > accept </button>
-								<button class="yesno" type="button" (click)="denyIncoming(request)"> deny </button>
-							</p>
-						}
-					</li>
-				</ul>
-			}
-			<!-- <li *ngFor="let request of incoming">
-				<button [class.selected]="request === selectedRequest" type="button" (click)="selectRequest(request)">
-					<span class="badge">{{ request.sender.id }}</span>
-					<span class="name">{{ request.sender.nickname }}</span>
-				</button>
+		@if ((!incoming) || (incomingLenght == 0) ) {
+			<p> zero incoming requests </p>
+		}
 
-				@if (selectedRequest) {
-					<p>
-						<button class="yesno" type="button" (click)="acceptIncoming(request)" > accept </button>
-						<button class="yesno" type="button"> deny </button>
-					</p>
-				}
+		@for (request of incoming; track request.id) {
+			<ul class="friends">
+				<li>
+					<button [class.selected]="request === selectedRequest" type="button" (click)="selectRequest(request)">
+						<span class="badge">{{ request.sender.id }}</span>
+						<span class="name">{{ request.sender.nickname }}</span>
+					</button>
+	
+					@if (selectedRequest) {
+						<p>
+							<button class="yesno" type="button" (click)="acceptIncoming(request)" > accept </button>
+							<button class="yesno" type="button" (click)="denyIncoming(request)"> deny </button>
+						</p>
+					}
+				</li>
+			</ul>
+		}
 
-				<!-- <span class="badge">{{ request.sender.id }}</span>
-				<span class="name">{{ request.sender.nickname }}</span>
-			</li> -->
-		<!-- </ul> -->
 		
 	</div>
 

@@ -49,6 +49,7 @@ export class FriendsComponent implements OnInit {
 
 	friends?: Friend[];
 	incoming?: FriendRequest[];
+	incomingLenght : Number = 0;
 	outgoing?: FriendRequest[];
 	errorMessage?: string;
 
@@ -64,7 +65,8 @@ export class FriendsComponent implements OnInit {
 		this.friendsService.getIncomingRequests().subscribe({
 			next: (data) => (
 				this.incoming = data,
-				console.log("all incoming: ", data)
+				console.log("all incoming: ", data),
+				this.incomingLenght = data.length()
 			),
 			error: (e) => (
 				console.error("all incoming error: " + e))
