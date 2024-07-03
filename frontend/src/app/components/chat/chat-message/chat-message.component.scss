@@ -49,3 +49,23 @@ div {
 	background: white;
     /* background-color: #f6e3d1; */
 }
+
+::ng-deep .mat-select-panel .div .cdk-overlay-container{
+    background: white;
+    color: black;
+}
+
+::ng-deep .mat-option {
+    background: white;
+    color: black;
+}
+
+::ng-deep .mat-option:hover {
+    background: #f0f0f0; /* Optional: A lighter background on hover */
+    color: black;
+}
+
+::ng-deep .mat-option-selected {
+    background: #e0e0e0; /* Optional: A slightly different background for the selected option */
+    color: black;
+}

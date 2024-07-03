@@ -1,13 +1,11 @@
 NAME = v1
 
-all: down build up
+all: down up
 
-re: data clean all
+re: data clean build up
 
 build: 
 	docker compose build
-
-images: docker images
 
 up: 
 	docker compose up

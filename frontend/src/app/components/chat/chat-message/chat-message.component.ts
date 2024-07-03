@@ -24,7 +24,7 @@ export class ChatMessageComponent implements AfterViewInit{
 	@Input() room: any;
 	@Input() user!: User;
 	selectedUser: any;
-	selectedUserID: any;
+	selectedUserID?: string;
 	
 	message: string | undefined;
 	// messages: string[] = [];
@@ -70,12 +70,14 @@ export class ChatMessageComponent implements AfterViewInit{
 		// ////console.log("chat-message sendmessage: " + this.room.name);
 	}
 
-	battle(userid: number){
+	battle(userid: string){
 		// ////console.log("FIGHTING------FIGHTING");
 		//console.log("chat-message.component userid: " + userid + ", room name: " + this.room.name);
-		this.chatService.battle(this.room.name, this.room.id, userid)
+		const num = Number(userid);
+		this.chatService.battle(this.room.name, this.room.id, num)
 		this.router.navigate(['/dashboard', 'game']);
 	}
+
 	joinBattle(roomnum: string){
 		//console.log(`chat-message.component ${roomnum}`)
 		this.chatService.joinBattle(roomnum);
@@ -84,17 +86,17 @@ export class ChatMessageComponent implements AfterViewInit{
 
 	mute(userid: string){
 		// ////console.log("FIGHTING------FIGHTING");
-		this.chatService.muteUser(this.room.id, userid);
+		this.chatService.muteUser(this.room.name, userid);
 	}
 
 	ban(userid: string){
 		// ////console.log("FIGHTING------FIGHTING");
-		this.chatService.banUser(this.room.id, userid);
+		this.chatService.banUser(this.room.name, userid);
 	}
 
 	kick(userid: string){
 		// ////console.log("FIGHTING------FIGHTING");
-		this.chatService.kickUser(this.room.id, userid);
+		this.chatService.kickUser(this.room.name, userid);
 	}
 
 	time(created: Date | undefined){

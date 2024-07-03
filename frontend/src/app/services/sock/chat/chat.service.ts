@@ -88,7 +88,8 @@ export class ChatService{
 	}
 	
 	leaveRoom(room: string, userid: string) {
-		this.chatSocket.emit('leaveRoom', {room, userid}, (err: any) => {
+		const num = Number(userid);
+		this.chatSocket.emit('leaveRoom', {room, num}, (err: any) => {
 			if (err) {
 				console.log("leaveRoom chat-sock error: ");
 				console.log(err);
@@ -194,7 +195,8 @@ export class ChatService{
 		});
 	}
 
-	muteUser(room: string, userid: string){
+	muteUser(room: string, user: string){
+		const userid = Number(user);
 		this.chatSocket.emit('mute', {room, userid}, (err: any) => {
 			if (err) {
 				console.log("leaveRoom chat-sock error: ");
@@ -204,7 +206,8 @@ export class ChatService{
 		});
 	}
 
-	banUser(room: string, userid: string){
+	banUser(room: string, user: string){
+		const userid = Number(user);
 		this.chatSocket.emit('ban', {room, userid}, (err: any) => {
 			if (err) {
 				console.log("banUser chat-sock error: ");
@@ -214,7 +217,8 @@ export class ChatService{
 		});
 	}
 
-	kickUser(room: string, userid: string){
+	kickUser(room: string, user: string){
+		const userid = Number(user);
 		this.chatSocket.emit('kick', {room, userid}, (err: any) => {
 			if (err) {
 				console.log("kickUser chat-sock error: ");
