@@ -11,6 +11,7 @@ import { Rooms } from '../../../models/rooms.class';
   providedIn: 'root'
 })
 export class ChatService{
+	count = 0;
 	private chatSocket = io("/chat");
 	private unread = true;
 	user?: User;
@@ -19,19 +20,22 @@ export class ChatService{
 	rooms: Rooms[] = []; 
 	roomss: Rooms[] = []; 
 
-	constructor(sockService: SockService, private userService: UserService) {
+	constructor( private userService: UserService) {
+		this.count++;
+		console.log("count: " + this.count);
 		this.userService.getUser(0).subscribe((userData) => {
 			this.user = userData;
 			console.log("User loaded in ChatService:", this.user);
 		});
 
-		this.chatSocket.onAny((event, ...args) => {
-			console.log("CHAT-SOCK EVENT: ");
-			console.log(event, args);
-		});
-		sockService.newSocketRegister("chatSocket");
+		// this.chatSocket.onAny((event, ...args) => {
+		// 	console.log("CHAT-SOCK EVENT: ");
+		// 	console.log(event, args);
+		// });
+		// sockService.newSocketRegister("chatSocket");
 	}
 	ngOnInit(): void {
+		console.log("dfd?");
 		// this.user$ = this.userService.getUser(0);
 	}
 
@@ -55,6 +59,7 @@ export class ChatService{
 			sender_id: this.user?.id,
 			room : room,
 		}
+		console.log("sending msg");
 		this.chatSocket.emit('message', messageObj, (err: any) => {
 			if (err) {
 				console.log("chat-sock error: ");

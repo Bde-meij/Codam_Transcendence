@@ -32,6 +32,8 @@ export class ChatMessageComponent implements AfterViewInit{
 	constructor(private chatService: ChatService, private router: Router, private userService :UserService) {};
 	
 	ngOnInit() {
+		// console.log("initing chatmsgcomponent");
+
 		//console.log("user message:")
 		//console.log(this.user)
 		// this.user.avatar = 
@@ -47,8 +49,12 @@ export class ChatMessageComponent implements AfterViewInit{
 	scrollToBottom() {
 		try {
 			const container = this.messageContainer.nativeElement;
-			container.scrollTop = container.scrollHeight - container.clientHeight + 50;
-		} catch(err) { }
+			const extra = this.messageInput.nativeElement;
+			container.scrollTop = container.scrollHeight - container.clientHeight;
+			// console.log("scrolling: " + container.scrollTop);
+		} catch(err) {
+			console.log("Error scrolltobottom");
+		 }
 	}
 
 	sendMessage() {

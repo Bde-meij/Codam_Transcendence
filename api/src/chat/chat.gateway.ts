@@ -48,7 +48,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	async handleConnection(client: Socket) {
 		try {
-			//console.log("handleConnection: " + client.id + "connecting...");
+			console.log("handleConnections: " + client.id + "connecting...");
 			const cookies = client.handshake.headers.cookie?.split('; ');
 			if (!cookies)
 				throw new NotAcceptableException();
@@ -73,6 +73,13 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			
 			client.data.nickname = user.nickname;
 			client.data.userid = (Number(user.id));
+			if (this.connectedUsers.includes(client.data.userid))
+			{
+				console.log("already connected");
+			}
+			else
+				console.log("not connected");
+
 			// this.fake_userid++;
             // client.data.key = user.roomKey;
 			
@@ -184,7 +191,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@MessageBody() data: { message: string, sender: string, sender_id: number, room: string },
 	@ConnectedSocket() socket: Socket,
 	) {
-		//console.log("handleMessage: " + data.room);
+		console.log("handleMessage: " + data.room + ", by: " + socket.id);
 		const Room = this.findRoom(data.room, "message");
 		// if (!Room.users.includes(data.sender_id)){
 		// 	//console.log(`handleMessage: not send, ${data.sender_id} not in list ${Room.users} `);
@@ -211,6 +218,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		// this.addDate();
 		this.io.to(Room.id.toString()).emit('message', message);
 		this.channelUserList(Room.name);
+		this.logger(data.room);
 	}
 
 	// const sockets = this.io.sockets.adapter.rooms.get(id);
@@ -649,10 +657,12 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				console.log("updateroom -1")
 				// this.findSocketUser(data.user_name);
 				this.updateAllUsers(client, this.chatRoomList);
+				client.emit('getConnectedUsers', this.connectedUsers);
 				return;
 			}
 		});
 		client.emit('getRoomss', temp);
+		client.emit('getConnectedUsers', this.connectedUsers);
 		temp = {};
 	}
 
