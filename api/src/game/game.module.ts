@@ -11,5 +11,6 @@ import { MatchService } from './match.service';
 	imports: [TypeOrmModule.forFeature([Match]), UserModule, AuthModule, UserModule],
 	controllers: [MatchController],
 	providers: [GameGateway, MatchService],
+	exports: [MatchService]
 })
 export class GameModule {}

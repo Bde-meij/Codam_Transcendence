@@ -11,5 +11,6 @@ import { UserModule } from 'src/user/user.module';
 	imports: [TypeOrmModule.forFeature([FriendRequest]), AuthModule, UserModule],
 	controllers: [FriendsController],
 	providers: [FriendsService, JwtService],
+	exports: [FriendsService]
 })
 export class FriendsModule {}
