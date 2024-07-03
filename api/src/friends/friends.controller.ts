@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Param, Delete, UseGuards, Req, HttpException, HttpStatus } from '@nestjs/common';
 import { FriendsService } from './friends.service';
 import { CreateFriendRequestDto } from './dto/create-friend.dto';
 import { JwtGuard } from 'src/auth/guard/jwt.guard';
@@ -78,58 +78,52 @@ export class FriendsController {
 	async isFriends(@Req() req, @Param('targetid') targetId: string) {
 		return await this.friendsService.isFriendsUserId(req.user.id, targetId);
 	}
-	
-	// -------------------------------------------------------------------------------------------------------------
-	// -------------------------------------------------------------------------------------------------------------
-	// -------------------------------------------------------------------------------------------------------------
-	// -------------------------------------------------------------------------------------------------------------
-	// ---------------------------------TESTING FUNCTIONS WITHOUT USING JWT COOKIES---------------------------------
-	// -------------------------------------------------------------------------------------------------------------
-	// -------------------------------------------------------------------------------------------------------------
-	// -------------------------------------------------------------------------------------------------------------
-	// -------------------------------------------------------------------------------------------------------------
+
+	// THESE ENDPOINTS HAVE BEEN MOVED TO THE TESTING CONTROLLER
+	// TO ACCESS THEM, PUT 'testing/' INTO THE URL. example:
+	// http://localhost:4200/api/friends/new-request/1/2
+	// is now
+	// http://localhost:4200/api/testing/friends/new-request/1/2
+	//
+	// Feel free to delete the endpoints below once you've switched over your testing requests
 
 	@Post('new-request/:userid/:target')
 	async create_NoCookie(@Req() req, @Param('target') target: string, @Param('userid') userId: string) {
-		const friendRequest: CreateFriendRequestDto = {
-			sender: userId,
-			target:	target
-		}
-		return await this.friendsService.create(friendRequest);
+		throw new HttpException('Endpoint has moved to: https://localhost:4200/api/testing/new-request/:userid/:target', HttpStatus.BAD_REQUEST);
 	}
 	
 	@Delete('delete-request-id/:userid/:requestid')
 	async deleteByRequestId_NoCookie(@Req() req, @Param('requestid') requestId: string, @Param('userid') userId: string) {
-		return await this.friendsService.deleteByRequestId(userId, requestId);
+		throw new HttpException('Endpoint has moved to: https://localhost:4200/api/testing/delete-request-id/:userid/:requestid', HttpStatus.BAD_REQUEST);
 	}
 	
 	@Delete('delete-request-user/:userid/:targetid')
 	async deleteByUserId_NoCookie(@Req() req, @Param('targetid') targetId: string, @Param('userid') userId: string) {
-		return await this.friendsService.deleteByUserId(userId, targetId);
+		throw new HttpException('Endpoint has moved to: https://localhost:4200/api/testing/delete-request-user/:userid/:targetid', HttpStatus.BAD_REQUEST);
 	}
 	
 	@Post('accept-request/:userid/:requestid')
 	async accept_NoCookie(@Req() req, @Param('requestid') requestId: string, @Param('userid') userId: string) {
-		return await this.friendsService.updateStatus(userId, requestId, FriendStatus.ACCEPTED);
+		throw new HttpException('Endpoint has moved to: https://localhost:4200/api/testing/accept-request/:userid/:requestid', HttpStatus.BAD_REQUEST);
 	}
 
 	@Get('incoming/:userid')
 	async findIncoming_NoCookie(@Req() req, @Param('userid') userId: string) {
-		return await this.friendsService.findIncoming(userId);
+		throw new HttpException('Endpoint has moved to: https://localhost:4200/api/testing/incoming/:userid', HttpStatus.BAD_REQUEST);
 	}
 	
 	@Get('outgoing/:userid')
 	async findOutgoing_NoCookie(@Req() req, @Param('userid') userId: string) {
-		return await this.friendsService.findOutgoing(userId);
+		throw new HttpException('Endpoint has moved to: https://localhost:4200/api/testing/outgoing/:userid', HttpStatus.BAD_REQUEST);
 	}
 
 	@Get('all/:userid')
 	async findFriends_NoCookie(@Req() req, @Param('userid') userId: string) {
-		return await this.friendsService.findFriends(userId);
+		throw new HttpException('Endpoint has moved to: https://localhost:4200/api/testing/all/:userid', HttpStatus.BAD_REQUEST);
 	}
 
 	@Get('is-friends/:userid/:targetid')
 	async isFriends_NoCookie(@Req() req, @Param('targetid') targetId: string, @Param('userid') userId: string) {
-		return await this.friendsService.isFriendsUserId(userId, targetId);
+		throw new HttpException('Endpoint has moved to: https://localhost:4200/api/testing/is-friends/:userid/:targetid', HttpStatus.BAD_REQUEST);
 	}
 }
