@@ -37,4 +37,8 @@ export class FriendsService {
 	addFriend(nickname: string) {
 		return this.http.post<any>(this.friendsUrl + '/new-request-nick/' + nickname, {});
 	}
+
+	isFriend(friendId: string) {
+		return this.http.get<any>(this.friendsUrl + '/is-friends/' + friendId, {});
+	}
 }
