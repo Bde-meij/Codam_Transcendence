@@ -31,8 +31,9 @@ export class UserDetailComponent implements OnChanges {
 
 	matches: any | undefined;
 
-	isfriend: boolean | undefined;
-	isself: boolean | undefined;
+	isfriend?: boolean;
+	isself?: boolean;
+	errorMessage: string | undefined;
 
 	constructor(private userService: UserService, private friendsService: FriendsService) {};
 
@@ -65,8 +66,9 @@ export class UserDetailComponent implements OnChanges {
 				console.log('user-detail stat data:', data),
 				this.stats = data
 			),
-			error: (error) => (
-				console.log('user-detail stat error:', error)
+			error: (e : HttpErrorResponse) => (
+				this.errorMessage = e.message,
+				console.log('user-detail stat error:', e)
 			)
 		});
 	}
@@ -78,18 +80,17 @@ export class UserDetailComponent implements OnChanges {
 				this.matches = data,
 				console.log('user-detail match data:', data)
 			),
-			error: (error) => (
-				console.log('user-detail match error:', error)
+			error: (e : HttpErrorResponse) => (
+				this.errorMessage = e.message,
+				console.log('user-detail match error:', e)
 			)
 		});
 	}
 
-	errorMessage: string | undefined;
-
 	addFriend() {
 		if (this.isfriend === undefined)
 			return;
-		this.friendsService.addFriend(this.id).subscribe({
+		this.friendsService.addFriendId(this.id).subscribe({
 			next: (data) => {
 				console.log("send friendrequest data: " + data)
 			},

@@ -152,7 +152,7 @@ export class FriendsComponent implements OnInit {
 	sendRequest(): void {
 		if (this.friendForm.value.friendName) {
 			console.log("sending this name: ", this.friendForm.value.friendName);
-			this.friendsService.addFriend(this.friendForm.value.friendName).subscribe({
+			this.friendsService.addFriendNick(this.friendForm.value.friendName).subscribe({
 				next: (data) => {
 					console.log("send friendrequest data: " + data)
 				},
