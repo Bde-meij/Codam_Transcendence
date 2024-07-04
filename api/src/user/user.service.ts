@@ -35,10 +35,10 @@ export class UserService {
 				{nickname: userData.nickname}
 			]
 		})
-		if (userExists.id === userData.id) {
+		if (userExists && userExists.id === userData.id) {
 			throw new HttpException('Id already in use!', 403);
 		}
-		if (userExists.nickname === userData.nickname) {
+		if (userExists && userExists.nickname === userData.nickname) {
 			throw new HttpException('Nickname already in use!', 403);
 		}
 		const savedUser = await this.userRepo.save({
