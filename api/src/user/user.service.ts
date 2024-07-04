@@ -81,7 +81,7 @@ export class UserService {
 	async get2faSecret(id: string) {
 		return await this.userRepo.findOne({
 			select: {
-				isTwoFAEnabled: true
+				twoFASecret: true
 			},
 			where: {
 				id: id
