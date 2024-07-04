@@ -1,3 +1,4 @@
+<button class="refresh" type="button" (click)="getLists()"> refresh all lists </button>
 <h2> Gary's family zone </h2>
 <p> because we're so much more then 'just friends' </p>
 <div class="friend_container">
@@ -22,6 +23,7 @@
 		<h3> friend </h3>
 		<p>id : {{selectedFriend.id}} </p>
 		<p>name : {{selectedFriend.nickname}} </p>
+		<button (click)="deleteFriend(selectedFriend)">unfriend</button>
 		<app-user-detail [id]="selectedFriend.id" ></app-user-detail>
 
 		<button (click)="deselectFriend()">close</button>

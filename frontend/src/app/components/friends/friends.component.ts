@@ -123,7 +123,22 @@ export class FriendsComponent implements OnInit {
 			},
 			error: (e : HttpErrorResponse) => {
 				this.errorMessage = e.message,
-				console.log("delete friendrequesterror: " + e.message)
+				console.log("delete friendrequest error: " + e.message)
+			}
+		});
+		this.getLists();
+	}
+
+	deleteFriend(friend: Friend) {
+		console.log("delete friend: ", friend);
+		this.selectedFriend = undefined;
+		this.friendsService.deleteFriend(friend.id).subscribe({
+			next: (data) => {
+				console.log("delete friend data: " + data)
+			},
+			error: (e : HttpErrorResponse) => {
+				this.errorMessage = e.message,
+				console.log("delete friend error: " + e.message)
 			}
 		});
 		this.getLists();
