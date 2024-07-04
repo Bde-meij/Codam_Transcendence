@@ -5,8 +5,7 @@
 <div class="setting_container">
 	<h3 class="setting_header"> Set things right! </h3>
 	<div class="setting_column" *ngIf="current_user_id">
-		<h2> you </h2>
-		<!-- <p> current id: {{current_user_id}} </p> -->
+		<h2> How Gary knows you: </h2>
 		<app-user-detail [id]="current_user_id"> </app-user-detail>
 	</div>
 	<div class="setting_column">
@@ -80,7 +79,7 @@
 					to: "{{this.current_nickname}}"
 				}
 			</p>
-			<p> (refresh to see changes) </p>
+			<p><button class="refresh" type="button" (click)="reload()">reload</button> to see changes </p>
 		}
 	</div>
 </div>

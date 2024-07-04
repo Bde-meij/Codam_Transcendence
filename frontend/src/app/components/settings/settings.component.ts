@@ -61,6 +61,10 @@ export class SettingsComponent implements OnInit {
 		});
 	}
 
+	reload() {
+		window.location.reload();
+	}
+
 	onChange() {
 		if (this.is2faEnabled) {
 			this.isChecked = true;
