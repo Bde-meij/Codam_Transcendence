@@ -11,20 +11,35 @@ export class UserService {
 	constructor(@InjectRepository(User) private readonly userRepo: Repository<User>) {}
 
   	async userExists(id: string) {
-		const user = await this.userRepo.findOne({where: {id}});
+		const user = await this.userRepo.findOne({
+			select: {
+				id: true
+			},
+			where: {
+				id
+			}
+		});
 		if (user)
 			return true;
 		return false;
-	} 
+	}
 
+	
 	async createUser(userData: CreateUserDto): Promise<User> {
-		const userIdExists = await this.userRepo.findOne({where: {id: userData.id}})
-		if (userIdExists) {
-			throw new HttpException('Id already in use!', 400);
+		const userExists = await this.userRepo.findOne({
+			select: {
+				id: true,
+			},
+			where: [
+				{id: userData.id},
+				{nickname: userData.nickname}
+			]
+		})
+		if (userExists.id === userData.id) {
+			throw new HttpException('Id already in use!', 403);
 		}
-		const userNameExists = await this.userRepo.findOne({where: {nickname: userData.nickname}})
-		if (userNameExists) {
-			throw new HttpException('Nickname already in use!', 400);
+		if (userExists.nickname === userData.nickname) {
+			throw new HttpException('Nickname already in use!', 403);
 		}
 		const savedUser = await this.userRepo.save({
 			id: userData.id,
@@ -32,7 +47,7 @@ export class UserService {
 		});
 		return savedUser;
 	}
-
+	
 	async createUsers(users: CreateUserDto[]): Promise<User[]> {
 		return await this.userRepo.save(users);
 	}
@@ -41,7 +56,7 @@ export class UserService {
 		const user = await this.userRepo.findOne({where: {id}});
 		return user;
 	}
-
+	
 	async findUserByName(name: string) {
 		const user = await this.userRepo.findOne({where: {nickname :name}});
 		console.log(user);
@@ -51,11 +66,44 @@ export class UserService {
 	async findAllUsers(): Promise<User[]> {
 		return await this.userRepo.find();
 	}
+	
+	async get2faEnabled(id: string) {
+		return await this.userRepo.findOne({
+			select: {
+				isTwoFAEnabled: true
+			},
+			where: {
+				id: id
+			}
+		})
+	}
+
+	async get2faSecret(id: string) {
+		return await this.userRepo.findOne({
+			select: {
+				isTwoFAEnabled: true
+			},
+			where: {
+				id: id
+			}
+		})
+	}
+
+	async getAvatar(id: string) {
+		return await this.userRepo.findOne({
+			select: {
+				avatar: true
+			},
+			where: {
+				id: id
+			}
+		})
+	}
 
 	async updateName(id: string, newName: string) {
 		await this.userRepo.update(id, {nickname: newName});
 	}
-
+	
 	async updateStatus(id: string, newStatus: string) {
 		await this.userRepo.update(id, {status: newStatus});
 	}
@@ -67,13 +115,20 @@ export class UserService {
 	async updateTwoFASecret(id: string, secret: any) {
 		await this.userRepo.update(id, {twoFASecret: secret.base32});
 	}
-
+	
 	async enableTwoFA(id: string) {
 		await this.userRepo.update(id, {isTwoFAEnabled: true});
 	}
-
+	
 	async disableTwoFA(id: string) {
 		await this.userRepo.update(id, {isTwoFAEnabled: false});
+	}
+
+	async updateTwoFA(id: string, enabled: boolean, secret: any) {
+		await this.userRepo.update(id, {
+			isTwoFAEnabled: enabled,
+			twoFASecret: secret.base32
+		})
 	}
 
 	async updateNickname(id: string, newName: string) {
