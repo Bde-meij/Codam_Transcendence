@@ -23,11 +23,11 @@ export class FriendsService {
 	}
 
 	deleteRequest(requestId: string) {
-		return this.http.delete<string>(this.friendsUrl + '/delete-request-id/' + requestId, {});
+		return this.http.delete<string>(this.friendsUrl + '/delete-request-id/' + requestId);
 	}
 
 	deleteFriend(friendId: string) {
-		return this.http.delete<string>(this.friendsUrl + '/delete-request-user/' + friendId, {});
+		return this.http.delete<string>(this.friendsUrl + '/delete-request-user/' + friendId);
 	}
 
 	getOutgoingRequests() {

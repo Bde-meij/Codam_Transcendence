@@ -89,6 +89,14 @@
 	// left: 50%;
 }
 
+.refresh {
+	font-size: small;
+	position: fixed;
+	left: 6%;
+	background-color: $font-color;
+	color: darken($background-color, 10%);
+}
+
 .errormessage {
 	color: $contrast-color;
 }
