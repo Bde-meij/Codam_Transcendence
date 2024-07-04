@@ -49,6 +49,7 @@ export class UserController {
 	async register(@Req() req, @Res() res, @Body() body: {nickname : string}) {
 		// console.log("NEW NAME:", body.nickname);
 		const user: CreateUserDto = {id: req.user.id, nickname: body.nickname};
+		console.error("NEW USER 1:", user);
 		await this.userService.createUser(user);
 		return res.status(HttpStatus.OK).json({message: 'User registered', user: user});
 	}
