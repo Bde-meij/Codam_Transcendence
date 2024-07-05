@@ -70,6 +70,12 @@ export class BossGameComponent implements OnInit, OnDestroy
 
 	ngOnInit()
 	{
+		this.screenResize();
+		window.addEventListener("resize", () =>
+		{
+			this.screenResize();
+		});
+		
 		this.bossHit = false;
 		this.damageCounter = 0;
 		this.checkEarlyDisconnect();
@@ -101,7 +107,6 @@ export class BossGameComponent implements OnInit, OnDestroy
 				this.startGame();
 			}},4000);
 		})
-
 	}
 
 	startGame()
@@ -109,7 +114,6 @@ export class BossGameComponent implements OnInit, OnDestroy
 		this.addAssets();
 		this.gameSrv.emit("startGameLoop");
 		
-		// gameloop
 		this.game.on("postupdate", ()=>
 		{
 			this.updateHack++;
@@ -140,10 +144,6 @@ export class BossGameComponent implements OnInit, OnDestroy
 
 		this.gameSrv.on("updateShurikenPos", (position: number[])=>
 		{
-			// updateShadows(this.players[0], this.playerShadows, 0);
-			// updateShadows(this.players[1], this.playerShadows, 3);
-			// updateShadows(this.players[2], this.playerShadows, 6);
-			// updateShadows(this.players[3], this.playerShadows, 9);
 			updateShadows(this.shuriken, this.shurikenShadows, 0);
 			this.shuriken.pos.x = position[0];
 			this.shuriken.pos.y = position[1];
@@ -193,7 +193,22 @@ export class BossGameComponent implements OnInit, OnDestroy
 			this.texts.lives.text = lives.toString();
 			// console.log("lives left", lives);
 		})
+
+		this.game.on("postupdate", ()=>
+		{
+			if (this.game.input.keyboard.isHeld(Keys.ArrowUp))
+			{
+				this.game.screen.viewport = {width: 100, height: 100};
+				this.game.screen.applyResolutionAndViewport();
+			}
+			if (this.game.input.keyboard.isHeld(Keys.ArrowDown))
+			{
+				this.game.screen.viewport = {width: 50, height: 50};
+				this.game.screen.applyResolutionAndViewport();
+			}
+		})
 	}
+
 
 	singleplayerMovement()
 	{
@@ -294,6 +309,15 @@ export class BossGameComponent implements OnInit, OnDestroy
 		this.game.remove(this.players[1]);
 		this.game.remove(this.players[2]);
 		this.game.remove(this.players[3]);
+	}
+
+	screenResize()
+	{
+		if (window.innerWidth < window.innerHeight)
+			this.game.screen.viewport = {width: window.innerWidth*0.7, height: window.innerWidth*0.7};
+		else
+			this.game.screen.viewport = {width: window.innerHeight*0.7, height: window.innerHeight*0.7};
+		this.game.screen.applyResolutionAndViewport();
 	}
 	
 	ngOnDestroy() 
