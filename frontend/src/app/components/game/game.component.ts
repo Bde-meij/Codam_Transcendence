@@ -48,6 +48,12 @@ export class GameComponent implements OnInit, OnDestroy
 	gameSrv: any
 	ngOnInit()
 	{
+		this.screenResize();
+		window.addEventListener("resize", () =>
+		{
+			this.screenResize();
+		});
+		
 		this.texts.leftPNameText.text = "";
 		this.texts.rightPNameText.text = "";
 		this.texts.winText.text = "";
@@ -201,6 +207,15 @@ export class GameComponent implements OnInit, OnDestroy
 			setTimeout(() =>{{this.ngOnDestroy();}},2000);
 			this.game.add(this.texts.abortText);
 		});
+	}
+
+	screenResize()
+	{
+		if (window.innerWidth < window.innerHeight)
+			this.game.screen.viewport = {width: window.innerWidth*0.7, height: window.innerWidth*0.7};
+		else
+			this.game.screen.viewport = {width: window.innerHeight*0.7, height: window.innerHeight*0.7};
+		this.game.screen.applyResolutionAndViewport();
 	}
 
 	ngOnDestroy() 
