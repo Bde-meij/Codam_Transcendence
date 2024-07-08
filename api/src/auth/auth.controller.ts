@@ -46,29 +46,34 @@ export class AuthController {
 			id: (req.user as any).id,
 			is2faVerified: true,
 		}
-		const user: User = await this.userService.findUserById(potentialNewUser.id)
-		if (user && user.isTwoFAEnabled == true) {
-			potentialNewUser.is2faVerified = false;
-		}
-		const tokens = await this.authService.getJwtTokens(potentialNewUser);
-		res.cookie('access_token', tokens.access_token, {httpOnly: true});
-		res.cookie('refresh_token', tokens.refresh_token, {httpOnly: true});
-		if (!user) {
+		try {
+			const user: User = await this.userService.findUserById(potentialNewUser.id)
+			if (user && user.isTwoFAEnabled == true) {
+				potentialNewUser.is2faVerified = false;
+			}
+			const tokens = await this.authService.getJwtTokens(potentialNewUser);
+			res.cookie('access_token', tokens.access_token, {httpOnly: true});
+			res.cookie('refresh_token', tokens.refresh_token, {httpOnly: true});
+			if (user.isTwoFAEnabled) {
+					res.status(HttpStatus.FOUND).redirect(`http://${req.hostname}:4200/twofa`);
+			}
+			else {
+				this.userService.updateStatus(user.id, 'online');
+				res.status(HttpStatus.FOUND).redirect(`http://${req.hostname}:4200/dashboard/home`);
+			}
+		} catch {
 			res.status(HttpStatus.FOUND).redirect(`http://${req.hostname}:4200/register`);
-		}
-		else if (user.isTwoFAEnabled) {
-				res.status(HttpStatus.FOUND).redirect(`http://${req.hostname}:4200/twofa`);
-		}
-		else {
-			this.userService.updateStatus(user.id, 'online');
-			res.status(HttpStatus.FOUND).redirect(`http://${req.hostname}:4200/dashboard`);
 		}
 	}
 
 	@Post('logout')
 	@UseGuards(JwtGuard)
-	async logout(@Req() req, @Res() res) {
-		await this.userService.updateStatus(req.user.id, 'offline');
+	async logout(@Req() req, @Res() res: Response) {
+		try {
+			await this.userService.updateStatus(req.user.id, 'offline');
+		} catch {
+			res.status(404).send({message: 'User not found'});
+		}
 		res.clearCookie('access_token');
 		res.clearCookie('refresh_token');
 		res.status(200).send({message: 'Logged out successfully'});

@@ -46,12 +46,14 @@ export class BossGameGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 			if (!token)
 				throw new NotAcceptableException();
 			var payload = await this.authService.verifyJwtAccessToken(token);
-			var user = await this.userService.findUserById(payload.id);
-			if (!user)
+			try {
+				var user = await this.userService.findUserById(payload.id);
+				client.data.userid = user.id;
+				client.data.nick = user.nickname;
+				client.data.key = user.roomKey;
+			} catch {
 				throw new NotAcceptableException();
-			client.data.userid = user.id;
-			client.data.nick = user.nickname;
-			client.data.key = user.roomKey;
+			}
 			// console.log(client.data.key);
 			client.emit("connectSignal");
 		}

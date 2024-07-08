@@ -10,13 +10,13 @@ import * as speakeasy from 'speakeasy';
 export class UserService {
 	constructor(@InjectRepository(User) private readonly userRepo: Repository<User>) {}
 
-  	async userExists(id: string) {
+  	async userExists(userId: string) {
 		const user = await this.userRepo.findOne({
 			select: {
 				id: true
 			},
 			where: {
-				id
+				id: userId
 			}
 		});
 		if (user)
@@ -49,96 +49,134 @@ export class UserService {
 		return savedUser;
 	}
 	
+	// test function? (unprotected)
 	async createUsers(users: CreateUserDto[]): Promise<User[]> {
 		return await this.userRepo.save(users);
 	}
 
-	async findUserById(id: string) {
-		const user = await this.userRepo.findOne({where: {id}});
+
+	async findUserById(userId: string) {
+		const user = await this.userRepo.findOne({
+			where: {
+				id: userId
+			}
+		});
+		if (!user)
+			throw new HttpException("User " + userId + " not found!", 404);
 		return user;
 	}
 	
-	async findUserByName(name: string) {
-		const user = await this.userRepo.findOne({where: {nickname :name}});
-		console.log(user);
+	async findUserByName(userName: string) {
+		const user = await this.userRepo.findOne({
+			where: {
+				nickname : userName
+			}
+		});
+		if (!user)
+			throw new HttpException("User " + userName + " not found!", 404);
 		return user;
 	}
 
+	// test function? (unprotected)
 	async findAllUsers(): Promise<User[]> {
 		return await this.userRepo.find();
 	}
 	
-	async get2faEnabled(id: string) {
+	async get2faEnabled(userId: string) {
+		if (!await this.userExists(userId))
+			throw new HttpException("User " + userId + " not found!", 404);
 		return await this.userRepo.findOne({
 			select: {
 				isTwoFAEnabled: true
 			},
 			where: {
-				id: id
+				id: userId
 			}
 		})
 	}
 
-	async get2faSecret(id: string) {
+	async get2faSecret(userId: string) {
+		if (!await this.userExists(userId))
+			throw new HttpException("User " + userId + " not found!", 404);
 		return await this.userRepo.findOne({
 			select: {
 				twoFASecret: true
 			},
 			where: {
-				id: id
+				id: userId
 			}
 		})
 	}
 
-	async getAvatar(id: string) {
+	async getAvatar(userId: string) {
+		if (!await this.userExists(userId))
+			throw new HttpException("User " + userId + " not found!", 404);
 		return await this.userRepo.findOne({
 			select: {
 				avatar: true
 			},
 			where: {
-				id: id
+				id: userId
 			}
 		})
 	}
 
-	async updateName(id: string, newName: string) {
-		await this.userRepo.update(id, {nickname: newName});
+	async updateName(userId: string, newName: string) {
+		if (!await this.userExists(userId))
+			throw new HttpException("User " + userId + " not found!", 404);
+		await this.userRepo.update(userId, {nickname: newName});
 	}
 	
-	async updateStatus(id: string, newStatus: string) {
-		await this.userRepo.update(id, {status: newStatus});
+	async updateStatus(userId: string, newStatus: string) {
+		if (!await this.userExists(userId))
+			throw new HttpException("User " + userId + " not found!", 404);
+		await this.userRepo.update(userId, {status: newStatus});
 	}
 
-	async updateAvatar(id: string, newAvatar: string) {
-		await this.userRepo.update(id, {avatar: newAvatar});
+	async updateAvatar(userId: string, newAvatar: string) {
+		if (!await this.userExists(userId))
+			throw new HttpException("User " + userId + " not found!", 404);
+		await this.userRepo.update(userId, {avatar: newAvatar});
 	}
 
-	async updateTwoFASecret(id: string, secret: any) {
-		await this.userRepo.update(id, {twoFASecret: secret.base32});
+	async updateTwoFASecret(userId: string, secret: any) {
+		if (!await this.userExists(userId))
+			throw new HttpException("User " + userId + " not found!", 404);
+		await this.userRepo.update(userId, {twoFASecret: secret.base32});
 	}
 	
-	async enableTwoFA(id: string) {
-		await this.userRepo.update(id, {isTwoFAEnabled: true});
+	async enableTwoFA(userId: string) {
+		if (!await this.userExists(userId))
+			throw new HttpException("User " + userId + " not found!", 404);
+		await this.userRepo.update(userId, {isTwoFAEnabled: true});
 	}
 	
-	async disableTwoFA(id: string) {
-		await this.userRepo.update(id, {isTwoFAEnabled: false});
+	async disableTwoFA(userId: string) {
+		if (!await this.userExists(userId))
+			throw new HttpException("User " + userId + " not found!", 404);
+		await this.userRepo.update(userId, {isTwoFAEnabled: false});
 	}
 
-	async updateTwoFA(id: string, enabled: boolean, secret: any) {
-		await this.userRepo.update(id, {
+	async updateTwoFA(userId: string, enabled: boolean, secret: any) {
+		if (!await this.userExists(userId))
+			throw new HttpException("User " + userId + " not found!", 404);
+		await this.userRepo.update(userId, {
 			isTwoFAEnabled: enabled,
 			twoFASecret: secret.base32
 		})
 	}
 
-	async updateNickname(id: string, newName: string) {
-		await this.userRepo.update(id, {nickname: newName});
+	async updateNickname(userId: string, newName: string) {
+		if (!await this.userExists(userId))
+			throw new HttpException("User " + userId + " not found!", 404);
+		await this.userRepo.update(userId, {nickname: newName});
 	}
 
 	async updateRoomKey(userId: string, roomKey: number) {
-		if (!await this.userExists(userId))
-			throw new HttpException("User not found!", 404);
+		if (!await this.userExists(userId)) {
+			console.error("ROOM KEY EXCEPTION IN USER SERVICE");
+			throw new HttpException("User " + userId + " not found!", 404);
+		}
 		await this.userRepo.update({id: userId}, {roomKey: roomKey});
 	}
 }
