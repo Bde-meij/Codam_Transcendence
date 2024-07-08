@@ -50,7 +50,7 @@ export class FriendsComponent implements OnInit {
 	friends?: Friend[];
 	incoming?: FriendRequest[];
 	outgoing?: FriendRequest[];
-	errorMessage?: string;
+	errorMessage?: string | undefined;
 
 	ngOnInit() {
 		this.getLists();
@@ -81,6 +81,7 @@ export class FriendsComponent implements OnInit {
 			error: (e) => (
 				console.error("all outgoing error: " + e))
 		});
+		this.errorMessage = undefined;
 	}
 
 	selectedFriend: Friend | undefined;
@@ -151,7 +152,7 @@ export class FriendsComponent implements OnInit {
 	sendRequest(): void {
 		if (this.friendForm.value.friendName) {
 			console.log("sending this name: ", this.friendForm.value.friendName);
-			this.friendsService.addFriend(this.friendForm.value.friendName).subscribe({
+			this.friendsService.addFriendNick(this.friendForm.value.friendName).subscribe({
 				next: (data) => {
 					console.log("send friendrequest data: " + data)
 				},

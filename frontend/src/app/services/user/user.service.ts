@@ -10,6 +10,7 @@ import { User } from '../../models/user.class';
 })
 export class UserService {
 	private userUrl = "/api/user";
+	private matchUrl = "/api/match";
 
 	constructor(private http: HttpClient, private router: Router) { };
 
@@ -50,5 +51,13 @@ export class UserService {
 			return this.http.get(this.userUrl + '/getAvatar/current', {responseType: 'blob'});
 		// console.log("getavatar called");
 		return this.http.get(this.userUrl + '/getAvatar/' + id, {responseType: 'blob'});
+	}
+
+	getMatches(id : string) {
+		return this.http.get(this.matchUrl + '/user-matches/' + id, {});
+	}
+
+	getStats(id: string) {
+		return this.http.get<any>(this.matchUrl + '/user-stats/' + id, {});
 	}
 }

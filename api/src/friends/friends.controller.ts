@@ -19,7 +19,7 @@ export class FriendsController {
 		return await this.friendsService.createNick(friendRequest);
 	}
 
-	// send new friend request with friend id
+	///✅ send new friend request with friend id
 	@Post('new-request/:targetid')
 	@UseGuards(JwtGuard)
 	async create(@Req() req, @Param('targetid') targetId: string) {
@@ -72,10 +72,19 @@ export class FriendsController {
 		return await this.friendsService.findFriends(req.user.id);
 	}
 	
-	// check if this is friend
+	///✅ check if this is friend
 	@Get('is-friends/:targetid')
 	@UseGuards(JwtGuard)
 	async isFriends(@Req() req, @Param('targetid') targetId: string) {
-		return await this.friendsService.isFriendsUserId(req.user.id, targetId);
+		if (req.user.id === targetId) {
+			return {
+				self: true, 
+				friend: true
+			};
+		}
+		return {
+			self: false, 
+			friend: await this.friendsService.isFriendsUserId(req.user.id, targetId)
+		};
 	}
 }

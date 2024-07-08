@@ -1,4 +1,5 @@
 <button class="refresh" type="button" (click)="getLists()"> refresh all lists </button>
+<p> </p>
 <h2> Gary's family zone </h2>
 <p> because we're so much more then 'just friends' </p>
 <div class="friend_container">
@@ -20,11 +21,12 @@
 	</div>
 
 	<div class="friend_column" *ngIf="selectedFriend">
-		<h3> friend </h3>
+		<!-- <h3> friend </h3>
 		<p>id : {{selectedFriend.id}} </p>
-		<p>name : {{selectedFriend.nickname}} </p>
-		<button (click)="deleteFriend(selectedFriend)">unfriend</button>
+		<p>name : {{selectedFriend.nickname}} </p> -->
+		<!-- <button (click)="deleteFriend(selectedFriend)">unfriend</button> -->
 		<app-user-detail [id]="selectedFriend.id" ></app-user-detail>
+		<button class="unfriend" (click)="deleteFriend(selectedFriend)">unfriend</button>
 
 		<button (click)="deselectFriend()">close</button>
 
@@ -88,7 +90,7 @@
 
 				@if (selectedOutgoingRequest === request) {
 					<p>
-						<button class="yesno" type="button" (click)="deleteRequest(request)"> cancel </button>
+						<button class="yesno" type="button" (click)="deleteRequest(request)"> cancel request </button>
 					</p>
 				}
 			</ul>

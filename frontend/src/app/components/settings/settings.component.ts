@@ -4,7 +4,7 @@ import { ReactiveFormsModule, FormsModule, FormGroup, FormControl, Validators } 
 import { AuthService } from '../../services/auth/auth.service';
 import { UniqueNameValidator, forbiddenNameValidator } from '../../services/validator/name-validator.service';
 import { UserService } from '../../services/user/user.service';
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { UserDetailComponent } from '../user-detail/user-detail.component';
 import { User } from '../../models/user.class';
@@ -38,6 +38,7 @@ export class SettingsComponent implements OnInit {
 	succesMessage = ""
 	current_nickname : string | null | undefined;
 	current_user_id : string | undefined;
+	current_file: File | undefined;
 
 	isChecked: boolean = false;
 	is2faEnabled: boolean = false;
@@ -59,6 +60,10 @@ export class SettingsComponent implements OnInit {
 				console.log("the e: ", e)
 			)
 		});
+	}
+
+	reload() {
+		window.location.reload();
 	}
 
 	onChange() {
@@ -110,5 +115,41 @@ export class SettingsComponent implements OnInit {
 		// this.router.navigate([this.router.url]);
 		// this.router.navigate(['/dashboard/settings/'], {});
 		console.log("NAVIGATE")
+	}
+
+	preview: string | undefined;
+	selectFile(event: any) {
+		const	selectedFiles = event.target.files;
+		if (selectedFiles) {
+			const file: File | null = selectedFiles.item(0);
+
+			if (file) {
+				this.preview = '';
+				this.current_file = file;
+
+				const reader = new FileReader();
+				reader.onload = (e: any) => {
+					// console.log("e.target.result: ", e.target.result);
+					this.preview = e.target.result;
+				};
+				reader.readAsDataURL(this.current_file);
+			}
+		}
+	};
+
+	changeAvatar() {
+		if (this.current_file) {
+			this.userService.uploadAvatar(this.current_file).subscribe({
+				next: (data) => {
+					console.log("change avatar data:", data);
+					this.succesMessage = data.message;
+					this.errorMessage = '';
+				},
+				error: (e: HttpErrorResponse) => {
+					this.errorMessage = e.message;
+					console.log("change avatar data error :", e.message);
+				}
+			});
+		}
 	}
 }

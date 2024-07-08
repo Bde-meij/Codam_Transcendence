@@ -9,6 +9,7 @@ import { extname, join } from 'path';
 import { createReadStream, existsSync, unlinkSync } from 'fs';
 import * as path from 'path';
 import { User, defaultAvatarUrl } from './entities/user.entity';
+import { ok } from 'assert';
 
 @Controller('user')
 export class UserController {
@@ -49,6 +50,7 @@ export class UserController {
 	async register(@Req() req, @Res() res, @Body() body: {nickname : string}) {
 		// console.log("NEW NAME:", body.nickname);
 		const user: CreateUserDto = {id: req.user.id, nickname: body.nickname};
+		console.error("NEW USER 1:", user);
 		await this.userService.createUser(user);
 		return res.status(HttpStatus.OK).json({message: 'User registered', user: user});
 	}
@@ -114,7 +116,7 @@ export class UserController {
 			},
 		}),
 	}))
-	async uploadAvatar(@Req() req, @UploadedFile() file: Express.Multer.File) {
+	async uploadAvatar(@Req() req, @Res() res, @UploadedFile() file: Express.Multer.File) {
 		const currentAvatarPath = (await this.userService.getAvatar(req.user.id)).avatar;
 		//deletes old image if there was one (and isn't default avatar)
 		if (currentAvatarPath === defaultAvatarUrl) {
@@ -124,7 +126,7 @@ export class UserController {
 		}
 		this.userService.updateAvatar(req.user.id, file.path);
 		console.log("MY DATA: ", file);
-		return ;
+		return res.status(HttpStatus.OK).json({message: 'Avatar uploaded'});
 	}
 
 	@Post('update-roomkey/:key')
