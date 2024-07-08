@@ -193,20 +193,6 @@ export class BossGameComponent implements OnInit, OnDestroy
 			this.texts.lives.text = lives.toString();
 			// console.log("lives left", lives);
 		})
-
-		this.game.on("postupdate", ()=>
-		{
-			if (this.game.input.keyboard.isHeld(Keys.ArrowUp))
-			{
-				this.game.screen.viewport = {width: 100, height: 100};
-				this.game.screen.applyResolutionAndViewport();
-			}
-			if (this.game.input.keyboard.isHeld(Keys.ArrowDown))
-			{
-				this.game.screen.viewport = {width: 50, height: 50};
-				this.game.screen.applyResolutionAndViewport();
-			}
-		})
 	}
 
 
