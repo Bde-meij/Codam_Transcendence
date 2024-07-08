@@ -50,7 +50,6 @@ export class UserController {
 	async register(@Req() req, @Res() res, @Body() body: {nickname : string}) {
 		// console.log("NEW NAME:", body.nickname);
 		const user: CreateUserDto = {id: req.user.id, nickname: body.nickname};
-		console.error("NEW USER 1:", user);
 		await this.userService.createUser(user);
 		return res.status(HttpStatus.OK).json({message: 'User registered', user: user});
 	}
@@ -79,7 +78,7 @@ export class UserController {
 		// console.log('GET: user/getAvatar');
 		const user = await this.userService.findUserById(req.user.id);
 		if (!user)
-			return res.status(HttpStatus.NOT_FOUND).json({message: 'User not found', avatar: user.avatar});
+			return res.status(HttpStatus.NOT_FOUND).json({message: 'User not found'});
 		const file = createReadStream(join(process.cwd(), user.avatar));
 		// Return error 404 if the avatar doesn't exist
 		file.on('error', () => {
@@ -95,7 +94,7 @@ export class UserController {
 		// console.log('GET: user/getAvatar/id');
 		const user = await this.userService.getAvatar(id);
 		if (!user)
-			return res.status(HttpStatus.NOT_FOUND).json({message: 'User not found', avatar: user.avatar});
+			return res.status(HttpStatus.NOT_FOUND).json({message: 'User not found'});
 		const file = createReadStream(join(process.cwd(), user.avatar));
 		// Return error 404 if the avatar doesn't exist
 		file.on('error', () => {
