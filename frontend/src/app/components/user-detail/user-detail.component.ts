@@ -34,16 +34,24 @@ export class UserDetailComponent implements OnChanges {
 	isfriend?: boolean;
 	isself?: boolean;
 	errorMessage: string | undefined;
+	userErrorMessage: string | undefined;
 
 	constructor(private userService: UserService, private friendsService: FriendsService) {};
 
 	ngOnChanges(): void {
-		this.userService.getUser(this.id).subscribe((data) => (
-			this.tempUser.id = data.id,
-			this.tempUser.nickname = data.nickname,
-			// this.tempUser.avatar = data.avatar,
-			this.tempUser.status = data.status
-		));
+		this.userErrorMessage = undefined;
+		this.userService.getUser(this.id).subscribe({
+			next: (data) => (
+				this.tempUser.id = data.id,
+				this.tempUser.nickname = data.nickname,
+				this.tempUser.status = data.status
+			),
+			error: (error : HttpErrorResponse) => (
+				console.log("user error message: ", error.message),
+				this.userErrorMessage = error.message
+			)
+		})
+
 		this.userService.getAvatar(this.id).subscribe((data) => (
 			this.tempUser.avatar = URL.createObjectURL(data)
 		))
@@ -60,6 +68,7 @@ export class UserDetailComponent implements OnChanges {
 	}
 
 	getStats() {
+		this.errorMessage = undefined;
 		this.matches = undefined;
 		this.userService.getStats(this.id).subscribe({
 			next: (data) => (
@@ -74,6 +83,7 @@ export class UserDetailComponent implements OnChanges {
 	}
 
 	getMatches() {
+		this.errorMessage = undefined;
 		this.stats = undefined;
 		this.userService.getMatches(this.id).subscribe({
 			next: (data) => (

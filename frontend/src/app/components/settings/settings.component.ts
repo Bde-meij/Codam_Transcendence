@@ -51,7 +51,7 @@ export class SettingsComponent implements OnInit {
 		this.authService.is2FAEnabled().subscribe(data =>
 			this.is2faEnabled = data.isTwoFAEnabled
 		);
-		this.userService.getUser('0').subscribe({
+		this.userService.getUser('current').subscribe({
 			next: (data ) => {
 				this.current_user_id = data.id
 				this.current_nickname = data.nickname
