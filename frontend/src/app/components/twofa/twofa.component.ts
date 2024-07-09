@@ -22,7 +22,7 @@ export class TwofaComponent {
 	this.authService.verify2FA(this.userInput).subscribe({
 		next: (response) => {
 			this.verificationRes = response;
-			console.log('Verification response:', response.message);
+			// console.log('Verification response:', response.message);
 			if (this.verificationRes.status)
 				this.router.navigate(['/dashboard/home']);
 		},

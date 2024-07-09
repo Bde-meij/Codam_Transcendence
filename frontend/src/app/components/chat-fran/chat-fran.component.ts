@@ -41,7 +41,7 @@ export class ChatUiComponent implements AfterViewInit{
 	constructor(private chatService: ChatService, private userService :UserService, private sidebarService: NbSidebarService) {};
 
 	ngOnInit() {
-    this.userService.getUser(0).subscribe((userData) => (
+    this.userService.getUser('0').subscribe((userData) => (
 			this.user = userData
 		));
 	

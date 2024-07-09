@@ -6,6 +6,7 @@
 @import './modules/nav.scss';
 @import './modules/button.scss';
 @import './modules/header.scss';
+@import './modules/link.scss';
 
 $dark-background: darken($background-color, 5%);
 
@@ -13,7 +14,7 @@ body {
 	width: 90%;
 	margin: 0 auto; //2em?
 	padding: 0 20px 20px 20px;
-	border: 5px solid black;
+	border: 5px solid transparent;
 	font: 100% $font-stack;
   	color: $font-color;
   	background-color: $background-color;
@@ -30,8 +31,6 @@ div {
 	border: 2px solid darken($button-color, 10%);
 }
 
-
-
 .chat_column {
 	flex: 50%;
 	min-height: 200px;
@@ -44,4 +43,8 @@ div {
 }
 .chat_container {
 	display: flex;
+}
+
+.errormessage {
+	color: $contrast-color;
 }

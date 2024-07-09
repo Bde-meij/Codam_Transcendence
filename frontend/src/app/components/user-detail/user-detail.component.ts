@@ -1,5 +1,5 @@
 import { NgIf, UpperCasePipe } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit } from '@angular/core';
 import { User } from '../../models/user.class';
 import { UserService } from '../../services/user/user.service';
 
@@ -10,36 +10,30 @@ import { UserService } from '../../services/user/user.service';
   templateUrl: './user-detail.component.html',
   styleUrl: './user-detail.component.scss'
 })
-export class UserDetailComponent implements OnInit {
-	@Input()id!: number;
+export class UserDetailComponent implements OnChanges {
+	@Input()id!: string;
 	my_user?: User;
+
+	tempUser = {
+		id: '',
+		nickname : '',
+		avatar: '',
+		status: ''
+	};
 
 	constructor(private userService: UserService) {};
 
-	ngOnInit(): void {
-		this.my_user = this.userDetails(this.id);
-	}
-
-	userDetails(tempID : number) : User {
-		let tempUser: User = {
-			id: 0,
-			nickname : '',
-			avatar: '',
-			status: ''
-		};
-
-		this.userService.getUser(tempID).subscribe((data) => (
-			tempUser.id = data.id,
-			tempUser.nickname = data.nickname,
-			tempUser.avatar = data.avatar,
-			tempUser.status = data.status
+	ngOnChanges(): void {
+		this.userService.getUser(this.id).subscribe((data) => (
+			this.tempUser.id = data.id,
+			this.tempUser.nickname = data.nickname,
+			// this.tempUser.avatar = data.avatar,
+			this.tempUser.status = data.status
 		));
-		this.userService.getAvatar(tempID).subscribe((data) => (
-			tempUser.avatar = URL.createObjectURL(data)
+		this.userService.getAvatar(this.id).subscribe((data) => (
+			this.tempUser.avatar = URL.createObjectURL(data)
 		))
-		
-		console.log('user', tempUser);
-
-		return tempUser;
+		this.my_user = this.tempUser;
 	}
+
 }

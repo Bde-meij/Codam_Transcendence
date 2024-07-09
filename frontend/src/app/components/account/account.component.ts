@@ -16,12 +16,12 @@ import { RouterLink } from '@angular/router';
   styleUrl: './account.component.scss'
 })
 export class AccountComponent implements OnInit {
-	my_id?: number;
+	my_id?: string;
 
 	constructor(private userService: UserService){}
 
 	ngOnInit(): void {
-		this.userService.getUser(0).subscribe(data => 
+		this.userService.getUser('0').subscribe(data => 
 			this.my_id = data.id
 		);		
 	};

@@ -15,6 +15,7 @@ import { GameMenuComponent } from './components/game-menu/game-menu.component';
 import { TwofaComponent } from './components/twofa/twofa.component';
 import { constTitle } from './models/title.const';
 import { ChatUiComponent } from './components/chat-fran/chat-fran.component';
+import { UserDetailComponent } from './components/user-detail/user-detail.component';
 
 export const routes: Routes = [
 	{
@@ -45,47 +46,52 @@ export const routes: Routes = [
 			{
 				path: 'home',
 				component: HomeComponent,
-				canActivate: [AuthGuard],
+				canActivate: [AuthGuard]
 			},
 			{
 				path: 'settings',
 				component: SettingsComponent,
-				canActivate: [AuthGuard],
+				canActivate: [AuthGuard]
 			},
 			{
 				path: 'game',
 				component: GameComponent,
-				canActivate: [AuthGuard],
+				canActivate: [AuthGuard]
 			},
 			{
 				path: 'bossPong',
 				component: BossGameComponent,
-				canActivate: [AuthGuard],
+				canActivate: [AuthGuard]
 			},
 			{
 				path: 'game-menu',
 				component: GameMenuComponent,
-				canActivate: [AuthGuard],
+				canActivate: [AuthGuard]
 			},
 			{
 				path: 'friends',
 				component: FriendsComponent,
-				canActivate: [AuthGuard],
+				canActivate: [AuthGuard]
 			},
 			{
 				path: 'account',
 				component: AccountComponent,
-				canActivate: [AuthGuard],
+				canActivate: [AuthGuard]
 			},
 			{
 				path: 'chat',
 				component: ChatComponent,
-				canActivate: [AuthGuard],
+				canActivate: [AuthGuard]
 			},
 			{
 				path: 'franchat',
 				component: ChatUiComponent,
 				canActivate: [AuthGuard],
+			},
+			{
+				path: 'detail/:id', 
+				component: UserDetailComponent,
+				canActivate: [AuthGuard]
 			},
 		],
 	},

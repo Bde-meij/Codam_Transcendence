@@ -6,11 +6,13 @@ import { UniqueNameValidator, forbiddenNameValidator } from '../../services/vali
 import { UserService } from '../../services/user/user.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { UserDetailComponent } from '../user-detail/user-detail.component';
+import { User } from '../../models/user.class';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [ReactiveFormsModule, NgIf, FormsModule, AsyncPipe],
+  imports: [ReactiveFormsModule, NgIf, FormsModule, AsyncPipe, UserDetailComponent],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.scss'
 })
@@ -33,8 +35,9 @@ export class SettingsComponent implements OnInit {
 
 	// newName : string = '';
 	errorMessage = "";
-	current_nickname = '';
-
+	succesMessage = ""
+	current_nickname : string | null | undefined;
+	current_user_id : string | undefined;
 
 	isChecked: boolean = false;
 	is2faEnabled: boolean = false;
@@ -47,9 +50,15 @@ export class SettingsComponent implements OnInit {
 		this.authService.is2FAEnabled().subscribe(data =>
 			this.is2faEnabled = data.isTwoFAEnabled
 		);
-		this.userService.getUser(0).subscribe(data =>
-			this.current_nickname = data.nickname
-		);
+		this.userService.getUser('0').subscribe({
+			next: (data ) => {
+				this.current_user_id = data.id
+				this.current_nickname = data.nickname
+			},
+			error: (e) => (
+				console.log("the e: ", e)
+			)
+		});
 	}
 
 	onChange() {
@@ -81,26 +90,25 @@ export class SettingsComponent implements OnInit {
 	changeName() {
 		console.log(this.profileForm.value.nickname);
 		if (this.profileForm.value.nickname) {
+			this.current_nickname = this.profileForm.value.nickname;
 			this.userService.changeName(this.profileForm.value.nickname).subscribe({
 				next: (data) => {
-					console.log(data);
-					this.userService.getUser(0).subscribe(data =>
-						this.current_nickname = data.nickname
-					);
-					// this.profileForm.invalid = true;
+					console.log("changename data:", data);
+					this.succesMessage = data.message;
+					this.errorMessage = '';
 				},
 				error: (e: HttpErrorResponse) => {
-					this.errorMessage = e.error.message;
-					console.log(e.error.message);
+					this.errorMessage = e.message;
+					// this.succesMessage = '';
+					console.log("changename data error :", e.message);
 				}
 			});
-		}
-	}
-
-	submitForm() {
-		this.changeName();
-		console.log("NAVIGATE")
-		window.location.reload();
+			this.profileForm.value.nickname = undefined;
+		};
+		// window.location.reload();
+		
+		// this.router.navigate([this.router.url]);
 		// this.router.navigate(['/dashboard/settings/'], {});
+		console.log("NAVIGATE")
 	}
 }

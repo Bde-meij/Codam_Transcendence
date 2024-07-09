@@ -1,12 +1,28 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { User } from 'src/user/entities/user.entity';
+import { FriendsService } from 'src/friends/friends.service';
+import { CreateFriendRequestDto } from 'src/friends/dto/create-friend.dto';
+import { FriendStatus } from 'src/friends/entities/friend.entity';
+import { CreateBlockDto } from 'src/block/dto/create-block.dto';
+import { BlockService } from 'src/block/block.service';
+import { DeleteBlockDto } from 'src/block/dto/delete-block.dto';
+import { CreateMatchDto } from 'src/game/dto/create-match.dto';
+import { UpdateMatchDto } from 'src/game/dto/update-match.dto';
+import { MatchService } from 'src/game/match.service';
 
 // !! DO NOT MAKE CALLS TO THIS ENDPOINT FOR REASONS OTHER THAN TESTING !!
 @Controller('testing')
 export class TestingController {
-	constructor(private readonly userService: UserService) {}
+	constructor(private readonly userService: UserService, private readonly friendsService: FriendsService, private readonly blockService: BlockService, private readonly matchService: MatchService) {}
+
+
+	// --------------------------------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------------------------------------------------
+	// ----------------------------------------------TEST USER ENPOINTS----------------------------------------------
+	// --------------------------------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------------------------------------------------
 
 	// Adds a single test user to the database
 	@Post('user')
@@ -44,5 +60,136 @@ export class TestingController {
 	async findAllUsers(): Promise <User[]> {
 		// console.log('findAllUsers() getting all users');
 		return await this.userService.findAllUsers();
+	}
+
+	// --------------------------------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------------------------------------------------
+	// -------------------------------------------FRIEND REQUEST ENDPOINTS-------------------------------------------
+	// --------------------------------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------------------------------------------------
+
+
+	// send new friend request with friend id
+	@Post('friends/new-request/:userid/:target')
+	async createRequest_NoCookie(@Param('target') target: string, @Param('userid') userId: string) {
+		const friendRequest: CreateFriendRequestDto = {
+			sender: userId,
+			target:	target
+		}
+		return await this.friendsService.create(friendRequest);
+	}
+	
+	// delete friend request (accepted or not) with the friend request id
+	@Delete('friends/delete-request-id/:userid/:requestid')
+	async deleteRequestByRequestId_NoCookie(@Param('requestid') requestId: string, @Param('userid') userId: string) {
+		return await this.friendsService.deleteByRequestId(userId, requestId);
+	}
+	
+	// delete friend request (accepted or not) with the target user id
+	@Delete('friends/delete-request-user/:userid/:targetid')
+	async deleteRequestByUserId_NoCookie(@Param('targetid') targetId: string, @Param('userid') userId: string) {
+		return await this.friendsService.deleteByUserId(userId, targetId);
+	}
+	
+	// accept friend request with the friend request id
+	@Post('friends/accept-request/:userid/:requestid')
+	async acceptRequest_NoCookie(@Param('requestid') requestId: string, @Param('userid') userId: string) {
+		return await this.friendsService.updateStatus(userId, requestId, FriendStatus.ACCEPTED);
+	}
+
+	// list with all incoming requests
+	@Get('friends/incoming/:userid')
+	async findIncomingRequests_NoCookie(@Param('userid') userId: string) {
+		return await this.friendsService.findIncoming(userId);
+	}
+	
+	// list with all outgoing requests
+	@Get('friends/outgoing/:userid')
+	async findOutgoingRequests_NoCookie(@Param('userid') userId: string) {
+		return await this.friendsService.findOutgoing(userId);
+	}
+
+	// list with all your friends
+	@Get('friends/all/:userid')
+	async findFriends_NoCookie(@Param('userid') userId: string) {
+		return await this.friendsService.findFriends(userId);
+	}
+
+	// check if this is friend
+	@Get('friends/is-friends/:userid/:targetid')
+	async isFriends_NoCookie(@Param('targetid') targetId: string, @Param('userid') userId: string) {
+		return await this.friendsService.isFriendsUserId(userId, targetId);
+	}
+	
+	
+	// --------------------------------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------------------------------------------------
+	// ------------------------------------------------BLOCK ENDPOINTS-----------------------------------------------
+	// --------------------------------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------------------------------------------------
+	
+	// list with all blocked users
+	@Get('block/all-blocked/:userid')
+	async getAllBlocked_NoCookie(@Param('userid') userId: string) {
+		return await this.blockService.getAllBlocked(userId);
+	}
+	
+	// check if target is blocked by sender
+	@Get('block/is-blocked/:userid/:targetid')
+	async isBlocked_NoCookie(@Param('targetid') targetId: string, @Param('userid') userId: string) {
+		const block: CreateBlockDto = {
+			sender: userId,
+			target: targetId,
+		}
+		return await this.blockService.isBlocked(block);
+	}
+
+	// create new block with user id
+	@Post('block/new-block/:userid/:targetid')
+	async createBlock_NoCookie(@Param('targetid') targetId: string, @Param('userid') userId: string) {
+		const block: CreateBlockDto = {
+			sender: userId,
+			target: targetId,
+		}
+		return await this.blockService.createBlock(block);
+	}
+	
+	// delete block with block id
+	@Delete('block/delete-block-id/:userid/:blockid')
+	async deleteBlockByBlockId_NoCookie(@Param('blockid') blockId: string, @Param('userid') userId: string) {
+		const block: DeleteBlockDto = {
+			sender: userId,
+			target: blockId,
+		}
+		return await this.blockService.deleteByBlockId(block);
+	}
+	
+	// delete block with user id
+	@Delete('block/delete-block-user/:userid/:targetid')
+	async deleteBlockByUserId_NoCookie(@Param('targetid') targetId: string, @Param('userid') userId: string) {
+		const block: DeleteBlockDto = {
+			sender: userId,
+			target: targetId,
+		}
+		return await this.blockService.deleteByUserId(block);
+	}
+
+	
+	// --------------------------------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------------------------------------------------
+	// ------------------------------------------------MATCH ENDPOINTS-----------------------------------------------
+	// --------------------------------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------------------------------------------------
+	
+	// creates a match
+	@Post('match/create')
+	async createMatch(@Body() data: CreateMatchDto) {
+		return await this.matchService.createMatch(data);
+	}
+	
+	// updates a match score and sets the winner
+	@Patch('match/update')
+	async updateMatch(@Body() data: UpdateMatchDto) {
+		return await this.matchService.updateMatch(data);
 	}
 }

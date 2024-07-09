@@ -18,7 +18,7 @@ export class UserService {
 	}
 
 	changeName(nickname: string) {
-		return this.http.post(this.userUrl + '/changename', { nickname })
+		return this.http.post<any>(this.userUrl + '/changename', { nickname })
 	}
 
 	isNameTaken (nickname: string) : Observable<boolean> {
@@ -26,10 +26,12 @@ export class UserService {
 	}
 
 	// to request your own info, use '0', otherwise use the userID.
-	getUser(id : number) : Observable<User>{
-		if (id == 0)
-			return this.http.get<User>(this.userUrl + '/current');
-		return this.http.get<User>(this.userUrl + '/name/' + id);
+	getUser(id : string) : Observable<any> {
+		if (id === '0') {
+			console.log("ID = 0");
+			return this.http.get<any>(this.userUrl + '/current', {});
+		}
+		return this.http.get<any>(this.userUrl + '/name/' + id, {});
 	};
 
 	updateRoomKey(roomKey: number) {
@@ -43,8 +45,8 @@ export class UserService {
 		return this.http.post<File>(this.userUrl + '/uploadAvatar', formData);
 	}
 
-	getAvatar(id: number) : Observable<Blob> {
-		if (id == 0)
+	getAvatar(id: string) : Observable<Blob> {
+		if (id === '0')
 			return this.http.get(this.userUrl + '/getAvatar/current', {responseType: 'blob'});
 		// console.log("getavatar called");
 		return this.http.get(this.userUrl + '/getAvatar/' + id, {responseType: 'blob'});
