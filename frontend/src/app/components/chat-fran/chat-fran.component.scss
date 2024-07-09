@@ -1,0 +1,15 @@
+@import '../../../styles/helpers/constants.scss';
+
+::ng-deep nb-layout-column {
+	justify-content: center;
+	display: flex;
+  }
+  nb-chat {
+	width: 500px;
+	nb-chat-message {
+		.message-sender {
+			font-weight: bold;
+			color: #333;
+		}
+	}
+  }

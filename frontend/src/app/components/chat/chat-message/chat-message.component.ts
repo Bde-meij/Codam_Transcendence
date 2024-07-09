@@ -9,11 +9,12 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { Router } from '@angular/router';
 import { UserService } from '../../../services/user/user.service';
+import { NbChatModule } from '@nebular/theme';
 
 @Component({
   selector: 'app-chat-message',
   standalone: true,
-  imports: [NgFor, FormsModule, NgIf, CommonModule, MatSelectModule, MatButtonModule],
+  imports: [NgFor, FormsModule, NgIf, CommonModule, MatSelectModule, MatButtonModule, NbChatModule],
   templateUrl: './chat-message.component.html',
   styleUrl: './chat-message.component.scss'
 })

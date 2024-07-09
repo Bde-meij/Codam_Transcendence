@@ -1,0 +1,21 @@
+<nb-layout>
+  	<div class="left-sidebar">Your chats
+		<li *ngFor="let roomName of getRoomNames()">
+			<button [class.selected]="roomsList[roomName] === selectedRoom" type="button" (click)="onSelect(roomsList[roomName])"> {{ roomName }} </button>
+        	<button (click)="joinRoom(roomName, '')"> joinRoom </button>
+		</li>
+	</div>
+	<div class="right-sidebar"></div>
+	<nb-layout-column>
+		<nb-chat size="large" scrollbottom="true" title="Chat UI" *ngIf="selectedRoom">
+			<nb-chat-message *ngFor="let msg of selectedRoom.messages"
+							[message]="msg.message"
+							[avatar]="msg.sender_avatar!"
+							[sender]="msg.sender_name"
+							[date]="msg.updated!">
+			</nb-chat-message>
+			<nb-chat-form (send)="sendMessage($event)" [dropFiles]="false">
+			</nb-chat-form>
+		</nb-chat>
+	</nb-layout-column>	
+</nb-layout>

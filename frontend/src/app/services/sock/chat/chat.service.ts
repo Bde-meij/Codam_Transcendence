@@ -51,7 +51,7 @@ export class ChatService{
 		// const sender = this.user$;
 		const messageObj = {
 			message : message,
-			sender : this.user?.nickname,
+			sender_name : this.user?.nickname,
 			sender_id: this.user?.id,
 			room : room,
 		}

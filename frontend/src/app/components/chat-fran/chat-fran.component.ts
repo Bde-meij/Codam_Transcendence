@@ -1,33 +1,30 @@
-import { Component, OnInit } from '@angular/core';
-import { AsyncPipe, NgFor, NgIf, CommonModule } from '@angular/common';
+import { NgFor, NgIf } from '@angular/common';
+import { AfterViewInit, Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { NbChatModule, NbSidebarModule } from '@nebular/theme';
 import { ChatService } from '../../services/sock/chat/chat.service';
 import { UserService } from '../../services/user/user.service';
-import { FormsModule } from '@angular/forms';
-import { Rooms } from '../../models/rooms.class';
-import { ChatMessageComponent } from './chat-message/chat-message.component';
 import { User } from '../../models/user.class';
+import { Rooms } from '../../models/rooms.class';
+import { NbThemeModule, NbLayoutModule} from '@nebular/theme';
 import { UserDetailComponent } from '../user-detail/user-detail.component';
-import { AfterViewInit, AfterViewChecked } from '@angular/core';
-import { ViewChild } from '@angular/core';
-import { NbChatModule, NbThemeModule } from '@nebular/theme';
-import { ChatUiComponentOld } from './chat-ui/chat-ui.component';
-
-export interface MessageInterface {
-	sender: string,
-	message: string
-}
+import { NbEvaIconsModule } from '@nebular/eva-icons';
+import { NbSidebarService } from '@nebular/theme';
 
 @Component({
-  selector: 'app-chat',
+  selector: 'app-chat-ui',
   standalone: true,
-  imports: [NgFor, FormsModule, AsyncPipe, ChatMessageComponent, NgIf, CommonModule, UserDetailComponent, NbChatModule, ChatUiComponentOld, NbThemeModule],
-  templateUrl: './chat.component.html',
-  styleUrl: './chat.component.scss'
+  imports: [NbChatModule, NgFor, NgIf, NbThemeModule, NbLayoutModule, UserDetailComponent, NbSidebarModule, NbEvaIconsModule],
+  templateUrl: './chat-fran.component.html',
+  styleUrl: './chat-fran.component.scss'
 })
+export class ChatUiComponent implements AfterViewInit{
 
-export class ChatComponent implements OnInit, AfterViewInit {
-	user!: User;
+	@ViewChild('messageContainer') messageContainer!: ElementRef;
+	@ViewChild('messageInput') messageInput!: ElementRef;
+	selectedUser: any;
+	selectedUserID?: string;
 	message: string | undefined;
+  	user!: User;
 	messages: string[] = [];
 
 	roomsList: Record<string, Rooms> = {};
@@ -41,10 +38,10 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		//console.log(room.messages);
 	};
 
-	constructor(private chatService: ChatService, private userService: UserService) {};
-	
+	constructor(private chatService: ChatService, private userService :UserService, private sidebarService: NbSidebarService) {};
+
 	ngOnInit() {
-		this.userService.getUser(0).subscribe((userData) => (
+    this.userService.getUser(0).subscribe((userData) => (
 			this.user = userData
 		));
 	
@@ -75,28 +72,28 @@ export class ChatComponent implements OnInit, AfterViewInit {
 			// ////console.log("getconnectedusers subscribe");
 			this.userss = userList;
 		})
-
-		this.createRoom("Global", "public", "");
+    this.createRoom("Global", "public", "");
 		// this.createRoom("temp",  "public", "");
 		this.joinRoom("Global", "");
 		// this.joinRoom("temp", "");
-
 	};
 
-	@ViewChild(ChatMessageComponent) viewChild!: ChatMessageComponent;
-
 	ngAfterViewInit() {
-		console.log("afterviewcheckedINIT");
+    console.log("afterviewcheckedINIT");
 		if (!this.selectedRoom)
 			this.chatService.updatePage();
 	}
+	
 
-	sendMessage() {
-		if (this.message) {
-			this.chatService.sendMessage(this.message, "sendmessageall");
-			// this.messages.push(this.message);
+	sendMessage(event: any) {
+		if (event.message) {
+			this.chatService.sendMessage(event.message, this.selectedRoom!.name);
 		}
 		this.message = '';
+		//console.log("room users: " + this.room.users);
+		//console.log(this.room.users)
+
+		////console.log("chat-message sendmessage: " + this.room.name);
 	}
 
 	makenum(str: string){
@@ -136,7 +133,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		return Object.keys(this.roomsList);
 	}
 
-	updatePage(){
-		this.chatService.updatePage();
+	showUsers() {
+		this.sidebarService.expand();
 	}
 }

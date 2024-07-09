@@ -26,8 +26,8 @@
     <!-- </ul> -->
 </div>
 
-  <div class="chat-room_columns" *ngIf="selectedRoom">
-    <app-chat-message [room]="selectedRoom" [user]="user"></app-chat-message>
+  <div class="chat-column" *ngIf="selectedRoom">
+    <app-chat-ui [room]="selectedRoom" [user]="user">App chat</app-chat-ui>
   </div>
 
   <div class="user-list-column">

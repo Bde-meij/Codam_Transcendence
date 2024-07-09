@@ -14,6 +14,7 @@ import { HomeComponent } from './components/home/home.component';
 import { GameMenuComponent } from './components/game-menu/game-menu.component';
 import { TwofaComponent } from './components/twofa/twofa.component';
 import { constTitle } from './models/title.const';
+import { ChatUiComponent } from './components/chat-fran/chat-fran.component';
 
 export const routes: Routes = [
 	{
@@ -79,6 +80,11 @@ export const routes: Routes = [
 			{
 				path: 'chat',
 				component: ChatComponent,
+				canActivate: [AuthGuard],
+			},
+			{
+				path: 'franchat',
+				component: ChatUiComponent,
 				canActivate: [AuthGuard],
 			},
 		],
