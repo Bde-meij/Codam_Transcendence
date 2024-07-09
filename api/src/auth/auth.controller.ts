@@ -31,6 +31,7 @@ export class AuthController {
 	@Get('isloggedin')
 	@UseGuards(JwtGuard)
 	async checkLoggedIn() {
+		// console.log('GET: auth/isloggedin');
 		return {loggedIn: true};
 	}
 
@@ -45,41 +46,23 @@ export class AuthController {
 			id: (req.user as any).id,
 			is2faVerified: true,
 		}
-		const userExists: boolean = await this.userService.userExists(potentialNewUser.id);
-		if (userExists) {
-			if ((await this.userService.findUserById(potentialNewUser.id)).isTwoFAEnabled)
-				potentialNewUser.is2faVerified = false;
+		const user: User = await this.userService.findUserById(potentialNewUser.id)
+		if (user && user.isTwoFAEnabled == true) {
+			potentialNewUser.is2faVerified = false;
 		}
 		const tokens = await this.authService.getJwtTokens(potentialNewUser);
 		res.cookie('access_token', tokens.access_token, {httpOnly: true});
 		res.cookie('refresh_token', tokens.refresh_token, {httpOnly: true});
-		if (!userExists) {
-			console.log("user not found");
+		if (!user) {
 			res.status(HttpStatus.FOUND).redirect(`http://${req.hostname}:4200/register`);
 		}
-		else
-		{
-			console.log("user found");
-			if ((await this.userService.findUserById(potentialNewUser.id)).isTwoFAEnabled) {
+		else if (user.isTwoFAEnabled) {
 				res.status(HttpStatus.FOUND).redirect(`http://${req.hostname}:4200/twofa`);
-			}
-			else {
-				this.userService.updateStatus(potentialNewUser.id, 'online');
-				res.status(HttpStatus.FOUND).redirect(`http://${req.hostname}:4200/dashboard`);
-			}
 		}
-	}
-
-	//makes jwt tokens that never expire for testing purposes
-	@Get('foreverCokkies')
-	async foreverCokkies(@Req() req: Request, @Res() res: Response) {
-		const fakeUser: CallbackAuthDto = {
-			id: (req.user as any).id,
-			is2faVerified: true,
+		else {
+			this.userService.updateStatus(user.id, 'online');
+			res.status(HttpStatus.FOUND).redirect(`http://${req.hostname}:4200/dashboard`);
 		}
-		const tokens = await this.authService.getForeverJwtTokens(fakeUser);
-		res.cookie('access_token', tokens.access_token, {httpOnly: true});
-		res.cookie('refresh_token', tokens.refresh_token, {httpOnly: true});
 	}
 
 	@Post('logout')
@@ -94,11 +77,10 @@ export class AuthController {
 	@Get('2fasetup')
 	@UseGuards(JwtGuard)
 	async setupTwoFA(@Req() req, @Res() res) {
-		const user: User = await this.userService.findUserById(req.user.id);
-		const secret = await this.authService.generateTwoFASecret(user.id);
+		const secret = await this.authService.generateTwoFASecret(req.user.id);
 		const otpauthUrl = speakeasy.otpauthURL({
 			secret: secret.ascii,
-			label: `Transcendence (${user.id})`,
+			label: `Transcendence (${req.user.id})`,
 			issuer: 'Transcendence',
 		});
 		const qrCodeUrl = await QRCode.toDataURL(otpauthUrl);
@@ -112,35 +94,33 @@ export class AuthController {
 		const user: User = await this.userService.findUserById(req.user.id);
 		const secret = user.twoFASecret;
 		const isValid = await this.authService.verifyTwoFAToken(secret, body.userInput);
-		if (isValid) {
-			const potentialNewUser: CallbackAuthDto = {
-				id: (req.user as any).id,
-				is2faVerified: true,
-			}
-			const tokens = await this.authService.getJwtTokens(potentialNewUser);
-			res.cookie('access_token', tokens.access_token);
-			res.cookie('refresh_token', tokens.refresh_token);
-			res.json({message: 'Google 2FA verified', status: true});
-			if (!user.isTwoFAEnabled)
-				await this.userService.enableTwoFA(user.id);
-			if (user.status == 'offline')
-				await this.userService.updateStatus(user.id, 'online');
-		}
-		else
+		if (!isValid) {
 			res.json({message: 'Invalid authentication code', status: false});
+			return;
+		}
+		const tokens = await this.authService.getJwtTokens({
+			id: req.user.id,
+			is2faVerified: true,
+		});
+		res.cookie('access_token', tokens.access_token);
+		res.cookie('refresh_token', tokens.refresh_token);
+		res.json({message: 'Google 2FA verified', status: true});
+		if (!user.isTwoFAEnabled)
+			await this.userService.enableTwoFA(user.id);
+		if (user.status == 'offline')
+			await this.userService.updateStatus(user.id, 'online');
 	}
 
 	@Post('2fadisable')
 	@UseGuards(JwtGuard)
 	async disableTwoFA(@Req() req) {
-		this.userService.disableTwoFA(req.user.id);
-		this.userService.updateTwoFASecret(req.user.id, {base32: null});
+		this.userService.updateTwoFA(req.user.id, false, {base32: null});
 	}
 
 	@Get('is2faenabled')
 	@UseGuards(JwtGuard)
 	async isTwoFAEnabled(@Req() req, @Res() res) {
-		const isEnabled = (await this.userService.findUserById(req.user.id)).isTwoFAEnabled;
+		const isEnabled = (await this.userService.get2faEnabled(req.user.id)).isTwoFAEnabled;
 		res.json({isTwoFAEnabled: isEnabled});
 	}
 
@@ -148,11 +128,10 @@ export class AuthController {
 	@UseGuards(JwtRefreshGuard)
 	async refreshToken(@Req() req, @Res() res) {
 		await this.authService.invalidateRefreshToken(req.refresh_token);
-		const user: CallbackAuthDto = {
-			id: (req.user as any).id,
-			is2faVerified: (req.user as any).is2faVerified,
-		}
-		const tokens = await this.authService.getJwtTokens(user);
+		const tokens = await this.authService.getJwtTokens({
+			id: req.user.id,
+			is2faVerified: req.user.is2faVerified,
+		});
 		res.cookie('access_token', tokens.access_token, {httpOnly: true});
 		res.cookie('refresh_token', tokens.refresh_token, {httpOnly: true});
 		res.json({message: "Tokens refreshed"});

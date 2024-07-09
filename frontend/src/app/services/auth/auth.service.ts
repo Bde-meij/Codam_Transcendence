@@ -16,7 +16,7 @@ export class AuthService {
 	// };
 
 	logout() {
-		console.log("authservice.logout called");
+		// console.log("authservice.logout called");
 		return this.http.post(this.authUrL + '/logout', { });
 	}	
 	

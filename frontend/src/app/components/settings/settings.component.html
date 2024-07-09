@@ -4,29 +4,39 @@
 
 <div class="setting_container">
 	<h3 class="setting_header"> Set things right! </h3>
-	<div class="setting_column">
-		<h2> The things to set: </h2>
-		<div>
-			<span>
-				Google 2FA:
-			</span>
-			<input type="checkbox" [(ngModel)]="is2faEnabled" (change)="onChange()">
-		</div>
-		<div>
-			<form [formGroup]="profileForm" (ngSubmit)="submitForm()">
-				<span>
-					Nickname:
-				</span>
-				<input type="text" formControlName="nickname" maxlength="13" placeholder={{current_nickname}} />
-				@if (profileForm.value.nickname != '') {
-					<button type="submit" [disabled]="!profileForm.valid">
-						send new nickname
-					</button>
-				}
-			</form>
-		</div>
+	<div class="setting_column" *ngIf="current_user_id">
+		<h2> How Gary knows you: </h2>
+		<app-user-detail [id]="current_user_id"> </app-user-detail>
 	</div>
 	<div class="setting_column">
+		<h2> The things to set: </h2>
+		<ul>
+			<div>
+				<span> Google 2FA: </span>
+				<input type="checkbox" [(ngModel)]="is2faEnabled" (change)="onChange()">
+			</div>
+			<div>
+				<form [formGroup]="profileForm" (ngSubmit)="changeName()">
+					<span> Nickname: </span>
+					<input type="text" formControlName="nickname" maxlength="13" placeholder={{current_nickname}} />
+					@if (profileForm.value.nickname != '') {
+						<button type="submit" [disabled]="!profileForm.valid">
+							send new nickname
+						</button>
+					}
+				</form>
+				<span> Avatar: </span>
+				<input type="file" (change)="selectFile($event)" > 
+				<button type="submit" (click)="changeAvatar()"> submit </button>
+			</div>
+		</ul>
+	</div>
+	<div class="setting_column">
+		@if (this.preview) {
+			<h3> preview </h3>
+			<img src={{this.preview}} width="100" height="100" />
+		}
+
 		@if (isChecked) {
 			<h3> Enable Google 2FA </h3>
 			<div>
@@ -52,7 +62,11 @@
 			</button>
 			{{this.verificationRes}}
 		}
+
 		@if (profileForm.value.nickname == '') {
+			@if (errorMessage) {
+				<p class="errormessage"> Gary got a problem : {{errorMessage}}</p>
+			}
 		} @else if (profileForm.pending) {
 			<p>
 				Let Gary think about it...
@@ -65,6 +79,15 @@
 			<p>
 				Such a pretty name 😏
 			</p>
+		}
+
+		@if (succesMessage) {
+			<p> Gary approves : {{succesMessage}} 
+				@if (succesMessage === "Nickname changed") {
+					to: "{{this.current_nickname}}"
+				}
+			</p>
+			<p><button class="refresh" type="button" (click)="reload()">reload</button> to see changes </p>
 		}
 	</div>
 </div>

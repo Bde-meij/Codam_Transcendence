@@ -17,14 +17,14 @@ export class SockService {
 
 	constructor() {
 		this.mainSocket.onAny((event, ...args) => {
-			console.log("MAIN-SOCK EVENT: ");
-			console.log(event, args);
+			// console.log("MAIN-SOCK EVENT: ");
+			// console.log(event, args);
 		});
 		this.newSocketRegister("mainSocket");
 	}
 
 	newSocketRegister(socketName: string) : void {
-		console.log("new socket register: " + socketName);
+		// console.log("new socket register: " + socketName);
 		// this.mainSocket.emit('message', "new " + socketName, (err: any) => {
 		// 	if (err) {
 		// 		console.log("main-sock error: ");
