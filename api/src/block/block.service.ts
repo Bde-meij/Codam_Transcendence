@@ -26,10 +26,10 @@ export class BlockService {
 
 	async getAllBlocked(userId: string): Promise<Block[]> {
 		const user: User = await this.userService.findUserById(userId);
-		// if (!user) {
-		// 	// console.log('User not found! User id:', userId);
-		// 	throw new HttpException('User not found', 404);
-		// }
+		if (!user) {
+			// console.log('User not found! User id:', userId);
+			throw new HttpException('User not found', 404);
+		}
 		return await this.blockRepo.find({
 			select: {
 				id: true,
@@ -54,15 +54,15 @@ export class BlockService {
 			throw new HttpException('Cannot block yourself', 400);
 		}
 		const sender: User = await this.userService.findUserById(createBlockDto.sender);
-		// if (!sender) {
-		// 	// console.log('Sender id not found! Sender id:', createBlockDto.sender);
-		// 	throw new HttpException('Sender id not found', 404);
-		// }
+		if (!sender) {
+			// console.log('Sender id not found! Sender id:', createBlockDto.sender);
+			throw new HttpException('Sender id not found', 404);
+		}
 		const target: User = await this.userService.findUserById(createBlockDto.target);
-		// if (!target) {
-		// 	// console.log('Target id not found! Target id:', createBlockDto.target);
-		// 	throw new HttpException('Target id not found', 404);
-		// }
+		if (!target) {
+			// console.log('Target id not found! Target id:', createBlockDto.target);
+			throw new HttpException('Target id not found', 404);
+		}
 		if (await this.isBlocked(createBlockDto)) {
 			// console.log('User already blocked!', createBlockDto.target);
 			throw new HttpException('User already blocked', 400);

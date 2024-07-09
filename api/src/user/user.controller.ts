@@ -28,11 +28,8 @@ export class UserController {
 	async isNameTaken(@Req() req, @Param('nickname') name: string) {
 		// console.log('GET: user/isnametaken');
 		let taken : boolean = false;
-		try { 
-			await this.userService.findUserByName(name);
+		if (await this.userService.findUserByName(name)) {
 			taken = true;
-		} catch {
-			taken = false;
 		}
 		// console.log("TAKEN : " + taken);
 		return (taken);

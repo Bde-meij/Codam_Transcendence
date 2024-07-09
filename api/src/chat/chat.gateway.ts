@@ -64,26 +64,23 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			if (!token)
 				throw new NotAcceptableException();
 			const payload = await this.authService.verifyJwtAccessToken(token);
-			try {
-				const user = await this.userService.findUserById(payload.id);
-				if (!user.nickname){
-					user.nickname = "Empty nickname Error";
-				}
-				client.data.nickname = user.nickname;
-				client.data.userid = user.id;
-				// this.fake_userid++;
-				// client.data.key = user.roomKey;
-				
-				this.joinArrayChats(client, client.data.nickname, client.data.userid);
-				this.connectedUsers.push(client.data.userid);
-				client.emit('getConnectedUsers', this.connectedUsers);
-				// this.getRoomsEmit(client);
-				client.emit('user', user);
-			} catch {
+			const user = await this.userService.findUserById(payload.id);
+			if (!user)
 				throw new NotAcceptableException();
+			if (!user.nickname){
+				user.nickname = "Empty nickname Error";
 			}
 			
+			client.data.nickname = user.nickname;
+			client.data.userid = user.id;
+			// this.fake_userid++;
+            // client.data.key = user.roomKey;
 			
+			this.joinArrayChats(client, client.data.nickname, client.data.userid);
+			this.connectedUsers.push(client.data.userid);
+			client.emit('getConnectedUsers', this.connectedUsers);
+			// this.getRoomsEmit(client);
+			client.emit('user', user);
 			// client.join("Global");
 			// this.chatRoomList["Global"].users.push(client.data.nickname);
 			// this.chatRoomList["Global"].users.push("test");
@@ -433,11 +430,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	{	
 		const roomKey = getNewRoomKey(); // nummer
 		//console.log(`InviteGame ${data.roomid} en ${roomKey}`)
-		try {
-			this.userService.updateRoomKey(client.data.userid, roomKey);
-		} catch {
-			throw new NotAcceptableException();
-		}
+		this.userService.updateRoomKey(client.data.userid, roomKey);
 		//console.log("invitegame: " + client.data.userid + ", userid: " + data.userid);
 		// //console.log(data.room + ", " + client.data.id)
 		const message: MessageInterface = {
@@ -456,11 +449,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@ConnectedSocket() client: Socket) 
 	{	
 		//console.log("joinbattle: " + data.numroom);
-		try {
-			this.userService.updateRoomKey(client.data.userid.toString(), Number(data.numroom));
-		} catch {
-			throw new NotAcceptableException();
-		}
+		this.userService.updateRoomKey(client.data.userid.toString(), Number(data.numroom));
 		// joinInvRoom(89413, 1);
 		// //console.log("invitegame: " + client.data.id + ", userid: " + data.userid);
 		// //console.log(data.room + ", " + client.data.id)
