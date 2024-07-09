@@ -50,7 +50,7 @@ export class ChatMessageComponent implements AfterViewInit{
 		try {
 			const container = this.messageContainer.nativeElement;
 			const extra = this.messageInput.nativeElement;
-			container.scrollTop = container.scrollHeight - container.clientHeight;
+			container.scrollTop = container.scrollHeight - container.clientHeight + 50;
 			// console.log("scrolling: " + container.scrollTop);
 		} catch(err) {
 			console.log("Error scrolltobottom");
@@ -86,7 +86,7 @@ export class ChatMessageComponent implements AfterViewInit{
 
 	joinBattle(roomnum: string){
 		//console.log(`chat-message.component ${roomnum}`)
-		this.chatService.joinBattle(roomnum);
+		this.chatService.joinBattle(roomnum, this.room.name);
 		this.router.navigate(['/dashboard', 'game']);
 	}
 

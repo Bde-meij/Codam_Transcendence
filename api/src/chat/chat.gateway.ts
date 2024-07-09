@@ -32,6 +32,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   	room_info: Record<string, RoomInfo>;
 	private connectedUsers: string[] = [];
 	gateway_roomid: number;
+	system_id: number = -1;
 	// fake_userid: number = 77000;
 	// loggary: Loggary;
 	constructor(private authService: AuthService, private userService: UserService, private passwordList: PasswordService) {
@@ -70,43 +71,23 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			if (!user.nickname){
 				user.nickname = "Empty nickname Error";
 			}
-			
 			client.data.nickname = user.nickname;
 			client.data.userid = (Number(user.id));
 			if (this.connectedUsers.includes(client.data.userid))
 			{
 				console.log("already connected");
-				// client.disconnect();
 			}
 			else
 				console.log("not connected");
-
-			// this.fake_userid++;
-            // client.data.key = user.roomKey;
-			
 			this.joinArrayChats(client, client.data.nickname, client.data.userid);
 			this.connectedUsers.push(client.data.userid);
-			client.emit('getConnectedUsers', this.connectedUsers);
-			// this.getRoomsEmit(client);
-			client.emit('user', user);
-			// client.join("Global");
-			// this.chatRoomList["Global"].users.push(client.data.nickname);
-			// this.chatRoomList["Global"].users.push("test");
-			// this.chatRoomList["Global"].users.push("tedfd");
-			// client.join("Help");
-			// this.chatRoomList["Help"].users.push(client.data.nickname);
-			// client.join("Help");
-			//console.log(user.nickname, "connected on socketID:", client.id);
-			// this.updateUserRooms(client.data.userid, client.data.nickname);
-			//console.log("ConnectedUsers: " + this.connectedUsers);
-			//console.log(Array.from(client.rooms))
+			this.io.emit('getConnectedUsers', this.connectedUsers);
 			client.emit('getRoomss', this.chatRoomList);
 		} catch {
-			//console.log(client.id, "connection refused");
+			console.log(client.id, "connection refused");
 			client.disconnect();
 			return;
-		}
-		
+		}	
 	}
 	
 	handleDisconnect(client: any) {
@@ -118,11 +99,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			//console.log(`Connected users: ${this.connectedUsers}`);
 		}
 		client.disconnect();
-		//console.log("----------------------------------"); 
-		//console.log("chat: user " + client.data.nickname + " disconnected: " + client.data.nickname + ", client: " + client.id);
+		this.io.emit('getConnectedUsers', this.connectedUsers);
 	}
 	
-		// socket.emit('joinRoom', { name: id });
+	// socket.emit('joinRoom', { name: id });
 	// this.io.to(socket.data.id).emit('addUser', socket.data.nickname);
 	// socket.emit('isAdmin');
 	// //console.log('roomList: ' +  Array.from(socket.rooms)[1]);
@@ -220,6 +200,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		this.io.to(Room.id.toString()).emit('message', message);
 		this.channelUserList(Room.name);
 		this.logger(data.room);
+		this.findUsername(77600);
 	}
 
 	// const sockets = this.io.sockets.adapter.rooms.get(id);
@@ -378,11 +359,13 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		else
 			console.log("not admin or owner");
 		this.channelUserList(data.room);
-		const datas = { user_id : -1, user_name: ""} ;
+		const datas = { user_id : this.system_id, user_name: ""} ;
 		this.updateRoom(datas, client);
+		const name = this.findUsername(data.userid);
 		const msg = this.create_message(`banned user ${data.username}`, room.id, room.name, client.data.userid)
 		this.io.in(room.id.toString()).emit("message", msg)
 		console.log(`ban: ${this.chatRoomList[data.room].id.toString()}`)
+
 	}
 
 	@SubscribeMessage('unBan') async unban(
@@ -397,7 +380,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			if (this.chatRoomList[data.room].banned.push((Number(data.userid)))){
 				this.chatRoomList[data.room].banned = this.chatRoomList[data.room].banned.filter(item => item == (Number(data.userid)));
 			}
-			const msg = this.create_message(`unbanned user ${data.userid}`, room.id, room.name, client.data.userid)
+			const name = this.findUsername(data.userid);
+			const msg = this.create_message(`unbanned user ${name}`, room.id, room.name, client.data.userid)
 			this.io.in(room.id.toString()).emit("message", msg)
 		}
 		//emit unban notification in chat
@@ -414,11 +398,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			this.kickUserId(data.userid, data.room)
 		}
 		else{
-			console.log("not admin");
-			this.kickUserId(data.userid, data.room)
-		}
 			// this.io.in(data.room).emit("error", `not admin`)
-		//kick user
+			console.log("not admin or target is owner");
+			return ;
+		}
 		this.channelUserList(data.room);
 		this.logger(data.room);
 	}
@@ -449,13 +432,17 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 
+	@SubscribeMessage('joinPrivateRoom') async joinPrivateRoom(){
 
-	@SubscribeMessage('joinPrivateRoom') async joinPrivateRoom(){}
-	@SubscribeMessage('addAdmin') async addAdmins() {}
-	@SubscribeMessage('removeAdmin') async removeAdmins() {}
+	}
 
+	@SubscribeMessage('addAdmin') async addAdmins() {
 
+	}
 
+	@SubscribeMessage('removeAdmin') async removeAdmins() {
+
+	}
 
 	@SubscribeMessage('inviteGame') async inviteGame(
 	@MessageBody() data: { roomid: number; room_name: string, userid: number },
@@ -465,7 +452,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		//console.log(`InviteGame ${data.roomid} en ${roomKey}`)
 		this.userService.updateRoomKey(client.data.userid, roomKey);
 		//console.log("invitegame: " + client.data.userid + ", userid: " + data.userid);
-		// //console.log(data.room + ", " + client.data.id)
 		const message: MessageInterface = {
 			message: roomKey.toString(),
 			roomId: data.roomid,
@@ -478,14 +464,14 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 	@SubscribeMessage('joinBattle') async joinBattle(
-	@MessageBody() data: { numroom: string },
+	@MessageBody() data: { numroom: string, room: string },
 	@ConnectedSocket() client: Socket) 
 	{	
-		// console.log("joinbattle: " + data.numroom);
-		this.userService.updateRoomKey(client.data.userid.toString(), Number(data.numroom));
-		// const msg = this.create_message(`Muted user ${data.userid}`, room.id, room.name, client.data.userid)
-		// this.io.to(room.id.toString()).emit('message', msg);
-		// this.io.to(client.data.id).emit('message', "hello");
+		console.log("joinbattle: " + data.numroom + ", room: " + data.room);
+		this.userService.updateRoomKey(client.data.userid.toString(), Number(data.numroom))
+		const room = this.findRoom(data.room, "kick");
+		const msg = this.create_message(`User ${client.data.nickname} joined the battle`, room.id, room.name, client.data.userid)
+		this.io.to(room.id.toString()).emit('message', msg);
 	}
 
 	// @SubscribeMessage('initRoom')
@@ -499,7 +485,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	// 		(room) => room.name === id,
 	// 	);
 	// 	if (Room === undefined) {
-	// 		socket.emit('errorMessage', 'The room does not exists.',);
+	// 		socket.emit('message', 'The room does not exists.',);
 	// 		return;
 	// 	}
 	// 	//console.log(Room.id);
@@ -508,7 +494,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	// 	this.io.in(data.room_name).emit('updateRoom', Room);
 	// }
 
-	
 	private addMessageToRoom(message: MessageInterface): void {
 		const roomId = message.roomId;
 	
@@ -569,7 +554,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		//console.log(`Leave socket ${socket.data.roomId}`)
 		const temp_room_id = socket.data.roomId.toString();
 		socket.leave(socket.data.roomId.toString());
-
 		// leave the room
 		// update the array
 	}
@@ -651,8 +635,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		Object.values(this.chatRoomList).forEach(room => {
 			if (room.users.includes(data.user_id) || room.status == "public")
 				temp[room.name] = room;
-			if (data.user_id == -1){
-				console.log("updateroom -1")
+			if (data.user_id == this.system_id){
+				console.log("updateroom system")
 				// this.findSocketUser(data.user_name);
 				this.updateAllUsers(client, this.chatRoomList);
 				client.emit('getConnectedUsers', this.connectedUsers);
@@ -662,6 +646,31 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		client.emit('getRoomss', temp);
 		client.emit('getConnectedUsers', this.connectedUsers);
 		temp = {};
+	}
+
+	@SubscribeMessage('client_update_room') async update_client_room(
+	@MessageBody() data: {user_id: number, user_name: string },
+	@ConnectedSocket() client: Socket) 
+	{	
+		console.log(`client_update_room`);
+		var temp : Record<string, Rooms> = {};
+		Object.values(this.chatRoomList).forEach(room => {
+			if (room.users.includes(data.user_id) || room.status == "public")
+				temp[room.name] = room;
+			if (data.user_id == this.system_id){
+				console.log("updateroom system")
+				// this.findSocketUser(data.user_name);
+				this.updateAllUsers(client, this.chatRoomList);
+				client.emit('getConnectedUsers', this.connectedUsers);
+				return;
+			}
+		});
+		client.emit('getRoomss', temp);
+		temp = {};
+	}
+
+	async update_client_rooms(room_id: number, room_name: string){
+		this.io.to(room_id.toString()).emit('update_room', this.chatRoomList[room_name]);
 	}
 
 	private updateAllUsers(socket: Socket, rooms: Record<string, Rooms>){
@@ -692,12 +701,14 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 	async findUsername(userid: number){
-		console.log("findUsername");
+		// console.log("findUsername");
 		const sockets = await this.io.fetchSockets();
 		for (const socketId of sockets) {
-			console.log(socketId.data.nickname);
+			if (socketId.data.userid == userid){
+				return socketId.data.nickname
+			}
 		}
-		console.log("end findSocketUser");
+		console.log("notFoundUsername");
 	}
 
 	private create_message(msg: string, room_id : number, room_name : string, sender_id : number){

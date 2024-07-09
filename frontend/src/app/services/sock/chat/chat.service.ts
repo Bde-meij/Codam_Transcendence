@@ -158,15 +158,6 @@ export class ChatService{
 		});
 	  }
 
-	//   getUser(): Observable<any> {
-	// 	return new Observable<any>((observer) => {
-	// 	  this.chatSocket.on('getUser', (user: any) => {
-	// 		user = user
-	// 	  });
-	// 	});
-	//   }
-
-
 	getConnectedUsers(): Observable<string[]> {
 		return new Observable((observer) => {
 			this.chatSocket.on('getConnectedUsers', (userss) => {
@@ -176,7 +167,13 @@ export class ChatService{
 		});
 	}
 
-
+	update_client_room(): Observable<Rooms> {
+		return new Observable((observer) => {
+			this.chatSocket.on('update_client_room', (room: Rooms) => {
+				observer.next(room);
+			});
+		});
+	}
 
 	getAllRoomsExceptFirst(): Observable<string[]> {
 		return new Observable<string[]>((observer) => {
@@ -246,9 +243,10 @@ export class ChatService{
 		});
 	}
 
-	joinBattle(roomnum: string){
+	joinBattle(roomnum: string, room: string){
 		const data = {
-			numroom: roomnum
+			numroom: roomnum,
+			room: room
 		}
 		// if (this.user)
 			// console.log("joinBAttle chatservice: " + this.user.id + ", data.roomnum: " + data.numroom);
