@@ -26,11 +26,11 @@ export class ChatService{
 			// console.log("User loaded in ChatService:", this.user);
 		});
 
-		// this.chatSocket.onAny((event, ...args) => {
-		// 	console.log("CHAT-SOCK EVENT: ");
-		// 	console.log(event, args);
-		// });
-		// sockService.newSocketRegister("chatSocket");
+		this.chatSocket.onAny((event, ...args) => {
+			console.log("CHAT-SOCK EVENT: ");
+			console.log(event, args);
+		});
+		sockService.newSocketRegister("chatSocket");
 	}
 	ngOnInit(): void {
 		console.log("dfd?");
