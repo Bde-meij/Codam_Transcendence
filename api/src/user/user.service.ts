@@ -100,39 +100,39 @@ export class UserService {
 		})
 	}
 
-	async updateName(id: string, newName: string) {
-		await this.userRepo.update(id, {nickname: newName});
+	async updateName(userId: string, newName: string) {
+		await this.userRepo.update(userId, {nickname: newName});
 	}
 	
-	async updateStatus(id: string, newStatus: string) {
-		await this.userRepo.update(id, {status: newStatus});
+	async updateStatus(userId: string, newStatus: string) {
+		await this.userRepo.update(userId, {status: newStatus});
 	}
 
-	async updateAvatar(id: string, newAvatar: string) {
-		await this.userRepo.update(id, {avatar: newAvatar});
+	async updateAvatar(userId: string, newAvatar: string) {
+		await this.userRepo.update(userId, {avatar: newAvatar});
 	}
 
-	async updateTwoFASecret(id: string, secret: any) {
-		await this.userRepo.update(id, {twoFASecret: secret.base32});
+	async updateTwoFASecret(userId: string, secret: any) {
+		await this.userRepo.update(userId, {twoFASecret: secret.base32});
 	}
 	
-	async enableTwoFA(id: string) {
-		await this.userRepo.update(id, {isTwoFAEnabled: true});
+	async enableTwoFA(userId: string) {
+		await this.userRepo.update(userId, {isTwoFAEnabled: true});
 	}
 	
-	async disableTwoFA(id: string) {
-		await this.userRepo.update(id, {isTwoFAEnabled: false});
+	async disableTwoFA(userId: string) {
+		await this.userRepo.update(userId, {isTwoFAEnabled: false});
 	}
 
-	async updateTwoFA(id: string, enabled: boolean, secret: any) {
-		await this.userRepo.update(id, {
+	async updateTwoFA(userId: string, enabled: boolean, secret: any) {
+		await this.userRepo.update(userId, {
 			isTwoFAEnabled: enabled,
 			twoFASecret: secret.base32
 		})
 	}
 
-	async updateNickname(id: string, newName: string) {
-		await this.userRepo.update(id, {nickname: newName});
+	async updateNickname(userId: string, newName: string) {
+		await this.userRepo.update(userId, {nickname: newName});
 	}
 
 	async updateRoomKey(userId: string, roomKey: number) {

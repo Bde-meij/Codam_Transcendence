@@ -15,15 +15,17 @@ import { ok } from 'assert';
 export class UserController {
 	constructor(private readonly userService: UserService) {}
 
+	// get current user
 	@Get('current')
 	@UseGuards(JwtGuard)
-	async getUser(@Req() req) : Promise<any> {
+	async getUser(@Req() req, @Res() res) : Promise<any> {
 		const user : User = await this.userService.findUserById(req.user.id);
 		if (!user)
 			throw new HttpException('Current user not found', HttpStatus.NOT_FOUND);
 		return user;
 	}
 	
+	// check if this nickname is taken
 	@Get('/isnametaken/:nickname')
 	@UseGuards(JwtGuard)
 	async isNameTaken(@Req() req, @Param('nickname') name: string) {
@@ -55,7 +57,7 @@ export class UserController {
 	
 	@Get('/name/:id')
 	@UseGuards(JwtGuard)
-	async findUserByName(@Req() req, @Param('id') id: string) {
+	async findUserById(@Req() req, @Param('id') id: string) {
 		// console.log('GET: user/name');
 		const user: User = await this.userService.findUserById(id);
 		if (!user)
@@ -75,16 +77,11 @@ export class UserController {
 	@Get('getAvatar')
 	@UseGuards(JwtGuard)
 	async getAvatar(@Req() req, @Res() res) {
-		// console.log('GET: user/getAvatar');
 		const user = await this.userService.findUserById(req.user.id);
-		if (!user)
-			return res.status(HttpStatus.NOT_FOUND).json({message: 'User not found'});
 		const file = createReadStream(join(process.cwd(), user.avatar));
-		// Return error 404 if the avatar doesn't exist
 		file.on('error', () => {
 			return res.status(HttpStatus.NOT_FOUND).json({message: 'Avatar not found', avatar: user.avatar});
 		})
-		
 		file.pipe(res);
 	}
 	
@@ -100,7 +97,6 @@ export class UserController {
 		file.on('error', () => {
 			return res.status(HttpStatus.NOT_FOUND).json({message: 'Avatar not found', avatar: user.avatar});
 		})
-		
 		file.pipe(res);
 	}
 
