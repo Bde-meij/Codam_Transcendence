@@ -29,7 +29,7 @@ export class UserService {
 	// to request your own info, use 'current', otherwise use the userID.
 	getUser(id : string) : Observable<any> {
 		if (id === 'current') {
-			console.log("ID = current");
+			// console.log("ID = current");
 			return this.http.get<any>(this.userUrl + '/current', {});
 		}
 		return this.http.get<any>(this.userUrl + '/name/' + id, {});
