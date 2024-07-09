@@ -76,6 +76,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			if (this.connectedUsers.includes(client.data.userid))
 			{
 				console.log("already connected");
+				// client.disconnect();
 			}
 			else
 				console.log("not connected");
@@ -113,10 +114,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		const index = this.connectedUsers.indexOf(userid);
 		if (index > -1) {
 			this.connectedUsers.splice(index, 1);
-			//console.log(`${userid} disconnected: ${client.data.nickname} `);
+			console.log(`${userid} disconnected: ${client.data.nickname} on ${index} `);
 			//console.log(`Connected users: ${this.connectedUsers}`);
 		}
-		client.di
+		client.disconnect();
 		//console.log("----------------------------------"); 
 		//console.log("chat: user " + client.data.nickname + " disconnected: " + client.data.nickname + ", client: " + client.id);
 	}
@@ -329,12 +330,16 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@ConnectedSocket() client: Socket) 
 	{
 		//check if room exists
-		//console.log("mute " + data.userid);
-		const room = this.findRoom(data.room, "ban");
-		if (this.isAdmin(data.userid, data.room) || this.isOwner(data.userid, data.room)){
+		console.log("mute " + data.userid);
+		const room = this.findRoom(data.room, "mute");
+		if (this.isAdmin(client.data.userid, data.room) || this.isOwner(client.data.user_id, data.room)){
 			this.chatRoomList[data.room].muted[data.userid] = new Date();
-			this.io.to(room.id.toString()).emit('system', `${data.username} + " is muted`);
+			this.io.to(room.id.toString()).emit('message', `${data.username} + " is muted`);
+			console.log(`muted: ${room.name}: ${room.muted}`)
 		}
+		else
+			console.log("not muted, not admin" + data.userid);
+
 		//emit mute notification in chat
 	}
 
@@ -344,7 +349,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	{
 		//check if room exists
 		const room = this.findRoom(data.room, "unMute");
-		if (this.isAdmin(data.userid, data.room) || this.isOwner(data.userid, data.room)){
+		if (this.isAdmin(client.data.userid, data.room) || this.isOwner(client.data.user_id, data.room)){
 			if (this.chatRoomList[data.room].muted[data.userid]){
 				delete this.chatRoomList[data.room].muted[data.userid];
 				this.io.in(room.id.toString()).emit("system", `${data.username} is unmuted.`)
