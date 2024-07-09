@@ -10,20 +10,19 @@ import * as speakeasy from 'speakeasy';
 export class UserService {
 	constructor(@InjectRepository(User) private readonly userRepo: Repository<User>) {}
 
-  	async userExists(id: string) {
+  	async userExists(userId: string) {
 		const user = await this.userRepo.findOne({
 			select: {
 				id: true
 			},
 			where: {
-				id
+				id : userId
 			}
 		});
 		if (user)
 			return true;
 		return false;
 	}
-
 	
 	async createUser(userData: CreateUserDto): Promise<User> {
 		console.error("NEW USER 2:", userData);
