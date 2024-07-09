@@ -42,7 +42,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	constructor(private chatService: ChatService, private userService: UserService) {};
 	
 	ngOnInit() {
-		this.userService.getUser('0').subscribe((userData) => (
+		this.userService.getUser('current').subscribe((userData) => (
 			this.user = userData
 		));
 	

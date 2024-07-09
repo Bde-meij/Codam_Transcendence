@@ -21,7 +21,7 @@ export class ChatService{
 	roomss: Rooms[] = []; 
 
 	constructor(sockService: SockService, private userService: UserService) {
-		this.userService.getUser('0').subscribe((userData) => {
+		this.userService.getUser('current').subscribe((userData) => {
 			this.user = userData;
 			// console.log("User loaded in ChatService:", this.user);
 		});

@@ -2,4 +2,12 @@
 
 .newchat {
 	background-color: $contrast-color;
-}
+};
+
+.navright {
+	float: right;
+	position: sticky;
+	height: fit-content;
+	// padding: 5px;
+	// display: inline-flex;
+};
