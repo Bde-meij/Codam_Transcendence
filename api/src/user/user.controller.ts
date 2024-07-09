@@ -18,11 +18,12 @@ export class UserController {
 	// get current user
 	@Get('current')
 	@UseGuards(JwtGuard)
-	async getUser(@Req() req, @Res() res) : Promise<any> {
+	async getUser(@Req() req, @Res() res) {
 		const user : User = await this.userService.findUserById(req.user.id);
 		if (!user)
-			throw new HttpException('Current user not found', HttpStatus.NOT_FOUND);
-		return user;
+			return res.status(HttpStatus.NOT_FOUND).json({message: 'Current user not found'});
+		return res.status(HttpStatus.OK).json(user);
+		// return user;
 	}
 	
 	// check if this nickname is taken
