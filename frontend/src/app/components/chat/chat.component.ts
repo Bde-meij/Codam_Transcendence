@@ -112,6 +112,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		console.log(`afterviewcheckedInit Room: ${this.selectedRoom}`);
 		if (!this.selectedRoom){
 			this.chatService.updatePage();
+			console.log(this.roomsList);
 			if (Object.keys(this.roomsList).length > 0) {
 				const firstRoomName = Object.keys(this.roomsList)[0];
 				this.selectedRoom = this.roomsList[0];

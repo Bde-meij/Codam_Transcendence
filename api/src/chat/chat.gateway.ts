@@ -16,7 +16,9 @@ import { UserService } from 'src/user/user.service';
 import { Injectable } from '@nestjs/common';
 import { PasswordService } from 'src/password/password.service';
 import { getNewRoomKey} from 'src/game/game.gateway';
-
+import { BlockService } from 'src/block/block.service';
+import { CreateBlockDto } from 'src/block/dto/create-block.dto';
+import { CreateUserDto } from 'src/user/dto/create-user.dto';
 @Injectable()
 @WebSocketGateway({
 	cors: { origin: 'http://localhost:4200' },
@@ -35,7 +37,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	system_id: number = -1;
 	// fake_userid: number = 77000;
 	// loggary: Loggary;
-	constructor(private authService: AuthService, private userService: UserService, private passwordList: PasswordService) {
+	constructor(private blockService: BlockService, private authService: AuthService, private userService: UserService, private passwordList: PasswordService) {
 		this.chatRoomList = {};
 		this.room_info = {};
 		this.gateway_roomid = 0;
@@ -191,9 +193,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		if (this.isMuted(data.room, data.sender_id, data.sender)){
 			// this.io.to(Room.id.toString()).emit('message', message);
 			console.log("handleMessage: Ismuted");
+			return ;
 		}
 		if (this.isBanned(data.room, data.sender_id)){
-			//console.log("handleMessage: Isbanned");
+			console.log("handleMessage: Isbanned");
 		}
 		// //console.log("room: " + data.room + ", socketdataid: " + socket.data.userid);
 		// this.addDate();
@@ -316,9 +319,12 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		console.log("mute " + data.userid);
 		const room = this.findRoom(data.room, "mute");
 		if (this.isAdmin(client.data.userid, data.room) || this.isOwner(client.data.user_id, data.room)){
+			if (!room.muted){
+				console.log("room is not initialised");
+			}
 			this.chatRoomList[data.room].muted[data.userid] = new Date();
 			console.log(`muted: ${room.name} ${data.userid}: ${room.muted[data.userid]}`)
-			this.chatRoomList[data.room].muted[data.userid].setMinutes(this.chatRoomList[data.room].muted[data.userid].getMinutes() + 30);
+			this.chatRoomList[data.room].muted[data.userid].setMinutes(this.chatRoomList[data.room].muted[data.userid].getMinutes() + 1);
 			const msg = this.create_message(`Muted user ${data.userid}`, room.id, room.name, client.data.userid)
 			this.io.to(room.id.toString()).emit('message', msg);
 			console.log(`muted: ${room.name} ${data.userid}: ${room.muted[data.userid]} send to ${room.id.toString()}`)
@@ -365,7 +371,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		const msg = this.create_message(`banned user ${data.username}`, room.id, room.name, client.data.userid)
 		this.io.in(room.id.toString()).emit("message", msg)
 		console.log(`ban: ${this.chatRoomList[data.room].id.toString()}`)
-
 	}
 
 	@SubscribeMessage('unBan') async unban(
@@ -532,18 +537,19 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 	private isMuted(roomId: string, userid: number, username: string){
-		if (this.chatRoomList.muteList){
-			if (this.chatRoomList.muteList[userid]){
-				//console.log("ismuted")
+		this.listMutedUsers(roomId);
+		if (this.chatRoomList[roomId].muted){
+			console.log(`${this.chatRoomList[roomId].muted}`);
+			if (this.chatRoomList[roomId].muted[userid]){
 				const now = new Date();
-				const diff = (now.getTime() - this.chatRoomList.muteList[userid].getTime()) / 1000 / 60;
-				//console.log(`now: ${now} diff: + ${diff}`)
-				if (diff < 3) {
+				const diff = (now.getTime() - this.chatRoomList[roomId].muted[userid].getTime()) / 1000 / 60;
+				console.log(`now: ${now} diff: + ${diff}`)
+				if (diff < 1) {
 					//console.log("You is muted: " + userid);
 					return true;
 				}
 				else
-					delete this.chatRoomList.muteList[userid];
+					delete this.chatRoomList[roomId].muted[userid];
 			}
 			//console.log("NOT muted: " + userid);
 		}
@@ -560,10 +566,13 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	private joinArrayChats(socket: Socket, username: string, user_id: number) {
 		Object.values(this.chatRoomList).forEach(room => {
-		  if (room.users.includes(user_id) || room.status === 'public') {
+		  if (room.users.includes(user_id)) {
+			socket.join(room.id.toString());
+			//console.log(`joinArrayChats User ${username} joined room ${room.name}`);
+		  }
+		  else if (room.status === 'public'){
 			socket.join(room.id.toString());
 			this.chatRoomList[room.name].users.push(user_id);
-			//console.log(`joinArrayChats User ${username} joined room ${room.name}`);
 		  }
 		});
 	}
@@ -580,13 +589,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	private isAdmin(user_id: number, room_name: string){
 		console.log(`Admin?: ${room_name} ${user_id}`)
 		const Room = this.findRoom(room_name, "isAdmin");
-		// const numberexists = Room.admins.find(number => number === user_id);
-		// const numberexists1 = Room.admins.includes(user_id);
-		// console.log("number exists: " + numberexists);
-		// console.log("number exists1: " + numberexists1);
-		// console.log(typeof user_id);
-		// console.log(typeof Room.admins[0]);
-		// console.log(`admins: ${Room.admins}`);
 		if (Room.admins.includes(user_id, 0))
 			console.log("admin found");
 		if (Room && Room.admins.includes(user_id)){
@@ -721,6 +723,33 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		};
 		return message
 	}
+
+	async block_user(send_user_id: number, target_user_id: number){
+		const data: CreateBlockDto = {
+			sender: "77600", 
+			target: "77600"
+		}
+		try{
+			const blockResult = await this.blockService.createBlock(data);
+			console.log(this.blockService.getAllBlocked("77600"));
+		}
+		catch(error){
+			console.log("doesnt work");
+		}
+	}
+
+	listMutedUsers(roomId: string): void {
+		const room = this.findRoom(roomId, 'listMutedUsers');
+		if (!room.muted) {
+		  console.log('No muted users.');
+		  return;
+		}
+		console.log('Muted users:');
+		for (const [userid, muteDate] of Object.entries(room.muted)) {
+		  console.log(`User ID: ${userid}, Muted Until: ${muteDate}`);
+		}
+	}
+
 	private createTestRooms() {
 		// Create dummy rooms example
 		const dummyRooms = [
