@@ -52,8 +52,8 @@ export class UserService {
 		return await this.userRepo.save(users);
 	}
 
-	async findUserById(id: string) {
-		const user = await this.userRepo.findOne({where: {id}});
+	async findUserById(userId: string) {
+		const user = await this.userRepo.findOne({where: {id: userId}});
 		return user;
 	}
 	
@@ -67,72 +67,72 @@ export class UserService {
 		return await this.userRepo.find();
 	}
 	
-	async get2faEnabled(id: string) {
+	async get2faEnabled(userId: string) {
 		return await this.userRepo.findOne({
 			select: {
 				isTwoFAEnabled: true
 			},
 			where: {
-				id: id
+				id: userId
 			}
 		})
 	}
 
-	async get2faSecret(id: string) {
+	async get2faSecret(userId: string) {
 		return await this.userRepo.findOne({
 			select: {
 				twoFASecret: true
 			},
 			where: {
-				id: id
+				id: userId
 			}
 		})
 	}
 
-	async getAvatar(id: string) {
+	async getAvatar(userId: string) {
 		return await this.userRepo.findOne({
 			select: {
 				avatar: true
 			},
 			where: {
-				id: id
+				id: userId
 			}
 		})
 	}
 
 	async updateName(userId: string, newName: string) {
-		await this.userRepo.update(userId, {nickname: newName});
+		await this.userRepo.update({id: userId}, {nickname: newName});
 	}
 	
 	async updateStatus(userId: string, newStatus: string) {
-		await this.userRepo.update(userId, {status: newStatus});
+		await this.userRepo.update({id: userId}, {status: newStatus});
 	}
 
 	async updateAvatar(userId: string, newAvatar: string) {
-		await this.userRepo.update(userId, {avatar: newAvatar});
+		await this.userRepo.update({id: userId}, {avatar: newAvatar});
 	}
 
 	async updateTwoFASecret(userId: string, secret: any) {
-		await this.userRepo.update(userId, {twoFASecret: secret.base32});
+		await this.userRepo.update({id: userId}, {twoFASecret: secret.base32});
 	}
 	
 	async enableTwoFA(userId: string) {
-		await this.userRepo.update(userId, {isTwoFAEnabled: true});
+		await this.userRepo.update({id: userId}, {isTwoFAEnabled: true});
 	}
 	
 	async disableTwoFA(userId: string) {
-		await this.userRepo.update(userId, {isTwoFAEnabled: false});
+		await this.userRepo.update({id: userId}, {isTwoFAEnabled: false});
 	}
 
 	async updateTwoFA(userId: string, enabled: boolean, secret: any) {
-		await this.userRepo.update(userId, {
+		await this.userRepo.update({id: userId}, {
 			isTwoFAEnabled: enabled,
 			twoFASecret: secret.base32
 		})
 	}
 
 	async updateNickname(userId: string, newName: string) {
-		await this.userRepo.update(userId, {nickname: newName});
+		await this.userRepo.update({id: userId}, {nickname: newName});
 	}
 
 	async updateRoomKey(userId: string, roomKey: number) {
