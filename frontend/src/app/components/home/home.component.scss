@@ -1,52 +1,47 @@
 @import '../../../styles/styles.scss';
 
 .home_image_container {
-	background-color: $font-color;
+	background-color: darkslategrey;
 }
 
-.home_game_button {
-	position: absolute; /* set button to an absolute position */
-	top: 48%; /* adjust the top position of the button */
-	left: 50.3%; /* adjust the left position of the button */
-	transform: translate(-50%, -50%); /* center the button */
-	z-index: 2; /* set a higher z-index than the image */
-	background: url('/assets/gifs/white_noise.gif') 50% 50%;
-	background-color: slategray;
-	background-blend-mode: overlay;
-	color: $contrast-color;
-	font-size: larger;
-	font-weight: bolder;
-	// background-repeat: repeat;
-	// background-position: 1em;
-	// background-color: #007bff; /* set your desired background color */
-	// color: linen; /* set your desired text color */
-	padding: 50px 50px; /* set your desired padding */
-	cursor: pointer; /* change mouse cursor on hover */
-}
-.home_game_button:hover {
-	color: linen;
-	background-color: transparent;
-}
+// .home_game_button {
+// 	position: absolute; /* set button to an absolute position */
+// 	top: 48%; /* adjust the top position of the button */
+// 	left: 50.3%; /* adjust the left position of the button */
+// 	transform: translate(-50%, -50%); /* center the button */
+// 	z-index: 2; /* set a higher z-index than the image */
+// 	background: url('/assets/gifs/white_noise.gif') 50% 50% !important;
+// 	background-color: slategray !important;
+// 	background-blend-mode: overlay;
+// 	color: firebrick;
+// 	font-size: larger;
+// 	font-weight: bolder;
+// 	padding: 50px 50px; /* set your desired padding */
+// 	cursor: pointer; /* change mouse cursor on hover */
+// }
+// .home_game_button:hover {
+// 	color: linen;
+// }
 
-.home_settings_button {
-	position: absolute;
-	transform: translate(-50%, -50%);
-	top: 65%;
-	left: 76%;
-	width: 80px;
-	height: 80px;
-	background-size: 100%;
-	color: transparent;
-	background-image: url('/assets/images/rusty_gear_small.png');
-	background-color: transparent;
-	// padding: 50px 50px;
-}
+// .home_settings_button {
+// 	position: absolute;
+// 	transform: translate(-50%, -50%);
+// 	top: 65%;
+// 	left: 76%;
+// 	width: 80px;
+// 	height: 80px;
+// 	background-size: 100%;
+// 	color: transparent;
+// 	background-image: url('/assets/images/rusty_gear_small.png');
+// 	background-color: transparent !important;
+// 	// padding: 50px 50px;
+// }
 
-.home_settings_button:hover {
-	width: 140px;
-	height: 140px;
-	background-size: 100%;
-	background-image: url('/assets/gifs/rotating_gear.gif');
-	color: linen;
-	font-weight: bolder;
-}
+// .home_settings_button:hover {
+// 	width: 140px;
+// 	height: 140px;
+// 	background-size: 100%;
+// 	background-image: url('/assets/gifs/rotating_gear.gif');
+// 	color: linen;
+// 	font-weight: bolder;
+// }

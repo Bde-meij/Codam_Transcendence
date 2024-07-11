@@ -61,7 +61,7 @@ export class AuthController {
 		}
 		else {
 			this.userService.updateStatus(user.id, 'online');
-			res.status(HttpStatus.FOUND).redirect(`http://${req.hostname}:4200/dashboard`);
+			res.status(HttpStatus.FOUND).redirect(`http://${req.hostname}:4200/dashboard/home`);
 		}
 	}
 

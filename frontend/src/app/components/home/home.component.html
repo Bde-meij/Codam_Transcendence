@@ -1,8 +1,12 @@
-<div class="home_image_container">
-	<img 	ngSrc="/assets/images/basement_home.jpg" 
+<div class="home_image_container" (window:resize)="onResize($event)">
+	<img	ngSrc="/assets/images/basement_home.jpg" 
 			width={{this.width}} 
 			height={{this.height}} 
 			priority /> 
-	<button class="home_game_button" [routerLink]="['/dashboard/game-menu']">play game</button>
-	<button class="home_settings_button" [routerLink]="['/dashboard/settings']"> settings </button>
+	<!-- <button class="home_game_button" [routerLink]="['/dashboard/game-menu']">
+		play game
+	</button>
+	<button class="home_settings_button" [routerLink]="['/dashboard/settings']">
+		 settings 
+	</button> -->
 </div>
