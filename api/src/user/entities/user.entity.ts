@@ -3,6 +3,8 @@ import { FriendRequest } from "src/friends/entities/friend.entity";
 import { Match } from "src/game/entities/match.entity";
 import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
 
+export const defaultAvatarUrl: string = "/uploads/default_avatar.png";
+
 @Entity('user')
 export class User {
 
@@ -18,7 +20,7 @@ export class User {
 	@Column({default: "online"})
 	status: string;
 
-	@Column({default: "/uploads/default_avatar.png"})
+	@Column({default: defaultAvatarUrl})
 	avatar: string;
 
 	@OneToMany(() => FriendRequest, (friend) => friend.sender)

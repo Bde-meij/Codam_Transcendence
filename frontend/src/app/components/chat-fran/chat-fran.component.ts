@@ -11,13 +11,13 @@ import { NbEvaIconsModule } from '@nebular/eva-icons';
 import { NbSidebarService } from '@nebular/theme';
 
 @Component({
-  selector: 'app-chat-ui',
+  selector: 'fran-chat-ui',
   standalone: true,
   imports: [NbChatModule, NgFor, NgIf, NbThemeModule, NbLayoutModule, UserDetailComponent, NbSidebarModule, NbEvaIconsModule],
   templateUrl: './chat-fran.component.html',
   styleUrl: './chat-fran.component.scss'
 })
-export class ChatUiComponent implements AfterViewInit{
+export class FranChatUiComponent implements AfterViewInit{
 
 	@ViewChild('messageContainer') messageContainer!: ElementRef;
 	@ViewChild('messageInput') messageInput!: ElementRef;

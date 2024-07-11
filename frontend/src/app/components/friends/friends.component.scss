@@ -89,6 +89,23 @@
 	// left: 50%;
 }
 
+.friend_column .unfriend {
+	color: $contrast-color;
+}
+
+.friend_column .unfriend:hover {
+	background-color: $contrast-color;
+	color: $background-color;
+}
+
+.refresh {
+	font-size: small;
+	position: fixed;
+	left: 6%;
+	background-color: $font-color;
+	color: darken($background-color, 10%);
+}
+
 .errormessage {
 	color: $contrast-color;
 }

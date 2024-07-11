@@ -1,5 +1,5 @@
 import { ApplicationConfig, importProvidersFrom } from '@angular/core';
-import { provideRouter, withRouterConfig } from '@angular/router';
+import { provideRouter, withComponentInputBinding, withRouterConfig } from '@angular/router';
 import { routes } from './app.routes';
 import { AuthService } from './services/auth/auth.service';
 import { provideHttpClient, HTTP_INTERCEPTORS, withInterceptorsFromDi } from '@angular/common/http';
@@ -10,7 +10,6 @@ import { NbChatModule, NbIconModule, NbLayoutModule, NbSidebarModule, NbSidebarS
 
 export const appConfig: ApplicationConfig = {
 	providers: [
-		provideRouter(routes),
 		importProvidersFrom(
 			NbThemeModule.forRoot({ name: 'default' }),
 			NbLayoutModule,
@@ -19,8 +18,8 @@ export const appConfig: ApplicationConfig = {
 			NbSidebarModule.forRoot(),
 		  ),
 		  NbSidebarService,
-		provideRouter(routes, withRouterConfig({
-			onSameUrlNavigation: 'reload'
+		provideRouter(routes, withComponentInputBinding(), withRouterConfig({
+			onSameUrlNavigation: 'reload',
 		})),
 		provideHttpClient(withInterceptorsFromDi()),
 		{ provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },

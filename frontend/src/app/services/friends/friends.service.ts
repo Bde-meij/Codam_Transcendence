@@ -23,14 +23,26 @@ export class FriendsService {
 	}
 
 	deleteRequest(requestId: string) {
-		return this.http.delete<string>(this.friendsUrl + '/delete-request-id/' + requestId, {});
+		return this.http.delete<string>(this.friendsUrl + '/delete-request-id/' + requestId);
+	}
+
+	deleteFriend(friendId: string) {
+		return this.http.delete<string>(this.friendsUrl + '/delete-request-user/' + friendId);
 	}
 
 	getOutgoingRequests() {
 		return this.http.get<any>(this.friendsUrl + '/outgoing', {});
 	}
 
-	addFriend(nickname: string) {
+	addFriendNick(nickname: string) {
 		return this.http.post<any>(this.friendsUrl + '/new-request-nick/' + nickname, {});
+	}
+
+	addFriendId(id : string) {
+		return this.http.post<any>(this.friendsUrl + '/new-request/' + id, {});
+	}
+
+	isFriend(friendId: string) {
+		return this.http.get<any>(this.friendsUrl + '/is-friends/' + friendId, {});
 	}
 }

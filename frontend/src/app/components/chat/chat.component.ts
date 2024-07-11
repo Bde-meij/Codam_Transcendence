@@ -44,7 +44,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	constructor(private chatService: ChatService, private userService: UserService) {};
 	
 	ngOnInit() {
-		this.userService.getUser('0').subscribe((userData) => (
+		this.userService.getUser('current').subscribe((userData) => (
 			this.user = userData
 		));
 	
@@ -56,6 +56,11 @@ export class ChatComponent implements OnInit, AfterViewInit {
 				))
 				this.roomsList[newmessage.room_name].messages?.push(newmessage);
 				this.messages.push(newmessage.message);
+				
+				// console.log("Room: " + newmessage.roomId + ", got a new message");
+				// console.log(newmessage);
+			} else {
+				//console.error("Room or messages array not found:", newmessage.roomId);
 			}
 		});
 
@@ -72,7 +77,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		});
 
 		this.chatService.getConnectedUsers().subscribe((userList: any) => {
-			// ////console.log("getconnectedusers subscribe");
+			// console.log("getconnectedusers subscribe");
 			this.userss = userList;
 		})
 
@@ -86,9 +91,16 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	@ViewChild(ChatMessageComponent) viewChild!: ChatMessageComponent;
 
 	ngAfterViewInit() {
-		console.log("afterviewcheckedINIT");
-		if (!this.selectedRoom)
+		// console.log(`afterviewcheckedInit Room: ${this.selectedRoom}`);
+		if (!this.selectedRoom){
 			this.chatService.updatePage();
+			// if (Object.keys(this.roomsList).length > 0) {
+			// 	const firstRoomName = Object.keys(this.roomsList)[0];
+			// 	this.selectedRoom = this.roomsList[0];
+			// 	this.onSelect(this.roomsList[firstRoomName]);
+			// console.log(`empty selectedroom, selected: ${this.roomsList[firstRoomName]}`);
+			// }
+		}
 	}
 
 	sendMessage() {

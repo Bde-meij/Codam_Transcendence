@@ -1,5 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
 @import '@nebular/theme/styles/prebuilt/default.css';
+@import '@nebular/theme/styles/globals';
 @import '@angular/material/prebuilt-themes/purple-green.css';
 @import './base/typography.scss';
 @import './helpers/constants.scss';
@@ -26,9 +27,12 @@ div {
 }
 
 .logbutton {
-	margin: 3;
-	background-color: $button-color;
+	// margin: 0;
+	// background-color: $button-color;
 	border: 2px solid darken($button-color, 10%);
+	margin-top: -1rem;
+	padding-top: 0.5rem;
+	padding-bottom: 0.5rem;
 }
 
 .chat_column {

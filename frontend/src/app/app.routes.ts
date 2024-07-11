@@ -14,7 +14,7 @@ import { HomeComponent } from './components/home/home.component';
 import { GameMenuComponent } from './components/game-menu/game-menu.component';
 import { TwofaComponent } from './components/twofa/twofa.component';
 import { constTitle } from './models/title.const';
-import { ChatUiComponent } from './components/chat-fran/chat-fran.component';
+import { FranChatUiComponent } from './components/chat-fran/chat-fran.component';
 import { UserDetailComponent } from './components/user-detail/user-detail.component';
 
 export const routes: Routes = [
@@ -85,11 +85,12 @@ export const routes: Routes = [
 			},
 			{
 				path: 'franchat',
-				component: ChatUiComponent,
+				component: FranChatUiComponent,
 				canActivate: [AuthGuard],
 			},
 			{
 				path: 'detail/:id', 
+				// data: {id: routes.thisArg},
 				component: UserDetailComponent,
 				canActivate: [AuthGuard]
 			},
