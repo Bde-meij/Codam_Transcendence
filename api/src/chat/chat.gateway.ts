@@ -134,8 +134,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		this.chatRoomList[data.room_name] = {
 			id: this.gateway_roomid,
 			name: data.room_name,
-			owner: socket.data.nickname,
-			admins: [socket.data.nickname],
+			owner: socket.data.userid,
+			admins: [socket.data.userid],
 			banned: [],
 			muted: {},
 			users: [socket.data.userid],
@@ -355,31 +355,40 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	{
 		console.log("ban: " + data.userid + ", in: " + data.room )
 		const room = this.findRoom(data.room, "ban");
+		if (!room){
+			console.log("error room not found");
+			return;
+		}
+		if (this.isOwner(data.userid, data.room)){
+			console.log("user is owner, can't be banned");
+			const msg = this.create_message(`${data.username} can't be banned, he is the channel owner`, room.id, room.name, client.data.userid)
+			this.io.in(room.id.toString()).emit("message", msg)
+			return;
+		}
 		if (this.isAdmin(client.data.userid, data.room) || this.isOwner(client.data.user_id, data.room)){
 			console.log("is authorized");
 			this.chatRoomList[data.room].banned.push(data.userid);
-			this.kickUserId(data.userid, data.room)
+			this.kickUserId(data.userid, room.id)
 			this.chatRoomList[data.room].users = this.chatRoomList[data.room].users.filter((item: number) => item !== data.userid);
-			this.io.in(room.id.toString()).emit("message", `${data.username} is banned.`)
+			const datas = { user_id : this.system_id, user_name: ""} ;
+			this.updateRoom(datas, client);
+			this.channelUserList(data.room);
+			const name = this.findUsername(data.userid);
+			const msg = this.create_message(`banned user ${data.username}`, room.id, room.name, client.data.userid)
+			this.io.in(room.id.toString()).emit("message", msg)
+			console.log(`ban: ${this.chatRoomList[data.room].id.toString()}`)
 		}
-		else
+		else{
 			console.log("not admin or owner");
-		this.channelUserList(data.room);
-		const datas = { user_id : this.system_id, user_name: ""} ;
-		this.updateRoom(datas, client);
-		const name = this.findUsername(data.userid);
-		const msg = this.create_message(`banned user ${data.username}`, room.id, room.name, client.data.userid)
-		this.io.in(room.id.toString()).emit("message", msg)
-		console.log(`ban: ${this.chatRoomList[data.room].id.toString()}`)
+			return;
+		}
 	}
 
 	@SubscribeMessage('unBan') async unban(
 	@MessageBody() data: { room: string; userid: number, username: string },
 	@ConnectedSocket() client: Socket)
 	{
-		//check if room exists
 		//console.log("unBan: " + data.userid + ", in: " + data.room )
-
 		const room = this.findRoom(data.room, "Unban");
 		if (this.isAdmin(data.userid, data.room) || this.isOwner(data.userid, data.room)){
 			if (this.chatRoomList[data.room].banned.push((Number(data.userid)))){
@@ -400,40 +409,34 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		const room = this.findRoom(data.room, "kick");
 		if (this.isAdmin(data.userid, data.room) || this.isOwner(data.userid, data.room)){
 			console.log("Authorized to kick");
-			this.kickUserId(data.userid, data.room)
+			console.log(room.users);
+			await this.kickUserId(data.userid, room.id)
+			const msg = this.create_message(`kicked user ${data.userid}`, room.id, room.name, client.data.userid)
+			this.io.in(room.id.toString()).emit("message", msg)
+			const datas = { user_id : this.system_id, user_name: ""} ;
+			this.updateRoom(datas, client);
+			this.channelUserList(data.room);
 		}
 		else{
 			// this.io.in(data.room).emit("error", `not admin`)
 			console.log("not admin or target is owner");
 			return ;
 		}
-		this.channelUserList(data.room);
-		this.logger(data.room);
 	}
 
-	private kickUserId(userid: number, roomid: string){
+	private async kickUserId(userid: number, roomid: number){
 		console.log(`kickuserid: ${userid}: ${roomid}`)
-		// const sockets = this.io.sockets.sockets;
-		const sockets = this.io.in(roomid).fetchSockets();
-		console.log(sockets);
-		// for (const socketId of sockets) {
-		// 	const target = this.io.sockets.sockets.get(socketId);
-		// 	console.log("kickUserId: targetnickname: " + target.data.nickname + "== userid: " + userid)
-		// 	if (target.data.userid === userid) {
-		// 		console.log("kickUserId: found socket: " + target.data.userid);
-		// 		target.leave(roomid);
-		// 		this.io.in(roomid).emit("message", `${target.data.nickname} has been kicked`)
-		// 		this.chatRoomList[roomid].users = this.chatRoomList[roomid].users.filter((item: number) => item !== target.data.userid);
-		// 		this.channelUserList(roomid);
-		// 		return true;
-		// 	}
-		// }
-		//console.log("kickUserId: not found socket");
-		return false;
-		// find socket of the room.
-		// find socket of the userid
-		// leaveroom(socket)
-		// emit user got kicked
+		const target = await this.findSocketUser(userid);
+		if (!target){
+			console.log("kickUserId: not found socket");
+			return false;
+		}
+		console.log("kickUserId: targetnickname: " + target.data.nickname + "== userid: " + userid)
+		console.log("kickUserId: found socket: " + target.data.userid);
+		target.leave(roomid.toString());
+		console.log(this.chatRoomList[roomid].users);
+		this.chatRoomList[roomid].users = this.chatRoomList[roomid].users.filter((item: number) => item !== target.data.userid);
+		return true;
 	}
 
 
@@ -691,15 +694,16 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		}
 	}
 
-	async findSocketUser(username: string){
-		console.log("findSocketUser");
+	async findSocketUser(userid: number){
+		console.log(`findSocketUser ${userid}`);
 		const sockets = await this.io.fetchSockets();
 		for (const socketId of sockets) {
-			console.log(socketId.data.nickname);
+			if (socketId.data.userid == userid){
+				console.log(`socket ${userid} found ${socketId.data.nickname}`);
+				return socketId;
+			}
 		}
-		console.log("end findSocketUser");
-
-		// const sockets = await this.io.in("room1").fetchSockets();
+		return ;
 	}
 
 	async findUsername(userid: number){
