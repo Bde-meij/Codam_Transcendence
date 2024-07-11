@@ -4,11 +4,12 @@ import { User } from '../../models/user.class';
 import { UserService } from '../../services/user/user.service';
 import { FriendsService } from '../../services/friends/friends.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { NbUserModule } from '@nebular/theme';
 
 @Component({
   selector: 'app-user-detail',
   standalone: true,
-  imports: [NgIf, UpperCasePipe, JsonPipe],
+  imports: [NgIf, UpperCasePipe, JsonPipe, NbUserModule],
   templateUrl: './user-detail.component.html',
   styleUrl: './user-detail.component.scss'
 })

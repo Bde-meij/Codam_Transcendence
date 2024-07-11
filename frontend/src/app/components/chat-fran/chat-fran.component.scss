@@ -1,16 +1,66 @@
 @import '../../../styles/helpers/constants.scss';
+@import '../../../styles/base/typography.scss';
 @import '@nebular/theme/styles/globals';
 
-::ng-deep nb-layout-column {
-	justify-content: center;
+  .chat-room_container {
 	display: flex;
+	justify-content: space-between;
+	background-color: transparent;
   }
-  nb-chat {
-	width: 500px;
-	nb-chat-message {
-		.message-sender {
-			font-weight: bold;
-			color: #333;
-		}
-	}
+  
+  .create-room-column {
+	flex: 0 0 100%;
+	padding: 10px;
+	margin-bottom: 10px;
+	background-color: $column-color;
+	text-align: center;
   }
+  
+  .rooms-list, .user-list {
+	width: 20%;
+	background: #f7f9fc; /* Light background color */
+	padding: 10px;
+	border-radius: 5px;
+  }
+  
+  .rooms-list {
+	margin-right: 20px;
+  }
+  
+  .user-list {
+	margin-left: 20px;
+  }
+  
+  .chat-box {
+	flex: 1;
+	background: #ffffff; /* White background for the chat box */
+	padding: 20px;
+	border-radius: 5px;
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Optional shadow for better appearance */
+  }
+  
+  .rooms-list h3, .user-list h3 {
+	margin-top: 0;
+  }
+  
+  .rooms-list ul {
+	list-style-type: none;
+	padding: 0;
+  }
+  
+  .rooms-list li {
+	margin-bottom: 10px;
+  }
+  
+  .rooms-list button {
+	display: block;
+	width: 100%;
+	margin-top: 5px;
+  }
+  
+  .friends {
+	margin: 0 0 2em 0;
+	list-style-type: none;
+	padding: 0;
+	width: 15em;
+}

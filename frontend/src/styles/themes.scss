@@ -1,0 +1,14 @@
+@forward '@nebular/theme/styles/theming';
+@use '@nebular/theme/styles/themes/default';
+@use '@nebular/theme/styles/theming' as *;
+@import './base/typography.scss';
+
+$nb-themes: nb-register-theme((
+	font-family-primary: $font-stack,
+	font-family-secondary: $font-stack,
+	text-heading-1-font-family: $font-stack,
+	font-size: 1rem, // Set default font size
+  // Add other typography customizations here
+), default, default);
+
+@include nb-install();

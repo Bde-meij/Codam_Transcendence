@@ -162,7 +162,7 @@ export class ChatService{
 		return new Observable((observer) => {
 			this.chatSocket.on('getConnectedUsers', (userss) => {
 				// console.log("getConnectedUsers: " + userss);
-				observer.next(userss);		
+				observer.next(userss);
 			});
 		});
 	}

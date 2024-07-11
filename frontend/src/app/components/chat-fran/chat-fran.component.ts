@@ -1,6 +1,6 @@
 import { NgFor, NgIf } from '@angular/common';
 import { AfterViewInit, Component, ElementRef, Input, ViewChild } from '@angular/core';
-import { NbChatModule, NbSidebarModule } from '@nebular/theme';
+import { NbCardModule, NbChatModule, NbSidebarModule, NbUserModule } from '@nebular/theme';
 import { ChatService } from '../../services/sock/chat/chat.service';
 import { UserService } from '../../services/user/user.service';
 import { User } from '../../models/user.class';
@@ -9,11 +9,12 @@ import { NbThemeModule, NbLayoutModule} from '@nebular/theme';
 import { UserDetailComponent } from '../user-detail/user-detail.component';
 import { NbEvaIconsModule } from '@nebular/eva-icons';
 import { NbSidebarService } from '@nebular/theme';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'fran-chat-ui',
   standalone: true,
-  imports: [NbChatModule, NgFor, NgIf, NbThemeModule, NbLayoutModule, UserDetailComponent, NbSidebarModule, NbEvaIconsModule],
+  imports: [FormsModule, NbChatModule, NbCardModule, NbUserModule, NgFor, NgIf, NbThemeModule, NbLayoutModule, UserDetailComponent, NbSidebarModule, NbEvaIconsModule],
   templateUrl: './chat-fran.component.html',
   styleUrl: './chat-fran.component.scss'
 })
@@ -41,7 +42,7 @@ export class FranChatUiComponent implements AfterViewInit{
 	constructor(private chatService: ChatService, private userService :UserService, private sidebarService: NbSidebarService) {};
 
 	ngOnInit() {
-    this.userService.getUser('0').subscribe((userData) => (
+    this.userService.getUser('current').subscribe((userData) => (
 			this.user = userData
 		));
 	
