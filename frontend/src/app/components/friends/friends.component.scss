@@ -1,7 +1,7 @@
 @import '../../../styles/styles.scss';
 
 .friend_container {
-	display: flex;
+	display: flex !important;
 }
 .friend_column {
 	flex: 33.33%;
