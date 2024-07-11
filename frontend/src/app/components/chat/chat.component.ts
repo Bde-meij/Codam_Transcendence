@@ -81,6 +81,16 @@ export class ChatComponent implements OnInit, AfterViewInit {
 			this.userss = userList;
 		})
 
+		this.chatService.update_client_room().subscribe((update_room: Rooms) => {
+			console.log(`update_cllient_room: ${update_room}`);
+			this.roomsList[update_room.name] = update_room;
+		})
+
+		// this.chatService.fetch_client_room().subscribe((update_room: Rooms) => {
+		// 	console.log(`update_cllient_room: ${update_room}`);
+		// 	this.roomsList[update_room.name] = update_room;
+		// })
+
 		this.createRoom("Global", "public", "");
 		// this.createRoom("temp",  "public", "");
 		this.joinRoom("Global", "");
@@ -91,15 +101,16 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	@ViewChild(ChatMessageComponent) viewChild!: ChatMessageComponent;
 
 	ngAfterViewInit() {
-		// console.log(`afterviewcheckedInit Room: ${this.selectedRoom}`);
+		console.log(`afterviewcheckedInit Room: ${this.selectedRoom}`);
 		if (!this.selectedRoom){
 			this.chatService.updatePage();
-			// if (Object.keys(this.roomsList).length > 0) {
-			// 	const firstRoomName = Object.keys(this.roomsList)[0];
-			// 	this.selectedRoom = this.roomsList[0];
-			// 	this.onSelect(this.roomsList[firstRoomName]);
-			// console.log(`empty selectedroom, selected: ${this.roomsList[firstRoomName]}`);
-			// }
+			console.log(this.roomsList);
+			if (Object.keys(this.roomsList).length > 0) {
+				const firstRoomName = Object.keys(this.roomsList)[0];
+				this.selectedRoom = this.roomsList[0];
+				this.onSelect(this.roomsList[firstRoomName]);
+				console.log(`empty selectedroom, selected: ${this.roomsList[firstRoomName]}`);
+			}
 		}
 	}
 
