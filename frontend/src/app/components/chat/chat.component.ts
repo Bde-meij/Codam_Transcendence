@@ -53,7 +53,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 					newmessage.sender_avatar = URL.createObjectURL(data)
 				))
 				this.roomsList[newmessage.room_name].messages?.push(newmessage);
-				this.messages.push(newmessage.message);
+				// this.messages.push(newmessage.message);
 				
 				// console.log("Room: " + newmessage.roomId + ", got a new message");
 				// console.log(newmessage);
@@ -90,7 +90,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		})
 
 		this.chatService.update_client_room().subscribe((update_room: Rooms) => {
-			console.log(`update_cllient_room: ${update_room}`);
+			console.log(`update_client_room: ${update_room}`);
 			this.roomsList[update_room.name] = update_room;
 		})
 
