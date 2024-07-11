@@ -26,9 +26,11 @@ export interface MessageInterface {
 	roomId: number;
 	room_name: string;
 	senderId: number;
+	sender_name: string;
 	created: Date;
 	updated?: Date;
 	game?: boolean;
+	sender_avatar?: string;
 }
 
 // export interface ConnectedInterface {

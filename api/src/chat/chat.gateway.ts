@@ -187,6 +187,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			roomId: Room.id,
 			room_name: data.room,
 			senderId: socket.data.userid,  // check 
+			sender_name: socket.data.nickname,
 			created: new Date(),
 		};
 		//console.log(`users: ${this.chatRoomList[data.room].users}`)
@@ -325,7 +326,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			this.chatRoomList[data.room].muted[data.userid] = new Date();
 			console.log(`muted: ${room.name} ${data.userid}: ${room.muted[data.userid]}`)
 			this.chatRoomList[data.room].muted[data.userid].setMinutes(this.chatRoomList[data.room].muted[data.userid].getMinutes() + 1);
-			const msg = this.create_message(`Muted user ${data.userid}`, room.id, room.name, client.data.userid)
+			const msg = this.create_message(`Muted user ${data.userid}`, room.id, room.name, client.data.userid, client.data.nickname)
 			this.io.to(room.id.toString()).emit('message', msg);
 			console.log(`muted: ${room.name} ${data.userid}: ${room.muted[data.userid]} send to ${room.id.toString()}`)
 		}
@@ -343,7 +344,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		if (this.isAdmin(client.data.userid, data.room) || this.isOwner(client.data.user_id, data.room)){
 			if (this.chatRoomList[data.room].muted[data.userid]){
 				delete this.chatRoomList[data.room].muted[data.userid];
-				const msg = this.create_message(`unmuted user ${data.userid}`, room.id, room.name, client.data.userid)
+				const msg = this.create_message(`unmuted user ${data.userid}`, room.id, room.name, client.data.userid, client.data.nickname)
 				this.io.in(room.id.toString()).emit("message", msg)
 			}
 		}
@@ -361,7 +362,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		}
 		if (this.isOwner(data.userid, data.room)){
 			console.log("user is owner, can't be banned");
-			const msg = this.create_message(`${data.username} can't be banned, he is the channel owner`, room.id, room.name, client.data.userid)
+			const msg = this.create_message(`${data.username} can't be banned, he is the channel owner`, room.id, room.name, client.data.userid, client.data.nickname)
 			this.io.in(room.id.toString()).emit("message", msg)
 			return;
 		}
@@ -374,7 +375,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			this.updateRoom(datas, client);
 			this.channelUserList(data.room);
 			const name = this.findUsername(data.userid);
-			const msg = this.create_message(`banned user ${data.username}`, room.id, room.name, client.data.userid)
+			const msg = this.create_message(`banned user ${data.username}`, room.id, room.name, client.data.userid, client.data.nickname)
 			this.io.in(room.id.toString()).emit("message", msg)
 			console.log(`ban: ${this.chatRoomList[data.room].id.toString()}`)
 		}
@@ -395,7 +396,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				this.chatRoomList[data.room].banned = this.chatRoomList[data.room].banned.filter(item => item == (Number(data.userid)));
 			}
 			const name = this.findUsername(data.userid);
-			const msg = this.create_message(`unbanned user ${name}`, room.id, room.name, client.data.userid)
+			const msg = this.create_message(`unbanned user ${name}`, room.id, room.name, client.data.userid, client.data.nickname)
 			this.io.in(room.id.toString()).emit("message", msg)
 		}
 		//emit unban notification in chat
@@ -411,7 +412,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			console.log("Authorized to kick");
 			console.log(room.users);
 			await this.kickUserId(data.userid, room.id)
-			const msg = this.create_message(`kicked user ${data.userid}`, room.id, room.name, client.data.userid)
+			const msg = this.create_message(`kicked user ${data.userid}`, room.id, room.name, client.data.userid, client.data.nickname)
 			this.io.in(room.id.toString()).emit("message", msg)
 			const datas = { user_id : this.system_id, user_name: ""} ;
 			this.updateRoom(datas, client);
@@ -465,6 +466,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			roomId: data.roomid,
 			room_name: data.room_name,
 			senderId: data.userid,  // check 
+			sender_name: data.userid.toString(),
 			created: new Date(),
 			game: true
 		};
@@ -478,7 +480,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		console.log("joinbattle: " + data.numroom + ", room: " + data.room);
 		this.userService.updateRoomKey(client.data.userid.toString(), Number(data.numroom))
 		const room = this.findRoom(data.room, "kick");
-		const msg = this.create_message(`User ${client.data.nickname} joined the battle`, room.id, room.name, client.data.userid)
+		const msg = this.create_message(`User ${client.data.nickname} joined the battle`, room.id, room.name, client.data.userid, client.data.nickname)
 		this.io.to(room.id.toString()).emit('message', msg);
 	}
 
@@ -717,12 +719,13 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		console.log("notFoundUsername");
 	}
 
-	private create_message(msg: string, room_id : number, room_name : string, sender_id : number){
+	private create_message(msg: string, room_id : number, room_name : string, sender_id : number, sender_name: string){
 		const message: MessageInterface = {
 			message: msg,
 			roomId: room_id,
 			room_name: room_name,
 			senderId: sender_id,  // check 
+			sender_name: sender_name,
 			created: new Date(),
 		};
 		return message
