@@ -33,18 +33,7 @@ export interface MessageInterface {
 	sender_avatar?: string;
 }
 
-// export interface ConnectedInterface {
-// 	id?: number;
-// 	socketId: string;
-// 	user: UserInterface;
-//   }
-  
-// export interface UserInterface {
-// 	id: number
-// 	username?: string;
-// 	users?: UserInterface
-// 	blockedUsers?: number[]
-// 	picture?: string
-// 	sizedPicture?: string
-// 	jwt?: string
-// }
+export interface Room_dto {
+	id: number;
+	password: string; //true or false?
+}
