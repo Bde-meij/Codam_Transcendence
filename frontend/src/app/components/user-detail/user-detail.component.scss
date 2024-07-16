@@ -3,3 +3,44 @@
 .unfriend {
 	color: $contrast-color;
 }
+
+.match {
+	background-color: white;
+	border: 0.2em solid $font-color;
+	border-radius: 0.5em 20%;
+	padding: 0.2em;
+	margin: 0.5em;
+	margin-left: 15%;
+	margin-right: 15%;
+}
+
+.win {
+	background-color: lighten($font-color, 40%);
+	border-radius: 0.5em 20%;
+}
+
+.lose {
+	background-color: lighten($contrast-color, 40%);
+	border-radius: 0.5em 20%;
+}
+
+.match .player {
+	background-color: transparent;
+	display: inline-block;
+}
+
+.match .name {
+	display: inline-block;
+	font-weight: bolder;
+	width: 120px;
+}
+
+.match .score {
+	display: inline-block;
+	width: 30px;
+}
+
+.match .vs {
+	margin-left: 5%;
+	margin-right: 5%;
+}
