@@ -37,8 +37,10 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	selectedRoom: Rooms | undefined;
 	
 	onSelect(room: Rooms): void {
+		console.log(`onselect ${room.name}`);
+		console.log(room);
 		this.selectedRoom = room;
-		//console.log(room.messages);
+		console.log(room.messages);
 	};
 
 	constructor(private chatService: ChatService, private userService: UserService) {};
@@ -55,7 +57,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 					newmessage.sender_avatar = URL.createObjectURL(data)
 				))
 				this.roomsList[newmessage.room_name].messages?.push(newmessage);
-				this.messages.push(newmessage.message);
+				// this.messages.push(newmessage.message);
 				
 				// console.log("Room: " + newmessage.roomId + ", got a new message");
 				// console.log(newmessage);
@@ -67,12 +69,10 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		this.chatService.getRoomsss().subscribe((chatRoomList: Record<string, Rooms>) => {
 			// ////console.log("getRoomss record");
 			this.roomsList = chatRoomList;
-			if (!this.selectedRoom && Object.keys(this.roomsList).length > 0) {
-				const firstRoomName = Object.keys(this.roomsList)[0];
-				// ////console.log("getrooms select")
-				////console.log(this.roomsList[firstRoomName]);
-				this.onSelect(this.roomsList[firstRoomName]);
-			  }
+			// if (!this.selectedRoom && Object.keys(this.roomsList).length > 0) {
+			// 	const firstRoomName = Object.keys(this.roomsList)[0];
+			// 	this.onSelect(this.roomsList[firstRoomName]);
+			// }
 			////console.log(this.roomsList);
 		});
 
@@ -82,8 +82,15 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		})
 
 		this.chatService.update_client_room().subscribe((update_room: Rooms) => {
-			console.log(`update_cllient_room: ${update_room}`);
+			console.log(`update_client_room: ${update_room}`);
+			console.log(update_room);
 			this.roomsList[update_room.name] = update_room;
+			// if (Object.keys(this.roomsList).length > 0 && !this.selectedRoom) {
+			// 	const firstRoomName = Object.keys(this.roomsList)[0];
+			// 	this.selectedRoom = this.roomsList[0];
+			// 	this.onSelect(this.roomsList[firstRoomName]);
+			// 	console.log(`update_client_room, selected: ${this.roomsList[firstRoomName]}`);
+			// }
 		})
 
 		// this.chatService.fetch_client_room().subscribe((update_room: Rooms) => {
@@ -104,13 +111,15 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		console.log(`afterviewcheckedInit Room: ${this.selectedRoom}`);
 		if (!this.selectedRoom){
 			this.chatService.updatePage();
+			console.log("selectinged room empty");
 			console.log(this.roomsList);
-			if (Object.keys(this.roomsList).length > 0) {
-				const firstRoomName = Object.keys(this.roomsList)[0];
-				this.selectedRoom = this.roomsList[0];
-				this.onSelect(this.roomsList[firstRoomName]);
-				console.log(`empty selectedroom, selected: ${this.roomsList[firstRoomName]}`);
-			}
+			// if (Object.keys(this.roomsList).length > 0) {
+			// 	console.log(Object.keys(this.roomsList).length);
+			// 	const firstRoomName = Object.keys(this.roomsList)[0];
+			// 	this.selectedRoom = this.roomsList[0];
+			// 	this.onSelect(this.roomsList[firstRoomName]);
+			// 	console.log(`empty selectedroom, selected: ${this.roomsList[firstRoomName]}`);
+			// }
 		}
 	}
 
@@ -144,6 +153,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	joinRoom(data: string, password: string) {
 		////console.log("joinroom component: " + data);
 		this.chatService.joinRoom(data, password);
+		this.onSelect(this.roomsList[data]);
 	}
 
 	getConnectedUsers() {

@@ -60,6 +60,8 @@ export class ChatMessageComponent implements AfterViewInit{
 
 	sendMessage() {
 		if (this.message) {
+			console.log(`${this.room.name} object:`);
+			console.log(this.room);
 			this.chatService.sendMessage(this.message, this.room.name);
 			this.scrollToBottom()
 			this.messageInput.nativeElement.focus();
