@@ -33,7 +33,24 @@ export interface MessageInterface {
 	sender_avatar?: string;
 }
 
-export interface Room_dto {
-	id: number;
+export interface RoomDto {
+	name: string;
 	password: string; //true or false?
+}
+
+export interface CheckPasswordDto {
+	id: number;
+	password: string;
+}
+
+export interface UpdatePasswordDto {
+	id: number;
+	oldPassword: string;
+	newPassword: string;
+}
+
+export interface UpdateNameDto {
+	id: number;
+	password: string;
+	newName: string;
 }

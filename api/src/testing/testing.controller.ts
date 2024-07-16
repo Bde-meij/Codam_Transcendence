@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { CheckPasswordDto, RoomDto, UpdateNameDto, UpdatePasswordDto } from 'src/chat/chatRoom.dto';
 import { User } from 'src/user/entities/user.entity';
 import { FriendsService } from 'src/friends/friends.service';
 import { CreateFriendRequestDto } from 'src/friends/dto/create-friend.dto';
@@ -11,11 +12,12 @@ import { DeleteBlockDto } from 'src/block/dto/delete-block.dto';
 import { CreateMatchDto } from 'src/game/dto/create-match.dto';
 import { UpdateMatchDto } from 'src/game/dto/update-match.dto';
 import { MatchService } from 'src/game/match.service';
+import { ChatRoomService } from 'src/chat/chatRoom.service';
 
 // !! DO NOT MAKE CALLS TO THIS ENDPOINT FOR REASONS OTHER THAN TESTING !!
 @Controller('testing')
 export class TestingController {
-	constructor(private readonly userService: UserService, private readonly friendsService: FriendsService, private readonly blockService: BlockService, private readonly matchService: MatchService) {}
+	constructor(private readonly userService: UserService, private readonly friendsService: FriendsService, private readonly blockService: BlockService, private readonly matchService: MatchService, private readonly chatRoomService: ChatRoomService) {}
 
 
 	// --------------------------------------------------------------------------------------------------------------
@@ -191,5 +193,42 @@ export class TestingController {
 	@Patch('match/update')
 	async updateMatch(@Body() data: UpdateMatchDto) {
 		return await this.matchService.updateMatch(data);
+	}
+
+
+	// --------------------------------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------------------------------------------------
+	// ----------------------------------------------CHATROOM ENDPOINTS----------------------------------------------
+	// --------------------------------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------------------------------------------------
+
+	// creates a chat room
+	@Post('chatroom/create')
+	async createChatRoom(@Body() data: RoomDto) {
+		return await this.chatRoomService.createChatRoom(data);
+	}
+
+	// deletes a chat room
+	@Delete('chatroom/delete')
+	async deleteChatRoom(@Body() data) {
+		return await this.chatRoomService.deleteChatRoom(data.id);
+	}
+
+	// checks is a password is correct
+	@Post('chatroom/check-password')
+	async checkPassword(@Body() data: CheckPasswordDto) {
+		return await this.chatRoomService.checkPassword(data);
+	}
+
+	// updates a chat room password
+	@Patch('chatroom/update-password')
+	async updatePassword(@Body() data: UpdatePasswordDto) {
+		return await this.chatRoomService.updatePassword(data);
+	}
+	
+	// updates a chat room name
+	@Patch('chatroom/update-name')
+	async updateName(@Body() data: UpdateNameDto) {
+		return await this.chatRoomService.updateName(data);
 	}
 }
