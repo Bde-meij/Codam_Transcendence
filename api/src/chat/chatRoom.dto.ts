@@ -38,6 +38,11 @@ export interface RoomDto {
 	password: string; //true or false?
 }
 
+export interface DeleteRoomDto {
+	id: number;
+	password: string;
+}
+
 export interface CheckPasswordDto {
 	id: number;
 	password: string;

@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
-import { CheckPasswordDto, RoomDto, UpdateNameDto, UpdatePasswordDto } from 'src/chat/chatRoom.dto';
+import { CheckPasswordDto, DeleteRoomDto, RoomDto, UpdateNameDto, UpdatePasswordDto } from 'src/chat/chatRoom.dto';
 import { User } from 'src/user/entities/user.entity';
 import { FriendsService } from 'src/friends/friends.service';
 import { CreateFriendRequestDto } from 'src/friends/dto/create-friend.dto';
@@ -210,8 +210,8 @@ export class TestingController {
 
 	// deletes a chat room
 	@Delete('chatroom/delete')
-	async deleteChatRoom(@Body() data) {
-		return await this.chatRoomService.deleteChatRoom(data.id);
+	async deleteChatRoom(@Body() data: DeleteRoomDto) {
+		return await this.chatRoomService.deleteChatRoom(data);
 	}
 
 	// checks is a password is correct

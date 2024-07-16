@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { ChatRoom } from "./entities/chatRoom.entity";
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from "typeorm";
-import { CheckPasswordDto, RoomDto, UpdateNameDto, UpdatePasswordDto } from "./chatRoom.dto";
+import { CheckPasswordDto, DeleteRoomDto, RoomDto, UpdateNameDto, UpdatePasswordDto } from "./chatRoom.dto";
 import { hash, compare } from 'bcrypt';
 
 @Injectable()
@@ -35,8 +35,15 @@ export class ChatRoomService {
 		};
 	}
 
-	async deleteChatRoom(roomId: number) {
-		await this.roomRepo.delete({id: roomId});
+	async deleteChatRoom(deleteRoomDto: DeleteRoomDto) {
+		const checkOldPassword: boolean = await this.checkPassword({
+			id: deleteRoomDto.id,
+			password: deleteRoomDto.password
+		});
+		if (!checkOldPassword)
+			return false;
+		await this.roomRepo.delete({id: deleteRoomDto.id});
+		return true;
 	}
 	
 	async checkPassword(checkPasswordDto: CheckPasswordDto): Promise<boolean> {
