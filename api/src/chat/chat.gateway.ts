@@ -1,5 +1,5 @@
 import { Global, NotAcceptableException, Req } from '@nestjs/common';
-import { Rooms, RoomInfo, MessageInterface } from './chatRoom.dto';
+import { Rooms, RoomInfo, MessageInterface, RoomDto } from './chatRoom.dto';
 import {
 	ConnectedSocket,
 	MessageBody,
@@ -18,6 +18,7 @@ import { getNewRoomKey} from 'src/game/game.gateway';
 import { BlockService } from 'src/block/block.service';
 import { CreateBlockDto } from 'src/block/dto/create-block.dto';
 import { DeleteBlockDto } from 'src/block/dto/delete-block.dto';
+import { ChatRoomService } from './chatRoom.service';
 @Injectable()
 @WebSocketGateway({
 	cors: { origin: 'http://localhost:4200' },
@@ -36,7 +37,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	system_id: number = -1;
 	// fake_userid: number = 77000;
 	// loggary: Loggary;
-	constructor(private blockService: BlockService, private authService: AuthService, private userService: UserService) {
+	constructor(private chatService: ChatRoomService, private blockService: BlockService, private authService: AuthService, private userService: UserService) {
 		this.chatRoomList = {};
 		this.room_info = {};
 		this.gateway_roomid = 0;
@@ -140,7 +141,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			muted: {},
 			users: [socket.data.userid],
 			status: "public",
-			password: data.password,
+			password: false,
 			messages: [], 
 		};
 		//console.log(`socket data nickname: ${socket.data.nickname} en ${socket.data.id} en ${socket.id}`);
@@ -153,7 +154,15 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			socket_id: socket.id,
 		  }
 		}
-		this.chatRoomList[data.room_name].users.push(77600);
+		const CreateRoomDB: any =  await this.chatService.createChatRoom({name :  data.room_name, password: data.password })
+		if (!CreateRoomDB){
+			const msg = this.system_message(socket.data.userid, socket.data.username, "create_room", -1, "Room already exists");
+			this.io.to("system_message").emit("create_room", msg);
+		}
+		this.chatRoomList[data.room_name].id = CreateRoomDB.id;
+		this.chatRoomList[data.room_name].users.push(socket.data.userid);
+
+		// console.log(`createroom: ${test}`);
 		socket.join(socket.data.id.toString());
 		//frontendimplemen
 		socket.emit('joinRoom', { room_id: socket.data.id, room_name: data.room_name });
@@ -172,7 +181,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	// //console.log(chatRoom.users);
 	@SubscribeMessage('message')
 	async handleMessage(
-	@MessageBody() data: { message: string, sender: string, sender_id: number, room: string },
+	@MessageBody() data: { message: string, sender: string, sender_id: number, room: string, sender_avatar: string },
 	@ConnectedSocket() socket: Socket,
 	) {
 		console.log("handleMessage: " + data.room + ", by: " + socket.id);
@@ -201,6 +210,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			room_name: data.room,
 			senderId: socket.data.userid,  // check 
 			sender_name: socket.data.nickname,
+			sender_avatar: data.sender_avatar,
 			created: new Date(),
 		};
 		// //console.log("room: " + data.room + ", socketdataid: " + socket.data.userid);
@@ -312,10 +322,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@ConnectedSocket() client: Socket) 
 	{
 		const room = this.findRoom(data.room, "changePassword");
-		if (this.isOwner(data.userid, data.room)){
-			this.chatRoomList[data.room].password = data.password;
-			this.io.to(room.id.toString()).emit('message', `Password changed`);
-		}
+		// if (this.isOwner(data.userid, data.room)){
+		// 	this.chatRoomList[data.room].password = data.password;
+		// 	this.io.to(room.id.toString()).emit('message', `Password changed`);
+		// }
 	}
 	
 	@SubscribeMessage('mute') async mute(
@@ -427,14 +437,18 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 	@SubscribeMessage('block') async block(
-	@MessageBody() data: { room: string; target_id: number; },
+	@MessageBody() data: { room: string; userid: number; },
 	@ConnectedSocket() client: Socket) 
 	{
 		try{
-			this.block_user(client.data.userid, data.target_id);
+			const blockResult = await this.blockService.createBlock({
+				sender: client.data.userid.toString(), 
+				target: data.userid.toString()
+			});
+			console.log(`user blocked`);
 		}
 		catch(error){
-
+			console.log(`block error ${error}`);
 		}
 	}
 
@@ -824,10 +838,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	private createTestRooms() {
 		// Create dummy rooms example
 		const dummyRooms = [
-			{ room_name: 'Global', status: 'public', password: '' },
-			{ room_name: 'Help', status: 'public', password: '' },
-			{ room_name: 'Private', status: 'private', password: '' },
-			{ room_name: 'Protected', status: 'protected', password: '' },
+			{ room_name: 'Global', status: 'public', password: false },
+			{ room_name: 'Help', status: 'public', password: false },
+			{ room_name: 'Private', status: 'private', password: false },
+			{ room_name: 'Protected', status: 'protected', password: false },
 		];
 	
 		dummyRooms.forEach((roomData) => {

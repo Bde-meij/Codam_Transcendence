@@ -47,13 +47,10 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		this.userService.getUser('current').subscribe((userData) => (
 			this.user = userData
 		));
-	
+		
 		this.chatService.getMessages().subscribe((newmessage: any ) => {
 			if (this.roomsList[newmessage.room_name]?.messages) {
-				
-				this.userService.getAvatar(newmessage.senderId).subscribe((data) => (
-					newmessage.sender_avatar = URL.createObjectURL(data)
-				))
+
 				this.roomsList[newmessage.room_name].messages?.push(newmessage);
 				// this.messages.push(newmessage.message);
 				
@@ -139,14 +136,6 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	// 	}
 	// }
 
-	sendMessage() {
-		if (this.message) {
-			this.chatService.sendMessage(this.message, "sendmessageall");
-			// this.messages.push(this.message);
-		}
-		this.message = '';
-	}
-
 	makenum(str: string){
 		return Number(str);
 	}
@@ -169,7 +158,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	joinRoom(data: string, password: string) {
 		////console.log("joinroom component: " + data);
 		this.chatService.joinRoom(data, password);
-		this.onSelect(this.roomsList[data]);
+		// this.onSelect(this.roomsList[data]);
 	}
 
 	getConnectedUsers() {

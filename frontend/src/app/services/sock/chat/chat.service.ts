@@ -23,7 +23,6 @@ export class ChatService{
 	constructor(sockService: SockService, private userService: UserService) {
 		this.userService.getUser('current').subscribe((userData) => {
 			this.user = userData;
-			// console.log("User loaded in ChatService:", this.user);
 		});
 
 		// this.chatSocket.onAny((event, ...args) => {
@@ -37,18 +36,7 @@ export class ChatService{
 		// this.user$ = this.userService.getUser(0);
 	}
 
-	// sendMessage(message: string): void {
-	// 	// this.user$ = this.userService.getUser();
-	// 	this.chatSocket.emit('message', message, (err: any) => {
-	// 		if (err) {
-	// 			console.log("chat-sock error: ");
-	// 			console.log(err);
-	// 			console.log(err.message);
-	// 		}
-	// 	});
-	// }
-
-	sendMessage(message: string, room: string): void {
+	sendMessage(message: string, room: string, avatar: string): void {
 		// this.user$ = this.userService.getUser(0);
 		// const sender = this.user$;
 		const messageObj = {
@@ -56,6 +44,7 @@ export class ChatService{
 			sender : this.user?.nickname,
 			sender_id: this.user?.id,
 			room : room,
+			sender_avatar: avatar
 		}
 		// console.log("sending msg");
 		this.chatSocket.emit('message', messageObj, (err: any) => {
@@ -220,6 +209,17 @@ export class ChatService{
 	kickUser(room: string, user: string){
 		const userid = Number(user);
 		this.chatSocket.emit('kick', {room, userid}, (err: any) => {
+			if (err) {
+				// console.log("kickUser chat-sock error: ");
+				// console.log(err);
+				// console.log(err.message);
+			}
+		});
+	}
+
+	blockUser(room: string, user: string){
+		const userid = Number(user);
+		this.chatSocket.emit('block', {room, userid}, (err: any) => {
 			if (err) {
 				// console.log("kickUser chat-sock error: ");
 				// console.log(err);
