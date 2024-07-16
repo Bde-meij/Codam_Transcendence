@@ -14,7 +14,6 @@ import { Socket, Server } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { UserService } from 'src/user/user.service';
 import { Injectable } from '@nestjs/common';
-import { PasswordService } from 'src/password/password.service';
 import { getNewRoomKey} from 'src/game/game.gateway';
 import { BlockService } from 'src/block/block.service';
 import { CreateBlockDto } from 'src/block/dto/create-block.dto';
@@ -37,7 +36,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	system_id: number = -1;
 	// fake_userid: number = 77000;
 	// loggary: Loggary;
-	constructor(private blockService: BlockService, private authService: AuthService, private userService: UserService, private passwordList: PasswordService) {
+	constructor(private blockService: BlockService, private authService: AuthService, private userService: UserService) {
 		this.chatRoomList = {};
 		this.room_info = {};
 		this.gateway_roomid = 0;

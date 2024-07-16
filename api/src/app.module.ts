@@ -7,7 +7,6 @@ import { ChatGateway } from './chat/chat.gateway';
 import { DatabaseModule } from './database/database.module';
 import { ConfigModule } from '@nestjs/config';
 import { TestingModule } from './testing/testing.module';
-import { PasswordService } from './password/password.service';
 import { FriendsModule } from './friends/friends.module';
 import { CookieMiddleware } from './auth/middleware/cookie.middleware';
 import { BlockModule } from './block/block.module';
@@ -36,7 +35,6 @@ import { MiddlewareConsumer } from '@nestjs/common';
 		BossGameModule,
 		GameModule,
 		ChatGateway,
-		PasswordService
 	],
 })
 export class AppModule implements NestModule{
