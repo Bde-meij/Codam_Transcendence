@@ -1,6 +1,6 @@
-import { NgFor, NgIf } from '@angular/common';
+import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, ViewChild } from '@angular/core';
-import { NbButtonModule, NbCardModule, NbChatModule, NbDialogService, NbUserModule } from '@nebular/theme';
+import { NbAutocompleteModule, NbButtonModule, NbCardModule, NbChatModule, NbDialogService, NbOptionModule, NbUserModule } from '@nebular/theme';
 import { ChatService } from '../../services/sock/chat/chat.service';
 import { UserService } from '../../services/user/user.service';
 import { User } from '../../models/user.class';
@@ -11,15 +11,15 @@ import { NbEvaIconsModule } from '@nebular/eva-icons';
 import { FormsModule } from '@angular/forms';
 import { createChatRoom } from '../createChatRoom/createChatRoom.component';
 import { Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { forbiddenNameValidator } from '../../services/validator/name-validator.service';
 
 @Component({
   selector: 'fran-chat-ui',
   standalone: true,
-  imports: [FormsModule, NbChatModule, NbUserModule, NgFor, NgIf, NbThemeModule, NbLayoutModule, UserDetailComponent, NbEvaIconsModule, NbCardModule],
+  imports: [CommonModule, FormsModule, NbChatModule, NbUserModule, NgFor, NgIf, NbThemeModule, NbLayoutModule, UserDetailComponent, NbEvaIconsModule, NbCardModule, NbOptionModule, ReactiveFormsModule],
   templateUrl: './chat-fran.component.html',
   styleUrl: './chat-fran.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FranChatUiComponent implements AfterViewInit{
 
@@ -36,8 +36,19 @@ export class FranChatUiComponent implements AfterViewInit{
 	userss: string[] | undefined;
 	roomName: string | undefined;
 	filteredOptions$!: Observable<string[]>;
-	
+
 	selectedRoom: Rooms | undefined;
+
+	userNameForm = new FormGroup({
+		userName: new FormControl('', {
+			validators: [
+				Validators.required,
+				forbiddenNameValidator(/gary/),
+				forbiddenNameValidator(/Gary/),
+			],
+			updateOn: 'change',
+		}),
+	});
 	
 	onSelect(room: Rooms): void {
 		this.selectedRoom = room;
@@ -155,17 +166,4 @@ export class FranChatUiComponent implements AfterViewInit{
 	isChannelOwner(): boolean {
 		return +this.user.id === +this.selectedRoom!.owner;
 	}
-
-	getFilteredOptions(value: string): Observable<string[]> {
-		return of(value).pipe(
-			map(filterString => this.filter(filterString)),
-		);
-	}
-
-	private filter(value: string): string[] {
-		const filteredValue = value.toLowerCase();
-		return this.userss!.filter(optionValue => optionValue.toLowerCase().includes(filteredValue));
-	}
-
-	
 }
