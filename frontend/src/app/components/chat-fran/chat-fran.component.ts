@@ -1,27 +1,31 @@
 import { NgFor, NgIf } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, Input, ViewChild } from '@angular/core';
-import { NbCardModule, NbChatModule, NbSidebarModule, NbUserModule } from '@nebular/theme';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { NbButtonModule, NbCardModule, NbChatModule, NbDialogService, NbUserModule } from '@nebular/theme';
 import { ChatService } from '../../services/sock/chat/chat.service';
 import { UserService } from '../../services/user/user.service';
 import { User } from '../../models/user.class';
 import { Rooms } from '../../models/rooms.class';
 import { NbThemeModule, NbLayoutModule} from '@nebular/theme';
-import { UserDetailComponent } from '../user-detail/user-detail.component';
+import { UserDetailComponent } from '../user-detail/user-detail.component';	
 import { NbEvaIconsModule } from '@nebular/eva-icons';
-import { NbSidebarService } from '@nebular/theme';
 import { FormsModule } from '@angular/forms';
+import { createChatRoom } from '../createChatRoom/createChatRoom.component';
+import { Observable, of } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'fran-chat-ui',
   standalone: true,
-  imports: [FormsModule, NbChatModule, NbCardModule, NbUserModule, NgFor, NgIf, NbThemeModule, NbLayoutModule, UserDetailComponent, NbSidebarModule, NbEvaIconsModule],
+  imports: [FormsModule, NbChatModule, NbUserModule, NgFor, NgIf, NbThemeModule, NbLayoutModule, UserDetailComponent, NbEvaIconsModule, NbCardModule],
   templateUrl: './chat-fran.component.html',
-  styleUrl: './chat-fran.component.scss'
+  styleUrl: './chat-fran.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FranChatUiComponent implements AfterViewInit{
 
 	@ViewChild('messageContainer') messageContainer!: ElementRef;
 	@ViewChild('messageInput') messageInput!: ElementRef;
+	@ViewChild('autoInput') input!: any;
 	selectedUser: any;
 	selectedUserID?: string;
 	message: string | undefined;
@@ -31,6 +35,7 @@ export class FranChatUiComponent implements AfterViewInit{
 	roomsList: Record<string, Rooms> = {};
 	userss: string[] | undefined;
 	roomName: string | undefined;
+	filteredOptions$!: Observable<string[]>;
 	
 	selectedRoom: Rooms | undefined;
 	
@@ -39,7 +44,7 @@ export class FranChatUiComponent implements AfterViewInit{
 		//console.log(room.messages);
 	};
 
-	constructor(private chatService: ChatService, private userService :UserService, private sidebarService: NbSidebarService) {};
+	constructor(private chatService: ChatService, private userService: UserService, private dialogService: NbDialogService) {};
 
 	ngOnInit() {
     this.userService.getUser('current').subscribe((userData) => (
@@ -64,7 +69,6 @@ export class FranChatUiComponent implements AfterViewInit{
 				const firstRoomName = Object.keys(this.roomsList)[0];
 				// ////console.log("getrooms select")
 				////console.log(this.roomsList[firstRoomName]);
-				this.onSelect(this.roomsList[firstRoomName]);
 			  }
 			////console.log(this.roomsList);
 		});
@@ -73,7 +77,8 @@ export class FranChatUiComponent implements AfterViewInit{
 			// ////console.log("getconnectedusers subscribe");
 			this.userss = userList;
 		})
-    this.createRoom("Global", "public", "");
+		this.filteredOptions$ = of(this.userss || []);
+    	this.createRoom("Global", "public", "");
 		// this.createRoom("temp",  "public", "");
 		this.joinRoom("Global", "");
 		// this.joinRoom("temp", "");
@@ -108,6 +113,17 @@ export class FranChatUiComponent implements AfterViewInit{
 		}
 	}
 
+	userCreatesRoom() {
+		this.dialogService.open(createChatRoom, {
+			context: {
+			}
+		  }).onClose.subscribe((input: any) => {
+			if (input) {
+				this.chatService.createRoom(input.roomName, '', input.password);
+			}
+		  });
+	}
+
 	getRooms() {
 		this.chatService.getRooms();
 	}
@@ -134,7 +150,22 @@ export class FranChatUiComponent implements AfterViewInit{
 		return Object.keys(this.roomsList);
 	}
 
-	showUsers() {
-		this.sidebarService.expand();
+	test() {}
+
+	isChannelOwner(): boolean {
+		return +this.user.id === +this.selectedRoom!.owner;
 	}
+
+	getFilteredOptions(value: string): Observable<string[]> {
+		return of(value).pipe(
+			map(filterString => this.filter(filterString)),
+		);
+	}
+
+	private filter(value: string): string[] {
+		const filteredValue = value.toLowerCase();
+		return this.userss!.filter(optionValue => optionValue.toLowerCase().includes(filteredValue));
+	}
+
+	
 }

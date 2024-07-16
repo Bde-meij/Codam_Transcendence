@@ -6,7 +6,7 @@ import { provideHttpClient, HTTP_INTERCEPTORS, withInterceptorsFromDi } from '@a
 import { CookieService } from 'ngx-cookie-service';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { ErrorInterceptor } from './interceptors/jwtToken.interceptor';
-import { NbChatModule, NbIconModule, NbLayoutModule, NbSidebarModule, NbSidebarService, NbThemeModule } from '@nebular/theme';
+import { NbChatModule, NbIconModule, NbLayoutModule, NbSidebarModule, NbSidebarService, NbThemeModule, NbCardModule, NbButtonModule, NbDialogModule } from '@nebular/theme';
 
 export const appConfig: ApplicationConfig = {
 	providers: [
@@ -16,6 +16,9 @@ export const appConfig: ApplicationConfig = {
 			NbChatModule.forRoot(),
 			NbIconModule,
 			NbSidebarModule.forRoot(),
+			NbCardModule,
+    		NbButtonModule,
+			NbDialogModule.forRoot(),
 		  ),
 		  NbSidebarService,
 		provideRouter(routes, withComponentInputBinding(), withRouterConfig({

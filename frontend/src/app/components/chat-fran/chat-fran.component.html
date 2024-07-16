@@ -1,44 +1,72 @@
-<nb-layout>
-<nb-layout-column>
-<div class="chat-room_container">
-	<div class="rooms-list">
-        <h3>Rooms</h3>
-        <ul>
-          <li *ngFor="let roomName of getRoomNames()">
-            <button [class.selected]="roomsList[roomName] === selectedRoom" type="button" (click)="onSelect(roomsList[roomName])">
-              {{ roomName }}
-            </button>
-            <button (click)="joinRoom(roomName, '')">Join Room</button>
-          </li>
-        </ul>
-      </div>
-	<div class="create-room-column">
-		<h3>Create a room:</h3>
-		<input [(ngModel)]="roomName" (keydown.enter)="createRoom(roomName!, 'public', '')" type="text">
-		<button (click)="createRoom(roomName!, 'public', '')">Send</button>
-	</div>
-
-	<div class="user-list-column">
-		<h3>Users:</h3>
-		<nb-card *ngFor="let m of userss">
-			<app-user-detail [id]=m></app-user-detail>
-		</nb-card>
-	</div>
-
-	<div class="chat-column" *ngIf="selectedRoom">
-			<nb-chat size="large" scrollbottom="true" title="Chat UI" *ngIf="selectedRoom">
-				<nb-chat-message *ngFor="let msg of selectedRoom.messages"
-								[message]="msg.message"
-								[avatar]="msg.sender_avatar!"
-								[sender]="msg.sender_name"
-								[date]="msg.created"
-								[reply]="this.user.nickname === msg.sender_name">
-				
-				</nb-chat-message>
-				<nb-chat-form (send)="sendMessage($event)" [dropFiles]="false">
-				</nb-chat-form>
-			</nb-chat>
-	</div>
+<!-- Create Room Section -->
+<div class="create-room-column">
+	<button (click)="userCreatesRoom()">Create a room</button>
 </div>
-</nb-layout-column>
-</nb-layout>
+
+<nb-layout>
+	<nb-layout-column>
+	  <!-- Main Content Container -->
+	  <div class="chat-room_container">
+		<!-- Rooms List -->
+		<div class="rooms-list">
+		  <h3>Rooms:</h3>
+		  <ul>
+			<li *ngFor="let roomName of getRoomNames()">
+				<input type="radio" id="{{roomName}}" name="room" (change)="onSelect(roomsList[roomName])">
+            	<label for="{{roomName}}" [class.selected]="roomsList[roomName] === selectedRoom">{{ roomName }}</label>
+			  <!-- <button [class.selected]="roomsList[roomName] === selectedRoom" type="button" (click)="onSelect(roomsList[roomName]); joinRoom(roomName, '')">
+				{{ roomName }}
+			  </button> -->
+			</li>
+		  </ul>
+		</div>
+		<!-- Chat Box -->
+		<div *ngIf="!selectedRoom">Select or create a room</div>
+		<div class="chat-column" *ngIf="selectedRoom">
+		  <nb-chat size="large" scrollbottom="true" [title]="selectedRoom.name">
+			<nb-chat-message *ngFor="let msg of selectedRoom.messages"
+							 [message]="msg.message"
+							 [avatar]="msg.sender_avatar!"
+							 [sender]="msg.sender_name"
+							 [date]="msg.created"
+							 [reply]="this.user.nickname === msg.sender_name">
+			</nb-chat-message>
+			<nb-chat-form (send)="sendMessage($event)" [dropFiles]="false"></nb-chat-form>
+		  </nb-chat>
+
+		  	<!-- <input #autoInput
+		  		nbInput
+				type="text"
+				(input)="onDropdownChange()"
+				placeholder="Enter user nickname"
+				[nbAutoComplete]="auto"/>
+
+		<nb-autocomplete #auto (selectionChange)="userSelectionChange($event)">
+			<nb-option *ngFor="let option of filteredOptions$ | async " [value]="option">
+				{{option}}
+			</nb-option>
+		</nb-autocomplete> -->
+
+		  	<button *ngIf="selectedRoom" mat-raised-button color="primary" (click)="test()">
+				Battle
+			</button>
+			<button *ngIf="selectedRoom" mat-raised-button color="primary" (click)="test()">
+				Mute
+			</button>
+			<button [disabled]="!isChannelOwner()" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="test()">
+				Ban
+			</button>
+			<button [disabled]="!isChannelOwner()" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="test()">
+				Kick
+			</button>
+		</div>
+		<!-- User List -->
+		<div class="user-list">
+		  <h3>Users:</h3>
+		  <nb-card *ngFor="let m of userss">
+			<app-user-detail [id]=m></app-user-detail>
+		  </nb-card>
+		</div>
+	  </div>
+	</nb-layout-column>
+  </nb-layout>
