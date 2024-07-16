@@ -72,11 +72,12 @@
 	padding: 0.5em 0.5em 0 0.7em;
 	background-color: lighten($font-color, 15%);
 	line-height: 1em;
-	margin-right: .8em;
+	margin-right: 0.8em;
 	border-radius: 4px 0 0 4px;
 }
 
 .friends .name {
+	margin-left: 0.5em;
 	align-self: center;
 }
 
@@ -84,13 +85,14 @@
 	font-size: xx-small;
 	margin-left: 0.5em;
 	.online {
-		background-color: lightgreen;
-		// color: white;
+		background-color: chartreuse;
 		padding: 0.3em;
 		border-radius: 100%;
 	};
 	.offline {
 		background-color: $contrast-color;
+		padding: 0.3em;
+		border-radius: 100%;
 	};
 }
 
@@ -100,16 +102,6 @@
 	min-width: 8em;
 	padding: 0.5em 0.5em 0 0.7em;
 	align-self: center;
-	// left: 50%;
-}
-
-.friend_column .unfriend {
-	color: $contrast-color;
-}
-
-.friend_column .unfriend:hover {
-	background-color: $contrast-color;
-	color: $background-color;
 }
 
 .refresh {
