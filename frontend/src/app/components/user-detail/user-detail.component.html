@@ -17,7 +17,19 @@
 			}
 
 			@if (this.matches != undefined) {
-				<div><span>matches in json (sorry) :</span> {{ this.matches | json }} </div>
+				@if (!this.matches[0]) {
+					<p> no matches yet 🙁 </p>
+				} @else {
+					<h3> matches : </h3>
+					@for (match of matches; track match.id) {
+						<div class="match">
+							<span class="name">
+								{{match.leftPlayer.nickname}}
+							</span>
+							 : {{match.leftPlayerScore}} - {{match.rightPlayerScore}} : {{match.rightPlayer.nickname}}
+						</div>
+					}
+				}
 			}
 		}
 

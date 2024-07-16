@@ -3,3 +3,16 @@
 .unfriend {
 	color: $contrast-color;
 }
+
+.match {
+	background-color: white;
+	border: 0.2em solid black;
+	border-radius: 1em 20%;
+	margin: 0.4em;
+	margin-left: 20%;
+	margin-right: 20%;
+}
+
+.match .name {
+	font-weight: 600;
+}
