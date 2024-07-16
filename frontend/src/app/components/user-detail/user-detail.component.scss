@@ -4,6 +4,11 @@
 	color: $contrast-color;
 }
 
+.unfriend:hover {
+	color: $background-color;
+	background-color: $contrast-color;
+}
+
 .match {
 	background-color: white;
 	border: 0.2em solid $font-color;

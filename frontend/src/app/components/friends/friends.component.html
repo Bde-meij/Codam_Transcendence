@@ -13,27 +13,26 @@
 
 		<ul class="friends">
 			<li *ngFor="let friend of friends">
-			<button [class.selected]="friend === selectedFriend" type="button" (click)="selectFriend(friend)">
-				<span class="badge">{{ friend.id }}</span>
-				<span class="name">{{ friend.nickname }}</span>
-			</button>
+				<button [class.selected]="friend === selectedFriend" type="button" (click)="selectFriend(friend)">
+					<span class="badge">{{ friend.id }}</span>
+					<span class="name">{{ friend.nickname }}</span>
+					<span class="status">
+						@if (friend.status === "online") {
+							<span class="online"> {{friend.status}} </span>
+						} @else if (friend.status === "offline") {
+							<span class="offline"> {{friend.status}} </span>
+						} @else {
+							{{friend.status}}
+						}
+					</span>
+				</button>
 			</li>
 		</ul>
 	</div>
 
 	<div class="friend_column" *ngIf="selectedFriend">
-		<!-- <h3> friend </h3>
-		<p>id : {{selectedFriend.id}} </p>
-		<p>name : {{selectedFriend.nickname}} </p> -->
-		<!-- <button (click)="deleteFriend(selectedFriend)">unfriend</button> -->
 		<app-user-detail [id]="selectedFriend.id" ></app-user-detail>
-		<!-- <button class="unfriend" (click)="deleteFriend(selectedFriend)">unfriend</button> -->
-
 		<button (click)="deselectFriend()">close</button>
-
-		<!-- <a routerLink="/dashboard/detail/{{selectedFriend.id}}">
-			<span class="badge">{{selectedFriend.id}}</span> {{selectedFriend.nickname}}
-		</a> -->
 	</div>
 
 	<div class="friend_column">
