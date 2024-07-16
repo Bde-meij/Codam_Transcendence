@@ -1,8 +1,10 @@
-@import '../../../styles/helpers/constants.scss';
+@import '../../../styles/styles.scss';
+@import '@angular/material/prebuilt-themes/purple-green.css';
 
 .chat-room_container {
 	display: flex;
 	flex-wrap: wrap;
+	background-color: transparent;
   }
   
   .create-room-column {

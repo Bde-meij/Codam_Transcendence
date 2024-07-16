@@ -1,7 +1,43 @@
-<div *ngIf="my_user" >
-	<h3> {{my_user.nickname | uppercase }} </h3>
+@if (userErrorMessage == undefined) {
+	<div *ngIf="my_user" >
+		<h3> {{my_user.nickname | uppercase }} </h3>
 
-	<div><span>id: </span>{{my_user.id}}</div>
-	<div><span>name: </span>{{my_user.nickname}}</div>
-	<div><span>avatar: </span><img src="{{my_user.avatar}}" height="80px" /></div>
-</div>
+		<div><span>id: </span>{{my_user.id}}</div>
+		<div><span>name: </span>{{my_user.nickname}}</div>
+		<div><span>avatar: </span><img src="{{my_user.avatar}}" height="80px" /></div>
+
+		@if(this.isfriend != undefined && this.isfriend == true) {
+			<button type="button" (click)="getStats()">get statistics</button>
+			<button type="button" (click)="getMatches()">get match history</button>
+
+			@if (this.stats != undefined) {
+				<div><span>wins :</span> {{stats.wins}} </div>
+				<div><span>losses :</span> {{stats.losses}} </div>
+				<div><span>winrate :</span> {{stats.winrate}} </div>
+			}
+
+			@if (this.matches != undefined) {
+				<div><span>matches in json (sorry) :</span> {{ this.matches | json }} </div>
+			}
+		}
+
+		@if (this.isself != undefined && this.isself == false) {
+			@if (this.isfriend == false) {
+				<button type="button" (click)="addFriend()"> add friend </button>
+			} 
+			@if (this.isfriend == true) {
+				<button class="unfriend" type="button" (click)="deleteFriend()"> delete friend </button>
+			}
+		}
+
+		@if (this.errorMessage) {
+			<p class="unfriend" >{{this.errorMessage}}</p>
+		}
+
+	</div>
+} @else {
+	<div class="error_message">
+		<p> Why you upset Gary?? </p>
+		<p> {{userErrorMessage}}</p>
+	</div>
+}

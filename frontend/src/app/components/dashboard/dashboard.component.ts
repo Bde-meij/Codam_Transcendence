@@ -23,9 +23,6 @@ export class DashboardComponent {
 		)
 	};
 
-	// ngOnInit(): void {
-	// }
-
 	isNotHomeRoute() {
 		return (!(this.router.url === '/dashboard/home'));
 	}

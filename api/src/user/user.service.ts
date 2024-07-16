@@ -10,21 +10,36 @@ import * as speakeasy from 'speakeasy';
 export class UserService {
 	constructor(@InjectRepository(User) private readonly userRepo: Repository<User>) {}
 
-  	async userExists(id: string) {
-		const user = await this.userRepo.findOne({where: {id}});
+  	async userExists(userId: string) {
+		const user = await this.userRepo.findOne({
+			select: {
+				id: true
+			},
+			where: {
+				id : userId
+			}
+		});
 		if (user)
 			return true;
 		return false;
-	} 
-
+	}
+	
 	async createUser(userData: CreateUserDto): Promise<User> {
-		const userIdExists = await this.userRepo.findOne({where: {id: userData.id}})
-		if (userIdExists) {
-			throw new HttpException('Id already in use!', 400);
+		console.error("NEW USER 2:", userData);
+		const userExists = await this.userRepo.findOne({
+			select: {
+				id: true,
+			},
+			where: [
+				{id: userData.id},
+				{nickname: userData.nickname}
+			]
+		})
+		if (userExists && userExists.id === userData.id) {
+			throw new HttpException('Id already in use!', 403);
 		}
-		const userNameExists = await this.userRepo.findOne({where: {nickname: userData.nickname}})
-		if (userNameExists) {
-			throw new HttpException('Nickname already in use!', 400);
+		if (userExists && userExists.nickname === userData.nickname) {
+			throw new HttpException('Nickname already in use!', 403);
 		}
 		const savedUser = await this.userRepo.save({
 			id: userData.id,
@@ -32,16 +47,16 @@ export class UserService {
 		});
 		return savedUser;
 	}
-
+	
 	async createUsers(users: CreateUserDto[]): Promise<User[]> {
 		return await this.userRepo.save(users);
 	}
 
-	async findUserById(id: string) {
-		const user = await this.userRepo.findOne({where: {id}});
+	async findUserById(userId: string) {
+		const user = await this.userRepo.findOne({where: {id: userId}});
 		return user;
 	}
-
+	
 	async findUserByName(name: string) {
 		const user = await this.userRepo.findOne({where: {nickname :name}});
 		console.log(user);
@@ -51,33 +66,73 @@ export class UserService {
 	async findAllUsers(): Promise<User[]> {
 		return await this.userRepo.find();
 	}
-
-	async updateName(id: string, newName: string) {
-		await this.userRepo.update(id, {nickname: newName});
+	
+	async get2faEnabled(userId: string) {
+		return await this.userRepo.findOne({
+			select: {
+				isTwoFAEnabled: true
+			},
+			where: {
+				id: userId
+			}
+		})
 	}
 
-	async updateStatus(id: string, newStatus: string) {
-		await this.userRepo.update(id, {status: newStatus});
+	async get2faSecret(userId: string) {
+		return await this.userRepo.findOne({
+			select: {
+				twoFASecret: true
+			},
+			where: {
+				id: userId
+			}
+		})
 	}
 
-	async updateAvatar(id: string, newAvatar: string) {
-		await this.userRepo.update(id, {avatar: newAvatar});
+	async getAvatar(userId: string) {
+		return await this.userRepo.findOne({
+			select: {
+				avatar: true
+			},
+			where: {
+				id: userId
+			}
+		})
 	}
 
-	async updateTwoFASecret(id: string, secret: any) {
-		await this.userRepo.update(id, {twoFASecret: secret.base32});
+	async updateName(userId: string, newName: string) {
+		await this.userRepo.update({id: userId}, {nickname: newName});
+	}
+	
+	async updateStatus(userId: string, newStatus: string) {
+		await this.userRepo.update({id: userId}, {status: newStatus});
 	}
 
-	async enableTwoFA(id: string) {
-		await this.userRepo.update(id, {isTwoFAEnabled: true});
+	async updateAvatar(userId: string, newAvatar: string) {
+		await this.userRepo.update({id: userId}, {avatar: newAvatar});
 	}
 
-	async disableTwoFA(id: string) {
-		await this.userRepo.update(id, {isTwoFAEnabled: false});
+	async updateTwoFASecret(userId: string, secret: any) {
+		await this.userRepo.update({id: userId}, {twoFASecret: secret.base32});
+	}
+	
+	async enableTwoFA(userId: string) {
+		await this.userRepo.update({id: userId}, {isTwoFAEnabled: true});
+	}
+	
+	async disableTwoFA(userId: string) {
+		await this.userRepo.update({id: userId}, {isTwoFAEnabled: false});
 	}
 
-	async updateNickname(id: string, newName: string) {
-		await this.userRepo.update(id, {nickname: newName});
+	async updateTwoFA(userId: string, enabled: boolean, secret: any) {
+		await this.userRepo.update({id: userId}, {
+			isTwoFAEnabled: enabled,
+			twoFASecret: secret.base32
+		})
+	}
+
+	async updateNickname(userId: string, newName: string) {
+		await this.userRepo.update({id: userId}, {nickname: newName});
 	}
 
 	async updateRoomKey(userId: string, roomKey: number) {

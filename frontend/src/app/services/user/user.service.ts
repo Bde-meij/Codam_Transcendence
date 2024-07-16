@@ -10,6 +10,7 @@ import { User } from '../../models/user.class';
 })
 export class UserService {
 	private userUrl = "/api/user";
+	private matchUrl = "/api/match";
 
 	constructor(private http: HttpClient, private router: Router) { };
 
@@ -25,10 +26,9 @@ export class UserService {
 		return this.http.get<boolean>(this.userUrl + '/isnametaken/' + nickname);
 	}
 
-	// to request your own info, use '0', otherwise use the userID.
+	// to request your own info, use 'current', otherwise use the userID.
 	getUser(id : string) : Observable<any> {
-		if (id === '0') {
-			console.log("ID = 0");
+		if (id === 'current') {
 			return this.http.get<any>(this.userUrl + '/current', {});
 		}
 		return this.http.get<any>(this.userUrl + '/name/' + id, {});
@@ -46,9 +46,17 @@ export class UserService {
 	}
 
 	getAvatar(id: string) : Observable<Blob> {
-		if (id === '0')
+		if (id === 'current')
 			return this.http.get(this.userUrl + '/getAvatar/current', {responseType: 'blob'});
 		// console.log("getavatar called");
 		return this.http.get(this.userUrl + '/getAvatar/' + id, {responseType: 'blob'});
+	}
+
+	getMatches(id : string) {
+		return this.http.get(this.matchUrl + '/user-matches/' + id, {});
+	}
+
+	getStats(id: string) {
+		return this.http.get<any>(this.matchUrl + '/user-stats/' + id, {});
 	}
 }

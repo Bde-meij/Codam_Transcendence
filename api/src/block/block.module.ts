@@ -10,5 +10,6 @@ import { Block } from './entities/block.entity';
 	imports: [TypeOrmModule.forFeature([Block]), AuthModule, UserModule],
 	controllers: [BlockController],
 	providers: [BlockService],
+	exports: [BlockService]
 })
 export class BlockModule {}

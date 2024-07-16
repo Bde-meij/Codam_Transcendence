@@ -83,7 +83,8 @@ export const routes: Routes = [
 				canActivate: [AuthGuard]
 			},
 			{
-				path: 'detail/:id', 
+				path: 'detail/:id',
+				// data: {id: routes.thisArg},
 				component: UserDetailComponent,
 				canActivate: [AuthGuard]
 			}

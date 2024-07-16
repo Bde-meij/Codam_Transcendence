@@ -1,10 +1,5 @@
 <h3> What Gary knows about you: </h3>
-<p>|</p>
 <div *ngIf="my_id">
 	<app-user-detail [id]="my_id"></app-user-detail>
 </div>
-<p>|</p>
-
-<h3> To change yourself, go to settings: </h3>
-<button [routerLink]="['/dashboard/settings']"> settings </button>
-<p>|</p>
+<h3> To change yourself, go to <button [routerLink]="['/dashboard/settings']"> settings </button></h3>

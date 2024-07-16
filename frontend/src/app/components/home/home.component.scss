@@ -1,4 +1,4 @@
-@import '../../../styles/helpers/constants.scss';
+@import '../../../styles/styles.scss';
 
 .home_image_container {
 	background-color: $font-color;
@@ -25,6 +25,7 @@
 }
 .home_game_button:hover {
 	color: linen;
+	background-color: transparent;
 }
 
 .home_settings_button {
