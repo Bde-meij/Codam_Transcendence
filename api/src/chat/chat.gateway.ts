@@ -448,7 +448,23 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			console.log(`user blocked`);
 		}
 		catch(error){
-			console.log(`block error ${error}`);
+			console.log(`block ${error}`);
+		}
+	}
+
+	@SubscribeMessage('unblock') async unblock(
+	@MessageBody() data: { room: string; userid: number; },
+	@ConnectedSocket() client: Socket) 
+	{
+		try{
+			const blockResult = await this.blockService.deleteByUserId({
+				sender: client.data.userid.toString(), 
+				target: data.userid.toString()
+			});
+			console.log(`user unblocked`);
+		}
+		catch(error){
+			console.log(`unblock ${error}`);
 		}
 	}
 

@@ -9,6 +9,7 @@ import { User } from '../../models/user.class';
 import { UserDetailComponent } from '../user-detail/user-detail.component';
 import { AfterViewInit, AfterViewChecked } from '@angular/core';
 import { ViewChild } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 export interface MessageInterface {
 	sender: string,
@@ -31,7 +32,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	roomsList: Record<string, Rooms> = {};
 	userss: string[] | undefined;
 	roomName: string | undefined;
-	
+	blocked_list: any | undefined;
 	selectedRoom: Rooms | undefined;
 	
 	onSelect(room: Rooms): void {
@@ -41,7 +42,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		console.log(room.messages);
 	};
 
-	constructor(private chatService: ChatService, private userService: UserService) {};
+	constructor(private chatService: ChatService, private userService: UserService, private http: HttpClient) {};
 	
 	ngOnInit() {
 		this.userService.getUser('current').subscribe((userData) => (
@@ -50,7 +51,9 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		
 		this.chatService.getMessages().subscribe((newmessage: any ) => {
 			if (this.roomsList[newmessage.room_name]?.messages) {
-
+				// this.blocked_list = this.http.delete<number[]>('/api/block/all-blocked/' + this.user.id);
+		
+				// if (!this.blocked_list?. .includes(newmessage.senderId))
 				this.roomsList[newmessage.room_name].messages?.push(newmessage);
 				// this.messages.push(newmessage.message);
 				

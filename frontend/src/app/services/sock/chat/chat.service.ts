@@ -5,7 +5,7 @@ import { SockService } from '../sock.service';
 import { UserService } from '../../user/user.service';
 import { User } from '../../../models/user.class';
 import { skip } from 'rxjs/operators';
-import { Rooms } from '../../../models/rooms.class';
+import { MessageInterface, Rooms } from '../../../models/rooms.class';
 
 @Injectable({
   providedIn: 'root'
@@ -100,7 +100,7 @@ export class ChatService{
 		});
 	}
 
-	getMessages(): Observable<string> {
+	getMessages(): Observable<MessageInterface> {
 		return new Observable((observer) => {
 			this.chatSocket.on('message', (message) => {
 				observer.next(message);
