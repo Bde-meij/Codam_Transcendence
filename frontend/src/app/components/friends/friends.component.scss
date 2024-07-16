@@ -83,6 +83,15 @@
 .friends .status {
 	font-size: xx-small;
 	margin-left: 0.5em;
+	.online {
+		background-color: lightgreen;
+		// color: white;
+		padding: 0.3em;
+		border-radius: 100%;
+	};
+	.offline {
+		background-color: $contrast-color;
+	};
 }
 
 .friends .yesno {
