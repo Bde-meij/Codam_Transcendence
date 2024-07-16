@@ -1,4 +1,4 @@
-@import '../../../styles/helpers/constants.scss';
+@import '../../../styles/styles.scss';
 
 .friend_container {
 	display: flex;
@@ -104,8 +104,4 @@
 	left: 6%;
 	background-color: $font-color;
 	color: darken($background-color, 10%);
-}
-
-.errormessage {
-	color: $contrast-color;
 }

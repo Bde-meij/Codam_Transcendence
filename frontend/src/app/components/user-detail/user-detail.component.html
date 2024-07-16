@@ -17,7 +17,61 @@
 			}
 
 			@if (this.matches != undefined) {
-				<div><span>matches in json (sorry) :</span> {{ this.matches | json }} </div>
+				@if (!this.matches[0]) {
+					<p> no matches yet 🙁 </p>
+				} @else {
+					<h3> matches : </h3>
+					@for (match of matches; track match.id) {
+						<div class="match">
+							@if (match.winningPlayer.id == my_user.id) {
+								<div class="win">							
+									<div class="player">
+										<span class="name">
+											{{match.leftPlayer.nickname}}
+										</span>
+										<span  class="score">
+											{{match.leftPlayerScore}}
+										</span>
+									</div>
+									<span class="vs">
+										-
+									</span>
+									<div class="player">
+										<span  class="score">
+											{{match.rightPlayerScore}}
+										</span>
+										<span class="name">
+											{{match.rightPlayer.nickname}}
+										</span>
+									</div>
+								</div>
+							}
+							@else {
+								<div class="lose">							
+									<div class="player">
+										<span class="name">
+											{{match.leftPlayer.nickname}}
+										</span>
+										<span  class="score">
+											{{match.leftPlayerScore}}
+										</span>
+									</div>
+									<span class="vs">
+										-
+									</span>
+									<div class="player">
+										<span  class="score">
+											{{match.rightPlayerScore}}
+										</span>
+										<span class="name">
+											{{match.rightPlayer.nickname}}
+										</span>
+									</div>
+								</div>
+							}
+						</div>
+					}
+				}
 			}
 		}
 
@@ -36,7 +90,7 @@
 
 	</div>
 } @else {
-	<div class="errorMessage">
+	<div class="error_message">
 		<p> Why you upset Gary?? </p>
 		<p> {{userErrorMessage}}</p>
 	</div>
