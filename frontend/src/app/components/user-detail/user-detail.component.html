@@ -23,10 +23,25 @@
 					<h3> matches : </h3>
 					@for (match of matches; track match.id) {
 						<div class="match">
-							<span class="name">
-								{{match.leftPlayer.nickname}}
+							<div class="player">
+								<span class="name">
+									{{match.leftPlayer.nickname}}
+								</span>
+								<span  class="score">
+									{{match.leftPlayerScore}}
+								</span>
+							</div>
+							<span class="vs">
+								-
 							</span>
-							 : {{match.leftPlayerScore}} - {{match.rightPlayerScore}} : {{match.rightPlayer.nickname}}
+							<div class="player">
+								<span  class="score">
+									{{match.rightPlayerScore}}
+								</span>
+								<span class="name">
+									{{match.rightPlayer.nickname}}
+								</span>
+							</div>
 						</div>
 					}
 				}

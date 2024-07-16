@@ -7,12 +7,31 @@
 .match {
 	background-color: white;
 	border: 0.2em solid black;
-	border-radius: 1em 20%;
+	border-radius: 0.5em 50%;
 	margin: 0.4em;
-	margin-left: 20%;
-	margin-right: 20%;
+	margin-left: 15%;
+	margin-right: 15%;
+}
+
+.match .player {
+	background-color: transparent;
+	display: inline-block;
 }
 
 .match .name {
-	font-weight: 600;
+	display: inline-block;
+	font-weight: bolder;
+	width: 100px;
+}
+
+.match .score {
+	display: inline-block;
+	width: 20px;
+	margin-left: 0.2em;
+	margin-right: 0.2em;
+}
+
+.match .vs {
+	margin-left: 0.2em;
+	margin-right: 0.2em;
 }
