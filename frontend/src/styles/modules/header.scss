@@ -5,6 +5,10 @@ h1 {
 }
 
 h2, h3 {
-	color: darken($font-color, 3%);
-	font-weight: lighter;
+	color: darken($font-color, 5%);
+	font-weight: bold;
+}
+
+h4 {
+	font-weight: 600;
 }
