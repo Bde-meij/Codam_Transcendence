@@ -22,7 +22,7 @@ export class AccountComponent implements OnInit {
 
 	ngOnInit(): void {
 		this.userService.getUser('current').subscribe(data => 
-			this.my_id = data.id,
+			this.my_id = data.id
 		);		
 	};
 }
