@@ -1,6 +1,6 @@
 import { Component, OnChanges, OnInit } from '@angular/core';
 // import { FAKE_FRIENDS, User } from '../../models/user.class';
-import { NgFor, NgIf, UpperCasePipe } from '@angular/common';
+import { JsonPipe, NgFor, NgIf, UpperCasePipe } from '@angular/common';
 import { UserDetailComponent } from '../user-detail/user-detail.component';
 import { FriendsService } from '../../services/friends/friends.service';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -12,24 +12,13 @@ import { FriendRequest } from '../../models/friendrequest.class';
 export interface Friend {
 	id: string;
 	nickname: string;
+	status:string;
 }
-
-export const FAKE_FRIENDS: Friend[] = [
-	{ id: "12", nickname: 'Dr. Nice' },
-	{ id: "13", nickname: 'Bombasto'},
-	{ id: "14", nickname: 'Celeritas'},
-	{ id: "15", nickname: 'Magneta'},
-	{ id: "16", nickname: 'RubberMan'},
-	{ id: "17", nickname: 'Dynama'},
-	{ id: "18", nickname: 'Dr. IQ'},
-	{ id: "19", nickname: 'Magma'},
-	{ id: "20", nickname: 'Tornado'}
-];
 
 @Component({
   selector: 'app-friends',
   standalone: true,
-  imports: [ReactiveFormsModule, NgFor, NgIf, UpperCasePipe, UserDetailComponent, RouterLink],
+  imports: [ReactiveFormsModule, NgFor, NgIf, UpperCasePipe, UserDetailComponent, RouterLink, JsonPipe],
   templateUrl: './friends.component.html',
   styleUrl: './friends.component.scss'
 })

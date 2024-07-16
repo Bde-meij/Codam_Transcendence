@@ -17,7 +17,7 @@
 			}
 
 			@if (this.matches != undefined) {
-				@if (!this.matches[0]) {
+				@if (this.matches.length == 0) {
 					<p> no matches yet 🙁 </p>
 				} @else {
 					<h3> matches : </h3>
