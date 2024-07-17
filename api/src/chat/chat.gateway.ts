@@ -73,11 +73,13 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			if (!user.nickname){
 				user.nickname = "Empty nickname Error";
 			}
+			// Update user status to online when connecting to the chat socket
+			this.userService.updateStatus(user.id, "online");
 			client.data.nickname = user.nickname;
 			client.data.userid = (Number(user.id));
 			if (this.connectedUsers.includes(client.data.userid))
-			{
-				console.log("already connected");
+				{
+					console.log("already connected");
 			}
 			else
 				console.log("not connected");
@@ -96,6 +98,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	handleDisconnect(client: any) {
 		const userid = client.data.userid;
 		const index = this.connectedUsers.indexOf(userid);
+		// Update user status to offline when connecting to the chat socket
+		this.userService.updateStatus(userid, "offline");
 		if (index > -1) {
 			this.connectedUsers.splice(index, 1);
 			console.log(`${userid} disconnected: ${client.data.nickname} on ${index} `);
