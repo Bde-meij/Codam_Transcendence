@@ -2,9 +2,9 @@ export interface Rooms {
 	id: string;
 	name: string;
 	owner: string;
-	admins: string[];
+	admins: number[];
 	banned?: string[];
-	users: string[];
+	users: number[];
 	muted?: string[];
 	status: string; //public, private
 	password: string; //true or false?
@@ -23,4 +23,6 @@ export interface MessageInterface {
 	updated?: Date;
 	game?: boolean;
 	sender_avatar?: string;
+	type: string;
+	customMessageData?: {href: string, text: string};
 }

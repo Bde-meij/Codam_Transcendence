@@ -83,7 +83,7 @@ export class ChatMessageComponent implements AfterViewInit{
 		// ////console.log("FIGHTING------FIGHTING");
 		//console.log("chat-message.component userid: " + userid + ", room name: " + this.room.name);
 		const num = Number(userid);
-		this.chatService.battle(this.room.name, this.room.id, num)
+		this.chatService.battle(this.room.name, this.room.id, +this.user.id, this.user.nickname)
 		this.router.navigate(['/dashboard', 'game']);
 	}
 

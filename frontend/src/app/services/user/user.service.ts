@@ -34,6 +34,10 @@ export class UserService {
 		return this.http.get<any>(this.userUrl + '/name/' + id, {});
 	};
 
+	getUserIdByName(name: string) : Observable<any> {
+		return this.http.get<any>(this.userUrl + '/getUserByName/' + name, {});
+	}
+
 	updateRoomKey(roomKey: number) {
 		return this.http.post(this.userUrl + '/update-roomkey/' + roomKey.toString(), {});
 	}

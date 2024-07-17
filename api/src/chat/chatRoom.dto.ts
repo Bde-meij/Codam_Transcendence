@@ -22,7 +22,7 @@ export interface RoomInfo {
 }
 
 export interface MessageInterface {
-	message: string;
+	message?: string;
 	roomId: number;
 	room_name: string;
 	senderId: number;
@@ -31,6 +31,8 @@ export interface MessageInterface {
 	updated?: Date;
 	game?: boolean;
 	sender_avatar?: string;
+	type: string;
+	cutomMessageData?: {href: string, text: string};
 }
 
 export interface RoomDto {

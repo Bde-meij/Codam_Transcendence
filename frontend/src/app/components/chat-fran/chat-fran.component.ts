@@ -1,23 +1,22 @@
 import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, ViewChild } from '@angular/core';
-import { NbAutocompleteModule, NbButtonModule, NbCardModule, NbChatModule, NbDialogService, NbOptionModule, NbUserModule } from '@nebular/theme';
+import { NbAutocompleteModule, NbButtonModule, NbCardModule, NbChatModule, NbDialogService, NbUserModule } from '@nebular/theme';
 import { ChatService } from '../../services/sock/chat/chat.service';
 import { UserService } from '../../services/user/user.service';
 import { User } from '../../models/user.class';
 import { Rooms } from '../../models/rooms.class';
 import { NbThemeModule, NbLayoutModule} from '@nebular/theme';
 import { UserDetailComponent } from '../user-detail/user-detail.component';	
-import { NbEvaIconsModule } from '@nebular/eva-icons';
-import { FormsModule } from '@angular/forms';
-import { createChatRoom } from '../createChatRoom/createChatRoom.component';
-import { Observable, of } from 'rxjs';
+import { createChatRoom } from './createChatRoom/createChatRoom.component';
+import { Observable, of, map, catchError } from 'rxjs';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { forbiddenNameValidator } from '../../services/validator/name-validator.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'fran-chat-ui',
   standalone: true,
-  imports: [CommonModule, FormsModule, NbChatModule, NbUserModule, NgFor, NgIf, NbThemeModule, NbLayoutModule, UserDetailComponent, NbEvaIconsModule, NbCardModule, NbOptionModule, ReactiveFormsModule],
+  imports: [CommonModule, NbChatModule, NbUserModule, NgFor, NgIf, NbLayoutModule, UserDetailComponent, NbCardModule, ReactiveFormsModule],
   templateUrl: './chat-fran.component.html',
   styleUrl: './chat-fran.component.scss',
 })
@@ -25,9 +24,8 @@ export class FranChatUiComponent implements AfterViewInit{
 
 	@ViewChild('messageContainer') messageContainer!: ElementRef;
 	@ViewChild('messageInput') messageInput!: ElementRef;
-	@ViewChild('autoInput') input!: any;
 	selectedUser: any;
-	selectedUserID?: string;
+	selectedUserID?: number;
 	message: string | undefined;
   	user!: User;
 	messages: string[] = [];
@@ -35,30 +33,32 @@ export class FranChatUiComponent implements AfterViewInit{
 	roomsList: Record<string, Rooms> = {};
 	userss: string[] | undefined;
 	roomName: string | undefined;
-	filteredOptions$!: Observable<string[]>;
 
 	selectedRoom: Rooms | undefined;
 
-	userNameForm = new FormGroup({
-		userName: new FormControl('', {
-			validators: [
-				Validators.required,
-				forbiddenNameValidator(/gary/),
-				forbiddenNameValidator(/Gary/),
-			],
-			updateOn: 'change',
-		}),
-	});
+	userNameForm!: FormGroup;
+
+	userNotFound: boolean = false;
 	
 	onSelect(room: Rooms): void {
 		this.selectedRoom = room;
 		//console.log(room.messages);
 	};
 
-	constructor(private chatService: ChatService, private userService: UserService, private dialogService: NbDialogService) {};
+	constructor(private chatService: ChatService, private userService: UserService, private dialogService: NbDialogService, private router: Router) {};
 
 	ngOnInit() {
-    this.userService.getUser('current').subscribe((userData) => (
+		this.userNameForm = new FormGroup({
+			userName: new FormControl('', {
+				validators: [
+					Validators.required,
+					forbiddenNameValidator(/gary/),
+					forbiddenNameValidator(/Gary/),
+				],
+				updateOn: 'change',
+			}),
+		});
+    	this.userService.getUser('current').subscribe((userData) => (
 			this.user = userData
 		));
 	
@@ -88,7 +88,6 @@ export class FranChatUiComponent implements AfterViewInit{
 			// ////console.log("getconnectedusers subscribe");
 			this.userss = userList;
 		})
-		this.filteredOptions$ = of(this.userss || []);
     	this.createRoom("Global", "public", "");
 		// this.createRoom("temp",  "public", "");
 		this.joinRoom("Global", "");
@@ -100,7 +99,6 @@ export class FranChatUiComponent implements AfterViewInit{
 		if (!this.selectedRoom)
 			this.chatService.updatePage();
 	}
-	
 
 	sendMessage(event: any) {
 		if (event.message) {
@@ -165,5 +163,65 @@ export class FranChatUiComponent implements AfterViewInit{
 
 	isChannelOwner(): boolean {
 		return +this.user.id === +this.selectedRoom!.owner;
+	}
+
+	isChannelAdmin(): boolean {
+		const userIdToNbr = +this.user.id;
+		return this.selectedRoom!.admins.includes(userIdToNbr);
+	}
+
+	battle() {
+		this.router.navigate(['/dashboard/game']);
+		this.chatService.battle(this.selectedRoom!.name, +this.selectedRoom!.id, +this.user.id, this.user.nickname);
+	}
+
+	joinBattle() {
+		this.chatService.joinBattle(this.selectedRoom!.id, this.selectedRoom!.name);
+	}
+
+	mute() {
+		this.userInRoom(this.userNameForm.value.userName).subscribe((userIsInRoom) => {
+			if (userIsInRoom) {
+				this.chatService.muteUser(this.selectedRoom!.name, this.userNameForm.value.userName);
+				this.userNotFound = false;
+			}
+			else
+				this.userNotFound = true;
+		})
+	}
+
+	ban() {
+		this.userInRoom(this.userNameForm.value.userName).subscribe((userIsInRoom) => {
+			if (userIsInRoom) {
+				this.chatService.banUser(this.selectedRoom!.name, this.userNameForm.value.userName);
+				this.userNotFound = false;
+			}
+			else
+				this.userNotFound = true;
+		})
+	}
+
+	kick() {
+		this.userInRoom(this.userNameForm.value.userName).subscribe((userIsInRoom) => {
+			if (userIsInRoom) {
+				this.chatService.kickUser(this.selectedRoom!.name, this.userNameForm.value.userName);
+				this.userNotFound = false;
+			}
+			else
+				this.userNotFound = true;
+		})
+	}
+
+	private userInRoom(userName: string): Observable<boolean> {
+		return this.userService.getUserIdByName(userName).pipe(
+			map((data: any) => {
+			  this.selectedUserID = data;
+			  return this.selectedRoom!.users.includes(this.selectedUserID!);
+			}),
+			catchError((error) => {
+			  console.error('Error fetching user ID:', error);
+			  return of(false); // Return false or handle error as needed
+			})
+		  );
 	}
 }

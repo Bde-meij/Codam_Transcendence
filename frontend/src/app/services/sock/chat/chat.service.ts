@@ -52,10 +52,11 @@ export class ChatService{
 		// this.user$ = this.userService.getUser(0);
 		// const sender = this.user$;
 		const messageObj = {
-			message : message,
-			sender_name : this.user?.nickname,
+			message: message,
+			sender_name: this.user?.nickname,
 			sender_id: this.user?.id,
-			room : room,
+			room: room,
+			type: 'text',
 		}
 		// console.log("sending msg");
 		this.chatSocket.emit('message', messageObj, (err: any) => {
@@ -228,11 +229,12 @@ export class ChatService{
 		});
 	}
 
-	battle(roomname: string, roomid: number, userid: number){
+	battle(roomname: string, roomid: number, userid: number, userName: string){
 		const data = {
 			roomid : roomid,
 			room_name : roomname,
 			userid: userid,
+			userName: userName,
 		}
 		this.chatSocket.emit('inviteGame', data, (err: any) => {
 			if (err) {

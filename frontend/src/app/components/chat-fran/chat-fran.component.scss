@@ -5,7 +5,7 @@
 nb-layout {
 	display: flex;
 	flex-direction: column;
-	height: 69vh;
+	height: 71vh;
 	overflow: hidden;
   }
   
@@ -38,7 +38,7 @@ nb-layout {
 	display: flex;
 	justify-content: space-between;
 	width: 100%;
-	height: 60vh;
+	height: 65vh;
   }
   
   .rooms-list, .user-list {
@@ -120,7 +120,11 @@ nb-layout {
 }
 
 .ban-kick-mute {
-	padding: 40px;
+	padding: 20px;
 	flex: auto;
 	text-align: center;
+}
+
+.user-name-input {
+	margin: 10px;
 }

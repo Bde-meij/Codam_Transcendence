@@ -130,4 +130,13 @@ export class UserController {
 	async updateRoomKey(@Req() req, @Param('key') key: string) {
 		await this.userService.updateRoomKey(req.user.id, +key);
 	}
+
+	@Get('getUserByName/:name')
+	@UseGuards(JwtGuard)
+	async getUserIdByName(@Req() req, @Param('name') name: string) {
+		const user: User = await this.userService.findUserByName(name);
+		if (!user)
+			throw new HttpException('User ' + name + ' not found', HttpStatus.NOT_FOUND);
+		return user.id;
+	}
 }
