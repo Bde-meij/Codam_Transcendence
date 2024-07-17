@@ -55,6 +55,8 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			client.data.userid = user.id;
 			client.data.nick = user.nickname;
 			client.data.key = user.roomKey;
+			await this.userService.updateStatus(client.data.userid, "in game");
+
 			client.emit("connectSignal");
 		}
 		catch
@@ -115,6 +117,13 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			roomMap.delete(room.name);
 		}
 		this.userService.updateRoomKey(client.data.userid, 0);
+		setTimeout(async() =>{{
+			const user = await this.userService.findUserById(client.data.userid);
+			if (!user)
+				return ;
+			if (user.status !== "offline")
+				await this.userService.updateStatus(client.data.userid, "online");
+		}},500);
 	}
 
 	// INITIALIZATIONS
