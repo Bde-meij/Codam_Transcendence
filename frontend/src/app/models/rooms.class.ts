@@ -19,7 +19,7 @@ export interface MessageInterface {
 	room_name: string;
 	senderId: number;
 	sender_name: string;
-	created: string;
+	created: Date;
 	updated?: Date;
 	game?: boolean;
 	sender_avatar?: string;

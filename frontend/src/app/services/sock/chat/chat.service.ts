@@ -5,7 +5,7 @@ import { SockService } from '../sock.service';
 import { UserService } from '../../user/user.service';
 import { User } from '../../../models/user.class';
 import { skip } from 'rxjs/operators';
-import { Rooms } from '../../../models/rooms.class';
+import { MessageInterface, Rooms } from '../../../models/rooms.class';
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +23,6 @@ export class ChatService{
 	constructor(sockService: SockService, private userService: UserService) {
 		this.userService.getUser('current').subscribe((userData) => {
 			this.user = userData;
-			// console.log("User loaded in ChatService:", this.user);
 		});
 
 		// this.chatSocket.onAny((event, ...args) => {
@@ -37,18 +36,7 @@ export class ChatService{
 		// this.user$ = this.userService.getUser(0);
 	}
 
-	// sendMessage(message: string): void {
-	// 	// this.user$ = this.userService.getUser();
-	// 	this.chatSocket.emit('message', message, (err: any) => {
-	// 		if (err) {
-	// 			console.log("chat-sock error: ");
-	// 			console.log(err);
-	// 			console.log(err.message);
-	// 		}
-	// 	});
-	// }
-
-	sendMessage(message: string, room: string): void {
+	sendMessage(message: string, room: string, avatar: string): void {
 		// this.user$ = this.userService.getUser(0);
 		// const sender = this.user$;
 		const messageObj = {
@@ -56,6 +44,7 @@ export class ChatService{
 			sender : this.user?.nickname,
 			sender_id: this.user?.id,
 			room : room,
+			sender_avatar: avatar
 		}
 		// console.log("sending msg");
 		this.chatSocket.emit('message', messageObj, (err: any) => {
@@ -111,7 +100,7 @@ export class ChatService{
 		});
 	}
 
-	getMessages(): Observable<string> {
+	getMessages(): Observable<MessageInterface> {
 		return new Observable((observer) => {
 			this.chatSocket.on('message', (message) => {
 				observer.next(message);
@@ -158,15 +147,6 @@ export class ChatService{
 		});
 	  }
 
-	//   getUser(): Observable<any> {
-	// 	return new Observable<any>((observer) => {
-	// 	  this.chatSocket.on('getUser', (user: any) => {
-	// 		user = user
-	// 	  });
-	// 	});
-	//   }
-
-
 	getConnectedUsers(): Observable<string[]> {
 		return new Observable((observer) => {
 			this.chatSocket.on('getConnectedUsers', (userss) => {
@@ -176,7 +156,13 @@ export class ChatService{
 		});
 	}
 
-
+	update_client_room(): Observable<Rooms> {
+		return new Observable((observer) => {
+			this.chatSocket.on('update_client_room', (room: Rooms) => {
+				observer.next(room);
+			});
+		});
+	}
 
 	getAllRoomsExceptFirst(): Observable<string[]> {
 		return new Observable<string[]>((observer) => {
@@ -231,6 +217,17 @@ export class ChatService{
 		});
 	}
 
+	blockUser(room: string, user: string){
+		const userid = Number(user);
+		this.chatSocket.emit('block', {room, userid}, (err: any) => {
+			if (err) {
+				// console.log("kickUser chat-sock error: ");
+				// console.log(err);
+				// console.log(err.message);
+			}
+		});
+	}
+
 	battle(roomname: string, roomid: number, userid: number){
 		const data = {
 			roomid : roomid,
@@ -246,9 +243,10 @@ export class ChatService{
 		});
 	}
 
-	joinBattle(roomnum: string){
+	joinBattle(roomnum: string, room: string){
 		const data = {
-			numroom: roomnum
+			numroom: roomnum,
+			room: room
 		}
 		// if (this.user)
 			// console.log("joinBAttle chatservice: " + this.user.id + ", data.roomnum: " + data.numroom);

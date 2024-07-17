@@ -9,6 +9,7 @@ import { User } from '../../models/user.class';
 import { UserDetailComponent } from '../user-detail/user-detail.component';
 import { AfterViewInit, AfterViewChecked } from '@angular/core';
 import { ViewChild } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 export interface MessageInterface {
 	sender: string,
@@ -31,29 +32,30 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	roomsList: Record<string, Rooms> = {};
 	userss: string[] | undefined;
 	roomName: string | undefined;
-	
+	blocked_list: any | undefined;
 	selectedRoom: Rooms | undefined;
 	
 	onSelect(room: Rooms): void {
+		console.log(`onselect ${room.name}`);
+		console.log(room);
 		this.selectedRoom = room;
-		//console.log(room.messages);
+		console.log(room.messages);
 	};
 
-	constructor(private chatService: ChatService, private userService: UserService) {};
+	constructor(private chatService: ChatService, private userService: UserService, private http: HttpClient) {};
 	
 	ngOnInit() {
 		this.userService.getUser('current').subscribe((userData) => (
 			this.user = userData
 		));
-	
+		
 		this.chatService.getMessages().subscribe((newmessage: any ) => {
 			if (this.roomsList[newmessage.room_name]?.messages) {
-				
-				this.userService.getAvatar(newmessage.senderId).subscribe((data) => (
-					newmessage.sender_avatar = URL.createObjectURL(data)
-				))
+				// this.blocked_list = this.http.delete<number[]>('/api/block/all-blocked/' + this.user.id);
+		
+				// if (!this.blocked_list?. .includes(newmessage.senderId))
 				this.roomsList[newmessage.room_name].messages?.push(newmessage);
-				this.messages.push(newmessage.message);
+				// this.messages.push(newmessage.message);
 				
 				// console.log("Room: " + newmessage.roomId + ", got a new message");
 				// console.log(newmessage);
@@ -75,12 +77,10 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		this.chatService.getRoomsss().subscribe((chatRoomList: Record<string, Rooms>) => {
 			// ////console.log("getRoomss record");
 			this.roomsList = chatRoomList;
-			if (!this.selectedRoom && Object.keys(this.roomsList).length > 0) {
-				const firstRoomName = Object.keys(this.roomsList)[0];
-				// ////console.log("getrooms select")
-				////console.log(this.roomsList[firstRoomName]);
-				this.onSelect(this.roomsList[firstRoomName]);
-			  }
+			// if (!this.selectedRoom && Object.keys(this.roomsList).length > 0) {
+			// 	const firstRoomName = Object.keys(this.roomsList)[0];
+			// 	this.onSelect(this.roomsList[firstRoomName]);
+			// }
 			////console.log(this.roomsList);
 		});
 
@@ -88,6 +88,23 @@ export class ChatComponent implements OnInit, AfterViewInit {
 			// console.log("getconnectedusers subscribe");
 			this.userss = userList;
 		})
+
+		this.chatService.update_client_room().subscribe((update_room: Rooms) => {
+			console.log(`update_client_room: ${update_room}`);
+			console.log(update_room);
+			this.roomsList[update_room.name] = update_room;
+			// if (Object.keys(this.roomsList).length > 0 && !this.selectedRoom) {
+			// 	const firstRoomName = Object.keys(this.roomsList)[0];
+			// 	this.selectedRoom = this.roomsList[0];
+			// 	this.onSelect(this.roomsList[firstRoomName]);
+			// 	console.log(`update_client_room, selected: ${this.roomsList[firstRoomName]}`);
+			// }
+		})
+
+		// this.chatService.fetch_client_room().subscribe((update_room: Rooms) => {
+		// 	console.log(`update_cllient_room: ${update_room}`);
+		// 	this.roomsList[update_room.name] = update_room;
+		// })
 
 		this.createRoom("Global", "public", "");
 		// this.createRoom("temp",  "public", "");
@@ -99,14 +116,17 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	@ViewChild(ChatMessageComponent) viewChild!: ChatMessageComponent;
 
 	ngAfterViewInit() {
-		// console.log(`afterviewcheckedInit Room: ${this.selectedRoom}`);
+		console.log(`afterviewcheckedInit Room: ${this.selectedRoom}`);
 		if (!this.selectedRoom){
 			this.chatService.updatePage();
+			console.log("selectinged room empty");
+			console.log(this.roomsList);
 			// if (Object.keys(this.roomsList).length > 0) {
+			// 	console.log(Object.keys(this.roomsList).length);
 			// 	const firstRoomName = Object.keys(this.roomsList)[0];
 			// 	this.selectedRoom = this.roomsList[0];
 			// 	this.onSelect(this.roomsList[firstRoomName]);
-			// console.log(`empty selectedroom, selected: ${this.roomsList[firstRoomName]}`);
+			// 	console.log(`empty selectedroom, selected: ${this.roomsList[firstRoomName]}`);
 			// }
 		}
 	}
@@ -118,14 +138,6 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	// 		this.chatService.updatePage();
 	// 	}
 	// }
-
-	sendMessage() {
-		if (this.message) {
-			this.chatService.sendMessage(this.message, "sendmessageall");
-			// this.messages.push(this.message);
-		}
-		this.message = '';
-	}
 
 	makenum(str: string){
 		return Number(str);
@@ -149,6 +161,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	joinRoom(data: string, password: string) {
 		////console.log("joinroom component: " + data);
 		this.chatService.joinRoom(data, password);
+		// this.onSelect(this.roomsList[data]);
 	}
 
 	getConnectedUsers() {

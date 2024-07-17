@@ -7,12 +7,12 @@ import { ChatGateway } from './chat/chat.gateway';
 import { DatabaseModule } from './database/database.module';
 import { ConfigModule } from '@nestjs/config';
 import { TestingModule } from './testing/testing.module';
-import { PasswordService } from './password/password.service';
 import { FriendsModule } from './friends/friends.module';
 import { CookieMiddleware } from './auth/middleware/cookie.middleware';
 import { BlockModule } from './block/block.module';
 import { NestModule } from '@nestjs/common';
 import { MiddlewareConsumer } from '@nestjs/common';
+import { ChannelModule } from './chat/chat.module';
 
 @Module({
 	imports: [
@@ -28,15 +28,13 @@ import { MiddlewareConsumer } from '@nestjs/common';
 		DatabaseModule,
 		TestingModule,
 		FriendsModule,
-		// ChannelModule,
+		ChannelModule,
 		BlockModule,
 	],
 	controllers: [],
 	providers: [
 		BossGameModule,
 		GameModule,
-		ChatGateway,
-		PasswordService
 	],
 })
 export class AppModule implements NestModule{

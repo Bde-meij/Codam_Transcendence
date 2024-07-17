@@ -7,7 +7,7 @@ export interface Rooms {
 	muted?: Record<number, Date>;
 	users: number[];
 	status: string; //public, private
-	password: string; //true or false?
+	password: boolean; //true or false?
 	created?: Date;
 	updated?: Date;
 	messages?: MessageInterface[];
@@ -26,23 +26,36 @@ export interface MessageInterface {
 	roomId: number;
 	room_name: string;
 	senderId: number;
+	sender_name: string;
 	created: Date;
 	updated?: Date;
 	game?: boolean;
+	sender_avatar?: string;
 }
 
-// export interface ConnectedInterface {
-// 	id?: number;
-// 	socketId: string;
-// 	user: UserInterface;
-//   }
-  
-// export interface UserInterface {
-// 	id: number
-// 	username?: string;
-// 	users?: UserInterface
-// 	blockedUsers?: number[]
-// 	picture?: string
-// 	sizedPicture?: string
-// 	jwt?: string
-// }
+export interface RoomDto {
+	name: string;
+	password: string; //true or false?
+}
+
+export interface DeleteRoomDto {
+	id: number;
+	password: string;
+}
+
+export interface CheckPasswordDto {
+	id: number;
+	password: string;
+}
+
+export interface UpdatePasswordDto {
+	id: number;
+	oldPassword: string;
+	newPassword: string;
+}
+
+export interface UpdateNameDto {
+	id: number;
+	password: string;
+	newName: string;
+}
