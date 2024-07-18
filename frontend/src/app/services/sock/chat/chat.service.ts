@@ -79,9 +79,9 @@ export class ChatService{
 		
 	}
 	
-	leaveRoom(room: string, userid: string) {
+	leaveRoom(roomid: number, room: string, userid: string) {
 		const num = Number(userid);
-		this.chatSocket.emit('leaveRoom', {room, num}, (err: any) => {
+		this.chatSocket.emit('leaveRoom', {roomid, room, num}, (err: any) => {
 			if (err) {
 				// console.log("leaveRoom chat-sock error: ");
 				// console.log(err);
@@ -156,9 +156,25 @@ export class ChatService{
 		});
 	}
 
+	update_public(): Observable<Rooms> {
+		return new Observable((observer) => {
+			this.chatSocket.on('update_public', (room: Rooms) => {
+				observer.next(room);
+			});
+		});
+	}
+
 	update_client_room(): Observable<Rooms> {
 		return new Observable((observer) => {
 			this.chatSocket.on('update_client_room', (room: Rooms) => {
+				observer.next(room);
+			});
+		});
+	}
+
+	delete_room(): Observable<string> {
+		return new Observable((observer) => {
+			this.chatSocket.on('delete_room', (room: string) => {
 				observer.next(room);
 			});
 		});

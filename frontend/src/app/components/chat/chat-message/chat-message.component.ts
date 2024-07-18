@@ -81,7 +81,7 @@ export class ChatMessageComponent implements AfterViewInit{
 
 	leaveRoom(room: string, userid: string) {
 		////console.log("chat-message component leaveRoom: " + room + ", id: " + userid);
-		this.chatService.leaveRoom(room, userid);
+		this.chatService.leaveRoom(this.room.id, room, userid);
 		// ////console.log("chat-message sendmessage: " + this.room.name);
 	}
 

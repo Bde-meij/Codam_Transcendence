@@ -162,20 +162,20 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		if (!CreateRoomDB){
 			const msg = this.system_message(socket.data.userid, socket.data.username, "create_room", -1, "Room already exists");
 			this.io.to("system_message").emit("create_room", msg);
+			console.log("already exists");
+			return;
 		}
 		this.chatRoomList[data.room_name].id = CreateRoomDB.id;
 		this.chatRoomList[data.room_name].users.push(socket.data.userid);
-
-		// console.log(`createroom: ${test}`);
 		socket.join(socket.data.id.toString());
-		//frontendimplemen
-		socket.emit('joinRoom', { room_id: socket.data.id, room_name: data.room_name });
-		//msg get messages?
-		socket.emit('getRoomss', this.chatRoomList);
+		if (this.chatRoomList[data.room_name].status == "public"){
+			console.log("public room");
+			this.update_public(data.room_name);
+		}
+		this.update_client_rooms(CreateRoomDB.id, data.room_name);
+		// socket.emit('getRoomss', this.chatRoomList);
 		
 		this.channelUserList(data.room_name);	
-		//change this for UUID counter
-		
 		this.gateway_roomid++;
 		//console.log("Created room: " + socket.data.id)
 	}
@@ -284,41 +284,35 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	
 	@SubscribeMessage('leaveRoom')
 	async leaveRoom(
-	@MessageBody() data: { room: string; username: string, userid: number },
+	@MessageBody() data: { roomid: number, room: string; username: string, userid: number },
 	@ConnectedSocket() client: Socket) {
 		//console.log("-------LEAVEROOM:")
 		//console.log(client.rooms);
-		
-		for (const value of client.rooms) {
-			//console.log(value);
-			// //console.log(value.data.id);
+		const user = await this.findSocketUser(client.data.userid);
+		if (!user){
+			console.log("LeaveRoom socket not found")
+			return;
 		}
-		// const sockets = this.io.sockets.adapter.rooms.get(data.room);
-		// //console.log(sockets);
-		// for (const socketId of sockets) {
-		// 	const target = this.io.sockets.sockets.get(socketId);
-		// 	if (target.data.nickname === data.userid) {
-		// 		//console.log(target);
-		// 		//console.log(target.data.name);
-		// 		//console.log(target.data.nickname);
-		// 		//console.log(target.data.userid);
-		// 		//console.log(target.data.id);
-		// 		client.leave(target.data.id);
-		// 	}
-		// }
-		// //console.log(target);
-		// //console.log(target.data.name);
-		// //console.log(target.data.nickname);
-		// //console.log(target.data.userid);
-		// //console.log(target.data.id);
-		//console.log("leaveRoom: " + data.room);
-		//console.log("LEAVEROOM:-----")
-
-	  	client.leave(data.room);
-		if(this.chatRoomList[data.room])
-			this.chatRoomList[data.room].users = this.chatRoomList[data.room].users.filter((item: number) => item !== data.userid);
-		// this.chatRoomList = this.chatRoomList[data.room].filter((item: string) => item !== data.userid);
-		client.emit('getRoomss', this.chatRoomList);
+		
+		if (!this.change_owner(data.room, client.data.userid)){
+			console.log("owner not changed");
+			return ;
+		}
+		const msg: MessageInterface = this.create_msg(
+			`Channel owner change to ${data.username}`,
+			data.roomid,
+			data.room,
+			client.data.userid,
+			data.username
+		)
+		this.io.to(data.roomid.toString()).emit("message", msg);
+		console.log(`userid ${client.data.userid}`)
+		this.chatRoomList[data.room].users = this.chatRoomList[data.room].users.filter((item: number) => item !== client.data.userid);
+		this.chatRoomList[data.room].admins = this.chatRoomList[data.room].admins.filter((item: number) => item !== client.data.userid);
+		user.leave(data.room)
+		this.update_client_rooms(data.roomid, data.room);
+		// client.emit('getRoomss', this.chatRoomList);
+		console.log("leaveroom succes");
 	}
 
 	@SubscribeMessage('changePassword') async changePassword(
@@ -748,10 +742,21 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		temp = {};
 	}
 
+	private update_public(room_name: string){
+		this.io.emit("update_public", this.chatRoomList[room_name]);
+	}
+
 	private update_client_rooms(room_id: number, room_name: string){
 		console.log("update_client_room");
 		this.io.to(room_id.toString()).emit('update_client_room', this.chatRoomList[room_name]);
 		console.log(this.chatRoomList[room_name]);
+	}
+
+	private delete_room(room_id: number, room_name: string){
+		if (!this.chatRoomList[room_name]){
+			this.io.emit('delete_room', room_name);
+		}
+		return;
 	}
 
 	private updateAllUsers(socket: Socket, rooms: Record<string, Rooms>){
@@ -809,6 +814,26 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			created: new Date(),
 		};
 		return message
+	}
+
+	private change_owner(room: string, userid: number) : boolean{
+		if (this.isOwner(userid, room)){
+			if (this.chatRoomList[room].admins){
+				const admin_owner = this.chatRoomList[room].admins.find(adminId => adminId !== userid) || null;
+				if (!admin_owner){
+					const user_owner = this.chatRoomList[room].users.find(adminId => adminId !== userid) || null;
+					if (!user_owner){
+						delete this.chatRoomList[room];
+						return false;
+					}
+					this.chatRoomList[room].owner = user_owner;
+					return true;
+				}
+				this.chatRoomList[room].owner = admin_owner;
+				return true
+			}
+		}
+		return false
 	}
 
 	private system_message(client_id: number, client_name: string, 

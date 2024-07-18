@@ -63,7 +63,8 @@ export class ChatComponent implements OnInit, AfterViewInit {
 				//console.error("Room or messages array not found:", newmessage.roomId);
 			}
 		});
-
+		
+	
 		// this.chatService.getRooms().subscribe((roomList: any) => {
 		// 	this.rooms.push(roomList);
 		// 	// ////console.log("getRooms frontend");
@@ -89,16 +90,23 @@ export class ChatComponent implements OnInit, AfterViewInit {
 			this.userss = userList;
 		})
 
-		this.chatService.update_client_room().subscribe((update_room: Rooms) => {
-			console.log(`update_client_room: ${update_room}`);
+		this.chatService.update_public().subscribe((update_room: Rooms) => {
+			console.log(`update_public: ${update_room.name}`);
 			console.log(update_room);
 			this.roomsList[update_room.name] = update_room;
-			// if (Object.keys(this.roomsList).length > 0 && !this.selectedRoom) {
-			// 	const firstRoomName = Object.keys(this.roomsList)[0];
-			// 	this.selectedRoom = this.roomsList[0];
-			// 	this.onSelect(this.roomsList[firstRoomName]);
-			// 	console.log(`update_client_room, selected: ${this.roomsList[firstRoomName]}`);
-			// }
+		})
+
+		this.chatService.update_client_room().subscribe((update_room: Rooms) => {
+			console.log(`update_client_room: ${update_room.name}`);
+			console.log(update_room);
+			this.roomsList[update_room.name] = update_room;
+		})
+
+
+
+		this.chatService.delete_room().subscribe((room: string) => {
+			console.log(`delete_room: ${room}`);
+			delete this.roomsList[room];
 		})
 
 		// this.chatService.fetch_client_room().subscribe((update_room: Rooms) => {
