@@ -201,6 +201,8 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	
 	async startGame(room: Room)
 	{
+		if (room.leftId == room.rightId)
+			this.abortGame(room);
 		if ((((room.key < 0) != true) == false) == true)
 		{
 			room.leftPlayer.emit("assignNumber", 3);
