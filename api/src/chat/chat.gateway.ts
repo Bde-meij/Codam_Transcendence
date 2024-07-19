@@ -19,6 +19,7 @@ import { BlockService } from 'src/block/block.service';
 import { CreateBlockDto } from 'src/block/dto/create-block.dto';
 import { DeleteBlockDto } from 'src/block/dto/delete-block.dto';
 import { ChatRoomService } from './chatRoom.service';
+
 @Injectable()
 @WebSocketGateway({
 	cors: { origin: 'http://localhost:4200' },
@@ -229,6 +230,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		// this.addDate();
 		console.log("sending msg");
 		this.chatRoomList[Room.name].messages.push(message);
+		
+		if (data.message == "test"){
+			console.log('name is test changing')
+			this.change_msg_name(socket.data.userid, "test");
+		}
 		this.io.to(Room.id.toString()).emit('message', message);
 		this.channelUserList(Room.name);
 		this.logger(data.room);
@@ -775,7 +781,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	private update_client_rooms(room_id: number, room_name: string){
 		console.log("update_client_room");
 		this.io.to(room_id.toString()).emit('update_client_room', this.chatRoomList[room_name]);
-		console.log(this.chatRoomList[room_name]);
+		// console.log(this.chatRoomList[room_name]);
 	}
 
 	private delete_room(room_id: number, room_name: string){
@@ -905,6 +911,25 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		for (const [userid, muteDate] of Object.entries(room.muted)) {
 		  console.log(`User ID: ${userid}, Muted Until: ${muteDate}`);
 		}
+	}
+
+
+	async change_msg_name(userid: number, new_name: string){	
+		Object.values(this.chatRoomList).forEach(room => {
+			this.chatRoomList[room.name].messages.forEach(msg => {
+				console.log(msg.sender_name);
+				if (msg.senderId == userid){
+					msg.sender_name = new_name;
+				}
+				console.log(msg.sender_name);
+			})
+		});
+		Object.values(this.chatRoomList).forEach(room => {
+			if (this.chatRoomList[room.name].users.includes(userid)){
+				console.log(`changemsname ${room.name} ${room.id}`)
+				this.update_client_rooms(room.id, room.name)
+			}
+		})
 	}
 
 	private createTestRooms() {
