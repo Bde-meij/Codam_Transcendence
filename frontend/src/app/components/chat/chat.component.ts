@@ -16,6 +16,8 @@ export interface MessageInterface {
 	message: string
 }
 
+let subbed = false;
+
 @Component({
   selector: 'app-chat',
   standalone: true,
@@ -49,40 +51,20 @@ export class ChatComponent implements OnInit, AfterViewInit {
 			this.user = userData
 		));
 		
-		this.chatService.getMessages().subscribe((newmessage: any ) => {
-			if (this.roomsList[newmessage.room_name]?.messages) {
-				// this.blocked_list = this.http.delete<number[]>('/api/block/all-blocked/' + this.user.id);
-		
-				// if (!this.blocked_list?. .includes(newmessage.senderId))
-				this.roomsList[newmessage.room_name].messages?.push(newmessage);
-				// this.messages.push(newmessage.message);
-				
-				// console.log("Room: " + newmessage.roomId + ", got a new message");
-				// console.log(newmessage);
-			} else {
-				//console.error("Room or messages array not found:", newmessage.roomId);
-			}
-		});
-		
-	
-		// this.chatService.getRooms().subscribe((roomList: any) => {
-		// 	this.rooms.push(roomList);
-		// 	// ////console.log("getRooms frontend");
-		// })
-
-		// this.chatService.getUser().subscribe((roomList: any) => {
-		// 	this.rooms.push(roomList);
-		// 	// ////console.log("getRooms frontend");
-		// })
+		if (!subbed) {
+			this.chatService.getMessages().subscribe((newmessage: any ) => {
+				if (this.roomsList[newmessage.room_name]?.messages) {
+					this.roomsList[newmessage.room_name].messages!.push(newmessage);
+				} else {
+					//console.error("Room or messages array not found:", newmessage.roomId);
+				}
+			});
+			subbed = true;
+		}
 
 		this.chatService.getRoomsss().subscribe((chatRoomList: Record<string, Rooms>) => {
-			// ////console.log("getRoomss record");
+			// ////console.log("getRoomsss record");
 			this.roomsList = chatRoomList;
-			// if (!this.selectedRoom && Object.keys(this.roomsList).length > 0) {
-			// 	const firstRoomName = Object.keys(this.roomsList)[0];
-			// 	this.onSelect(this.roomsList[firstRoomName]);
-			// }
-			////console.log(this.roomsList);
 		});
 
 		this.chatService.getConnectedUsers().subscribe((userList: any) => {
@@ -102,23 +84,19 @@ export class ChatComponent implements OnInit, AfterViewInit {
 			this.roomsList[update_room.name] = update_room;
 		})
 
-
-
 		this.chatService.delete_room().subscribe((room: string) => {
 			console.log(`delete_room: ${room}`);
 			delete this.roomsList[room];
 		})
 
-		// this.chatService.fetch_client_room().subscribe((update_room: Rooms) => {
-		// 	console.log(`update_cllient_room: ${update_room}`);
-		// 	this.roomsList[update_room.name] = update_room;
-		// })
+		this.chatService.personal_listen().subscribe((rooms: Record<string, Rooms>) => {
+			console.log(`personal_listen ${rooms}`);
+			this.roomsList = rooms;
+		})
 
-		this.createRoom("Global", "public", "");
-		// this.createRoom("temp",  "public", "");
-		this.joinRoom("Global", "");
-		// this.joinRoom("temp", "");
 
+		// this.createRoom("Global", "public", "");
+		// this.joinRoom("Global", "");
 	};
 
 	@ViewChild(ChatMessageComponent) viewChild!: ChatMessageComponent;

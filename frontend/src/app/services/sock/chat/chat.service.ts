@@ -14,7 +14,7 @@ export class ChatService{
 	count = 0;
 	private chatSocket = io("/chat");
 	private unread = false;
-	user?: User;
+	user!: User;
 
 	userss: string[] = [];
 	rooms: Rooms[] = []; 
@@ -159,6 +159,14 @@ export class ChatService{
 	update_public(): Observable<Rooms> {
 		return new Observable((observer) => {
 			this.chatSocket.on('update_public', (room: Rooms) => {
+				observer.next(room);
+			});
+		});
+	}
+
+	personal_listen(): Observable<Record<string, Rooms>> {
+		return new Observable((observer) => {
+			this.chatSocket.on((this.user.id + "_listen"), (room: Record<string, Rooms>) => {
 				observer.next(room);
 			});
 		});
