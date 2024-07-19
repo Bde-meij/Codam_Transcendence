@@ -52,6 +52,7 @@ export class BossGameGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 			client.data.userid = user.id;
 			client.data.nick = user.nickname;
 			client.data.key = user.roomKey;
+			await this.userService.updateStatus(client.data.userid, "in game");
 			// console.log(client.data.key);
 			client.emit("connectSignal");
 		}
@@ -151,6 +152,13 @@ export class BossGameGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 
 	handleDisconnect(client: Socket)
 	{
+		setTimeout(async() =>{{
+			const user = await this.userService.findUserById(client.data.userid);
+			if (!user)
+				return ;
+			if (user.status !== "offline")
+				await this.userService.updateStatus(client.data.userid, "online");
+		}},500);
 		var room = roomMap.get(client.data.room);
 		if (room != null)
 		{

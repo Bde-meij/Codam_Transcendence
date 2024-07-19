@@ -12,6 +12,7 @@ import { CookieMiddleware } from './auth/middleware/cookie.middleware';
 import { BlockModule } from './block/block.module';
 import { NestModule } from '@nestjs/common';
 import { MiddlewareConsumer } from '@nestjs/common';
+import { ChannelModule } from './chat/chat.module';
 
 @Module({
 	imports: [
@@ -27,14 +28,13 @@ import { MiddlewareConsumer } from '@nestjs/common';
 		DatabaseModule,
 		TestingModule,
 		FriendsModule,
-		// ChannelModule,
+		ChannelModule,
 		BlockModule,
 	],
 	controllers: [],
 	providers: [
 		BossGameModule,
 		GameModule,
-		ChatGateway,
 	],
 })
 export class AppModule implements NestModule{

@@ -7,7 +7,7 @@ export interface Rooms {
 	muted?: Record<number, Date>;
 	users: number[];
 	status: string; //public, private
-	password: string; //true or false?
+	password: boolean; //true or false?
 	created?: Date;
 	updated?: Date;
 	messages?: MessageInterface[];

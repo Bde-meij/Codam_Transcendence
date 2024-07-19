@@ -1,4 +1,4 @@
-import { Component, Input, ViewChild, ElementRef, AfterViewInit  } from '@angular/core';
+import { Component, Input, ViewChild, ElementRef, AfterViewInit, SimpleChanges  } from '@angular/core';
 import { AsyncPipe, NgFor } from '@angular/common';
 import { User } from '../../../models/user.class';
 import { Rooms } from '../../../models/rooms.class';
@@ -33,6 +33,7 @@ export class ChatMessageComponent implements AfterViewInit{
 	constructor(private chatService: ChatService, private router: Router, private userService :UserService) {};
 	
 	ngOnInit() {
+	
 		// console.log("initing chatmsgcomponent");
 
 		//console.log("user message:")
@@ -43,6 +44,12 @@ export class ChatMessageComponent implements AfterViewInit{
 		// ))
 	}
 
+	ngOnChanges(changes: SimpleChanges): void {
+		this.userService.getAvatar(this.user.id).subscribe((data) => (
+			this.user.avatar = URL.createObjectURL(data)
+		))
+	}
+	  
 	ngAfterViewInit() {
 		this.scrollToBottom();
 	}
@@ -60,9 +67,9 @@ export class ChatMessageComponent implements AfterViewInit{
 
 	sendMessage() {
 		if (this.message) {
-			console.log(`${this.room.name} object:`);
-			console.log(this.room);
-			this.chatService.sendMessage(this.message, this.room.name);
+			// console.log(`${this.room.name} object:`);
+			// console.log(this.room);
+			this.chatService.sendMessage(this.message, this.room.name, this.user.avatar);
 			this.scrollToBottom()
 			this.messageInput.nativeElement.focus();
 		}
@@ -75,7 +82,7 @@ export class ChatMessageComponent implements AfterViewInit{
 
 	leaveRoom(room: string, userid: string) {
 		////console.log("chat-message component leaveRoom: " + room + ", id: " + userid);
-		this.chatService.leaveRoom(room, userid);
+		this.chatService.leaveRoom(this.room.id, room, userid);
 		// ////console.log("chat-message sendmessage: " + this.room.name);
 	}
 
@@ -107,6 +114,10 @@ export class ChatMessageComponent implements AfterViewInit{
 	// 	// ////console.log("FIGHTING------FIGHTING");
 	// 	this.chatService.kickUser(this.room.name, userid);
 	// }
+
+	block(target_id: string){
+		this.chatService.blockUser(this.room.name, target_id)
+	}
 
 	time(created: Date | undefined){
 		if (created){

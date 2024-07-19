@@ -16,12 +16,10 @@
 
 	<input #messageInput [(ngModel)]="message" (keydown.enter)="sendMessage()" type="text" [class.chat_input]="message" > 
 	<button (click)="sendMessage()"> SendMessage </button>
-	<button (click)="leaveRoom(room.name, 'David')"> leaveRoom </button>
-	<button (click)="joinBattle(message.message, user.id)"> joinBattle </button>
+	<button (click)="leaveRoom(room.name, user.nickname)"> leaveRoom </button>
+	 <button (click)="joinBattle(message.message, user.id)"> joinBattle </button> -->
 
-</div>
-
-<div class="chat_columns">
+<!-- <div class="chat_columns">
 	<mat-form-field>
 		<mat-label>Select User</mat-label>
 		<mat-select [(value)]="selectedUserID">   div forces the whole screen orange
@@ -42,6 +40,9 @@
 	</button>
 	<button *ngIf="selectedUserID" mat-raised-button color="primary" (click)="kick(selectedUserID)">
 		Kick
+	</button>
+	<button *ngIf="selectedUserID" mat-raised-button color="primary" (click)="block(selectedUserID)">
+		block
 	</button>
 	
 </div> -->

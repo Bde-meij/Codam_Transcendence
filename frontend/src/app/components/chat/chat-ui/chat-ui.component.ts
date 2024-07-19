@@ -35,7 +35,7 @@ export class ChatUiComponentOld implements AfterViewInit{
 
 	sendMessage() {
 		if (this.message) {
-			this.chatService.sendMessage(this.message, this.room.name);
+			this.chatService.sendMessage(this.message, this.room.name, '');
 			this.messageInput.nativeElement.focus();
 		}
 		this.message = '';

@@ -1,13 +1,15 @@
 import { Injectable } from "@nestjs/common";
-import { ChatRoom } from "./entities/chatRoom.entity";
+import { ChatMessage, ChatRoom, chatRoomList } from "./entities/chatRoom.entity";
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from "typeorm";
-import { CheckPasswordDto, DeleteRoomDto, RoomDto, UpdateNameDto, UpdatePasswordDto } from "./chatRoom.dto";
+import { CheckPasswordDto, DeleteRoomDto, RoomDto, UpdateNameDto, UpdatePasswordDto} from "./chatRoom.dto";
 import { hash, compare } from 'bcrypt';
 
 @Injectable()
 export class ChatRoomService {
-	constructor(@InjectRepository(ChatRoom) private readonly roomRepo: Repository<ChatRoom>) {}
+	constructor(@InjectRepository(ChatRoom) private readonly roomRepo: Repository<ChatRoom>,
+				@InjectRepository(chatRoomList) private readonly roomListRepo: Repository<chatRoomList>,
+				@InjectRepository(ChatMessage) private readonly messageRepo: Repository<ChatMessage>) {}
 
 	async createChatRoom(roomDto: RoomDto) {
 		// Check if room name isn't taken
@@ -110,5 +112,25 @@ export class ChatRoomService {
 			}
 		);
 		return true;
+	}
+
+	async updateUsername(userid: number, newName: string){
+		const userMessages = await this.messageRepo.find({
+			where: {
+			  senderId: userid,
+			},
+		  });
+		
+		  if (userMessages.length === 0) {
+			return false;
+		  }
+
+		  await this.messageRepo.createQueryBuilder()
+			.update(ChatMessage)
+			.set({ sender_name: newName })
+			.where("senderId = :userid", { userid })
+			.execute();
+		
+		  return true;
 	}
 }

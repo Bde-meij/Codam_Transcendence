@@ -5,7 +5,7 @@ import { SockService } from '../sock.service';
 import { UserService } from '../../user/user.service';
 import { User } from '../../../models/user.class';
 import { skip } from 'rxjs/operators';
-import { Rooms } from '../../../models/rooms.class';
+import { MessageInterface, Rooms } from '../../../models/rooms.class';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +14,7 @@ export class ChatService{
 	count = 0;
 	private chatSocket = io("/chat");
 	private unread = false;
-	user?: User;
+	user!: User;
 
 	userss: string[] = [];
 	rooms: Rooms[] = []; 
@@ -23,7 +23,6 @@ export class ChatService{
 	constructor(sockService: SockService, private userService: UserService) {
 		this.userService.getUser('current').subscribe((userData) => {
 			this.user = userData;
-			// console.log("User loaded in ChatService:", this.user);
 		});
 
 		// this.chatSocket.onAny((event, ...args) => {
@@ -37,18 +36,7 @@ export class ChatService{
 		// this.user$ = this.userService.getUser(0);
 	}
 
-	// sendMessage(message: string): void {
-	// 	// this.user$ = this.userService.getUser();
-	// 	this.chatSocket.emit('message', message, (err: any) => {
-	// 		if (err) {
-	// 			console.log("chat-sock error: ");
-	// 			console.log(err);
-	// 			console.log(err.message);
-	// 		}
-	// 	});
-	// }
-
-	sendMessage(message: string, room: string): void {
+	sendMessage(message: string, room: string, avatar: string): void {
 		// this.user$ = this.userService.getUser(0);
 		// const sender = this.user$;
 		const messageObj = {
@@ -92,9 +80,9 @@ export class ChatService{
 		
 	}
 	
-	leaveRoom(room: string, userid: string) {
+	leaveRoom(roomid: number, room: string, userid: string) {
 		const num = Number(userid);
-		this.chatSocket.emit('leaveRoom', {room: room, username: this.user!.nickname, userid: num}, (err: any) => {
+		this.chatSocket.emit('leaveRoom', {roomid, room, num}, (err: any) => {
 			if (err) {
 				// console.log("leaveRoom chat-sock error: ");
 				// console.log(err);
@@ -113,7 +101,7 @@ export class ChatService{
 		});
 	}
 
-	getMessages(): Observable<string> {
+	getMessages(): Observable<MessageInterface> {
 		return new Observable((observer) => {
 			this.chatSocket.on('message', (message) => {
 				observer.next(message);
@@ -169,9 +157,33 @@ export class ChatService{
 		});
 	}
 
+	update_public(): Observable<Rooms> {
+		return new Observable((observer) => {
+			this.chatSocket.on('update_public', (room: Rooms) => {
+				observer.next(room);
+			});
+		});
+	}
+
+	personal_listen(): Observable<Record<string, Rooms>> {
+		return new Observable((observer) => {
+			this.chatSocket.on((this.user.id + "_listen"), (room: Record<string, Rooms>) => {
+				observer.next(room);
+			});
+		});
+	}
+
 	update_client_room(): Observable<Rooms> {
 		return new Observable((observer) => {
 			this.chatSocket.on('update_client_room', (room: Rooms) => {
+				observer.next(room);
+			});
+		});
+	}
+
+	delete_room(): Observable<string> {
+		return new Observable((observer) => {
+			this.chatSocket.on('delete_room', (room: string) => {
 				observer.next(room);
 			});
 		});
@@ -217,8 +229,20 @@ export class ChatService{
 		});
 	}
 
-	kickUser(room: string, user: number, avatar: string){
-		this.chatSocket.emit('kick', {room, user, avatar}, (err: any) => {
+	kickUser(room: string, user: number){
+		const userid = Number(user);
+		this.chatSocket.emit('kick', {room, userid}, (err: any) => {
+			if (err) {
+				// console.log("kickUser chat-sock error: ");
+				// console.log(err);
+				// console.log(err.message);
+			}
+		});
+	}
+
+	blockUser(room: string, user: string){
+		const userid = Number(user);
+		this.chatSocket.emit('block', {room, userid}, (err: any) => {
 			if (err) {
 				// console.log("kickUser chat-sock error: ");
 				// console.log(err);
