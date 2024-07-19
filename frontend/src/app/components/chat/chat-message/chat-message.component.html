@@ -1,5 +1,5 @@
-<div class="chat_columns" #messageContainer>
-	<!-- <div *ngIf="room" ></div> -->
+<!-- <div class="chat_columns" #messageContainer>
+	<div *ngIf="room" ></div>
 	<h3> the messages in room: {{ room.name}} </h3>
 		<li *ngFor="let message of room.messages" 
 		[ngClass]="{'blue-text': isEven(message.senderId), 'black-text': !isEven(message.senderId)}">
@@ -17,14 +17,14 @@
 	<input #messageInput [(ngModel)]="message" (keydown.enter)="sendMessage()" type="text" [class.chat_input]="message" > 
 	<button (click)="sendMessage()"> SendMessage </button>
 	<button (click)="leaveRoom(room.name, 'David')"> leaveRoom </button>
-	<!-- <button (click)="joinBattle(message.message, user.id)"> joinBattle </button> -->
+	<button (click)="joinBattle(message.message, user.id)"> joinBattle </button>
 
 </div>
 
 <div class="chat_columns">
 	<mat-form-field>
 		<mat-label>Select User</mat-label>
-		<mat-select [(value)]="selectedUserID">  <!--- div forces the whole screen orange --->
+		<mat-select [(value)]="selectedUserID">   div forces the whole screen orange
 			<mat-option *ngFor="let user of room.users" [value]="user">
 				{{ user}}
 			</mat-option>
@@ -44,7 +44,7 @@
 		Kick
 	</button>
 	
-</div>
+</div> -->
 
 <!-- <h4>wrong Userlist: </h4>
 <ul>

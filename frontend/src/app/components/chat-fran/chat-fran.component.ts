@@ -172,17 +172,17 @@ export class FranChatUiComponent implements AfterViewInit{
 
 	battle() {
 		this.router.navigate(['/dashboard/game']);
-		this.chatService.battle(this.selectedRoom!.name, +this.selectedRoom!.id, +this.user.id, this.user.nickname);
+		this.chatService.battle(this.selectedRoom!.name, +this.selectedRoom!.id, +this.user.id, this.user.nickname, this.user.avatar);
 	}
 
 	joinBattle() {
-		this.chatService.joinBattle(this.selectedRoom!.id, this.selectedRoom!.name);
+		this.chatService.joinBattle(this.selectedRoom!.id, this.selectedRoom!.name, this.user.avatar);
 	}
 
 	mute() {
 		this.userInRoom(this.userNameForm.value.userName).subscribe((userIsInRoom) => {
 			if (userIsInRoom) {
-				this.chatService.muteUser(this.selectedRoom!.name, this.userNameForm.value.userName);
+				this.chatService.muteUser(this.selectedRoom!.name, this.selectedUserID!, this.user.avatar);
 				this.userNotFound = false;
 			}
 			else
@@ -193,7 +193,7 @@ export class FranChatUiComponent implements AfterViewInit{
 	ban() {
 		this.userInRoom(this.userNameForm.value.userName).subscribe((userIsInRoom) => {
 			if (userIsInRoom) {
-				this.chatService.banUser(this.selectedRoom!.name, this.userNameForm.value.userName);
+				this.chatService.banUser(this.selectedRoom!.name, this.selectedUserID!, this.user.avatar);
 				this.userNotFound = false;
 			}
 			else
@@ -204,7 +204,7 @@ export class FranChatUiComponent implements AfterViewInit{
 	kick() {
 		this.userInRoom(this.userNameForm.value.userName).subscribe((userIsInRoom) => {
 			if (userIsInRoom) {
-				this.chatService.kickUser(this.selectedRoom!.name, this.userNameForm.value.userName);
+				this.chatService.kickUser(this.selectedRoom!.name, this.selectedUserID!, this.user.avatar);
 				this.userNotFound = false;
 			}
 			else
@@ -223,5 +223,9 @@ export class FranChatUiComponent implements AfterViewInit{
 			  return of(false); // Return false or handle error as needed
 			})
 		  );
+	}
+
+	onAvatarClick(msg: any) {
+		console.log("Avatar clicked on!");
 	}
 }

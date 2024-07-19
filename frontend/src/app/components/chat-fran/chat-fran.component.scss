@@ -42,7 +42,7 @@ nb-layout {
   }
   
   .rooms-list, .user-list {
-	width: 20%;
+	width: 30%;
 	background-color: $column-color;
 	padding: 10px;
 	border-radius: 5px;
@@ -127,4 +127,8 @@ nb-layout {
 
 .user-name-input {
 	margin: 10px;
+}
+
+.user-not-found {
+	color: rgb(255, 74, 74);
 }

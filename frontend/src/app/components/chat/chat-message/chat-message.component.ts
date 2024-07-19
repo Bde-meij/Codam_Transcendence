@@ -79,34 +79,34 @@ export class ChatMessageComponent implements AfterViewInit{
 		// ////console.log("chat-message sendmessage: " + this.room.name);
 	}
 
-	battle(userid: string){
-		// ////console.log("FIGHTING------FIGHTING");
-		//console.log("chat-message.component userid: " + userid + ", room name: " + this.room.name);
-		const num = Number(userid);
-		this.chatService.battle(this.room.name, this.room.id, +this.user.id, this.user.nickname)
-		this.router.navigate(['/dashboard', 'game']);
-	}
+	// battle(userid: string){
+	// 	// ////console.log("FIGHTING------FIGHTING");
+	// 	//console.log("chat-message.component userid: " + userid + ", room name: " + this.room.name);
+	// 	const num = Number(userid);
+	// 	this.chatService.battle(this.room.name, this.room.id, +this.user.id, this.user.nickname)
+	// 	this.router.navigate(['/dashboard', 'game']);
+	// }
 
-	joinBattle(roomnum: string){
-		//console.log(`chat-message.component ${roomnum}`)
-		this.chatService.joinBattle(roomnum, this.room.name);
-		this.router.navigate(['/dashboard', 'game']);
-	}
+	// joinBattle(roomnum: string){
+	// 	//console.log(`chat-message.component ${roomnum}`)
+	// 	this.chatService.joinBattle(roomnum, this.room.name);
+	// 	this.router.navigate(['/dashboard', 'game']);
+	// }
 
-	mute(userid: string){
-		// ////console.log("FIGHTING------FIGHTING");
-		this.chatService.muteUser(this.room.name, userid);
-	}
+	// mute(userid: string){
+	// 	// ////console.log("FIGHTING------FIGHTING");
+	// 	this.chatService.muteUser(this.room.name, userid);
+	// }
 
-	ban(userid: string){
-		// ////console.log("FIGHTING------FIGHTING");
-		this.chatService.banUser(this.room.name, userid);
-	}
+	// ban(userid: string){
+	// 	// ////console.log("FIGHTING------FIGHTING");
+	// 	this.chatService.banUser(this.room.name, userid);
+	// }
 
-	kick(userid: string){
-		// ////console.log("FIGHTING------FIGHTING");
-		this.chatService.kickUser(this.room.name, userid);
-	}
+	// kick(userid: string){
+	// 	// ////console.log("FIGHTING------FIGHTING");
+	// 	this.chatService.kickUser(this.room.name, userid);
+	// }
 
 	time(created: Date | undefined){
 		if (created){

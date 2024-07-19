@@ -30,6 +30,11 @@
 							 [date]="msg.created"
 							 [reply]="this.user.nickname === msg.sender_name"
 							 [customMessageData]="msg.customMessageData">
+				<ng-template nbChatMessageAvatar>
+					<div (click)="onAvatarClick(msg)" style="cursor: pointer;">
+						<nb-user [name]="msg.sender_name!" [picture]="msg.sender_avatar!"></nb-user>
+					</div>
+				</ng-template>
 			</nb-chat-message>
 			<nb-chat-form (send)="sendMessage($event)" [dropFiles]="false"></nb-chat-form>
 		  </nb-chat>
@@ -40,7 +45,7 @@
 		  <div [formGroup]="userNameForm" class="user-name-input">
 		  	<input type="text" formControlName="userName" maxlength="13" placeholder="their nickname"/>
 		  </div>
-			<button [disabled]="!userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="mute()">
+			<button [disabled]="!isChannelAdmin() || !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="mute()">
 				Mute
 			</button>
 			<button [disabled]="!isChannelAdmin() || !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="ban()">
@@ -49,7 +54,7 @@
 			<button [disabled]="!isChannelAdmin() || !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="kick()">
 				Kick
 			</button>
-			<p *ngIf="userNotFound">User not found in this room</p>
+			<p class="user-not-found" *ngIf="userNotFound">User not found in this room</p>
 		</div>
 		</div>
 		<!-- User List -->

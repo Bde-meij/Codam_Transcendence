@@ -16,6 +16,8 @@ export class createChatRoom {
   password: string = '';
   withPassword: boolean = false;
   submitWithoutName: boolean = false;
+  roomType: string = 'public';
+  users?: string[];
 
   constructor(protected dialogRef: NbDialogRef<createChatRoom>) {}
 
@@ -23,7 +25,7 @@ export class createChatRoom {
     if (!this.withPassword)
       this.password = '';
     if (this.roomName)
-      this.dialogRef.close({roomName: this.roomName, password: this.password});
+      this.dialogRef.close({roomName: this.roomName, password: this.password, roomType: this.roomType});
     else
       this.submitWithoutName = true;
   }
