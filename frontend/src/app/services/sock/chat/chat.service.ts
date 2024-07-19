@@ -48,6 +48,7 @@ export class ChatService{
 			type: 'text',
 		}
 		// console.log("sending msg");
+		this.get_all_rooms();
 		this.chatSocket.emit('message', messageObj, (err: any) => {
 			if (err) {
 				// console.log("chat-sock error: ");
@@ -232,6 +233,16 @@ export class ChatService{
 	kickUser(room: string, user: number){
 		const userid = Number(user);
 		this.chatSocket.emit('kick', {room, userid}, (err: any) => {
+			if (err) {
+				// console.log("kickUser chat-sock error: ");
+				// console.log(err);
+				// console.log(err.message);
+			}
+		});
+	}
+
+	get_all_rooms(){
+		this.chatSocket.emit('all_rooms', {}, (err: any) => {
 			if (err) {
 				// console.log("kickUser chat-sock error: ");
 				// console.log(err);

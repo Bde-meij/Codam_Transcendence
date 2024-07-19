@@ -130,6 +130,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			(room_name) => room_name.name === data.room_name,
 		);
 		if (Room) {
+			console.log("roomexists");
 			socket.emit('Room already exists, please pick another name',);
 			return;
 		}
@@ -166,8 +167,12 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			return;
 		}
 		this.chatRoomList[data.room_name].id = CreateRoomDB.id;
+		socket.data.id = CreateRoomDB.id;
 		this.chatRoomList[data.room_name].users.push(socket.data.userid);
-		socket.join(socket.data.id.toString());
+		console.log(`joining ${socket.data.id}`);
+		console.log(`joining ${this.chatRoomList[data.room_name].id}`);
+
+		socket.join(this.chatRoomList[data.room_name].id.toString());
 		if (this.chatRoomList[data.room_name].status == "public"){
 			console.log("public room");
 			this.update_public(data.room_name);
@@ -734,6 +739,14 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		temp = {};
 	}
 
+	@SubscribeMessage('all_rooms') async all_rooms(
+	@MessageBody()
+	@ConnectedSocket() client: Socket) 
+	{	
+		console.log('Send all rooms to client');
+		this.updateAllUsers(client, this.chatRoomList)
+	}
+
 	@SubscribeMessage('client_update_room') async update_client_room(
 	@MessageBody() data: {user_id: number, user_name: string },
 	@ConnectedSocket() client: Socket) 
@@ -773,7 +786,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 	private updateAllUsers(socket: Socket, rooms: Record<string, Rooms>){
-		socket.emit('getRoomss', rooms);
+		this.io.emit('getRoomss', rooms);
 		// this.logger();
 	}
 

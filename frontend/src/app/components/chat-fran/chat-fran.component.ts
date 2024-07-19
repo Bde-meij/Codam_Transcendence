@@ -13,6 +13,8 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { forbiddenNameValidator } from '../../services/validator/name-validator.service';
 import { Router } from '@angular/router';
 
+let subbed = false;
+
 @Component({
   selector: 'fran-chat-ui',
   standalone: true,
@@ -62,37 +64,52 @@ export class FranChatUiComponent implements AfterViewInit{
     	this.userService.getUser('current').subscribe((userData) => (
 			this.user = userData
 		));
-	
-		this.chatService.getMessages().subscribe((newmessage: any ) => {
-			if (this.roomsList[newmessage.room_name]?.messages) {
-				
-				this.userService.getAvatar(newmessage.senderId).subscribe((data) => (
-					newmessage.sender_avatar = URL.createObjectURL(data)
-				))
-				this.roomsList[newmessage.room_name].messages?.push(newmessage);
-				this.messages.push(newmessage.message);
-			}
-		});
+		
+		if (!subbed) {
+			this.chatService.getMessages().subscribe((newmessage: any ) => {
+				if (this.roomsList[newmessage.room_name]?.messages) {
+					
+					this.userService.getAvatar(newmessage.senderId).subscribe((data) => (
+						newmessage.sender_avatar = URL.createObjectURL(data)
+					))
+					this.roomsList[newmessage.room_name].messages?.push(newmessage);
+					this.messages.push(newmessage.message);
+				}
+			});
+			subbed = true;
+		}
 
 		this.chatService.getRoomsss().subscribe((chatRoomList: Record<string, Rooms>) => {
-			// ////console.log("getRoomss record");
+			// ////console.log("getRoomsss record");
 			this.roomsList = chatRoomList;
-			if (!this.selectedRoom && Object.keys(this.roomsList).length > 0) {
-				const firstRoomName = Object.keys(this.roomsList)[0];
-				// ////console.log("getrooms select")
-				////console.log(this.roomsList[firstRoomName]);
-			  }
-			////console.log(this.roomsList);
 		});
 
 		this.chatService.getConnectedUsers().subscribe((userList: any) => {
 			// ////console.log("getconnectedusers subscribe");
 			this.userss = userList;
 		})
-    	this.createRoom("Global", "public", "");
-		// this.createRoom("temp",  "public", "");
-		this.joinRoom("Global", "");
-		// this.joinRoom("temp", "");
+
+		this.chatService.update_public().subscribe((update_room: Rooms) => {
+			console.log(`update_public: ${update_room.name}`);
+			console.log(update_room);
+			this.roomsList[update_room.name] = update_room;
+		})
+
+		this.chatService.update_client_room().subscribe((update_room: Rooms) => {
+			console.log(`update_client_room: ${update_room.name}`);
+			console.log(update_room);
+			this.roomsList[update_room.name] = update_room;
+		})
+
+		this.chatService.delete_room().subscribe((room: string) => {
+			console.log(`delete_room: ${room}`);
+			delete this.roomsList[room];
+		})
+
+		this.chatService.personal_listen().subscribe((rooms: Record<string, Rooms>) => {
+			console.log(`personal_listen ${rooms}`);
+			this.roomsList = rooms;
+		})
 	};
 
 	ngAfterViewInit() {
@@ -103,6 +120,7 @@ export class FranChatUiComponent implements AfterViewInit{
 
 	sendMessage(event: any) {
 		if (event.message) {
+			// this.get_all_rooms();
 			this.chatService.sendMessage(event.message, this.selectedRoom!.name, this.user!.avatar);
 		}
 		this.message = '';
@@ -224,6 +242,10 @@ export class FranChatUiComponent implements AfterViewInit{
 			  return of(false); // Return false or handle error as needed
 			})
 		  );
+	}
+
+	get_all_rooms(){
+		this.chatService.get_all_rooms();
 	}
 
 	onAvatarClick(msg: any) {
