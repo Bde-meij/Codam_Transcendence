@@ -3,7 +3,7 @@
 	<nb-card-body>
 	  <form (ngSubmit)="submitForm()">
 		<div class="radio-buttons">
-			<input type="radio" id="public" name="room_type" [(ngModel)]="roomType">
+			<input type="radio" id="public" name="room_type" [(ngModel)]="roomType" checked>
 			<label for="public">Public</label>
 			<input type="radio" id="private" name="room_type" [(ngModel)]="roomType">
 			<label for="private">Private</label>

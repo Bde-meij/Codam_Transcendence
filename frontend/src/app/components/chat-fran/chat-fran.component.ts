@@ -41,8 +41,8 @@ export class FranChatUiComponent implements AfterViewInit{
 	userNotFound: boolean = false;
 	
 	onSelect(room: Rooms): void {
-		this.joinRoom(room.name, '');
 		this.selectedRoom = room;
+		this.joinRoom(room.name, '');
 		//console.log(room.messages);
 	};
 
@@ -130,6 +130,7 @@ export class FranChatUiComponent implements AfterViewInit{
 		  }).onClose.subscribe((input: any) => {
 			if (input) {
 				this.chatService.createRoom(input.roomName, '', input.password);
+				this.joinRoom(input.roomName, input.password);
 			}
 		  });
 	}
