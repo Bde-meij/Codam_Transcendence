@@ -78,11 +78,11 @@ export const routes: Routes = [
 				component: AccountComponent,
 				canActivate: [AuthGuard]
 			},
-			// {
-			// 	path: 'chat',
-			// 	component: ChatComponent,
-			// 	canActivate: [AuthGuard]
-			// },
+			{
+				path: 'chat',
+				component: ChatComponent,
+				canActivate: [AuthGuard]
+			},
 			{
 				path: 'franchat',
 				component: FranChatUiComponent,
