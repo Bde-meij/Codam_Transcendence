@@ -119,6 +119,8 @@ export class ChatMessageComponent implements AfterViewInit{
 		this.chatService.blockUser(this.room.name, target_id)
 	}
 
+	
+
 	time(created: Date | undefined){
 		if (created){
 			const hours = created.getHours().toString().padStart(2, '0');

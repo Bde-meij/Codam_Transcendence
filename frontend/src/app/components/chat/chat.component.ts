@@ -53,7 +53,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 			this.user = userData
 		));
 		
-		if (!subbed) {
+		if (subbed) {
 			this.chatService.getMessages().subscribe((newmessage: any ) => {
 				if (this.roomsList[newmessage.room_name]?.messages) {
 					this.userService.getAvatar(newmessage.senderId).subscribe((data) => (
