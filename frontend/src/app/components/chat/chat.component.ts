@@ -136,7 +136,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 
 	createRoom(roomName: string, status: string, password: string) {
 		if (roomName) {
-		  this.chatService.createRoom(roomName, status, password);
+		  this.chatService.createRoom(roomName, status, password, []);
 		  this.roomName = '';
 		}
 	}

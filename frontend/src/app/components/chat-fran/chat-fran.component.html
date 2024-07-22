@@ -11,9 +11,12 @@
 		<div class="rooms-list">
 		  <h3>Rooms:</h3>
 		  <ul>
-			<li *ngFor="let roomName of getRoomNames()">
+			<li *ngFor="let roomName of getRoomNames()" class="room-items">
+            <label for="{{roomName}}" [class.selected]="roomsList[roomName] === selectedRoom">
 				<input type="radio" id="{{roomName}}" name="room" (change)="onSelect(roomsList[roomName])">
-            	<label for="{{roomName}}" [class.selected]="roomsList[roomName] === selectedRoom">{{ roomName }}</label>
+				{{ roomName }}
+				<button class="leave-room-button" (click)="leaveRoom(roomName)">X</button>
+			</label>
 			</li>
 		  </ul>
 		</div>

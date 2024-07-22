@@ -1,11 +1,11 @@
 import { CommonModule, NgFor, NgIf } from '@angular/common';
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, ViewChild } from '@angular/core';
-import { NbAutocompleteModule, NbButtonModule, NbCardModule, NbChatModule, NbDialogService, NbUserModule } from '@nebular/theme';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, ViewChild } from '@angular/core';
+import { NbCardModule, NbChatModule, NbDialogService, NbUserModule } from '@nebular/theme';
 import { ChatService } from '../../services/sock/chat/chat.service';
 import { UserService } from '../../services/user/user.service';
 import { User } from '../../models/user.class';
 import { Rooms } from '../../models/rooms.class';
-import { NbThemeModule, NbLayoutModule} from '@nebular/theme';
+import { NbLayoutModule} from '@nebular/theme';
 import { UserDetailComponent } from '../user-detail/user-detail.component';	
 import { createChatRoom } from './createChatRoom/createChatRoom.component';
 import { Observable, of, map, catchError } from 'rxjs';
@@ -134,20 +134,19 @@ export class FranChatUiComponent implements AfterViewInit{
 		return Number(str);
 	}
 
-	createRoom(roomName: string, status: string, password: string) {
+	createRoom(roomName: string, status: string, password: string, users: number[]) {
 		if (roomName) {
-		  this.chatService.createRoom(roomName, status, password);
+		  this.chatService.createRoom(roomName, status, password, users);
 		  this.roomName = '';
 		}
 	}
 
 	userCreatesRoom() {
 		this.dialogService.open(createChatRoom, {
-			context: {
-			}
+			context: {}
 		  }).onClose.subscribe((input: any) => {
 			if (input) {
-				this.chatService.createRoom(input.roomName, '', input.password);
+				this.chatService.createRoom(input.roomName, input.roomType, input.password, input.users);
 				this.joinRoom(input.roomName, input.password);
 			}
 		  });
@@ -164,6 +163,10 @@ export class FranChatUiComponent implements AfterViewInit{
 	joinRoom(data: string, password: string) {
 		////console.log("joinroom component: " + data);
 		this.chatService.joinRoom(data, password);
+	}
+
+	leaveRoom(roomName: string) {
+		this.chatService.leaveRoom(+this.roomsList[roomName].id, roomName, this.user.id);
 	}
 
 	getConnectedUsers() {

@@ -17,7 +17,6 @@ export const appConfig: ApplicationConfig = {
 			NbCardModule,
 			NbDialogModule.forRoot(),
 		  ),
-		  NbSidebarService,
 		provideRouter(routes, withComponentInputBinding(), withRouterConfig({
 			onSameUrlNavigation: 'reload',
 		})),

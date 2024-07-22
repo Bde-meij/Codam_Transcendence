@@ -48,6 +48,7 @@ export class ChatService{
 			type: 'text',
 		}
 		// console.log("sending msg");
+		// this.get_all_rooms();
 		this.chatSocket.emit('message', messageObj, (err: any) => {
 			if (err) {
 				// console.log("chat-sock error: ");
@@ -57,9 +58,9 @@ export class ChatService{
 		});
 	}
 
-	createRoom(room_name: string, status: string, password: string): void {
+	createRoom(room_name: string, status: string, password: string, users: number[]): void {
 		// console.log("createRoom called: " + room_name + ", status: " + status + ", password: " + password);
-		this.chatSocket.emit('createRoom', { room_name, status, password}, (err: any) => {
+		this.chatSocket.emit('createRoom', { room_name, status, password, users}, (err: any) => {
 			if (err) {
 				// console.log("createRoom chat-sock error: ");
 				// console.log(err);

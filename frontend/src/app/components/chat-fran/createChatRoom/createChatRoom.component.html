@@ -3,11 +3,11 @@
 	<nb-card-body>
 	  <form (ngSubmit)="submitForm()">
 		<div class="radio-buttons">
-			<input type="radio" id="public" name="room_type" [(ngModel)]="roomType" checked (ngModelChange)="onTypeChange($event)">
+			<input type="radio" id="public" name="room_type" value="public" [(ngModel)]="roomType" checked (change)="onTypeChange($event)">
 			<label for="public">Public</label>
-			<input type="radio" id="private" name="room_type" [(ngModel)]="roomType" (ngModelChange)="onTypeChange($event)">
+			<input type="radio" id="private" name="room_type" value="private" [(ngModel)]="roomType" (change)="onTypeChange($event)">
 			<label for="private">Private</label>
-			<input type="radio" id="protected" name="room_type" [(ngModel)]="roomType" (ngModelChange)="onTypeChange($event)">
+			<input type="radio" id="protected" name="room_type" value="protected" [(ngModel)]="roomType" (change)="onTypeChange($event)">
 			<label for="protected">Protected</label>
 		</div>
 		<div class="room-name-input">
@@ -16,7 +16,7 @@
 		</div>
 		<div class="password-option">
 			<input type="checkbox" id="passwordOption" name="passwordOption" [(ngModel)]="withPassword" value="false" [disabled]="roomType === 'public'">
-			<label for="passwordOption">With password</label>
+			<label for="passwordOption">With password</label>	
 		</div>
 		<div class="password-input">
 			<label for="password"> Password:</label>
@@ -24,12 +24,15 @@
 		</div>
 		<form (ngSubmit)="addUser()">
 			<div class="user-selection">
-				<label for="users">Add users:</label>
-				<input type="text" id="users" name="users">
+				<label for="users">Add user:</label>
+				<input type="text" id="users" name="users" [(ngModel)]="userToAddName">
 			</div>
 			<div class="add-user-button">
 				<button nbButton type="submit">Add user</button>
-				<div *ngIf="userExists" class="error">User doesn't exist</div>
+				<div *ngIf="userNotFound" class="error">User doesn't exist</div>
+				<div *ngIf="userInRoom" class="error">User already in room</div>
+				<div>Users:</div>
+				<li *ngFor="let user of usersByName">{{user}}</li>
 			</div>
 		</form>
 		<div class="submit-button">
