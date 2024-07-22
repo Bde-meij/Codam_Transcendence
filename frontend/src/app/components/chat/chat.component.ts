@@ -94,9 +94,9 @@ export class ChatComponent implements OnInit, AfterViewInit {
 			delete this.roomsList[room];
 		})
 
-		this.chatService.personal_listen().subscribe((rooms: Record<string, Rooms>) => {
-			console.log(`personal_listen ${rooms}`);
-			this.roomsList = rooms;
+		this.chatService.personal_listen().subscribe((message: any) => {
+			console.log(`personal_listen ${message}`);
+			// this.roomsList = rooms;
 		})
 
 

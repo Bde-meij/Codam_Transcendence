@@ -4,7 +4,7 @@ import { NbAutocompleteModule, NbButtonModule, NbCardModule, NbChatModule, NbDia
 import { ChatService } from '../../services/sock/chat/chat.service';
 import { UserService } from '../../services/user/user.service';
 import { User } from '../../models/user.class';
-import { Rooms } from '../../models/rooms.class';
+import { MessageInterface, Rooms } from '../../models/rooms.class';
 import { NbThemeModule, NbLayoutModule} from '@nebular/theme';
 import { UserDetailComponent } from '../user-detail/user-detail.component';	
 import { createChatRoom } from './createChatRoom/createChatRoom.component';
@@ -43,7 +43,9 @@ export class FranChatUiComponent implements AfterViewInit{
 	userNotFound: boolean = false;
 	
 	onSelect(room: Rooms): void {
+		console.log("users: ", room.users);
 		this.joinRoom(room.name, '');
+		console.log("users: ", room.users);
 		this.selectedRoom = room;
 		//console.log(room.messages);
 	};
@@ -68,7 +70,7 @@ export class FranChatUiComponent implements AfterViewInit{
 		if (!subbed) {
 			this.chatService.getMessages().subscribe((newmessage: any ) => {
 				if (this.roomsList[newmessage.room_name]?.messages) {
-					
+					console.log("message re3ceived");
 					this.userService.getAvatar(newmessage.senderId).subscribe((data) => (
 						newmessage.sender_avatar = URL.createObjectURL(data)
 					))
@@ -99,6 +101,12 @@ export class FranChatUiComponent implements AfterViewInit{
 			console.log(`update_client_room: ${update_room.name}`);
 			console.log(update_room);
 			this.roomsList[update_room.name] = update_room;
+			if (this.selectedRoom){
+				if (this.selectedRoom.name == update_room.name){
+					console.log("updated selected room");
+					this.selectedRoom = update_room;
+				}
+			}
 		})
 
 		this.chatService.delete_room().subscribe((room: string) => {
@@ -106,9 +114,19 @@ export class FranChatUiComponent implements AfterViewInit{
 			delete this.roomsList[room];
 		})
 
-		this.chatService.personal_listen().subscribe((rooms: Record<string, Rooms>) => {
-			console.log(`personal_listen ${rooms}`);
-			this.roomsList = rooms;
+		this.chatService.personal_listen().subscribe((message: any) => {
+			console.log(`personal listen`);
+			// console.log(`personal_listen ${message.message} - ${this.selectedRoom}`);
+			if (this.selectedRoom){
+				Object.values(this.roomsList).forEach(room => {
+					if (this.selectedRoom!.name == message.room_name){
+						console.log(message.message);
+						this.roomsList[message.sender_name].messages!.push(message);
+						this.messages.push(message.message);
+						// this.selectedRoom = this.roomsList[message.sender_name];
+					}
+				});
+			}
 		})
 	};
 
@@ -201,7 +219,7 @@ export class FranChatUiComponent implements AfterViewInit{
 	mute() {
 		this.userInRoom(this.userNameForm.value.userName).subscribe((userIsInRoom) => {
 			if (userIsInRoom) {
-				this.chatService.muteUser(this.selectedRoom!.name, this.selectedUserID!, this.user.avatar);
+				this.chatService.muteUser(this.selectedRoom!.name, this.userNameForm.value.userName, this.user.avatar);
 				this.userNotFound = false;
 			}
 			else
@@ -212,7 +230,7 @@ export class FranChatUiComponent implements AfterViewInit{
 	ban() {
 		this.userInRoom(this.userNameForm.value.userName).subscribe((userIsInRoom) => {
 			if (userIsInRoom) {
-				this.chatService.banUser(this.selectedRoom!.name, this.selectedUserID!, this.user.avatar);
+				this.chatService.banUser(this.selectedRoom!.name, this.userNameForm.value.userName, this.user.avatar);
 				this.userNotFound = false;
 			}
 			else
@@ -223,7 +241,7 @@ export class FranChatUiComponent implements AfterViewInit{
 	kick() {
 		this.userInRoom(this.userNameForm.value.userName).subscribe((userIsInRoom) => {
 			if (userIsInRoom) {
-				this.chatService.kickUser(this.selectedRoom!.name, this.selectedUserID!);
+				this.chatService.kickUser(this.selectedRoom!.name, this.userNameForm.value.userName);
 				this.userNotFound = false;
 			}
 			else

@@ -141,7 +141,7 @@ export class ChatService{
 		});
 	  }
 	
-	  getRoomsss(): Observable<Record<string, Rooms>> {
+	getRoomsss(): Observable<Record<string, Rooms>> {
 		return new Observable<Record<string, Rooms>>((observer) => {
 		  this.chatSocket.on('getRoomss', (chatRoomList: Record<string, Rooms>) => {
 			observer.next(chatRoomList);
@@ -166,14 +166,19 @@ export class ChatService{
 		});
 	}
 
-	personal_listen(): Observable<Record<string, Rooms>> {
+	personal_listen(): Observable<MessageInterface> {
+		this.userService.getUser('current').subscribe((userData) => {
+			this.user = userData;
+		});
+		const room = this.user.id + "_listen";
+		console.log("personal listen: " + room);
 		return new Observable((observer) => {
-			this.chatSocket.on((this.user.id + "_listen"), (room: Record<string, Rooms>) => {
-				observer.next(room);
+			this.chatSocket.on(room, (message) => {
+				observer.next(message);
 			});
 		});
 	}
-
+	
 	update_client_room(): Observable<Rooms> {
 		return new Observable((observer) => {
 			this.chatSocket.on('update_client_room', (room: Rooms) => {
@@ -210,8 +215,13 @@ export class ChatService{
 		});
 	}
 
-	muteUser(room: string, user: number, avatar: string){
-		this.chatSocket.emit('mute', {room, user, avatar}, (err: any) => {
+	muteUser(room: string, user: string, avatar: string){
+		const data = {
+			room: room,
+			username: user,
+			avatar: avatar
+		}
+		this.chatSocket.emit('mute', data, (err: any) => {
 			if (err) {
 				// console.log("leaveRoom chat-sock error: ");
 				// console.log(err);
@@ -220,8 +230,14 @@ export class ChatService{
 		});
 	}
 
-	banUser(room: string, user: number, avatar: string){
-		this.chatSocket.emit('ban', {room, user, avatar}, (err: any) => {
+	banUser(room: string, username: string, avatar: string){
+		console.log(`param check ban ${username}`);
+		const data = {
+			room: room,
+			username: username,
+			avatar: avatar
+		}
+		this.chatSocket.emit('ban', data, (err: any) => {
 			if (err) {
 				// console.log("banUser chat-sock error: ");
 				// console.log(err);
@@ -230,9 +246,13 @@ export class ChatService{
 		});
 	}
 
-	kickUser(room: string, user: number){
-		const userid = Number(user);
-		this.chatSocket.emit('kick', {room, userid}, (err: any) => {
+	kickUser(room: string, user: string){
+		console.log(`param check kickuser ${user}`);
+		const data = {
+			room: room,
+			username: user,
+		}
+		this.chatSocket.emit('kick', data, (err: any) => {
 			if (err) {
 				// console.log("kickUser chat-sock error: ");
 				// console.log(err);
