@@ -45,7 +45,7 @@ export class Room
 		this.ballSpeed[0] = 0;
 		this.ballSpeed[1] = 0;
 		this.ballPos[0] = 400;
-		this.ballPos[1] = 600;
+		this.ballPos[1] = 300;
 		setTimeout(() =>{this.ballSpeed[0] = 9*mod;},1000)
 	}
 
