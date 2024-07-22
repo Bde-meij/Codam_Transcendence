@@ -48,7 +48,6 @@ export class ChatService{
 			type: 'text',
 		}
 		// console.log("sending msg");
-		this.get_all_rooms();
 		this.chatSocket.emit('message', messageObj, (err: any) => {
 			if (err) {
 				// console.log("chat-sock error: ");

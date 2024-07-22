@@ -3,11 +3,11 @@
 	<nb-card-body>
 	  <form (ngSubmit)="submitForm()">
 		<div class="radio-buttons">
-			<input type="radio" id="public" name="room_type" [(ngModel)]="roomType" checked>
+			<input type="radio" id="public" name="room_type" [(ngModel)]="roomType" checked (ngModelChange)="onTypeChange($event)">
 			<label for="public">Public</label>
-			<input type="radio" id="private" name="room_type" [(ngModel)]="roomType">
+			<input type="radio" id="private" name="room_type" [(ngModel)]="roomType" (ngModelChange)="onTypeChange($event)">
 			<label for="private">Private</label>
-			<input type="radio" id="protected" name="room_type" [(ngModel)]="roomType">
+			<input type="radio" id="protected" name="room_type" [(ngModel)]="roomType" (ngModelChange)="onTypeChange($event)">
 			<label for="protected">Protected</label>
 		</div>
 		<div class="room-name-input">
@@ -15,16 +15,26 @@
 			<input type="text" id="roomName" name="roomName" nbInput [(ngModel)]="roomName" required>
 		</div>
 		<div class="password-option">
-			<input type="checkbox" id="passwordOption" name="passwordOption" [(ngModel)]="withPassword" value="false">
+			<input type="checkbox" id="passwordOption" name="passwordOption" [(ngModel)]="withPassword" value="false" [disabled]="roomType === 'public'">
 			<label for="passwordOption">With password</label>
 		</div>
 		<div class="password-input">
 			<label for="password"> Password:</label>
 			<input type="text" id="password" name="password" nbInput [(ngModel)]="password" [disabled]="!withPassword">
+		</div>
+		<form (ngSubmit)="addUser()">
+			<div class="user-selection">
+				<label for="users">Add users:</label>
+				<input type="text" id="users" name="users">
+			</div>
+			<div class="add-user-button">
+				<button nbButton type="submit">Add user</button>
+				<div *ngIf="userExists" class="error">User doesn't exist</div>
+			</div>
+		</form>
 		<div class="submit-button">
 			<button nbButton type="submit">Submit</button>
 			<div *ngIf="submitWithoutName" class="error">Please give your room a name</div>
-		</div>
 		</div>
 	  </form>
 	</nb-card-body>

@@ -29,4 +29,11 @@ export class createChatRoom {
     else
       this.submitWithoutName = true;
   }
+
+  onTypeChange(event: Event) {
+    const inputElement = event.target as HTMLInputElement;
+    this.roomType = inputElement.value;
+    if (this.roomType !== 'public')
+      this.withPassword = true;
+  }
 }
