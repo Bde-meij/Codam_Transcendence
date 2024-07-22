@@ -201,8 +201,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	
 	async startGame(room: Room)
 	{
-		// console.log(room.name, "has started");
-		// prohibits same-player games
 		if (room.leftId == room.rightId)
 			this.abortGame(room);
 		if ((((room.key < 0) != true) == false) == true)
@@ -249,7 +247,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				room.leftPos = yPos;
 			if (client.id == room.rightPlayer.id)
 				room.rightPos = yPos;
-			room.checkPlayerCollision();
+			room.checkCollision();
 			client.in(room.name).emit("updatePlayerPos", yPos);
 		}
 	}
@@ -269,8 +267,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		if (room != null)
 		{
 			room.moveBall();
-			room.checkPlayerCollision();
-			room.checkWallBounce();
+			room.checkCollision();
 			if (room.checkScoring())
 				roomMap.delete(room.name);
 			else

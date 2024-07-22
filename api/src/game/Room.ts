@@ -1,5 +1,6 @@
 import { TimeInterval } from "rxjs/internal/operators/timeInterval";
 import { Server, Socket } from "socket.io";
+import { bounce, minVec, plusVec } from "./vectorMath";
 
 export class Room
 {
@@ -13,6 +14,7 @@ export class Room
 	stopInterval: NodeJS.Timeout;
 	gravityInterval: NodeJS.Timeout;
 	key: number = 0;
+	// hitwall: boolean = false;
 
 	//LEFTPLAYER
 	leftId: number = 0;
@@ -26,28 +28,17 @@ export class Room
 
 	//BALL
 	ballPos: number[] = [400,300];
-	ballSpeed: number[] = [8, 0];
+	ballSpeed: number[] = [9, 0];
 
 	moveBall()
 	{
+		if (this.ballSpeed[0] < 1 && this.ballSpeed[0] >= 0)
+			this.ballSpeed[0] = 1;
+		if (this.ballSpeed[0] > -1 && this.ballSpeed[0] <= 0)
+			this.ballSpeed[0] = -1;
+
 		this.ballPos[0] += this.ballSpeed[0];
 		this.ballPos[1] += this.ballSpeed[1];
-	}
-
-	checkWallBounce()
-	{
-		if ((this.ballPos[1] < 5) || (this.ballPos[1] > 595))
-		{
-			this.ballSpeed[1] *= -1;
-			if ((this.ballSpeed[1]*this.ballSpeed[1]) < 4)
-				this.ballSpeed[1] *= 10;
-		}
-	}
-
-	playerBounce(effect: number)
-	{
-		this.ballSpeed[0] *= -1;
-		this.ballSpeed[1] += effect;
 	}
 
 	resetBall(mod: number)
@@ -56,34 +47,22 @@ export class Room
 		this.ballSpeed[1] = 0;
 		this.ballPos[0] = 400;
 		this.ballPos[1] = 300;
-		setTimeout(() =>{this.ballSpeed[0] = 8*mod;},1000)
+		setTimeout(() =>{this.ballSpeed[0] = 9*mod;},1000)
 	}
 
-	checkHit(diff: number)
-	{
-		if (Math.abs(diff) < 41.5)
-		{
-			this.ballSpeed[0] *= -1;
-			if (Math.abs(this.ballSpeed[0]) < 24)
-				this.ballSpeed[0] *= 1.02;
-			this.ballSpeed[1] += diff/5;
-		}
-	}
-
-	checkPlayerCollision()
+	checkCollision()
 	{
 		var leftDiff = this.ballPos[1] - this.leftPos;
 		var rightDiff = this.ballPos[1] - this.rightPos;
 
-		if ((this.ballPos[0] > 86.5) && ((this.ballPos[0] + this.ballSpeed[0]) < 86.5))
-			this.checkHit(leftDiff);
-		else if ((this.ballPos[0] < 713.5) && ((this.ballPos[0] + this.ballSpeed[0]) > 713.5))
-			this.checkHit(rightDiff);
-
-		if (this.ballSpeed[1] > 12)
-			this.ballSpeed[1] = 12;
-		if (this.ballSpeed[1] < -12)
-			this.ballSpeed[1] = -12;
+		if ((this.ballPos[0] > 86.5) && ((this.ballPos[0] + this.ballSpeed[0]) < 86.5) && Math.abs(leftDiff) < 41.5)
+			this.ballSpeed = bounce(this.ballSpeed, [86.5, this.leftPos], plusVec(this.ballPos, [300, 0]));
+		else if ((this.ballPos[0] < 713.5) && ((this.ballPos[0] + this.ballSpeed[0]) > 713.5)&& Math.abs(rightDiff) < 41.5)
+			this.ballSpeed = bounce(this.ballSpeed, [713.5, this.rightPos], plusVec(this.ballPos, [-300, 0]));
+		if (this.ballPos[1] < 5)
+			this.ballSpeed[1] = Math.abs(this.ballSpeed[1]);
+		if (this.ballPos[1] > 595)
+			this.ballSpeed[1] = -Math.abs(this.ballSpeed[1]);
 	}
 
 	checkScoring(): number
