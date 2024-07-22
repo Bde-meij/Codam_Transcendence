@@ -14,6 +14,7 @@ export class Room
 	stopInterval: NodeJS.Timeout;
 	gravityInterval: NodeJS.Timeout;
 	key: number = 0;
+	// hitwall: boolean = false;
 
 	//LEFTPLAYER
 	leftId: number = 0;
@@ -44,7 +45,7 @@ export class Room
 		this.ballSpeed[0] = 0;
 		this.ballSpeed[1] = 0;
 		this.ballPos[0] = 400;
-		this.ballPos[1] = 300;
+		this.ballPos[1] = 600;
 		setTimeout(() =>{this.ballSpeed[0] = 9*mod;},1000)
 	}
 
@@ -57,8 +58,10 @@ export class Room
 			this.ballSpeed = bounce(this.ballSpeed, [86.5, this.leftPos], plusVec(this.ballPos, [300, 0]));
 		else if ((this.ballPos[0] < 713.5) && ((this.ballPos[0] + this.ballSpeed[0]) > 713.5)&& Math.abs(rightDiff) < 41.5)
 			this.ballSpeed = bounce(this.ballSpeed, [713.5, this.rightPos], plusVec(this.ballPos, [-300, 0]));
-		if ((this.ballPos[1] < 5) || (this.ballPos[1] > 595))
-			this.ballSpeed[1] *= -1;
+		if (this.ballPos[1] < 5)
+			this.ballSpeed[1] = Math.abs(this.ballSpeed[1]);
+		if (this.ballPos[1] > 595)
+			this.ballSpeed[1] = -Math.abs(this.ballSpeed[1]);
 	}
 
 	checkScoring(): number
