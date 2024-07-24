@@ -86,7 +86,7 @@ export class AuthService {
 		});
 	}
 
-	async generateTwoFASecret(id: string) {
+	async generateTwoFASecret(id: number) {
 		const secret = speakeasy.generateSecret();
 		await this.userService.updateTwoFASecret(id, secret)
 		return secret;

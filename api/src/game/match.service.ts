@@ -84,7 +84,7 @@ export class MatchService {
 		)
 	}
 
-	async getUserMatches(targetId: string): Promise<Match[]> {
+	async getUserMatches(targetId: number): Promise<Match[]> {
 		if (!await this.userService.userExists(targetId)) {
 			// console.log('User not found! User id:', targetId);
 			throw new HttpException('User not found', 404);
@@ -124,7 +124,7 @@ export class MatchService {
 		return matches;
 	}
 
-	async getUserStats(targetId: string) {
+	async getUserStats(targetId: number) {
 		const matches: Match[] = await this.getUserMatches(targetId);
 		if (matches.length == 0) {
 			return {
@@ -145,7 +145,7 @@ export class MatchService {
 		};
 	}
 
-	async deleteMatch(matchId: string) {
+	async deleteMatch(matchId: number) {
 		// console.log("DELETING MATCH:", matchId);
 		const match: Match = await this.matchRepo.findOne({
 			where: {id: matchId}

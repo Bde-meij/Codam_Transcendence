@@ -4,7 +4,7 @@ import { CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typ
 @Entity('block')
 export class Block {
 	@PrimaryGeneratedColumn()
-	id: string;
+	id: number;
 
 	@ManyToOne(() => User, (user) => user.blockOut)
 	sender: User;

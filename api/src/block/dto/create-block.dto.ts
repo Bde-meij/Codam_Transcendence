@@ -1,5 +1,5 @@
 export class CreateBlockDto {
-	sender: string;
+	sender: number;
 
-	target: string;
+	target: number;
 }

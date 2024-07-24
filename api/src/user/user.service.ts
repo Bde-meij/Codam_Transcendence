@@ -1,16 +1,14 @@
-import { Injectable, Res, HttpStatus, HttpException } from '@nestjs/common';
+import { Injectable, HttpException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
-import * as speakeasy from 'speakeasy';
 
 @Injectable()
 export class UserService {
 	constructor(@InjectRepository(User) private readonly userRepo: Repository<User>) {}
 
-  	async userExists(userId: string) {
+  	async userExists(userId: number) {
 		const user = await this.userRepo.findOne({
 			select: {
 				id: true
@@ -52,7 +50,7 @@ export class UserService {
 		return await this.userRepo.save(users);
 	}
 
-	async findUserById(userId: string) {
+	async findUserById(userId: number) {
 		const user = await this.userRepo.findOne({where: {id: userId}});
 		return user;
 	}
@@ -67,7 +65,7 @@ export class UserService {
 		return await this.userRepo.find();
 	}
 	
-	async get2faEnabled(userId: string) {
+	async get2faEnabled(userId: number) {
 		return await this.userRepo.findOne({
 			select: {
 				isTwoFAEnabled: true
@@ -78,7 +76,7 @@ export class UserService {
 		})
 	}
 
-	async get2faSecret(userId: string) {
+	async get2faSecret(userId: number) {
 		return await this.userRepo.findOne({
 			select: {
 				twoFASecret: true
@@ -89,7 +87,7 @@ export class UserService {
 		})
 	}
 
-	async getAvatar(userId: string) {
+	async getAvatar(userId: number) {
 		return await this.userRepo.findOne({
 			select: {
 				avatar: true
@@ -100,42 +98,42 @@ export class UserService {
 		})
 	}
 
-	async updateName(userId: string, newName: string) {
+	async updateName(userId: number, newName: string) {
 		await this.userRepo.update({id: userId}, {nickname: newName});
 	}
 	
-	async updateStatus(userId: string, newStatus: string) {
+	async updateStatus(userId: number, newStatus: string) {
 		await this.userRepo.update({id: userId}, {status: newStatus});
 	}
 
-	async updateAvatar(userId: string, newAvatar: string) {
+	async updateAvatar(userId: number, newAvatar: string) {
 		await this.userRepo.update({id: userId}, {avatar: newAvatar});
 	}
 
-	async updateTwoFASecret(userId: string, secret: any) {
+	async updateTwoFASecret(userId: number, secret: any) {
 		await this.userRepo.update({id: userId}, {twoFASecret: secret.base32});
 	}
 	
-	async enableTwoFA(userId: string) {
+	async enableTwoFA(userId: number) {
 		await this.userRepo.update({id: userId}, {isTwoFAEnabled: true});
 	}
 	
-	async disableTwoFA(userId: string) {
+	async disableTwoFA(userId: number) {
 		await this.userRepo.update({id: userId}, {isTwoFAEnabled: false});
 	}
 
-	async updateTwoFA(userId: string, enabled: boolean, secret: any) {
+	async updateTwoFA(userId: number, enabled: boolean, secret: any) {
 		await this.userRepo.update({id: userId}, {
 			isTwoFAEnabled: enabled,
 			twoFASecret: secret.base32
 		})
 	}
 
-	async updateNickname(userId: string, newName: string) {
+	async updateNickname(userId: number, newName: string) {
 		await this.userRepo.update({id: userId}, {nickname: newName});
 	}
 
-	async updateRoomKey(userId: string, roomKey: number) {
+	async updateRoomKey(userId: number, roomKey: number) {
 		if (!await this.userExists(userId))
 			throw new HttpException("User not found!", 404);
 		await this.userRepo.update({id: userId}, {roomKey: roomKey});

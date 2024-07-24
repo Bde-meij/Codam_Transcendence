@@ -15,7 +15,7 @@ export enum MatchStatus {
 @Entity('match')
 export class Match {
 	@PrimaryGeneratedColumn()
-	id: string;
+	id: number;
 
 	@Column({
 		type: 'enum',

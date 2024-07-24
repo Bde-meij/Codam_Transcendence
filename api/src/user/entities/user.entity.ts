@@ -9,7 +9,7 @@ export const defaultAvatarUrl: string = "/uploads/default_avatar.png";
 export class User {
 
 	@PrimaryColumn()
-	id: string;
+	id: number;
 
 	@Column()
 	nickname: string;
