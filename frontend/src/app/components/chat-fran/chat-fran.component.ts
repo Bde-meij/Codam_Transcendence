@@ -16,41 +16,59 @@ import { Router } from '@angular/router';
 let subbed = false;
 
 @Component({
-  selector: 'fran-chat-ui',
-  standalone: true,
-  imports: [CommonModule, NbChatModule, NbUserModule, NgFor, NgIf, NbLayoutModule, UserDetailComponent, NbCardModule, ReactiveFormsModule],
-  templateUrl: './chat-fran.component.html',
-  styleUrl: './chat-fran.component.scss',
+	selector: 'fran-chat-ui',
+	standalone: true,
+	imports: [
+		CommonModule,
+		NbChatModule,
+		NbUserModule,
+		NgFor,
+		NgIf,
+		NbLayoutModule,
+		UserDetailComponent,
+		NbCardModule,
+		ReactiveFormsModule
+	],
+	templateUrl: './chat-fran.component.html',
+	styleUrl: './chat-fran.component.scss',
 })
 export class FranChatUiComponent implements AfterViewInit{
-
 	@ViewChild('messageContainer') messageContainer!: ElementRef;
 	@ViewChild('messageInput') messageInput!: ElementRef;
+
 	selectedUser: any;
 	selectedUserID?: number;
 	message: string | undefined;
-  	user!: User;
+	user!: User;
 	messages: string[] = [];
 
 	roomsList: Record<string, Rooms> = {};
+	userMap: Map<number, string>;
 	userss: string[] | undefined;
+	
 	roomName: string | undefined;
-
 	selectedRoom: Rooms | undefined;
-
 	userNameForm!: FormGroup;
-
 	userNotFound: boolean = false;
 	
 	onSelect(room: Rooms): void {
 		console.log("users: ", room.users);
+		this.change_sender_avatar(room.name);
 		this.joinRoom(room.name, '');
 		console.log("users: ", room.users);
 		this.selectedRoom = room;
 		//console.log(room.messages);
 	};
 
-	constructor(private chatService: ChatService, private userService: UserService, private dialogService: NbDialogService, private router: Router) {};
+	constructor(
+		private chatService: ChatService, 
+		private userService: UserService, 
+		private dialogService: NbDialogService,
+		private router: Router
+	) {
+		this.userMap = new Map<number, string>();
+
+	};
 
 	ngOnInit() {
 		this.userNameForm = new FormGroup({
@@ -63,7 +81,7 @@ export class FranChatUiComponent implements AfterViewInit{
 				updateOn: 'change',
 			}),
 		});
-    	this.userService.getUser('current').subscribe((userData) => (
+		this.userService.getUser('current').subscribe((userData) => (
 			this.user = userData
 		));
 		
@@ -71,9 +89,10 @@ export class FranChatUiComponent implements AfterViewInit{
 			this.chatService.getMessages().subscribe((newmessage: any ) => {
 				if (this.roomsList[newmessage.room_name]?.messages) {
 					console.log("message re3ceived");
-					this.userService.getAvatar(newmessage.senderId).subscribe((data) => (
-						newmessage.sender_avatar = URL.createObjectURL(data)
-					))
+					newmessage.sender_avatar = this.get_avatar(newmessage.senderId);
+					// this.userService.getAvatar(newmessage.senderId).subscribe((data) => (
+					// 	newmessage.sender_avatar = URL.createObjectURL(data)
+					// ))
 					this.roomsList[newmessage.room_name].messages?.push(newmessage);
 					this.messages.push(newmessage.message);
 				}
@@ -104,6 +123,7 @@ export class FranChatUiComponent implements AfterViewInit{
 			if (this.selectedRoom){
 				if (this.selectedRoom.name == update_room.name){
 					console.log("updated selected room");
+					// this.change_sender_avatar(this.selectedRoom.name);
 					this.selectedRoom = update_room;
 				}
 			}
@@ -131,9 +151,13 @@ export class FranChatUiComponent implements AfterViewInit{
 	};
 
 	ngAfterViewInit() {
-    console.log("afterviewcheckedINIT");
+		console.log("afterviewcheckedINIT");
 		if (!this.selectedRoom)
 			this.chatService.updatePage();
+		Object.values(this.roomsList).forEach(room => {
+			this.change_sender_avatar(room.name);
+		});
+
 	}
 
 	sendMessage(event: any) {
@@ -211,9 +235,10 @@ export class FranChatUiComponent implements AfterViewInit{
 		this.router.navigate(['/dashboard/game']);
 		this.chatService.battle(this.selectedRoom!.name, +this.selectedRoom!.id, +this.user.id, this.user.nickname, this.user.avatar);
 	}
-
+	
 	joinBattle() {
 		this.chatService.joinBattle(this.selectedRoom!.id, this.selectedRoom!.name, this.user.avatar);
+		this.router.navigate(['/dashboard', 'game']);
 	}
 
 	mute() {
@@ -248,6 +273,62 @@ export class FranChatUiComponent implements AfterViewInit{
 				this.userNotFound = true;
 		})
 	}
+
+	deleteRoom()
+	{
+		this.chatService.deleteRoom(Number(this.selectedRoom!.id), this.selectedRoom!.name, this.user.id);
+	}
+
+	leaveRoom() {
+		////console.log("chat-message component leaveRoom: " + room + ", id: " + userid);
+		this.chatService.leaveRoom(Number(this.selectedRoom!.id), this.selectedRoom!.name, this.user.id);
+		// ////console.log("chat-message sendmessage: " + this.room.name);
+	}
+
+	setAdmin() {
+		this.userInRoom(this.userNameForm.value.userName).subscribe((userIsInRoom) => {
+			if (userIsInRoom) {
+				////console.log("chat-message component leaveRoom: " + room + ", id: " + userid);
+				this.chatService.setAdmin(this.selectedRoom!.id, this.userNameForm.value.userName);
+				// ////console.log("chat-message sendmessage: " + this.room.name);
+			}
+		});
+	}
+
+	get_avatar(userid: number){
+		var newAvatar = this.userMap.get(userid);
+		if (!newAvatar){
+			this.storeUser(userid);
+			newAvatar = this.userMap.get(userid);
+		}	
+		return newAvatar;
+	}
+
+	storeUser(userid: number): Observable<void> {
+		console.log("storeUser");
+		return this.userService.getAvatar(userid.toString()).pipe(
+		  map((data) => {
+			this.userMap.set(userid, URL.createObjectURL(data));
+		  })
+		);
+	  }
+	
+	  async change_sender_avatar(room_name: string) {
+		const room = this.roomsList[room_name];
+		if (room && room.messages) {
+			for (const message of room.messages) {
+				let newAvatar = this.userMap.get(message.senderId);
+				if (!newAvatar) {
+					await this.storeUser(message.senderId).toPromise();
+					newAvatar = this.userMap.get(message.senderId);
+				}
+				if (newAvatar) {
+					message.sender_avatar = newAvatar;
+				}
+			}
+		}
+	  }
+	  
 
 	private userInRoom(userName: string): Observable<boolean> {
 		return this.userService.getUserIdByName(userName).pipe(

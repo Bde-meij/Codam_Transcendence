@@ -54,6 +54,18 @@
 			<button [disabled]="!isChannelAdmin() || !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="kick()">
 				Kick
 			</button>
+			<button [disabled]="!isChannelAdmin() || !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="invite()">
+				invite
+			</button>
+			<button [disabled]="!isChannelAdmin() || !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="setAdmin()">
+				setAdmin
+			</button>
+			<button [disabled]="!isChannelAdmin() || !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="leaveRoom()">
+				leaveRoom
+			</button>
+			<button [disabled]="!isChannelAdmin() || !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="deleteRoom()">
+				deleteRoom
+			</button>
 			<p class="user-not-found" *ngIf="userNotFound">User not found in this room</p>
 		</div>
 		</div>

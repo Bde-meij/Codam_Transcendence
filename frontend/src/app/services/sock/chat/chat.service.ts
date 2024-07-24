@@ -81,16 +81,16 @@ export class ChatService{
 		
 	}
 	
-	leaveRoom(roomid: number, room: string, userid: string) {
-		const num = Number(userid);
-		this.chatSocket.emit('leaveRoom', {roomid, room, num}, (err: any) => {
+	leaveRoom(roomid: number, room: string, user: string) {
+		const userid = Number(user);
+		this.chatSocket.emit('leaveRoom', {roomid, room, userid}, (err: any) => {
 			if (err) {
 				// console.log("leaveRoom chat-sock error: ");
 				// console.log(err);
 				// console.log(err.message);
 			}
 		});
-	  }
+	}
 
 	sendUserList(message: string): void {
 		this.chatSocket.emit('getUserList', message, (err: any) => {
@@ -261,6 +261,32 @@ export class ChatService{
 		});
 	}
 
+	deleteRoom(roomid: number, room: string, user: string) {
+		const userid = Number(user);
+		this.chatSocket.emit('deleteRoom', {roomid, room, userid}, (err: any) => {
+			if (err) {
+				// console.log("deleteRoom chat-sock error: ");
+				// console.log(err);
+				// console.log(err.message);
+			}
+		});
+	}
+
+	setAdmin(room: number, userid: string){
+		console.log(`param check setadmin ${userid}`);
+		const data = {
+			room: room,
+			userid: (Number(userid)),
+		}
+		this.chatSocket.emit('setadmin', data, (err: any) => {
+			if (err) {
+				// console.log("setAdmin chat-sock error: ");
+				// console.log(err);
+				// console.log(err.message);
+			}
+		});
+	}
+
 	get_all_rooms(){
 		this.chatSocket.emit('all_rooms', {}, (err: any) => {
 			if (err) {
@@ -299,7 +325,7 @@ export class ChatService{
 		});
 	}
 
-	joinBattle(roomnum: string, room: string, avatar: string){
+	joinBattle(roomnum: number, room: string, avatar: string){
 		const data = {
 			numroom: roomnum,
 			room: room,

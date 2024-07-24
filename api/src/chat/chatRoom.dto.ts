@@ -14,11 +14,15 @@ export interface Rooms {
 }
 
 export interface RoomInfo {
-	room_id: number;
-	nickname: string;
-	Owner: boolean;
-	Admin: boolean;
-	socket_id: string;
+	id: number;
+	name: string;
+	owner: number;
+	admins: number[];
+	banned?: number[];
+	muted?: Record<number, Date>;
+	users: number[];
+	status: string; //public, private
+	password: boolean; //true or false?
 }
 
 export interface MessageInterface {
@@ -33,6 +37,21 @@ export interface MessageInterface {
 	sender_avatar?: string;
 	type: string;
 	cutomMessageData?: {href: string, text: string};
+}
+
+export interface Rooms {
+	id: number;
+	name: string;
+	owner: number;
+	admins: number[];
+	banned?: number[];
+	muted?: Record<number, Date>;
+	users: number[];
+	status: string; //public, private
+	password: boolean; //true or false?
+	created?: Date;
+	updated?: Date;
+	messages?: MessageInterface[];
 }
 
 export interface RoomDto {

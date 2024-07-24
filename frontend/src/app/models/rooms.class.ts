@@ -1,5 +1,5 @@
 export interface Rooms {
-	id: string;
+	id: number;
 	name: string;
 	owner: string;
 	admins: number[];
