@@ -11,6 +11,7 @@
 			<button type="button" (click)="getMatches()">get match history</button>
 
 			@if (this.stats != undefined) {
+				<div><span>rank :</span> {{stats.ranking}} </div>
 				<div><span>wins :</span> {{stats.wins}} </div>
 				<div><span>losses :</span> {{stats.losses}} </div>
 				<div><span>winrate :</span> {{stats.winrate}} </div>
