@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Res, HttpStatus, UseGuards, Req, UseInterceptors, UploadedFile, HttpException, ParseIntPipe, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Res, HttpStatus, UseGuards, Req, UseInterceptors, UploadedFile, HttpException, ParseIntPipe, Query, PayloadTooLargeException } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { JwtGuard } from 'src/auth/guard/jwt.guard';
@@ -114,10 +114,16 @@ export class UserController {
 			},
 		}),
 		fileFilter: (req, file, cb) => {
+			if (req.headers['content-length'] >= 1 * 1024 * 1024) {
+				return cb(new PayloadTooLargeException("file too large"), false);
+			}
 			const MIME_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'image/gif'];
 			if (!MIME_TYPES.includes(file.mimetype))
 				return cb(null, false);
 			cb(null, true);
+		},
+		limits: {
+			fileSize: 1 * 1024 * 1024 // 1mb
 		}
 	}))
 	async uploadAvatar(@Req() req, @Res() res, @UploadedFile() file: Express.Multer.File) {
