@@ -6,6 +6,7 @@ import { Block } from 'src/block/entities/block.entity';
 import { ChatRoom } from 'src/chat/entities/chatRoom.entity';
 import { FriendRequest } from 'src/friends/entities/friend.entity';
 import { Match } from 'src/game/entities/match.entity';
+import { MatchStats } from 'src/game/entities/stats.entity';
 import { User } from 'src/user/entities/user.entity';
 
 @Module({
@@ -28,6 +29,7 @@ import { User } from 'src/user/entities/user.entity';
 					refreshToken,
 					Block,
 					Match,
+					MatchStats,
 					ChatRoom,
 				],
 			})
