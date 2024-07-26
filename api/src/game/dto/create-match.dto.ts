@@ -1,9 +1,9 @@
 import { MatchType } from "../entities/match.entity";
 
 export class CreateMatchDto {
-	leftPlayerId: string;
+	leftPlayerId: number;
 
-	rightPlayerId: string;
+	rightPlayerId: number;
 
 	type: MatchType;
 }

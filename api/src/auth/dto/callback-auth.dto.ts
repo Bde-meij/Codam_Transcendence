@@ -1,5 +1,4 @@
 export class CallbackAuthDto {
-	id: string;
+	id: number;
 	is2faVerified: boolean;
-	// nickname: string;
 }

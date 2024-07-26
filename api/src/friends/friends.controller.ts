@@ -1,20 +1,21 @@
-import { Controller, Get, Post, Param, Delete, UseGuards, Req, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Param, Delete, UseGuards, Req, ParseIntPipe, Body } from '@nestjs/common';
 import { FriendsService } from './friends.service';
-import { CreateFriendRequestDto } from './dto/create-friend.dto';
+import { CreateFriendIdRequestDto, CreateFriendNickRequestDto } from './dto/create-friend.dto';
 import { JwtGuard } from 'src/auth/guard/jwt.guard';
 import { FriendStatus } from './entities/friend.entity';
+import { NicknameDto } from 'src/user/dto/user.dto';
 
 @Controller('friends')
 export class FriendsController {
 	constructor(private readonly friendsService: FriendsService) {}
-	
+
 	///✅ send new friend request with friend nickname
-	@Post('new-request-nick/:targetnick')
+	@Post('new-request-nick')
 	@UseGuards(JwtGuard)
-	async createNick(@Req() req, @Param('targetnick') targetNick: string) {
-		const friendRequest: CreateFriendRequestDto = {
+	async createNick(@Req() req, @Body() targetNick: NicknameDto) {
+		const friendRequest: CreateFriendNickRequestDto = {
 			sender: req.user.id,
-			target:	targetNick
+			target:	targetNick.nickname
 		}
 		return await this.friendsService.createNick(friendRequest);
 	}
@@ -22,8 +23,8 @@ export class FriendsController {
 	///✅ send new friend request with friend id
 	@Post('new-request/:targetid')
 	@UseGuards(JwtGuard)
-	async create(@Req() req, @Param('targetid') targetId: string) {
-		const friendRequest: CreateFriendRequestDto = {
+	async create(@Req() req, @Param('targetid', ParseIntPipe) targetId: number) {
+		const friendRequest: CreateFriendIdRequestDto = {
 			sender: req.user.id,
 			target:	targetId
 		}
@@ -33,21 +34,21 @@ export class FriendsController {
 	///✅ delete friend request (accepted or not) with the friend request id
 	@Delete('delete-request-id/:requestid')
 	@UseGuards(JwtGuard)
-	async deleteByRequestId(@Req() req, @Param('requestid') requestId: string) {
+	async deleteByRequestId(@Req() req, @Param('requestid', ParseIntPipe) requestId: number) {
 		return await this.friendsService.deleteByRequestId(req.user.id, requestId);
 	}
 	
 	///✅ delete friend request (accepted or not) with the target user id
 	@Delete('delete-request-user/:targetid')
 	@UseGuards(JwtGuard)
-	async deleteByUserId(@Req() req, @Param('targetid') targetId: string) {
+	async deleteByUserId(@Req() req, @Param('targetid', ParseIntPipe) targetId: number) {
 		return await this.friendsService.deleteByUserId(req.user.id, targetId);
 	}
 	
 	///✅ accept friend request with the friend request id
 	@Post('accept-request/:requestid')
 	@UseGuards(JwtGuard)
-	async accept(@Req() req, @Param('requestid') requestId: string) {
+	async accept(@Req() req, @Param('requestid', ParseIntPipe) requestId: number) {
 		return await this.friendsService.updateStatus(req.user.id, requestId, FriendStatus.ACCEPTED);
 	}
 
@@ -75,8 +76,8 @@ export class FriendsController {
 	///✅ check if this is friend
 	@Get('is-friends/:targetid')
 	@UseGuards(JwtGuard)
-	async isFriends(@Req() req, @Param('targetid') targetId: string) {
-		if (req.user.id === targetId) {
+	async isFriends(@Req() req, @Param('targetid', ParseIntPipe) targetId: number) {
+		if (req.user.id == targetId) {
 			return {
 				self: true, 
 				friend: true

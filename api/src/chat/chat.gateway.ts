@@ -446,8 +446,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	{
 		try{
 			const blockResult = await this.blockService.createBlock({
-				sender: client.data.userid.toString(), 
-				target: data.userid.toString()
+				sender: client.data.userid, 
+				target: data.userid
 			});
 			console.log(`user blocked`);
 		}
@@ -462,8 +462,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	{
 		try{
 			const blockResult = await this.blockService.deleteByUserId({
-				sender: client.data.userid.toString(), 
-				target: data.userid.toString()
+				sender: client.data.userid, 
+				target: data.userid
 			});
 			console.log(`user unblocked`);
 		}
@@ -819,8 +819,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	async block_user(send_user_id: number, target_user_id: number){
 		const data: CreateBlockDto = {
-			sender: send_user_id.toString(), 
-			target: target_user_id.toString()
+			sender: send_user_id, 
+			target: target_user_id
 		}
 		try{
 			const blockResult = await this.blockService.createBlock(data);
@@ -832,8 +832,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	async unblock_user(send_user_id: number, target_user_id: number){
 		const data: DeleteBlockDto = {
-			sender: send_user_id.toString(), 
-			target: target_user_id.toString()
+			sender: send_user_id, 
+			target: target_user_id
 		}
 		try{
 			const blockResult = await this.blockService.deleteByUserId(data);

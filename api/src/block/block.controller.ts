@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, Delete, Req } from '@nestjs/common';
+import { Controller, Get, Post, Param, Delete, Req, ParseIntPipe } from '@nestjs/common';
 import { BlockService } from './block.service';
 import { CreateBlockDto } from './dto/create-block.dto';
 import { DeleteBlockDto } from './dto/delete-block.dto';
@@ -13,7 +13,7 @@ export class BlockController {
 	}
 
 	@Get('is-blocked/:targetid')
-	async isBlocked(@Req() req, @Param('targetid') targetId: string) {
+	async isBlocked(@Req() req, @Param('targetid', ParseIntPipe) targetId: number) {
 		const block: CreateBlockDto = {
 			sender: req.user.id,
 			target: targetId,
@@ -22,7 +22,7 @@ export class BlockController {
 	}
 
 	@Post('new-block/:targetid')
-	async createBlock(@Req() req, @Param('targetid') targetId: string) {
+	async createBlock(@Req() req, @Param('targetid', ParseIntPipe) targetId: number) {
 		const block: CreateBlockDto = {
 			sender: req.user.id,
 			target: targetId,
@@ -31,16 +31,17 @@ export class BlockController {
 	}
 	
 	@Delete('delete-block-id/:blockid')
-	async deleteByBlockId(@Req() req, @Param('blockid') blockId: string) {
+	async deleteByBlockId(@Req() req, @Param('blockid', ParseIntPipe) blockId: number) {
 		const block: DeleteBlockDto = {
 			sender: req.user.id,
 			target: blockId,
 		}
+		
 		return await this.blockService.deleteByBlockId(block);
 	}
 	
 	@Delete('delete-block-user/:targetid')
-	async deleteByUserId(@Req() req, @Param('targetid') targetId: string) {
+	async deleteByUserId(@Req() req, @Param('targetid', ParseIntPipe) targetId: number) {
 		const block: DeleteBlockDto = {
 			sender: req.user.id,
 			target: targetId,

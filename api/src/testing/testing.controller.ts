@@ -1,10 +1,10 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { CheckPasswordDto, DeleteRoomDto, RoomDto, UpdateNameDto, UpdatePasswordDto } from 'src/chat/chatRoom.dto';
 import { User } from 'src/user/entities/user.entity';
 import { FriendsService } from 'src/friends/friends.service';
-import { CreateFriendRequestDto } from 'src/friends/dto/create-friend.dto';
+import { CreateFriendIdRequestDto } from 'src/friends/dto/create-friend.dto';
 import { FriendStatus } from 'src/friends/entities/friend.entity';
 import { CreateBlockDto } from 'src/block/dto/create-block.dto';
 import { BlockService } from 'src/block/block.service';
@@ -46,13 +46,13 @@ export class TestingController {
 	}
 	
 	@Post('user-update-roomkey/:userid/:key')
-	async updateRoomKey(@Param('userid') userId: string, @Param('key') roomKey: string) {
-		return await this.userService.updateRoomKey(userId, +roomKey);
+	async updateRoomKey(@Param('userid', ParseIntPipe) userId: number, @Param('key', ParseIntPipe) roomKey: number) {
+		return await this.userService.updateRoomKey(userId, roomKey);
 	}
 
 	// Gets a single user with the given id from the database
 	@Get('user/:id')
-	async getUser(@Param('id') id: string): Promise<User> {
+	async getUser(@Param('id', ParseIntPipe) id: number): Promise<User> {
 		// console.log('getUser() getting user');
 		return await this.userService.findUserById(id);
 	}
@@ -73,53 +73,53 @@ export class TestingController {
 
 	// send new friend request with friend id
 	@Post('friends/new-request/:userid/:target')
-	async createRequest_NoCookie(@Param('target') target: string, @Param('userid') userId: string) {
-		const friendRequest: CreateFriendRequestDto = {
+	async createRequest_NoCookie(@Param('target', ParseIntPipe) targetId: number, @Param('userid', ParseIntPipe) userId: number) {
+		const friendRequest: CreateFriendIdRequestDto = {
 			sender: userId,
-			target:	target
+			target:	targetId
 		}
 		return await this.friendsService.create(friendRequest);
 	}
 	
 	// delete friend request (accepted or not) with the friend request id
 	@Delete('friends/delete-request-id/:userid/:requestid')
-	async deleteRequestByRequestId_NoCookie(@Param('requestid') requestId: string, @Param('userid') userId: string) {
+	async deleteRequestByRequestId_NoCookie(@Param('requestid', ParseIntPipe) requestId: number, @Param('userid', ParseIntPipe) userId: number) {
 		return await this.friendsService.deleteByRequestId(userId, requestId);
 	}
 	
 	// delete friend request (accepted or not) with the target user id
 	@Delete('friends/delete-request-user/:userid/:targetid')
-	async deleteRequestByUserId_NoCookie(@Param('targetid') targetId: string, @Param('userid') userId: string) {
+	async deleteRequestByUserId_NoCookie(@Param('targetid', ParseIntPipe) targetId: number, @Param('userid', ParseIntPipe) userId: number) {
 		return await this.friendsService.deleteByUserId(userId, targetId);
 	}
 	
 	// accept friend request with the friend request id
 	@Post('friends/accept-request/:userid/:requestid')
-	async acceptRequest_NoCookie(@Param('requestid') requestId: string, @Param('userid') userId: string) {
+	async acceptRequest_NoCookie(@Param('requestid', ParseIntPipe) requestId: number, @Param('userid', ParseIntPipe) userId: number) {
 		return await this.friendsService.updateStatus(userId, requestId, FriendStatus.ACCEPTED);
 	}
 
 	// list with all incoming requests
 	@Get('friends/incoming/:userid')
-	async findIncomingRequests_NoCookie(@Param('userid') userId: string) {
+	async findIncomingRequests_NoCookie(@Param('userid', ParseIntPipe) userId: number) {
 		return await this.friendsService.findIncoming(userId);
 	}
 	
 	// list with all outgoing requests
 	@Get('friends/outgoing/:userid')
-	async findOutgoingRequests_NoCookie(@Param('userid') userId: string) {
+	async findOutgoingRequests_NoCookie(@Param('userid', ParseIntPipe) userId: number) {
 		return await this.friendsService.findOutgoing(userId);
 	}
 
 	// list with all your friends
 	@Get('friends/all/:userid')
-	async findFriends_NoCookie(@Param('userid') userId: string) {
+	async findFriends_NoCookie(@Param('userid', ParseIntPipe) userId: number) {
 		return await this.friendsService.findFriends(userId);
 	}
 
 	// check if this is friend
 	@Get('friends/is-friends/:userid/:targetid')
-	async isFriends_NoCookie(@Param('targetid') targetId: string, @Param('userid') userId: string) {
+	async isFriends_NoCookie(@Param('targetid', ParseIntPipe) targetId: number, @Param('userid', ParseIntPipe) userId: number) {
 		return await this.friendsService.isFriendsUserId(userId, targetId);
 	}
 	
@@ -132,13 +132,13 @@ export class TestingController {
 	
 	// list with all blocked users
 	@Get('block/all-blocked/:userid')
-	async getAllBlocked_NoCookie(@Param('userid') userId: string) {
+	async getAllBlocked_NoCookie(@Param('userid') userId: number) {
 		return await this.blockService.getAllBlocked(userId);
 	}
 	
 	// check if target is blocked by sender
 	@Get('block/is-blocked/:userid/:targetid')
-	async isBlocked_NoCookie(@Param('targetid') targetId: string, @Param('userid') userId: string) {
+	async isBlocked_NoCookie(@Param('targetid', ParseIntPipe) targetId: number, @Param('userid', ParseIntPipe) userId: number) {
 		const block: CreateBlockDto = {
 			sender: userId,
 			target: targetId,
@@ -148,7 +148,7 @@ export class TestingController {
 
 	// create new block with user id
 	@Post('block/new-block/:userid/:targetid')
-	async createBlock_NoCookie(@Param('targetid') targetId: string, @Param('userid') userId: string) {
+	async createBlock_NoCookie(@Param('targetid', ParseIntPipe) targetId: number, @Param('userid', ParseIntPipe) userId: number) {
 		const block: CreateBlockDto = {
 			sender: userId,
 			target: targetId,
@@ -158,7 +158,7 @@ export class TestingController {
 	
 	// delete block with block id
 	@Delete('block/delete-block-id/:userid/:blockid')
-	async deleteBlockByBlockId_NoCookie(@Param('blockid') blockId: string, @Param('userid') userId: string) {
+	async deleteBlockByBlockId_NoCookie(@Param('blockid', ParseIntPipe) blockId: number, @Param('userid', ParseIntPipe) userId: number) {
 		const block: DeleteBlockDto = {
 			sender: userId,
 			target: blockId,
@@ -168,7 +168,7 @@ export class TestingController {
 	
 	// delete block with user id
 	@Delete('block/delete-block-user/:userid/:targetid')
-	async deleteBlockByUserId_NoCookie(@Param('targetid') targetId: string, @Param('userid') userId: string) {
+	async deleteBlockByUserId_NoCookie(@Param('targetid', ParseIntPipe) targetId: number, @Param('userid', ParseIntPipe) userId: number) {
 		const block: DeleteBlockDto = {
 			sender: userId,
 			target: targetId,
@@ -194,7 +194,7 @@ export class TestingController {
 	async updateMatch(@Body() data: UpdateMatchDto) {
 		return await this.matchService.updateMatch(data);
 	}
-
+	
 
 	// --------------------------------------------------------------------------------------------------------------
 	// --------------------------------------------------------------------------------------------------------------
