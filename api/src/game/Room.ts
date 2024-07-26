@@ -32,9 +32,9 @@ export class Room
 
 	moveBall()
 	{
-		if (this.ballSpeed[0] < 1 && this.ballSpeed[0] >= 0)
+		if (this.ballSpeed[0] < 1 && this.ballSpeed[0] > 0)
 			this.ballSpeed[0] = 1;
-		if (this.ballSpeed[0] > -1 && this.ballSpeed[0] <= 0)
+		if (this.ballSpeed[0] > -1 && this.ballSpeed[0] < 0)
 			this.ballSpeed[0] = -1;
 
 		this.ballPos[0] += this.ballSpeed[0];
