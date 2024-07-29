@@ -274,8 +274,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	// //console.log(chatRoom);
 	// const chatRoom = this.chatRoomList[socket.data.id];
 	// //console.log(chatRoom.users);
-	@UseFilters(BadRequestExceptionsFilter)
-	@UsePipes(new ValidationPipe({ transform: true }))
+	// @UseFilters(BadRequestExceptionsFilter)
+	// @UsePipes(new ValidationPipe({ transform: true }))
 	@SubscribeMessage('message')
 	async handleMessage(
 	@MessageBody() data: messageDto,
