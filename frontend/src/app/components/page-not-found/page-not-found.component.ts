@@ -10,3 +10,4 @@ import { RouterLink } from '@angular/router';
 })
 export class PageNotFoundComponent {
 }
+https://rxjs.dev/api/operators/catchError

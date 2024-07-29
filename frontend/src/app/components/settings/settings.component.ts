@@ -95,9 +95,10 @@ export class SettingsComponent implements OnInit {
 	changeName() {
 		console.log(this.profileForm.value.nickname);
 		if (this.profileForm.value.nickname) {
-			this.current_nickname = this.profileForm.value.nickname;
+			// this.current_nickname = this.profileForm.value.nickname;
 			this.userService.changeName(this.profileForm.value.nickname).subscribe({
 				next: (data) => {
+					this.current_nickname = this.profileForm.value.nickname
 					console.log("changename data:", data);
 					this.succesMessage = data.message;
 					this.errorMessage = '';
