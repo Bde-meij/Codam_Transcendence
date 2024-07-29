@@ -123,7 +123,7 @@ export class SettingsComponent implements OnInit {
 		if (selectedFiles) {
 			const file: File | null = selectedFiles.item(0);
 
-			if (file) {
+			if (file && file.size < 1 * 1024 * 1024) {
 				this.preview = '';
 				this.current_file = file;
 

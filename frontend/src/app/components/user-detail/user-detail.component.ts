@@ -27,7 +27,8 @@ export class UserDetailComponent implements OnChanges {
 	stats : undefined | {
 		wins : undefined,
 		losses : undefined,
-		winrate: undefined
+		winrate: undefined,
+		ranking: undefined
 	};
 
 	matches: any | undefined;

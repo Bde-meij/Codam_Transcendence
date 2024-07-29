@@ -1,5 +1,5 @@
 export class DeleteBlockDto {
-	sender: string;
+	sender: number;
 
-	target: string;
+	target: number;
 }

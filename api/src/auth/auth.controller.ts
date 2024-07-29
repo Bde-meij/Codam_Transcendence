@@ -8,6 +8,7 @@ import {
 	Res,
 	HttpStatus,
 	Param,
+	HttpException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Request, Response, Express, response } from 'express';
@@ -120,7 +121,11 @@ export class AuthController {
 	@Get('is2faenabled')
 	@UseGuards(JwtGuard)
 	async isTwoFAEnabled(@Req() req, @Res() res) {
-		const isEnabled = (await this.userService.get2faEnabled(req.user.id)).isTwoFAEnabled;
+		const status = (await this.userService.get2faEnabled(req.user.id));
+		if (!status){
+			throw new HttpException('User ' + req.user.id + ' not found', HttpStatus.NOT_FOUND);
+		}
+		const isEnabled = status.isTwoFAEnabled
 		res.json({isTwoFAEnabled: isEnabled});
 	}
 

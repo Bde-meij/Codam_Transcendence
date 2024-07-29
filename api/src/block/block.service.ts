@@ -24,7 +24,7 @@ export class BlockService {
 		return true;
 	}
 
-	async getAllBlocked(userId: string): Promise<Block[]> {
+	async getAllBlocked(userId: number): Promise<Block[]> {
 		const user: User = await this.userService.findUserById(userId);
 		if (!user) {
 			// console.log('User not found! User id:', userId);

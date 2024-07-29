@@ -9,7 +9,7 @@ export enum FriendStatus {
 @Entity('friendRequest')
 export class FriendRequest {
 	@PrimaryGeneratedColumn()
-	id: string;
+	id: number;
 
 	@ManyToOne(() => User, (user) => user.friendOut)
 	sender: User;

@@ -1,5 +1,5 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { CreateFriendRequestDto } from './dto/create-friend.dto';
+import { CreateFriendIdRequestDto, CreateFriendNickRequestDto } from './dto/create-friend.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FriendRequest, FriendStatus } from './entities/friend.entity';
@@ -10,28 +10,31 @@ import { User } from 'src/user/entities/user.entity';
 export class FriendsService {
 	constructor(@InjectRepository(FriendRequest) private readonly friendRepo: Repository<FriendRequest>, private readonly userService: UserService) {}
 
-	async createNick(createFriendRequestDto: CreateFriendRequestDto): Promise<any> {
-		const target: User = await this.userService.findUserByName(createFriendRequestDto.target);
+	async createNick(createFriendNickRequestDto: CreateFriendNickRequestDto): Promise<any> {
+		const target: User = await this.userService.findUserByName(createFriendNickRequestDto.target);
 		if (!target) {
 			throw new HttpException('Target user not found', 404);
 		}
-		createFriendRequestDto.target = target.id;
-		return await this.create(createFriendRequestDto);
+		const createFriendIdRequestDto: CreateFriendIdRequestDto = {
+			sender: createFriendNickRequestDto.sender,
+			target: target.id
+		}
+		return await this.create(createFriendIdRequestDto);
 	}
 
-	async create(createFriendRequestDto: CreateFriendRequestDto): Promise<any> {
-		if (createFriendRequestDto.sender === createFriendRequestDto.target) {
-			// console.log('Friend request cannot be sent to yourself! User id:', createFriendRequestDto.sender);
+	async create(createFriendIdRequestDto: CreateFriendIdRequestDto): Promise<any> {
+		if (createFriendIdRequestDto.sender === createFriendIdRequestDto.target) {
+			// console.log('Friend request cannot be sent to yourself! User id:', createFriendIdRequestDto.sender);
 			throw new HttpException('Friend request cannot be sent to yourself', 400);
 		}
-		const sender: User = await this.userService.findUserById(createFriendRequestDto.sender);
+		const sender: User = await this.userService.findUserById(createFriendIdRequestDto.sender);
 		if (!sender) {
-			// console.log('Sender id not found! Sender id:', createFriendRequestDto.sender);
+			// console.log('Sender id not found! Sender id:', createFriendIdRequestDto.sender);
 			throw new HttpException('Sender id not found', 404);
 		}
-		const target: User = await this.userService.findUserById(createFriendRequestDto.target);
+		const target: User = await this.userService.findUserById(createFriendIdRequestDto.target);
 		if (!target) {
-			// console.log('Target id not found! Target id:', createFriendRequestDto.target);
+			// console.log('Target id not found! Target id:', createFriendIdRequestDto.target);
 			throw new HttpException('Target id not found', 404);
 		}
 		// Add check for if target has sender blocked. blocking should also delete any request between the 2 users
@@ -67,7 +70,7 @@ export class FriendsService {
 		};
 	}
 
-	async deleteByRequestId(userId: string, requestId: string) {
+	async deleteByRequestId(userId: number, requestId: number) {
 		const request: FriendRequest = await this.friendRepo.findOne({
 			where: {
 				id: requestId
@@ -81,7 +84,7 @@ export class FriendsService {
 			// console.log('Friend request not found!');
 			throw new HttpException('Friend request not found', 404);
 		}
-		if (request.sender.id !== userId && request.target.id !== userId) {
+		if (request.sender.id != userId && request.target.id != userId) {
 			// console.log('This friend request is not yours!');
 			throw new HttpException('This friend request is not yours', 401);
 		}
@@ -89,7 +92,7 @@ export class FriendsService {
 		// console.log("Request deleted:\n", request);
 	}
 	
-	async deleteByUserId(userId: string, targetId: string) {
+	async deleteByUserId(userId: number, targetId: number) {
 		const request: FriendRequest = await this.friendRepo.findOne({
 			where: [
 				{sender: {id: userId}, target: {id: targetId}},
@@ -104,7 +107,7 @@ export class FriendsService {
 		// console.log("Request deleted:\n", request);
 	}
 	
-	async updateStatus(userId: string, requestId: string, status: FriendStatus) {
+	async updateStatus(userId: number, requestId: number, status: FriendStatus) {
 		const updatedRequests: FriendRequest = await this.friendRepo.findOne({
 			where: {
 				id: requestId,
@@ -121,7 +124,7 @@ export class FriendsService {
 		);	
 	}
 	
-	async findIncoming(targetId: string): Promise<FriendRequest[]> {
+	async findIncoming(targetId: number): Promise<FriendRequest[]> {
 		const target: User = await this.userService.findUserById(targetId);
 		if (!target) {
 				// console.log('Target id not found! Target id:', targetId);
@@ -146,7 +149,7 @@ export class FriendsService {
 		return (incomingRequests);
 	}
 	
-	async findOutgoing(senderId: string): Promise<FriendRequest[]> {
+	async findOutgoing(senderId: number): Promise<FriendRequest[]> {
 		const sender: User = await this.userService.findUserById(senderId);
 		if (!sender) {
 			// console.log('Sender id not found! Sender id:', senderId);
@@ -171,7 +174,7 @@ export class FriendsService {
 		return (outgoingRequests);
 	}
 
-	async findFriends(userId: string): Promise<User[]> {
+	async findFriends(userId: number): Promise<User[]> {
 		const user: User = await this.userService.findUserById(userId);
 		if (!user) {
 			// console.log('User not found! User id:', userId);
@@ -221,7 +224,7 @@ export class FriendsService {
 		return friends;
 	}
 
-	async isFriendsUserId(userId: string, targetId: string): Promise<boolean> {
+	async isFriendsUserId(userId: number, targetId: number): Promise<boolean> {
 		const request = await this.friendRepo.findOne({
 			where: [
 				{sender: {id: userId}, target: {id: targetId}},
