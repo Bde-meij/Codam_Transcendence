@@ -107,7 +107,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	@ViewChild(ChatMessageComponent) viewChild!: ChatMessageComponent;
 
 	ngAfterViewInit() {
-		console.log(`afterviewcheckedInit Room: ${this.selectedRoom}`);
+		// console.log(`afterviewcheckedInit Room: ${this.selectedRoom}`);
 		if (!this.selectedRoom){
 			this.chatService.updatePage();
 			console.log("selectinged room empty");

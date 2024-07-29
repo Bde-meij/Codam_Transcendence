@@ -1,5 +1,5 @@
-import { Global, NotAcceptableException, Req } from '@nestjs/common';
-import { Rooms, RoomInfo, MessageInterface, RoomDto } from './chatRoom.dto';
+import { UsePipes, NotAcceptableException, Injectable, ValidationPipe, UseFilters, ArgumentsHost, Catch, HttpException, BadRequestException } from '@nestjs/common';
+import { Rooms, RoomInfo, MessageInterface, RoomDto, messageDto } from './chatRoom.dto';
 import {
 	ConnectedSocket,
 	MessageBody,
@@ -9,16 +9,51 @@ import {
 	SubscribeMessage,
 	WebSocketGateway,
 	WebSocketServer,
+	WsException,
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { UserService } from 'src/user/user.service';
-import { Injectable } from '@nestjs/common';
 import { getNewRoomKey} from 'src/game/game.gateway';
 import { BlockService } from 'src/block/block.service';
 import { CreateBlockDto } from 'src/block/dto/create-block.dto';
 import { DeleteBlockDto } from 'src/block/dto/delete-block.dto';
 import { ChatRoomService } from './chatRoom.service';
+import { BaseWsExceptionFilter, WsResponse } from '@nestjs/websockets';
+
+@Catch(WsException)
+export class WebsocketExceptionsFilter extends BaseWsExceptionFilter {
+  catch(exception: WsException, host: ArgumentsHost) {
+	console.log("exception");
+    const client = host.switchToWs().getClient() as WebSocket;
+    const data = host.switchToWs().getData();
+    const error =  exception.getError() ;
+    const details = error instanceof Object ? { ...error } : { message: error };
+    client.send(JSON.stringify({
+      event: "error",
+      data: {
+        id: (client as any).id,
+        rid: data.rid,
+        ...details
+      }
+    }));
+  }
+}
+
+@Catch(BadRequestException)
+export class BadRequestExceptionsFilter extends BaseWsExceptionFilter {
+  catch(exception: any, host: ArgumentsHost) {
+    // Here you have the exception and you can check the data
+    const wsException = new WsException(exception.getResponse())
+    super.catch(wsException, host);
+	const ctx = host.switchToWs()
+    const client = ctx.getClient() as WebSocket;
+
+
+	client.send(JSON.stringify({ "Test": String }))
+	console.log(client);
+  }
+}
 
 @Injectable()
 @WebSocketGateway({
@@ -218,6 +253,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			return;
 		}
 		this.chatRoomList[data.room_name].id = CreateRoomDB.id;
+
 		socket.data.id = CreateRoomDB.id;
 		this.chatRoomList[data.room_name].users.push(socket.data.userid);
 		this.chatRoomList[data.room_name].users.push(data.user);
@@ -238,9 +274,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	// //console.log(chatRoom);
 	// const chatRoom = this.chatRoomList[socket.data.id];
 	// //console.log(chatRoom.users);
+	@UseFilters(BadRequestExceptionsFilter)
+	@UsePipes(new ValidationPipe({ transform: true }))
 	@SubscribeMessage('message')
 	async handleMessage(
-	@MessageBody() data: { message: string, sender_name: string, sender_id: number, room: string, type: string, cutsomMessageData: {href: string, text: string}, sender_avatar: string },
+	@MessageBody() data: messageDto,
 	@ConnectedSocket() socket: Socket,
 	) {
 
@@ -280,8 +318,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			sender_avatar: data.sender_avatar,
 			created: new Date(),
 			type: data.type,
-			cutomMessageData: data.cutsomMessageData
-
+			cutomMessageData: data.customMessageData
 		};
 		// //console.log("room: " + data.room + ", socketdataid: " + socket.data.userid);
 		// this.addDate();

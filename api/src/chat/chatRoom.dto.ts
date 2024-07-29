@@ -1,3 +1,5 @@
+import { IsAlphanumeric, IsNumber, isNumber } from "class-validator";
+
 export interface Rooms {
 	id: number;
 	name: string;
@@ -54,6 +56,20 @@ export interface Rooms {
 	messages?: MessageInterface[];
 }
 
+export class messageDto{
+	@IsAlphanumeric()
+	message: string;
+	
+	@IsAlphanumeric()
+	sender_name: string;
+	@IsNumber()
+	sender_id: number;
+	room: string;
+	type: string;
+	customMessageData: {href: string, text: string};
+	sender_avatar: string;
+}
+	
 export interface RoomDto {
 	name: string;
 	password: string; //true or false?

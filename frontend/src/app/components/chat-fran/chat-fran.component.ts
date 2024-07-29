@@ -151,7 +151,7 @@ export class FranChatUiComponent implements AfterViewInit{
 	};
 
 	ngAfterViewInit() {
-		console.log("afterviewcheckedINIT");
+		// console.log("afterviewcheckedINIT");
 		if (!this.selectedRoom)
 			this.chatService.updatePage();
 		Object.values(this.roomsList).forEach(room => {

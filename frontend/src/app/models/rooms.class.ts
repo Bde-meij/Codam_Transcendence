@@ -26,3 +26,13 @@ export interface MessageInterface {
 	type: string;
 	customMessageData?: {href: string, text: string};
 }
+
+export interface messageDto{
+	message: string;
+	sender_name: string;
+	sender_id: number;
+	room: string;
+	type: string;
+	customMessageData: {href: string, text: string};
+	sender_avatar: string;
+}
