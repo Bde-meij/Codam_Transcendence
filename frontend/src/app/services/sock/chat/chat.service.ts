@@ -166,14 +166,9 @@ export class ChatService{
 		});
 	}
 
-	personal_listen(): Observable<MessageInterface> {
-		this.userService.getUser('current').subscribe((userData) => {
-			this.user = userData;
-		});
-		const room = this.user.id + "_listen";
-		console.log("personal listen: " + room);
+	error_message(): Observable<MessageInterface> {
 		return new Observable((observer) => {
-			this.chatSocket.on(room, (message) => {
+			this.chatSocket.on("error_message", (message) => {
 				observer.next(message);
 			});
 		});
@@ -267,7 +262,7 @@ export class ChatService{
 			room: room,
 			username: user,
 		}
-		this.chatSocket.emit('invite', data, (err: any) => {
+		this.chatSocket.emit('createPrivateRoom', data, (err: any) => {
 			if (err) {
 				// console.log("kickUser chat-sock error: ");
 				// console.log(err);
@@ -312,9 +307,21 @@ export class ChatService{
 		});
 	}
 
-	blockUser(room: string, user: string){
-		const userid = Number(user);
-		this.chatSocket.emit('block', {room, userid}, (err: any) => {
+	blockUser(user: string, room: string){
+		this.chatSocket.emit('block', {user, room}, (err: any) => {
+			if (err) {
+				// console.log("kickUser chat-sock error: ");
+				// console.log(err);
+				// console.log(err.message);
+			}
+		});
+	}
+
+	updateName(user: string){
+		const data = {
+			sender_name: user
+		}
+		this.chatSocket.emit('updateName', data, (err: any) => {
 			if (err) {
 				// console.log("kickUser chat-sock error: ");
 				// console.log(err);

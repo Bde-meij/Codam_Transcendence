@@ -81,22 +81,31 @@ export class FranChatUiComponent implements AfterViewInit{
 				updateOn: 'change',
 			}),
 		});
-		this.userService.getUser('current').subscribe((userData) => (
-			this.user = userData
-		));
+		this.userService.getUser('current').subscribe((userData) => {
+			this.user = userData;
+			if (this.user)
+				this.updateName();
+		});
 		
 		if (!subbed) {
 			this.chatService.getMessages().subscribe((newmessage: any ) => {
 				if (this.roomsList[newmessage.room_name]?.messages) {
 					console.log("message re3ceived");
-					newmessage.sender_avatar = this.get_avatar(newmessage.senderId);
+					if (newmessage.senderId > 0)
+						newmessage.sender_avatar = this.get_avatar(newmessage.senderId);
 					// this.userService.getAvatar(newmessage.senderId).subscribe((data) => (
 					// 	newmessage.sender_avatar = URL.createObjectURL(data)
 					// ))
 					this.roomsList[newmessage.room_name].messages?.push(newmessage);
-					this.messages.push(newmessage.message);
 				}
 			});
+			this.chatService.error_message().subscribe((message: any) => {
+				// console.log(`error_message`);
+				console.log(`error_message ${message.message} - ${this.selectedRoom?.name}`);
+				if (!this.roomsList[message.room_name])
+					this.roomsList[message.room_name];
+				this.roomsList[message.room_name].messages?.push(message);
+			})
 			subbed = true;
 		}
 
@@ -134,30 +143,16 @@ export class FranChatUiComponent implements AfterViewInit{
 			delete this.roomsList[room];
 		})
 
-		this.chatService.personal_listen().subscribe((message: any) => {
-			console.log(`personal listen`);
-			// console.log(`personal_listen ${message.message} - ${this.selectedRoom}`);
-			if (this.selectedRoom){
-				Object.values(this.roomsList).forEach(room => {
-					if (this.selectedRoom!.name == message.room_name){
-						console.log(message.message);
-						this.roomsList[message.sender_name].messages!.push(message);
-						this.messages.push(message.message);
-						// this.selectedRoom = this.roomsList[message.sender_name];
-					}
-				});
-			}
-		})
+		
 	};
 
 	ngAfterViewInit() {
-		// console.log("afterviewcheckedINIT");
+		console.log("afterviewcheckedINIT");
 		if (!this.selectedRoom)
 			this.chatService.updatePage();
 		Object.values(this.roomsList).forEach(room => {
 			this.change_sender_avatar(room.name);
 		});
-
 	}
 
 	sendMessage(event: any) {
@@ -283,6 +278,17 @@ export class FranChatUiComponent implements AfterViewInit{
 		this.chatService.deleteRoom(Number(this.selectedRoom!.id), this.selectedRoom!.name, this.user.id);
 	}
 
+	block()
+	{
+		this.chatService.blockUser(this.userNameForm.value.userName, this.selectedRoom!.name);
+	}
+
+	updateName()
+	{
+		// console.log("updating name");
+		this.chatService.updateName(this.user.nickname);
+	}
+
 	leaveRoom() {
 		////console.log("chat-message component leaveRoom: " + room + ", id: " + userid);
 		this.chatService.leaveRoom(Number(this.selectedRoom!.id), this.selectedRoom!.name, this.user.id);
@@ -321,13 +327,15 @@ export class FranChatUiComponent implements AfterViewInit{
 		const room = this.roomsList[room_name];
 		if (room && room.messages) {
 			for (const message of room.messages) {
-				let newAvatar = this.userMap.get(message.senderId);
-				if (!newAvatar) {
-					await this.storeUser(message.senderId).toPromise();
-					newAvatar = this.userMap.get(message.senderId);
-				}
-				if (newAvatar) {
-					message.sender_avatar = newAvatar;
+				if (message.senderId > 0){
+					let newAvatar = this.userMap.get(message.senderId);
+					if (!newAvatar) {
+						await this.storeUser(message.senderId).toPromise();
+						newAvatar = this.userMap.get(message.senderId);
+					}
+					if (newAvatar) {
+						message.sender_avatar = newAvatar;
+					}
 				}
 			}
 		}
