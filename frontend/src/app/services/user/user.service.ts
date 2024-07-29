@@ -1,4 +1,4 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 // import { UserInterface } from '../../models/user.class';
 import { Observable, catchError } from 'rxjs';
@@ -22,9 +22,19 @@ export class UserService {
 		return this.http.post<any>(this.userUrl + '/changename', { nickname })
 	}
 
-	isNameTaken (nickname: string) : Observable<boolean> {
-		return this.http.get<boolean>(this.userUrl + '/isnametaken', {params: {nickname: nickname}});
+	isNameTaken(nickname: string) : Observable<any> {
+		return this.http.get<any>(this.userUrl + '/isnametaken', {params: {nickname: nickname}});
 	}
+
+	// nameValidatorTaken(nickname: string) : Observable<boolean> {
+	// 	my_first_observable : Observable<boolean> = this.isNameTaken(nickname).pipe<boolean>((data) => {
+			
+	// 	});
+	// }
+
+	// isNameTaken (nickname: string) : Observable<boolean> {
+	// 	return this.http.get<boolean>(this.userUrl + '/isnametaken', {params: {nickname: nickname}});
+	// }
 
 	// to request your own info, use 'current', otherwise use the userID.
 	getUser(id : string) : Observable<any> {

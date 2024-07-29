@@ -114,7 +114,7 @@ export class SettingsComponent implements OnInit {
 		
 		// this.router.navigate([this.router.url]);
 		// this.router.navigate(['/dashboard/settings/'], {});
-		console.log("NAVIGATE")
+		// console.log("NAVIGATE")
 	}
 
 	preview: string | undefined;
