@@ -243,6 +243,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@MessageBody() data: { message: string, sender_name: string, sender_id: number, room: string, type: string, cutsomMessageData: {href: string, text: string}, sender_avatar: string },
 	@ConnectedSocket() socket: Socket,
 	) {
+
+		
 		if (socket.data.nickname != data.sender_name){
 			console.log("change msg name ", socket.data.userid, data.sender_name)
 			this.change_msg_name(socket.data.userid, data.sender_name);

@@ -261,6 +261,21 @@ export class ChatService{
 		});
 	}
 
+	invite(room: string, user: string){
+		console.log(`param check invite ${user}`);
+		const data = {
+			room: room,
+			username: user,
+		}
+		this.chatSocket.emit('invite', data, (err: any) => {
+			if (err) {
+				// console.log("kickUser chat-sock error: ");
+				// console.log(err);
+				// console.log(err.message);
+			}
+		});
+	}
+
 	deleteRoom(roomid: number, room: string, user: string) {
 		const userid = Number(user);
 		this.chatSocket.emit('deleteRoom', {roomid, room, userid}, (err: any) => {

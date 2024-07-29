@@ -274,6 +274,10 @@ export class FranChatUiComponent implements AfterViewInit{
 		})
 	}
 
+	invite() {
+		this.chatService.invite(this.selectedRoom!.name, this.userNameForm.value.userName);
+	}
+
 	deleteRoom()
 	{
 		this.chatService.deleteRoom(Number(this.selectedRoom!.id), this.selectedRoom!.name, this.user.id);
