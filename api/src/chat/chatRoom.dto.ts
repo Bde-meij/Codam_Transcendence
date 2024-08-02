@@ -56,6 +56,19 @@ export interface Rooms {
 	messages?: MessageInterface[];
 }
 
+export interface ErrorMessage{
+	msg: string;
+	status_code: number;
+	room?: string;
+}
+
+export interface createRoomDto{
+	room_name: string,
+	status: string, 
+	password: string,
+	password_bool: boolean,
+}
+
 export class messageDto{
 	@IsAlphanumeric()
 	message: string;

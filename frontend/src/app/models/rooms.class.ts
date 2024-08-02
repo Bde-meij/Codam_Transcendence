@@ -36,3 +36,16 @@ export interface messageDto{
 	customMessageData: {href: string, text: string};
 	sender_avatar: string;
 }
+
+export interface ErrorMessage{
+	msg: string;
+	status_code: number;
+	room?: string;
+}
+
+export interface createRoomDto{
+	room_name: string,
+	status: string, 
+	password: string,
+	password_bool: boolean,
+}

@@ -5,6 +5,7 @@ import { UserService } from '../../services/user/user.service';
 import { FriendsService } from '../../services/friends/friends.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { NbUserModule } from '@nebular/theme';
+import { ChatService } from '../../services/sock/chat/chat.service';
 
 @Component({
   selector: 'app-user-detail',
@@ -38,7 +39,7 @@ export class UserDetailComponent implements OnChanges {
 	errorMessage: string | undefined;
 	userErrorMessage: string | undefined;
 
-	constructor(private userService: UserService, private friendsService: FriendsService) {};
+	constructor(private userService: UserService, private friendsService: FriendsService, private chatService: ChatService) {};
 
 	ngOnChanges(): void {
 		this.userErrorMessage = undefined;
@@ -127,5 +128,12 @@ export class UserDetailComponent implements OnChanges {
 			}
 		});
 		this.isfriend = undefined;
+	}
+
+	inviteChat(){
+		if (this.my_user?.id != this.id)
+		{
+			this.chatService.inviteChat(this.id)
+		}
 	}
 }

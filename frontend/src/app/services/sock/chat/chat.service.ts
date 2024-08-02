@@ -5,7 +5,7 @@ import { SockService } from '../sock.service';
 import { UserService } from '../../user/user.service';
 import { User } from '../../../models/user.class';
 import { skip } from 'rxjs/operators';
-import { MessageInterface, Rooms } from '../../../models/rooms.class';
+import { ErrorMessage, MessageInterface, Rooms } from '../../../models/rooms.class';
 
 @Injectable({
   providedIn: 'root'
@@ -166,7 +166,7 @@ export class ChatService{
 		});
 	}
 
-	error_message(): Observable<MessageInterface> {
+	error_message(): Observable<ErrorMessage> {
 		return new Observable((observer) => {
 			this.chatSocket.on("error_message", (message) => {
 				observer.next(message);
@@ -271,6 +271,19 @@ export class ChatService{
 		});
 	}
 
+	inviteChat(user: string){
+		const userid = Number(user);
+		console.log(`param check invite ${user}`);
+		this.chatSocket.emit('inviteChat', userid, (err: any) => {
+			if (err) {
+				// console.log("kickUser chat-sock error: ");
+				// console.log(err);
+				// console.log(err.message);
+			}
+		});
+	}
+
+
 	deleteRoom(roomid: number, room: string, user: string) {
 		const userid = Number(user);
 		this.chatSocket.emit('deleteRoom', {roomid, room, userid}, (err: any) => {
@@ -329,6 +342,17 @@ export class ChatService{
 			}
 		});
 	}
+
+	last_open_room(room_name: string){
+		this.chatSocket.emit('last_open_room', room_name, (err: any) => {
+			if (err) {
+				// console.log("kickUser chat-sock error: ");
+				// console.log(err);
+				// console.log(err.message);
+			}
+		});
+	}
+
 
 	battle(roomname: string, roomid: number, userid: number, userName: string, avatar: string){
 		const data = {

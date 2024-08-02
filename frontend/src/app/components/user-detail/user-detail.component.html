@@ -9,7 +9,7 @@
 		@if(this.isfriend != undefined && this.isfriend == true) {
 			<button type="button" (click)="getStats()">get statistics</button>
 			<button type="button" (click)="getMatches()">get match history</button>
-
+			<button type="button" (click)="inviteChat()">chat with</button>
 			@if (this.stats != undefined) {
 				<div><span>rank :</span> {{stats.ranking}} </div>
 				<div><span>wins :</span> {{stats.wins}} </div>

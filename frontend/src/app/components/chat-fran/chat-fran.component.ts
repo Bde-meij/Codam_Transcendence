@@ -4,7 +4,7 @@ import { NbAutocompleteModule, NbButtonModule, NbCardModule, NbChatModule, NbDia
 import { ChatService } from '../../services/sock/chat/chat.service';
 import { UserService } from '../../services/user/user.service';
 import { User } from '../../models/user.class';
-import { MessageInterface, Rooms } from '../../models/rooms.class';
+import { ErrorMessage, MessageInterface, Rooms } from '../../models/rooms.class';
 import { NbThemeModule, NbLayoutModule} from '@nebular/theme';
 import { UserDetailComponent } from '../user-detail/user-detail.component';	
 import { createChatRoom } from './createChatRoom/createChatRoom.component';
@@ -57,6 +57,7 @@ export class FranChatUiComponent implements AfterViewInit{
 		this.joinRoom(room.name, '');
 		console.log("users: ", room.users);
 		this.selectedRoom = room;
+		this.last_open_room();
 		//console.log(room.messages);
 	};
 
@@ -65,9 +66,9 @@ export class FranChatUiComponent implements AfterViewInit{
 		private userService: UserService, 
 		private dialogService: NbDialogService,
 		private router: Router
-	) {
+	) 
+	{
 		this.userMap = new Map<number, string>();
-
 	};
 
 	ngOnInit() {
@@ -81,7 +82,7 @@ export class FranChatUiComponent implements AfterViewInit{
 				updateOn: 'change',
 			}),
 		});
-		this.userService.getUser('current').subscribe((userData) => {
+		this.userService.getUser('current').subscribe((userData: User) => {
 			this.user = userData;
 			if (this.user)
 				this.updateName();
@@ -99,8 +100,30 @@ export class FranChatUiComponent implements AfterViewInit{
 					this.roomsList[newmessage.room_name].messages?.push(newmessage);
 				}
 			});
-			this.chatService.error_message().subscribe((message: any) => {
-				// console.log(`error_message`);
+
+			this.chatService.error_message().subscribe((msg: ErrorMessage) => {
+				let room_id = 0;
+				let room_name = 'Global';
+
+				if (!msg.msg)
+					msg.msg = "Undefined error";
+				if (this.selectedRoom){
+					room_id = this.selectedRoom?.id;
+					room_name = this.selectedRoom?.name;
+				} else if (msg.room){
+					room_id = this.roomsList[msg.room].id;
+					room_name = msg.room;
+				}
+				const message : MessageInterface = {
+					message: msg.msg,
+					roomId: room_id,
+					room_name: room_name,
+					senderId: -1,
+					sender_name: "Error Handler",
+					sender_avatar: '',
+					type: 'text',
+					created: new Date(),
+				}
 				console.log(`error_message ${message.message} - ${this.selectedRoom?.name}`);
 				if (!this.roomsList[message.room_name])
 					this.roomsList[message.room_name];
@@ -110,12 +133,10 @@ export class FranChatUiComponent implements AfterViewInit{
 		}
 
 		this.chatService.getRoomsss().subscribe((chatRoomList: Record<string, Rooms>) => {
-			// ////console.log("getRoomsss record");
 			this.roomsList = chatRoomList;
 		});
 
 		this.chatService.getConnectedUsers().subscribe((userList: any) => {
-			// ////console.log("getconnectedusers subscribe");
 			this.userss = userList;
 		})
 
@@ -185,6 +206,9 @@ export class FranChatUiComponent implements AfterViewInit{
 		  }).onClose.subscribe((input: any) => {
 			if (input) {
 				this.chatService.createRoom(input.roomName, '', input.password);
+				setTimeout(() => {
+					this.onSelect(this.roomsList[input.roomName])
+				}, 300);
 			}
 		  });
 	}
@@ -287,6 +311,12 @@ export class FranChatUiComponent implements AfterViewInit{
 	{
 		// console.log("updating name");
 		this.chatService.updateName(this.user.nickname);
+	}
+
+	last_open_room()
+	{
+		this.chatService.last_open_room(this.selectedRoom!.name);
+		console.log("open room: " + this.selectedRoom!.name);
 	}
 
 	leaveRoom() {
