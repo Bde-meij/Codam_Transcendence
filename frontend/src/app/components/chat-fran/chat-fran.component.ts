@@ -52,6 +52,7 @@ export class FranChatUiComponent implements AfterViewInit{
 	userNameForm!: FormGroup;
 	userNotFound: boolean = false;
 	
+	blockedList: number[] = [];
 	onSelect(room: Rooms): void {
 		console.log("users: ", room.users);
 		this.change_sender_avatar(room.name);
@@ -93,6 +94,9 @@ export class FranChatUiComponent implements AfterViewInit{
 			this.chatService.getMessages().subscribe((newmessage: any ) => {
 				if (this.roomsList[newmessage.room_name]?.messages) {
 					console.log("message re3ceived");
+					this.blockedList = [];
+					if (this.blockedList.includes(newmessage.senderId))
+						return;
 					if (newmessage.senderId > 0)
 						newmessage.sender_avatar = this.get_avatar(newmessage.senderId);
 					// this.userService.getAvatar(newmessage.senderId).subscribe((data) => (
@@ -105,7 +109,7 @@ export class FranChatUiComponent implements AfterViewInit{
 			this.chatService.error_message().subscribe((msg: ErrorMessage) => {
 				let room_id = 0;
 				let room_name = 'Global';
-
+				
 				if (!msg.msg)
 					msg.msg = "Undefined error";
 				if (this.selectedRoom){
@@ -120,7 +124,7 @@ export class FranChatUiComponent implements AfterViewInit{
 					roomId: room_id,
 					room_name: room_name,
 					senderId: -1,
-					sender_name: "Error Handler",
+					sender_name: "System messager",
 					sender_avatar: '',
 					type: 'text',
 					created: new Date(),
@@ -128,6 +132,7 @@ export class FranChatUiComponent implements AfterViewInit{
 				console.log(`error_message ${message.message} - ${this.selectedRoom?.name}`);
 				if (!this.roomsList[message.room_name])
 					this.roomsList[message.room_name];
+				console.log("error message naar " + message.room_name);
 				this.roomsList[message.room_name].messages?.push(message);
 			})
 			subbed = true;
@@ -221,7 +226,8 @@ export class FranChatUiComponent implements AfterViewInit{
 		}).onClose.subscribe((input: any) => {
 			if (input) {
 				console.log(input);
-				this.chatService.settingsChat(input.roomName, input.password, input.roomType);
+				console.log(input.roomName);
+				this.chatService.settingsChat(input);
 				setTimeout(() => {
 					this.onSelect(this.roomsList[input.roomName])
 				}, 300);

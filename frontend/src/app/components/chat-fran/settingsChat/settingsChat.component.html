@@ -1,33 +1,46 @@
 <nb-card>
-	<nb-card-header>Create a new room</nb-card-header>
+	<nb-card-header><h6>Change settings of {{this.selectedRoom!.name}}</h6></nb-card-header>
 	<nb-card-body>
 	  <form (ngSubmit)="submitForm()">
 		<div class="radio-buttons">
 			<input type="radio" id="public" name="room_type" [(ngModel)]="roomType" value="public">
 			<label for="public">Public</label>
-
 			<input type="radio" id="private" name="room_type" [(ngModel)]="roomType" value="private">
 			<label for="private">Private</label>
-
 			<input type="radio" id="protected" name="room_type" [(ngModel)]="roomType" value="protected">
 			<label for="protected">Protected</label>
 		</div>
+
 		<div class="room-name-input">
 			<label for="roomName">Room name:</label>
 			<input type="text" id="roomName" name="roomName" nbInput [(ngModel)]="roomName" [readonly]="true" required>
 		</div>
+
 		<div class="password-option" *ngIf="roomType !== 'public'">
 			<input type="checkbox" id="passwordOption" name="passwordOption" [(ngModel)]="withPassword" value="false" >
 			<label for="passwordOption">With password</label>
 		</div>
+
 		<div class="password-input" *ngIf="roomType !== 'public'">
 			<label for="password"> Password:</label>
 			<input type="text" id="password" name="password" nbInput [(ngModel)]="password" [disabled]="roomType === 'public' || !withPassword">
+		</div>
+
+		<div *ngFor="let userId of selectedRoom!.users">
+			<nb-toggle *ngIf=isAdmin(userId) [checked]="true" (checkedChange)="toggle($event, userId)"> {{userId}} don't you do it..</nb-toggle>
+			<nb-toggle *ngIf=!isAdmin(userId) [checked]="false" (checkedChange)="toggle($event, userId)"> {{userId}} make me admin!</nb-toggle>
+		</div>
+
+		<div>
+			<h6>Active Admins:</h6>
+			<li *ngFor="let user of admins">User {{user}}</li>
+		</div> 
+
 		<div class="submit-button">
 			<button nbButton type="submit">Submit</button>
 			<div *ngIf="submitWithoutName" class="error">Please give your room a name</div>
 		</div>
-		</div>
+		
 	  </form>
 	</nb-card-body>
   </nb-card>

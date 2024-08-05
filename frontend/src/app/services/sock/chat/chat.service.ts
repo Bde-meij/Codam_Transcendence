@@ -69,9 +69,9 @@ export class ChatService{
 		});
 	}
 
-	settingsChat(room_name: string, status: string, password: string): void {
-		// console.log("createRoom called: " + room_name + ", status: " + status + ", password: " + password);
-		this.chatSocket.emit('settingsChat', { room_name, status, password}, (err: any) => {
+	settingsChat(input: any): void {
+		// console.log("settingsChat called: " + room_name + ", status: " + status + ", password: " + password + ", admins: " + admins);
+		this.chatSocket.emit('settingsChat', input, (err: any) => {
 			if (err) {
 				// console.log("createRoom chat-sock error: ");
 				// console.log(err);

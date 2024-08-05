@@ -20,7 +20,10 @@
 		<!-- Chat Box -->
 		<div *ngIf="!selectedRoom">Select or create a room</div>
 		<div class="chat-column" *ngIf="selectedRoom"> 
-		<button (click)="settingsChat(selectedRoom)">Settings of {{selectedRoom.name}}</button>
+
+		<div *ngIf="selectedRoom!.owner === this.user.id">
+			<button (click)="settingsChat(selectedRoom)">Settings of {{selectedRoom.name}}</button>
+		</div>
 		  <nb-chat size="large" scrollbottom="true" [title]="selectedRoom.name">
 			<a *nbCustomMessage="'link'" href="/dashboard/game" (click)="joinBattle()">Join battle!</a>
 			<nb-chat-message *ngFor="let msg of selectedRoom.messages"
@@ -57,9 +60,6 @@
 			</button>
 			<button [disabled]="!isChannelAdmin() || !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="invite()">
 				Invite chat
-			</button>
-			<button [disabled]="!isChannelAdmin() || !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="setAdmin()">
-				setAdmin
 			</button>
 			<button [disabled]="!isChannelAdmin() || !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="leaveRoom()">
 				leaveRoom
