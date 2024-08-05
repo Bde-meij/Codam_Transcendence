@@ -153,8 +153,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			password: data.password_bool,
 			messages: [], 
 		};
-		//console.log(`socket data nickname: ${socket.data.nickname} en ${socket.data.id} en ${socket.id}`);
-
+		//unique room id from database.
 		const CreateRoomDB: any =  await this.chatService.createChatRoom({name :  data.room_name, password: data.password })
 		if (!CreateRoomDB){
 			this.emit_error_message(socket, `Room '${data.room_name}' already exists in the database, please pick another name`, 1, socket.data.room)
@@ -166,72 +165,25 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		this.chatRoomList[data.room_name].users.push(socket.data.userid);
 		console.log(`joining ${socket.data.id}`);
 		console.log(`joining ${this.chatRoomList[data.room_name].id}`);
-
+		//adding invite user
+		var userid = null;
+		if (data.username){
+			userid = this.findUserId(data.username);	
+		}
+		if (data.userid){
+			userid = data.userid;	
+		}
+		if (userid){
+			this.chatRoomList[data.room_name].users.push(userid);
+			if (data.password_bool == false){
+				const user = await this.findSocketUser(userid);
+				user.join(this.chatRoomList[data.room_name].id.toString());
+			}
+		}
+	
 		socket.join(this.chatRoomList[data.room_name].id.toString());
 		if (this.chatRoomList[data.room_name].status == "public"){
 			console.log("public room");
-			this.update_public(data.room_name);
-		}
-		this.update_client_rooms(CreateRoomDB.id, data.room_name);
-		socket.emit('getRoomss', this.chatRoomList);
-		
-		this.channelUserList(data.room_name);	
-	}
-
-	@SubscribeMessage('createPrivateRoom')
-	async createPrivateRoom(
-	@MessageBody() data: { room_name: string; user: number, password: string },
-	@ConnectedSocket() socket: Socket) 
-	{
-		//check if exists if so exit
-		const room = Object.values(this.chatRoomList).find(
-			(room_name) => room_name.name === data.room_name,
-		);
-		if (room) {
-			console.log("roomexists");
-			this.emit_error_message(socket, "Room already exists", 1, socket.data.room)
-			return;
-		}
-		Object.values(this.chatRoomList).forEach(room => {
-			if (room.status == "private"){
-				if (room.users.includes(data.user) && room.users.includes(socket.data.userid)) {
-					this.emit_error_message(socket, "Room already exists", 1, socket.data.room)
-					return;
-				}
-			}
-		});
-		//console.log("createRoom called: " + data.room_name);
-		socket.data.id = -1;
-		socket.data.name = data.room_name;
-		this.chatRoomList[data.room_name] = {
-			id: -1,
-			name: data.room_name,
-			owner: socket.data.userid,
-			admins: [socket.data.userid],
-			banned: [],
-			muted: {},
-			users: [socket.data.userid][data.user],
-			status: "private",
-			password: false,
-			messages: [], 
-		};
-		//console.log(`socket data nickname: ${socket.data.nickname} en ${socket.data.id} en ${socket.id}`);
-
-		const CreateRoomDB: any =  await this.chatService.createChatRoom({name :  data.room_name, password: data.password })
-		if (!CreateRoomDB){
-			this.emit_error_message(socket, "Room already exists", 1, socket.data.room)
-			return;
-		}
-		this.chatRoomList[data.room_name].id = CreateRoomDB.id;
-		socket.data.id = CreateRoomDB.id;
-		this.chatRoomList[data.room_name].users.push(socket.data.userid);
-		this.chatRoomList[data.room_name].users.push(data.user);
-
-		console.log(`joining ${socket.data.id}`);
-		console.log(`joining ${this.chatRoomList[data.room_name].id}`);
-
-		socket.join(this.chatRoomList[data.room_name].id.toString());
-		if (this.chatRoomList[data.room_name].status == "public"){
 			this.update_public(data.room_name);
 		}
 		this.update_client_rooms(CreateRoomDB.id, data.room_name);
@@ -873,6 +825,12 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		client.data.room = room;
 	}
 
+	@SubscribeMessage('settingsChat') async settingsChat(
+	@MessageBody() room: string,
+	@ConnectedSocket() client: Socket) 
+	{	
+		client.data.room = room;
+	}
 
 	@SubscribeMessage('updateName') async check_name(
 	@MessageBody() data: {sender_name: string},
@@ -960,6 +918,16 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		const sockets = await this.io.fetchSockets();
 		for (const socketId of sockets) {
 			if (socketId.data.userid == userid){
+				return socketId.data.nickname
+			}
+		}
+		console.log("username not found");
+	}
+
+	async findUserId(username: string){
+		const sockets = await this.io.fetchSockets();
+		for (const socketId of sockets) {
+			if (socketId.data.nickname == username){
 				return socketId.data.nickname
 			}
 		}

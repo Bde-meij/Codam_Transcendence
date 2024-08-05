@@ -65,6 +65,8 @@ export interface ErrorMessage{
 export interface createRoomDto{
 	room_name: string,
 	status: string, 
+	username?: string,
+	userid?: number,
 	password: string,
 	password_bool: boolean,
 }

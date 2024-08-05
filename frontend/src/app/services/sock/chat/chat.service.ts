@@ -19,7 +19,7 @@ export class ChatService{
 	userss: string[] = [];
 	rooms: Rooms[] = []; 
 	roomss: Rooms[] = []; 
-
+	private selectedRoom?: Rooms;
 	constructor(sockService: SockService, private userService: UserService) {
 		this.userService.getUser('current').subscribe((userData) => {
 			this.user = userData;
@@ -61,6 +61,17 @@ export class ChatService{
 	createRoom(room_name: string, status: string, password: string): void {
 		// console.log("createRoom called: " + room_name + ", status: " + status + ", password: " + password);
 		this.chatSocket.emit('createRoom', { room_name, status, password}, (err: any) => {
+			if (err) {
+				// console.log("createRoom chat-sock error: ");
+				// console.log(err);
+				// console.log(err.message);
+			}
+		});
+	}
+
+	settingsChat(room_name: string, status: string, password: string): void {
+		// console.log("createRoom called: " + room_name + ", status: " + status + ", password: " + password);
+		this.chatSocket.emit('settingsChat', { room_name, status, password}, (err: any) => {
 			if (err) {
 				// console.log("createRoom chat-sock error: ");
 				// console.log(err);
@@ -408,4 +419,13 @@ export class ChatService{
 	isUnread() {
 		return this.unread;
 	}
+
+	set room(room: Rooms) {
+		this.selectedRoom = room;
+	  }
+
+	  get room(): Rooms | undefined {
+		return this.selectedRoom;
+	  }
+
 }

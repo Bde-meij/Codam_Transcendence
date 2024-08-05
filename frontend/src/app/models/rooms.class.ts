@@ -7,7 +7,7 @@ export interface Rooms {
 	users: number[];
 	muted?: string[];
 	status: string; //public, private
-	password: string; //true or false?
+	password: boolean; //true or false?
 	created?: Date;
 	updated?: Date;
 	messages?: MessageInterface[];
@@ -46,6 +46,8 @@ export interface ErrorMessage{
 export interface createRoomDto{
 	room_name: string,
 	status: string, 
+	username?: string,
+	userid?: number,
 	password: string,
 	password_bool: boolean,
 }
