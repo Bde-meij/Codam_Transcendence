@@ -14,7 +14,7 @@
 		</div>
 		<div class="room-name-input">
 			<label for="roomName">Room name:</label>
-			<input type="text" id="roomName" name="roomName" nbInput [(ngModel)]="roomName" required>
+			<input type="text" id="roomName" name="roomName" nbInput [(ngModel)]="roomName" [readonly]="true" required>
 		</div>
 		<div class="password-option" *ngIf="roomType !== 'public'">
 			<input type="checkbox" id="passwordOption" name="passwordOption" [(ngModel)]="withPassword" value="false" >

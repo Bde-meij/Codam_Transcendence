@@ -1,6 +1,6 @@
 import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, ViewChild } from '@angular/core';
-import { NbAutocompleteModule, NbButtonModule, NbCardModule, NbChatModule, NbDialogService, NbUserModule } from '@nebular/theme';
+import { NbAutocompleteModule, NbButtonModule, NbCardModule, NbChatModule, NbDialogConfig, NbDialogService, NbUserModule } from '@nebular/theme';
 import { ChatService } from '../../services/sock/chat/chat.service';
 import { UserService } from '../../services/user/user.service';
 import { User } from '../../models/user.class';
@@ -12,6 +12,7 @@ import { Observable, of, map, catchError } from 'rxjs';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { forbiddenNameValidator } from '../../services/validator/name-validator.service';
 import { Router } from '@angular/router';
+import { settingsChat } from './settingsChat/settingsChat.component';
 
 let subbed = false;
 
@@ -201,11 +202,26 @@ export class FranChatUiComponent implements AfterViewInit{
 
 	userCreatesRoom() {
 		this.dialogService.open(createChatRoom, {
-			context: {
-			}
+			context: {}
 		  }).onClose.subscribe((input: any) => {
 			if (input) {
-				this.chatService.createRoom(input.roomName, '', input.password);
+				console.log(input);
+
+				this.chatService.createRoom(input.roomName, input.status, input.password);
+				setTimeout(() => {
+					this.onSelect(this.roomsList[input.roomName])
+				}, 300);
+			}
+		  });
+	}
+
+	settingsChat(room: Rooms) {
+		this.chatService.room = this.selectedRoom!;
+		this.dialogService.open(settingsChat, {context:{}
+		}).onClose.subscribe((input: any) => {
+			if (input) {
+				console.log(input);
+				this.chatService.settingsChat(input.roomName, input.password, input.roomType);
 				setTimeout(() => {
 					this.onSelect(this.roomsList[input.roomName])
 				}, 300);
