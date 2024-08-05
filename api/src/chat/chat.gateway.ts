@@ -91,6 +91,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			this.connectedUsers.push(client.data.userid);
 			this.io.emit('getConnectedUsers', this.connectedUsers);
 			client.emit('getRoomss', this.chatRoomList);
+			this.get_all_blocked(client.data.userid, client);
 		} catch {
 			console.log(client.id, "connection refused");
 			client.disconnect();
@@ -157,7 +158,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		const CreateRoomDB: any =  await this.chatService.createChatRoom({name :  data.room_name, password: data.password })
 		if (!CreateRoomDB){
 			this.emit_error_message(socket, `Room '${data.room_name}' already exists in the database, please pick another name`, 1, socket.data.room)
-			console.log("already exists");
+			console.log("already exist5,7 s");
 			return;
 		}
 		this.chatRoomList[data.room_name].id = CreateRoomDB.id;
@@ -208,7 +209,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			socket.data.nickname = data.sender_name
 		}
 		// this.name_changer(socket, data.sender_name);
-		console.log("handleMessage: " + data.room + ", by: " + socket.id);
+		console.log("handleMessage: " + data.room + ", by: " + socket.data.nickname);
 		const Room = this.findRoom(data.room, "message");
 		if (!Room){
 			console.log(`Room doesn't exist`);
@@ -242,11 +243,12 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		};
 		// //console.log("room: " + data.room + ", socketdataid: " + socket.data.userid);
 		// this.addDate();
-		console.log("sending msg");
+		console.log("sending msg by ", socket.data.nickname);
 		this.chatRoomList[Room.name].messages.push(message);
 		this.io.to(Room.id.toString()).emit('message', message);
 		const msg =  message;
 		this.channelUserList(Room.name);
+		this.get_all_blocked(socket.data.userid, socket);
 	}
 
 	//room number
@@ -494,6 +496,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			// const msg: MessageInterface = this.create_msg(`${user.nickname} blocked`, -1, data.room, -1 ,client.data.nickname,'text','')
 			// client.emit("error_message", msg)
 			this.emit_error_message(client, `${user.nickname} blocked`, 0, client.data.room)
+			this.get_all_blocked(client.data.userid, client);
 			console.log(`user blocked`);
 		}
 		catch(error){
@@ -501,6 +504,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			// const msg = this.create_msg(`Can't block ${user.nickname} ${error}`, -1, data.room, -1 ,client.data.nickname,'text','')
 			// client.emit("error_message", msg)
 			console.log(`block ${error}`);
+			console.log(`block error`);
 		}
 	}
 
@@ -708,7 +712,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	private joinArrayChats(socket: Socket, username: string, user_id: number) {
 		Object.values(this.chatRoomList).forEach(room => {
-		  if (room.users.includes(user_id)) {
+		  if (room.users.includes(user_id) && room.password == false) {
 			socket.join(room.id.toString());
 			//console .log(`joinArrayChats User ${username} joined room ${room.name}`);
 		  }
@@ -775,6 +779,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@ConnectedSocket() client: Socket) 
 	{	
 		console.log(`updateRoom`);
+		this.get_all_blocked(client.data.userid, client);
 		var temp : Record<string, Rooms> = {};
 		Object.values(this.chatRoomList).forEach(room => {
 			if (room.users.includes(data.user_id) || room.status == "public")
@@ -834,6 +839,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	{	
 		this.change_msg_name(socket.data.userid, data.sender_name);
 		socket.data.nickname = data.sender_name
+		console.log("new name: ", socket.data.nickname);
 		
 	}
 	
@@ -1019,6 +1025,17 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		}
 	}
 
+	async get_all_blocked(send_user_id: number, socket: Socket){
+		try{
+			const blockResult = await this.blockService.getAllBlocked(send_user_id);
+			console.log("get all blocked", blockResult);
+			socket.emit("blocked", blockResult);
+		}
+		catch(error){
+			console.log("doesnt work");
+		}
+	}
+	
 	listMutedUsers(roomId: string): void {
 		const room = this.findRoom(roomId, 'listMutedUsers');
 		if (!room.muted) {
@@ -1060,7 +1077,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	async change_msg_name(userid: number, new_name: string){	
 		Object.values(this.chatRoomList).forEach(room => {
 			this.chatRoomList[room.name].messages.forEach(msg => {
-				console.log(msg.sender_name);
+				// console.log(msg.sender_name);
 				if (msg.senderId == userid){
 					msg.sender_name = new_name;
 				}
@@ -1073,6 +1090,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				this.update_client_rooms(room.id, room.name)
 			}
 		})
+		console.log("name changed");
 	}
 
 	private name_changer(socket: Socket, name: string){

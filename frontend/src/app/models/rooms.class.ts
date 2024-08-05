@@ -1,3 +1,5 @@
+import { User } from "./user.class";
+
 export interface Rooms {
 	id: number;
 	name: string;
@@ -50,4 +52,11 @@ export interface createRoomDto{
 	userid?: number,
 	password: string,
 	password_bool: boolean,
+}
+
+export interface Blocks {
+	id: number;
+	sender: User;
+	target: User;
+	createdAt: Date;
 }

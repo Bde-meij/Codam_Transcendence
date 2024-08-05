@@ -79,6 +79,7 @@ export class messageDto{
 	sender_name: string;
 	@IsNumber()
 	sender_id: number;
+	@IsAlphanumeric()
 	room: string;
 	type: string;
 	customMessageData: {href: string, text: string};

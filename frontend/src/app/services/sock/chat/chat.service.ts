@@ -1,4 +1,5 @@
 import { Injectable, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { io } from 'socket.io-client';
 import { SockService } from '../sock.service';
@@ -6,13 +7,14 @@ import { UserService } from '../../user/user.service';
 import { User } from '../../../models/user.class';
 import { skip } from 'rxjs/operators';
 import { ErrorMessage, MessageInterface, Rooms } from '../../../models/rooms.class';
-
+import { Blocks } from '../../../models/rooms.class';
 @Injectable({
   providedIn: 'root'
 })
 export class ChatService{
 	count = 0;
 	private chatSocket = io("/chat");
+	private blockUrl = '/api/block';
 	private unread = false;
 	user!: User;
 
@@ -20,7 +22,11 @@ export class ChatService{
 	rooms: Rooms[] = []; 
 	roomss: Rooms[] = []; 
 	private selectedRoom?: Rooms;
-	constructor(sockService: SockService, private userService: UserService) {
+	constructor(
+				private http: HttpClient,
+				sockService: SockService, 
+				private userService: UserService) 
+	{
 		this.userService.getUser('current').subscribe((userData) => {
 			this.user = userData;
 		});
@@ -31,6 +37,7 @@ export class ChatService{
 		// });
 		// sockService.newSocketRegister("chatSocket");
 	}
+
 	ngOnInit(): void {
 		// console.log("dfd?");
 		// this.user$ = this.userService.getUser(0);
@@ -180,6 +187,14 @@ export class ChatService{
 	error_message(): Observable<ErrorMessage> {
 		return new Observable((observer) => {
 			this.chatSocket.on("error_message", (message) => {
+				observer.next(message);
+			});
+		});
+	}
+
+	get_all_blocked(): Observable<any> {
+		return new Observable((observer) => {
+			this.chatSocket.on("blocked", (message) => {
 				observer.next(message);
 			});
 		});
@@ -341,6 +356,16 @@ export class ChatService{
 		});
 	}
 
+	unblockUser(user: string, room: string){
+		this.chatSocket.emit('unblock', {user, room}, (err: any) => {
+			if (err) {
+				// console.log("kickUser chat-sock error: ");
+				// console.log(err);
+				// console.log(err.message);
+			}
+		});
+	}
+
 	updateName(user: string){
 		const data = {
 			sender_name: user
@@ -422,10 +447,21 @@ export class ChatService{
 
 	set room(room: Rooms) {
 		this.selectedRoom = room;
-	  }
+	}
 
-	  get room(): Rooms | undefined {
+	get room(): Rooms | undefined {
 		return this.selectedRoom;
-	  }
+	}
 
+	getBlocked() {
+		return this.http.get<Blocks[]>(this.blockUrl + '/all-blocked:', {});
+	}
+	
+	isBlocked(userid: number){
+		return this.http.get<Blocks[]>(this.blockUrl + '/is-blocked/:' + userid.toString(), {});
+	}
+
+	removeBlock(userid: number){
+		return this.http.get<Blocks[]>(this.blockUrl + '/delete-block-user/:' + userid, {});
+	}
 }

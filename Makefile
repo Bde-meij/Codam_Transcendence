@@ -1,6 +1,6 @@
 NAME = v1
 
-all: down up
+all: up
 
 re: data clean build up
 

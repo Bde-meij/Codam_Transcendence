@@ -4,7 +4,7 @@ import { NbAutocompleteModule, NbButtonModule, NbCardModule, NbChatModule, NbDia
 import { ChatService } from '../../services/sock/chat/chat.service';
 import { UserService } from '../../services/user/user.service';
 import { User } from '../../models/user.class';
-import { ErrorMessage, MessageInterface, Rooms } from '../../models/rooms.class';
+import { Blocks, ErrorMessage, MessageInterface, Rooms } from '../../models/rooms.class';
 import { NbThemeModule, NbLayoutModule} from '@nebular/theme';
 import { UserDetailComponent } from '../user-detail/user-detail.component';	
 import { createChatRoom } from './createChatRoom/createChatRoom.component';
@@ -15,6 +15,7 @@ import { Router } from '@angular/router';
 import { settingsChat } from './settingsChat/settingsChat.component';
 
 let subbed = false;
+
 
 @Component({
 	selector: 'fran-chat-ui',
@@ -51,15 +52,17 @@ export class FranChatUiComponent implements AfterViewInit{
 	selectedRoom: Rooms | undefined;
 	userNameForm!: FormGroup;
 	userNotFound: boolean = false;
-	
-	blockedList: number[] = [];
+	blockbool: boolean = false;
+	blockedList?: Blocks[];
+
 	onSelect(room: Rooms): void {
+		this.selectedRoom = room;
+		this.last_open_room();
 		console.log("users: ", room.users);
 		this.change_sender_avatar(room.name);
 		this.joinRoom(room.name, '');
 		console.log("users: ", room.users);
 		this.selectedRoom = room;
-		this.last_open_room();
 		//console.log(room.messages);
 	};
 
@@ -74,6 +77,7 @@ export class FranChatUiComponent implements AfterViewInit{
 	};
 
 	ngOnInit() {
+		this.getLists();
 		this.userNameForm = new FormGroup({
 			userName: new FormControl('', {
 				validators: [
@@ -86,24 +90,38 @@ export class FranChatUiComponent implements AfterViewInit{
 		});
 		this.userService.getUser('current').subscribe((userData: User) => {
 			this.user = userData;
-			if (this.user)
+			if (this.user){
+				console.log("namechange?");
 				this.updateName();
+			}
 		});
 		
 		if (!subbed) {
 			this.chatService.getMessages().subscribe((newmessage: any ) => {
 				if (this.roomsList[newmessage.room_name]?.messages) {
-					console.log("message re3ceived");
-					this.blockedList = [];
-					if (this.blockedList.includes(newmessage.senderId))
-						return;
+					console.log("New message");
+					this.blockedList?.forEach(block => {
+						if (block.target.id == newmessage.senderId)
+							console.log("already blocked?");
+							this.blockbool = true;
+							return;	
+					});
+					// if (this.blockedList.includes(newmessage.senderId))
+					// 	return;
 					if (newmessage.senderId > 0)
 						newmessage.sender_avatar = this.get_avatar(newmessage.senderId);
 					// this.userService.getAvatar(newmessage.senderId).subscribe((data) => (
 					// 	newmessage.sender_avatar = URL.createObjectURL(data)
 					// ))
-					this.roomsList[newmessage.room_name].messages?.push(newmessage);
+					if (!this.blockbool){
+						console.log("blockblool = faslse", this.blockbool);
+						this.roomsList[newmessage.room_name].messages?.push(newmessage);
+					}
+					else
+						this.blockbool = false;
+					
 				}
+				this.blockbool = false;
 			});
 
 			this.chatService.error_message().subscribe((msg: ErrorMessage) => {
@@ -135,6 +153,11 @@ export class FranChatUiComponent implements AfterViewInit{
 				console.log("error message naar " + message.room_name);
 				this.roomsList[message.room_name].messages?.push(message);
 			})
+
+			this.chatService.get_all_blocked().subscribe((blocked: any) => {
+				console.log("blockedlist:", blocked);
+				this.blockedList = blocked
+			})
 			subbed = true;
 		}
 
@@ -149,6 +172,16 @@ export class FranChatUiComponent implements AfterViewInit{
 		this.chatService.update_public().subscribe((update_room: Rooms) => {
 			console.log(`update_public: ${update_room.name}`);
 			console.log(update_room);
+			if (update_room.messages){
+				for (let i = update_room.messages.length - 1; i >= 0; i--) {
+					const msg = update_room.messages[i];
+					const isBlocked = this.blockedList?.some(block => Number(block.target.id) === msg.senderId);
+					if (isBlocked){
+						update_room.messages.splice(i, 1);
+					}
+				}
+			}
+			
 			this.roomsList[update_room.name] = update_room;
 		})
 
@@ -329,6 +362,11 @@ export class FranChatUiComponent implements AfterViewInit{
 		this.chatService.blockUser(this.userNameForm.value.userName, this.selectedRoom!.name);
 	}
 
+	unblock()
+	{
+		this.chatService.unblockUser(this.userNameForm.value.userName, this.selectedRoom!.name);
+	}
+
 	updateName()
 	{
 		// console.log("updating name");
@@ -413,5 +451,16 @@ export class FranChatUiComponent implements AfterViewInit{
 
 	onAvatarClick(msg: any) {
 		console.log("Avatar clicked on!");
+	}
+
+	getLists() {
+		this.chatService.getBlocked().subscribe({
+			next: (data) => (
+				this.blockedList = data,
+				console.log("all blocked ", data)
+			),
+			error: (e) => (
+				console.error("all blocked error: " + e))
+		});
 	}
 }

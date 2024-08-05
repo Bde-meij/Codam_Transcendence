@@ -70,6 +70,9 @@
 			<button [disabled]="!isChannelAdmin() || !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="block()">
 				Block
 			</button>
+			<button [disabled]="!isChannelAdmin() || !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="unblock()">
+				Unblock
+			</button>
 			<p class="user-not-found" *ngIf="userNotFound">User not found in this room</p>
 		</div>
 		</div>
