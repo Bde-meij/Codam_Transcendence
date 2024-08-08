@@ -177,7 +177,11 @@ export class BossGameComponent implements OnInit, OnDestroy
 			this.removeAssets();
 			this.texts.win.text = "PLAYERS WON!"
 			this.game.add(this.texts.win);
-			setTimeout(() => {this.ngOnDestroy()}, 2000);
+			setTimeout(() =>{{
+				if (window.location.pathname === '/dashboard/bossPong') {
+					this.router.navigate(['/dashboard/game-menu']);
+				}
+			;}},2000);
 		})
 		
 		this.gameSrv.on("playersLose", () =>
@@ -185,7 +189,11 @@ export class BossGameComponent implements OnInit, OnDestroy
 			this.removeAssets();
 			this.texts.win.text = "YOU LOST!"
 			this.game.add(this.texts.win);
-			setTimeout(() => {this.ngOnDestroy()}, 2000);
+			setTimeout(() =>{{
+				if (window.location.pathname === '/dashboard/bossPong') {
+					this.router.navigate(['/dashboard/game-menu']);
+				}
+			;}},2000);
 		})
 
 		this.gameSrv.on("outOfBounds", (lives: number) =>
@@ -258,7 +266,11 @@ export class BossGameComponent implements OnInit, OnDestroy
 		{
 			this.game.remove(this.texts.wait);
 			this.game.remove(this.texts.timer);
-			setTimeout(() =>{{this.ngOnDestroy();}},2000);
+			setTimeout(() =>{{
+				if (window.location.pathname === '/dashboard/bossPong') {
+					this.router.navigate(['/dashboard/game-menu']);
+				}
+			;}},2000);
 			this.game.add(this.texts.abort);
 		});
 	}
@@ -312,6 +324,8 @@ export class BossGameComponent implements OnInit, OnDestroy
 		this.game.stop();
 		this.game.canvas.remove();
 		this.gameSrv.disconnect();
-		this.router.navigate(['/dashboard/game-menu']);
+		if (window.location.pathname === '/dashboard/bossPong') {
+			this.router.navigate(['/dashboard/game-menu']);
+		}
 	}
 }
