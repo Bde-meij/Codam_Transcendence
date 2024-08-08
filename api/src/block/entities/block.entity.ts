@@ -2,7 +2,7 @@ import { User } from "src/user/entities/user.entity";
 import { CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('block')
-export class Block {
+export class Blocks {
 	@PrimaryGeneratedColumn()
 	id: number;
 

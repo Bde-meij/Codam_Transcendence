@@ -1,4 +1,4 @@
-import { Block } from "src/block/entities/block.entity";
+import { Blocks } from "src/block/entities/block.entity";
 import { FriendRequest } from "src/friends/entities/friend.entity";
 import { Match } from "src/game/entities/match.entity";
 import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
@@ -29,11 +29,11 @@ export class User {
 	@OneToMany(() => FriendRequest, (friend) => friend.target)
 	friendIn: FriendRequest[];
 
-	@OneToMany(() => Block, (block) => block.sender)
-	blockOut: Block[];
+	@OneToMany(() => Blocks, (block) => block.sender)
+	blockOut: Blocks[];
 
-	@OneToMany(() => Block, (block) => block.target)
-	blockIn: Block[];
+	@OneToMany(() => Blocks, (block) => block.target)
+	blockIn: Blocks[];
 
 	@OneToMany(() => Match, (match) => match.winningPlayer)
 	matchWinningPlayer: Match[];

@@ -1,13 +1,15 @@
+import { User } from "./user.class";
+
 export interface Rooms {
-	id: string;
+	id: number;
 	name: string;
 	owner: string;
-	admins: string[];
+	admins: number[];
 	banned?: string[];
-	users: string[];
+	users: number[];
 	muted?: string[];
 	status: string; //public, private
-	password: string; //true or false?
+	password: boolean; //true or false?
 	created?: Date;
 	updated?: Date;
 	messages?: MessageInterface[];
@@ -23,4 +25,38 @@ export interface MessageInterface {
 	updated?: Date;
 	game?: boolean;
 	sender_avatar?: string;
+	type: string;
+	customMessageData?: {href: string, text: string};
+}
+
+export interface messageDto{
+	message: string;
+	sender_name: string;
+	sender_id: number;
+	room: string;
+	type: string;
+	customMessageData: {href: string, text: string};
+	sender_avatar: string;
+}
+
+export interface ErrorMessage{
+	msg: string;
+	status_code: number;
+	room?: string;
+}
+
+export interface createRoomDto{
+	room_name: string,
+	status: string, 
+	username?: string,
+	userid?: number,
+	password: string,
+	password_bool: boolean,
+}
+
+export interface Blocks {
+	id: number;
+	sender: User;
+	target: User;
+	createdAt: Date;
 }

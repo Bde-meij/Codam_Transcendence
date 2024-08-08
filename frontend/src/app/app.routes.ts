@@ -8,12 +8,12 @@ import { FriendsComponent } from './components/friends/friends.component';
 import { AccountComponent } from './components/account/account.component';
 import { AuthGuard } from './authguard';
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
-import { ChatComponent } from './components/chat/chat.component';
 import { RegisterComponent } from './components/register/register.component';
 import { HomeComponent } from './components/home/home.component';
 import { GameMenuComponent } from './components/game-menu/game-menu.component';
 import { TwofaComponent } from './components/twofa/twofa.component';
 import { constTitle } from './models/title.const';
+import { FranChatUiComponent } from './components/chat-fran/chat-fran.component';
 import { UserDetailComponent } from './components/user-detail/user-detail.component';
 
 export const routes: Routes = [
@@ -78,16 +78,16 @@ export const routes: Routes = [
 				canActivate: [AuthGuard]
 			},
 			{
-				path: 'chat',
-				component: ChatComponent,
-				canActivate: [AuthGuard]
+				path: 'franchat',
+				component: FranChatUiComponent,
+				canActivate: [AuthGuard],
 			},
 			{
-				path: 'detail/:id',
+				path: 'detail/:id', 
 				// data: {id: routes.thisArg},
 				component: UserDetailComponent,
 				canActivate: [AuthGuard]
-			}
+			},
 		],
 	},
 	{
