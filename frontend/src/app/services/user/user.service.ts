@@ -26,16 +26,6 @@ export class UserService {
 		return this.http.get<any>(this.userUrl + '/isnametaken', {params: {nickname: nickname}});
 	}
 
-	// nameValidatorTaken(nickname: string) : Observable<boolean> {
-	// 	my_first_observable : Observable<boolean> = this.isNameTaken(nickname).pipe<boolean>((data) => {
-			
-	// 	});
-	// }
-
-	// isNameTaken (nickname: string) : Observable<boolean> {
-	// 	return this.http.get<boolean>(this.userUrl + '/isnametaken', {params: {nickname: nickname}});
-	// }
-
 	// to request your own info, use 'current', otherwise use the userID.
 	getUser(id : string) : Observable<any> {
 		if (id === 'current') {
