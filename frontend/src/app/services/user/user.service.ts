@@ -23,7 +23,7 @@ export class UserService {
 	}
 
 	isNameTaken (nickname: string) : Observable<boolean> {
-		return this.http.get<boolean>(this.userUrl + '/isnametaken/' + nickname);
+		return this.http.get<boolean>(this.userUrl + '/isnametaken', {params: {nickname: nickname}});
 	}
 
 	// to request your own info, use 'current', otherwise use the userID.

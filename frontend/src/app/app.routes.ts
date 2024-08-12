@@ -8,7 +8,6 @@ import { FriendsComponent } from './components/friends/friends.component';
 import { AccountComponent } from './components/account/account.component';
 import { AuthGuard } from './authguard';
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
-import { ChatComponent } from './components/chat/chat.component';
 import { RegisterComponent } from './components/register/register.component';
 import { HomeComponent } from './components/home/home.component';
 import { GameMenuComponent } from './components/game-menu/game-menu.component';
@@ -76,11 +75,6 @@ export const routes: Routes = [
 			{
 				path: 'account',
 				component: AccountComponent,
-				canActivate: [AuthGuard]
-			},
-			{
-				path: 'chat',
-				component: ChatComponent,
 				canActivate: [AuthGuard]
 			},
 			{

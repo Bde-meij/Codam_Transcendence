@@ -39,6 +39,10 @@ export class createChatRoom {
       this.password = '';
     if (this.roomName)
       this.dialogRef.close({roomName: this.roomName, password: this.password, roomType: this.roomType, users: this.users});
+    if (this.roomName){
+		console.log("roomtype:" , this.roomType);
+      this.dialogRef.close({roomName: this.roomName, password: this.password, roomType: this.roomType});
+	}
     else
       this.submitWithoutName = true;
   }

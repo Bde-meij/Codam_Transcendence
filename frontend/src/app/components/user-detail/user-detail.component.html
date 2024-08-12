@@ -9,8 +9,9 @@
 		@if(this.isfriend != undefined && this.isfriend == true) {
 			<button type="button" (click)="getStats()">get statistics</button>
 			<button type="button" (click)="getMatches()">get match history</button>
-
+			<button *ngIf="my_user?.id !== client_user?.id" type="button" (click)="inviteChat()">Chat with</button>
 			@if (this.stats != undefined) {
+				<div><span>rank :</span> {{stats.ranking}} </div>
 				<div><span>wins :</span> {{stats.wins}} </div>
 				<div><span>losses :</span> {{stats.losses}} </div>
 				<div><span>winrate :</span> {{stats.winrate}} </div>
@@ -82,6 +83,8 @@
 			@if (this.isfriend == true) {
 				<button class="unfriend" type="button" (click)="deleteFriend()"> delete friend </button>
 			}
+			<button type="button" (click)="routeProfile()"> Profile </button>
+
 		}
 
 		@if (this.errorMessage) {
