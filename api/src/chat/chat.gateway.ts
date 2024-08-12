@@ -168,7 +168,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		}
 		this.chatRoomList[data.room_name].id = CreateRoomDB.id;
 		socket.data.id = CreateRoomDB.id;
-		this.chatRoomList[data.room_name].users.push(socket.data.userid);
+		if (!this.chatRoomList[data.room_name].users.includes(socket.data.userid))
+			this.chatRoomList[data.room_name].users.push(socket.data.userid);
 		console.log(`joining ${socket.data.id}`);
 		console.log(`joining ${this.chatRoomList[data.room_name].id}`);
 		//adding invite user
@@ -180,7 +181,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			userid = data.userid;	
 		}
 		if (userid){
-			this.chatRoomList[data.room_name].users.push(userid);
+			if (!this.chatRoomList[data.room_name].users.includes(userid))
+				this.chatRoomList[data.room_name].users.push(userid);
 			if (data.password_bool == false){
 				const user = await this.findSocketUser(userid);
 				user.join(this.chatRoomList[data.room_name].id.toString());
@@ -208,7 +210,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@MessageBody() data: messageDto,
 	@ConnectedSocket() socket: Socket,
 	) {
-		console.log(`nickname: ${socket.data.nickname} en ${data.sender_name}`);
+		// console.log(`nickname: ${socket.data.nickname} en ${data.sender_name}`);
 		if (socket.data.nickname != data.sender_name){
 			// console.log("change msg name ", socket.data.userid, data.sender_name)
 			this.change_msg_name(socket.data.userid, data.sender_name);
@@ -249,7 +251,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		};
 		// //console.log("room: " + data.room + ", socketdataid: " + socket.data.userid);
 		// this.addDate();
-		console.log("sending msg by ", socket.data.nickname);
+		// console.log("sending msg by ", socket.data.nickname);
 		this.chatRoomList[Room.name].messages.push(message);
 		this.io.to(Room.id.toString()).emit('message', message);
 		const msg =  message;
@@ -799,7 +801,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		  }
 		  if (room.status === 'public' && !room.banned.includes(user_id)){
 			socket.join(room.id.toString());
-			this.chatRoomList[room.name].users.push(user_id);
+			if (!room.users.includes(user_id))
+				this.chatRoomList[room.name].users.push(user_id);
 			this.update_client_rooms(this.chatRoomList[room.name].id, room.name);
 		  }
 		 
@@ -1143,7 +1146,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		  console.log('No muted users.');
 		  return;
 		}
-		console.log('Muted users:');
+		// console.log('Muted users:');
 		for (const [userid, muteDate] of Object.entries(room.muted)) {
 		  console.log(`User ID: ${userid}, Muted Until: ${muteDate}`);
 		}
@@ -1232,7 +1235,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		const sockets = await this.io.in(room.toString()).fetchSockets();
 		for (const socketId of sockets) {
 			if (socketId.data.userid == userid){
-				console.log(`isConnected true: ${userid} found ${socketId.data.nickname} in ${room}`);
+				// console.log(`isConnected true: ${userid} found ${socketId.data.nickname} in ${room}`);
 				return true;
 			}
 		}

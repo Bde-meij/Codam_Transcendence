@@ -107,8 +107,6 @@ export class FranChatUiComponent implements AfterViewInit{
 							this.blockbool = true;
 							return;	
 					});
-					// if (this.blockedList.includes(newmessage.senderId))
-					// 	return;
 					if (newmessage.senderId > 0)
 						newmessage.sender_avatar = this.get_avatar(newmessage.senderId);
 					// this.userService.getAvatar(newmessage.senderId).subscribe((data) => (
@@ -127,7 +125,7 @@ export class FranChatUiComponent implements AfterViewInit{
 
 			this.chatService.update_client_room().subscribe((update_room: Rooms) => {
 				// console.log(`update_client_room: ${update_room.name}`);
-				console.log(update_room);
+				// console.log(update_room);
 				this.roomsList[update_room.name] = update_room;
 				if (this.selectedRoom){
 					if (this.selectedRoom.name == update_room.name){
@@ -169,7 +167,7 @@ export class FranChatUiComponent implements AfterViewInit{
 			})
 
 			this.chatService.get_all_blocked().subscribe((blocked: any) => {
-				console.log("blockedlist:", blocked);
+				// console.log("blockedlist:", blocked);
 				this.blockedList = blocked
 			})
 			subbed = true;
@@ -185,7 +183,7 @@ export class FranChatUiComponent implements AfterViewInit{
 
 		this.chatService.update_public().subscribe((update_room: Rooms) => {
 			// console.log(`update_public: ${update_room.name}`);
-			console.log(update_room);
+			// console.log(update_room);
 			if (update_room.messages){
 				for (let i = update_room.messages.length - 1; i >= 0; i--) {
 					const msg = update_room.messages[i];
