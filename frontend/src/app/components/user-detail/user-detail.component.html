@@ -83,6 +83,8 @@
 			@if (this.isfriend == true) {
 				<button class="unfriend" type="button" (click)="deleteFriend()"> delete friend </button>
 			}
+			<button type="button" (click)="routeProfile()"> Profile </button>
+
 		}
 
 		@if (this.errorMessage) {

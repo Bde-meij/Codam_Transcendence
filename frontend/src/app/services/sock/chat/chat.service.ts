@@ -458,10 +458,10 @@ export class ChatService{
 	}
 	
 	isBlocked(userid: number){
-		return this.http.get<Blocks[]>(this.blockUrl + '/is-blocked/:' + userid.toString(), {});
+		return this.http.get<Blocks[]>(this.blockUrl + '/is-blocked/' + userid.toString(), {});
 	}
 
 	removeBlock(userid: number){
-		return this.http.get<Blocks[]>(this.blockUrl + '/delete-block-user/:' + userid, {});
+		return this.http.get<Blocks[]>(this.blockUrl + '/delete-block-user/' + userid, {});
 	}
 }

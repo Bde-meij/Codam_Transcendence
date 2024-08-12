@@ -145,4 +145,8 @@ export class UserDetailComponent implements OnChanges {
 			}, 400);
 		}
 	}
+
+	routeProfile(){
+		this.router.navigate(['/dashboard', "detail" ,	 this.id]);
+	}
 }

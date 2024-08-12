@@ -16,19 +16,19 @@
 			<input type="text" id="roomName" name="roomName" nbInput [(ngModel)]="roomName" [readonly]="true" required>
 		</div>
 
-		<div class="password-option" *ngIf="roomType !== 'public'">
+		<div class="password-option" *ngIf="roomType === 'protected'">
 			<input type="checkbox" id="passwordOption" name="passwordOption" [(ngModel)]="withPassword" value="false" >
 			<label for="passwordOption">With password</label>
 		</div>
 
-		<div class="oldpassword-input" *ngIf="roomType !== 'public'">
+		<div class="oldpassword-input" *ngIf="roomType === 'protected'">
 			<label for="password"> old password:</label>
-			<input type="text" id="oldPassword" name="oldPassword" nbInput [(ngModel)]="oldPassword" [disabled]="roomType === 'public' || !withPassword">
+			<input type="text" id="oldPassword" name="oldPassword" nbInput [(ngModel)]="oldPassword" [disabled]="roomType !== 'protected' || !withPassword">
 		</div>
 
-		<div class="newpassword-input" *ngIf="roomType !== 'public'">
+		<div class="newpassword-input" *ngIf="roomType === 'protected'">
 			<label for="password"> new password:</label>
-			<input type="text" id="newPassword" name="newPassword" nbInput [(ngModel)]="newPassword" [disabled]="roomType === 'public' || !withPassword">
+			<input type="text" id="newPassword" name="newPassword" nbInput [(ngModel)]="newPassword" [disabled]="roomType !== 'protected' || !withPassword">
 		</div>
 
 		<div *ngFor="let userId of selectedRoom!.users">

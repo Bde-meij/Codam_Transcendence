@@ -303,7 +303,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			socket.join(room.id.toString());
 			const msg: MessageInterface = this.create_msg(`${socket.data.nickname} has joined the channel`, room.id, room.name, socket.data.userid, socket.data.nickname, 'text', socket.data.avatar)
 			this.io.to(room.id.toString()).emit('message', msg);
-			this.chatRoomList[data.room_name].users.push(socket.data.userid);
+			if (!this.chatRoomList[data.room_name].users.includes(socket.data.userid))
+				this.chatRoomList[data.room_name].users.push(socket.data.userid);
 			this.chatRoomList[data.room_name].messages.push(msg);
 
 			//console.log("joinedRoom: " + room.id + ", name: " + room.name + ", users: " + room.users);

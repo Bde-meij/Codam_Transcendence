@@ -303,8 +303,6 @@ export class FranChatUiComponent implements AfterViewInit{
 		return Object.keys(this.roomsList);
 	}
 
-	test() {}
-
 	isChannelOwner(): boolean {
 		return +this.user.id === +this.selectedRoom!.owner;
 	}
@@ -361,29 +359,23 @@ export class FranChatUiComponent implements AfterViewInit{
 		this.chatService.invite(this.selectedRoom!.name, this.userNameForm.value.userName);
 	}
 
-	deleteRoom()
-	{
+	deleteRoom(){
 		this.chatService.deleteRoom(Number(this.selectedRoom!.id), this.selectedRoom!.name, this.user.id);
 	}
 
-	block()
-	{
+	block(){
 		this.chatService.blockUser(this.userNameForm.value.userName, this.selectedRoom!.name);
 	}
 
-	unblock()
-	{
+	unblock(){
 		this.chatService.unblockUser(this.userNameForm.value.userName, this.selectedRoom!.name);
 	}
 
-	updateName()
-	{
-		// console.log("updating name");
+	updateName(){
 		this.chatService.updateName(this.user.nickname);
 	}
 
-	last_open_room()
-	{
+	last_open_room(){
 		this.chatService.last_open_room(this.selectedRoom!.name);
 		console.log("open room: " + this.selectedRoom!.name);
 	}
@@ -462,7 +454,7 @@ export class FranChatUiComponent implements AfterViewInit{
 		console.log("Avatar clicked on!");
 	}
 
-	getLists() {
+	getLists(){
 		this.chatService.getBlocked().subscribe({
 			next: (data) => (
 				this.blockedList = data,
