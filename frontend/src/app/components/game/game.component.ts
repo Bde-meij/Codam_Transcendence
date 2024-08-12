@@ -232,8 +232,5 @@ export class GameComponent implements OnInit, OnDestroy
 		this.game.stop();
 		this.game.canvas.remove();
 		this.gameSrv.disconnect();
-		// this.gameSrv.ngOnDestroy();
-		// console.log("location:", window.location);
-			// this.router.navigate(['/dashboard/game-menu']);
 	}
 }

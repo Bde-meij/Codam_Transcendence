@@ -324,8 +324,5 @@ export class BossGameComponent implements OnInit, OnDestroy
 		this.game.stop();
 		this.game.canvas.remove();
 		this.gameSrv.disconnect();
-		if (window.location.pathname === '/dashboard/bossPong') {
-			this.router.navigate(['/dashboard/game-menu']);
-		}
 	}
 }
