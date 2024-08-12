@@ -90,6 +90,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			this.joinArrayChats(client, client.data.nickname, client.data.userid);
 			this.connectedUsers.push(client.data.userid);
 			this.io.emit('getConnectedUsers', this.connectedUsers);
+			// client.emit('getRoomss', this.chatRoomList);
 			this.get_all_blocked(client.data.userid, client);
 			this.updateRefresh(client, client.data.userid);
 		} catch {
@@ -193,6 +194,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			this.update_public(data.room_name);
 		}
 		this.update_client_rooms(CreateRoomDB.id, data.room_name);
+		// socket.emit('getRoomss', this.chatRoomList);
 		this.channelUserList(data.room_name);	
 	}
 
