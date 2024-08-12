@@ -1,7 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { CreateBlockDto } from './dto/create-block.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Block } from './entities/block.entity';
+import { Blocks } from './entities/block.entity';
 import { Repository } from 'typeorm';
 import { UserService } from 'src/user/user.service';
 import { User } from 'src/user/entities/user.entity';
@@ -9,10 +9,10 @@ import { DeleteBlockDto } from './dto/delete-block.dto';
 
 @Injectable()
 export class BlockService {
-	constructor(@InjectRepository(Block) private readonly blockRepo: Repository<Block>, private readonly userService: UserService) {}
+	constructor(@InjectRepository(Blocks) private readonly blockRepo: Repository<Blocks>, private readonly userService: UserService) {}
 
 	async isBlocked(createBlockDto: CreateBlockDto): Promise<boolean> {
-		const block: Block = await this.blockRepo.findOne({
+		const block: Blocks = await this.blockRepo.findOne({
 			where: {
 				sender: {id: createBlockDto.sender},
 				target: {id: createBlockDto.target},
@@ -24,7 +24,7 @@ export class BlockService {
 		return true;
 	}
 
-	async getAllBlocked(userId: number): Promise<Block[]> {
+	async getAllBlocked(userId: number): Promise<Blocks[]> {
 		const user: User = await this.userService.findUserById(userId);
 		if (!user) {
 			// console.log('User not found! User id:', userId);
@@ -67,7 +67,7 @@ export class BlockService {
 			// console.log('User already blocked!', createBlockDto.target);
 			throw new HttpException('User already blocked', 400);
 		}
-		const block: Block = await this.blockRepo.save({
+		const block: Blocks = await this.blockRepo.save({
 			sender: sender,
 			target: target,
 		});
@@ -87,7 +87,7 @@ export class BlockService {
 	}
 
 	async deleteByBlockId(deleteBlockDto: DeleteBlockDto) {
-		const block: Block = await this.blockRepo.findOne({
+		const block: Blocks = await this.blockRepo.findOne({
 			where: {
 				id: deleteBlockDto.target,
 				sender: {
@@ -104,7 +104,7 @@ export class BlockService {
 	}
 	
 	async deleteByUserId(deleteBlockDto: DeleteBlockDto) {
-		const block: Block = await this.blockRepo.findOne({
+		const block: Blocks = await this.blockRepo.findOne({
 			where: {
 				sender: {
 					id: deleteBlockDto.sender

@@ -1,3 +1,5 @@
+import { IsAlphanumeric, IsNumber, IsString } from "class-validator";
+
 export interface Rooms {
 	id: number;
 	name: string;
@@ -14,15 +16,19 @@ export interface Rooms {
 }
 
 export interface RoomInfo {
-	room_id: number;
-	nickname: string;
-	Owner: boolean;
-	Admin: boolean;
-	socket_id: string;
+	id: number;
+	name: string;
+	owner: number;
+	admins: number[];
+	banned?: number[];
+	muted?: Record<number, Date>;
+	users: number[];
+	status: string; //public, private
+	password: boolean; //true or false?
 }
 
 export interface MessageInterface {
-	message: string;
+	message?: string;
 	roomId: number;
 	room_name: string;
 	senderId: number;
@@ -31,8 +37,57 @@ export interface MessageInterface {
 	updated?: Date;
 	game?: boolean;
 	sender_avatar?: string;
+	type: string;
+	cutomMessageData?: {href: string, text: string};
 }
 
+export interface Rooms {
+	id: number;
+	name: string;
+	owner: number;
+	admins: number[];
+	banned?: number[];
+	muted?: Record<number, Date>;
+	users: number[];
+	status: string; //public, private
+	password: boolean; //true or false?
+	created?: Date;
+	updated?: Date;
+	messages?: MessageInterface[];
+}
+
+export interface ErrorMessage{
+	msg: string;
+	status_code: number;
+	room?: string;
+}
+
+export class createRoomDto{
+	@IsString()
+	room_name: string;
+	status: string; 
+	username?: string;
+	userid?: number;
+	password: string;
+	password_bool: boolean;
+}
+
+export class messageDto{
+	@IsString()
+	message: string;
+	
+	@IsString()
+	@IsAlphanumeric()
+	sender_name: string;
+	@IsNumber()
+	sender_id: number;
+	@IsString()
+	room: string;
+	type: string;
+	customMessageData: {href: string, text: string};
+	sender_avatar: string;
+}
+	
 export interface RoomDto {
 	name: string;
 	password: string; //true or false?

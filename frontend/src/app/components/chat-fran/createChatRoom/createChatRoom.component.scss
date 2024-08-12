@@ -1,0 +1,11 @@
+@import '../../../../styles/helpers/constants.scss';
+
+.room-name-input, .password-option, .password-input, .submit-button, .error {
+	padding: 10px 20px;
+	background-color: $column-color;
+	text-align: center;
+}
+
+.error {
+	color: rgb(255, 74, 74);
+}

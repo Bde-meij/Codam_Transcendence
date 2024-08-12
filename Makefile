@@ -1,11 +1,12 @@
 NAME = v1
 
-all: down up
+all: up
 
 re: data clean build up
 
 build: 
 	docker compose build
+	docker compose up
 
 up: 
 	docker compose up
@@ -13,6 +14,12 @@ up:
 down: 
 	docker compose down
 
+frontend:
+	docker compose build ./frontend
+
+api:
+	docker compose build ./api
+	
 clean:
 	@if [ -n "$$(docker ps -a -q)" ]; then \
 		docker stop $$(docker ps -a -q); \

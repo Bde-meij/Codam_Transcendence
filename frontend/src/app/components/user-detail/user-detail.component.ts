@@ -4,17 +4,22 @@ import { User } from '../../models/user.class';
 import { UserService } from '../../services/user/user.service';
 import { FriendsService } from '../../services/friends/friends.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { NbUserModule } from '@nebular/theme';
+import { ChatService } from '../../services/sock/chat/chat.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-user-detail',
   standalone: true,
-  imports: [NgIf, UpperCasePipe, JsonPipe],
+  imports: [NgIf, UpperCasePipe, JsonPipe, NbUserModule],
   templateUrl: './user-detail.component.html',
   styleUrl: './user-detail.component.scss'
 })
 export class UserDetailComponent implements OnChanges {
 	@Input()id!: string;
 	my_user?: User;
+	client_user!: User
+	text: string = "Chat!"
 
 	tempUser = {
 		id: '',
@@ -31,14 +36,17 @@ export class UserDetailComponent implements OnChanges {
 	};
 
 	matches: any | undefined;
-
+	
 	isfriend?: boolean;
 	isself?: boolean;
 	errorMessage: string | undefined;
 	userErrorMessage: string | undefined;
 
-	constructor(private userService: UserService, private friendsService: FriendsService) {};
-
+	constructor(private userService: UserService, private friendsService: FriendsService, private chatService: ChatService, private router: Router) {
+		this.userService.getUser('current').subscribe((userData) => {
+			this.client_user = userData;
+		});
+	}
 	ngOnChanges(): void {
 		this.userErrorMessage = undefined;
 		this.userService.getUser(this.id).subscribe({
@@ -126,5 +134,19 @@ export class UserDetailComponent implements OnChanges {
 			}
 		});
 		this.isfriend = undefined;
+	}
+
+	inviteChat(){
+		if (this.my_user?.id != this.client_user.id)
+		{
+			this.chatService.inviteChat(this.id);
+			setTimeout(() => {
+				this.router.navigate(['/dashboard', 'franchat']);
+			}, 400);
+		}
+	}
+
+	routeProfile(){
+		this.router.navigate(['/dashboard', "detail" ,	 this.id]);
 	}
 }
