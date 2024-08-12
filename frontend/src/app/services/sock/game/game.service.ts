@@ -1,12 +1,11 @@
-import { Injectable, OnDestroy } from '@angular/core';
-import { Socket, io } from 'socket.io-client';
-import { SockService } from '../sock.service';
+import { Injectable } from '@angular/core';
+import { io } from 'socket.io-client';
 import { Observable } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
 
-export class GameService implements OnDestroy{
+export class GameService{
 	gameSocket = io("/game");
 	
 	connect() {
@@ -141,9 +140,5 @@ export class GameService implements OnDestroy{
 	emitYPos(playerPos :number)
 	{
 		this.gameSocket.emit("updatePlayer", playerPos);
-	}
-
-	ngOnDestroy() 
-	{
 	}
 }
