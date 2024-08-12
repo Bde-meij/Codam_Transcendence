@@ -29,12 +29,12 @@ export class UserController {
 	// check if this nickname is taken
 	@Get('isnametaken')
 	@UseGuards(JwtGuard)
-	async isNameTaken(@Req() req, @Query() name: NicknameDto) {
+	async isNameTaken(@Req() req, @Res() res, @Query() name: NicknameDto) {
 		let taken : boolean = false;
 		if (await this.userService.findUserByName(name.nickname)) {
 			taken = true;
 		}
-		return (taken);
+		return res.status(HttpStatus.OK).json(taken);
 	}
 	
 	@Post('changename')
