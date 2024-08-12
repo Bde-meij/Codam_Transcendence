@@ -46,6 +46,9 @@
 			<button *ngIf="selectedRoom" mat-raised-button color="primary" (click)="battle()">
 				Battle
 			</button>
+			<button *ngIf="selectedRoom" mat-raised-button color="primary" (click)="leaveRoom()">
+				leave room
+			</button>
 		  <div [formGroup]="userNameForm" class="user-name-input">
 		  	<input type="text" formControlName="userName" maxlength="13" placeholder="their nickname"/>
 		  </div>
@@ -60,9 +63,6 @@
 			</button>
 			<button [disabled]="!isChannelAdmin() || !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="invite()">
 				Invite chat
-			</button>
-			<button [disabled]=" !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="leaveRoom()">
-				leaveRoom
 			</button>
 			<button [disabled]="!isChannelOwner() || !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="deleteRoom()">
 				deleteRoom

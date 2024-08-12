@@ -19,6 +19,8 @@ export class ChatService{
 	user!: User;
 
 	userss: string[] = [];
+	usernames: { user: string; username: string }[] = [];
+
 	rooms: Rooms[] = []; 
 	roomss: Rooms[] = []; 
 	private selectedRoom?: Rooms;
@@ -31,6 +33,10 @@ export class ChatService{
 			this.user = userData;
 		});
 
+		this.get_users_names().subscribe((usernames_list: any) => {
+			this.usernames = usernames_list;
+			console.log(this.usernames);
+		})
 		// this.chatSocket.onAny((event, ...args) => {
 		// 	console.log("CHAT-SOCK EVENT: ");
 		// 	console.log(event, args);
@@ -76,10 +82,31 @@ export class ChatService{
 		});
 	}
 
+	giveUsernames(room: string): void {
+		// console.log("settingsChat called: " + room_name + ", status: " + status + ", password: " + password + ", admins: " + admins);
+		this.chatSocket.emit('give_usernames', room, (err: any) => {
+			if (err) {
+				// console.log("createRoom chat-sock error: ");
+				// console.log(err);
+				// console.log(err.message);
+			}
+		});
+	}
+
 	settingsChat(input: any): void {
 		// console.log("settingsChat called: " + room_name + ", status: " + status + ", password: " + password + ", admins: " + admins);
 		this.chatSocket.emit('settingsChat', input, (err: any) => {
 			if (err) {
+				// console.log("createRoom chat-sock error: ");
+				// console.log(err);
+				// console.log(err.message);
+			}
+		});
+	}
+
+	checkPassword(input: any): void {
+		this.chatSocket.emit('checkPassword', input, (err: any) => {
+		if (err) {
 				// console.log("createRoom chat-sock error: ");
 				// console.log(err);
 				// console.log(err.message);
@@ -200,6 +227,14 @@ export class ChatService{
 		});
 	}
 	
+	get_users_names(): Observable<any> {
+		return new Observable((observer) => {
+			this.chatSocket.on("usernames", (message) => {
+				observer.next(message);
+			});
+		});
+	}
+
 	update_client_room(): Observable<Rooms> {
 		return new Observable((observer) => {
 			this.chatSocket.on('update_client_room', (room: Rooms) => {
@@ -452,6 +487,11 @@ export class ChatService{
 	get room(): Rooms | undefined {
 		return this.selectedRoom;
 	}
+
+	get username_list(): { user: string; username: string }[]{
+		return this.usernames;
+	}
+
 
 	getBlocked() {
 		return this.http.get<Blocks[]>(this.blockUrl + '/all-blocked', {});

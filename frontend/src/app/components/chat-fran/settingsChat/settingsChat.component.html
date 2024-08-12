@@ -31,14 +31,13 @@
 			<input type="text" id="newPassword" name="newPassword" nbInput [(ngModel)]="newPassword" [disabled]="roomType !== 'protected' || !withPassword">
 		</div>
 
-		<div *ngFor="let userId of selectedRoom!.users">
-			<nb-toggle *ngIf=isAdmin(userId) [checked]="true" (checkedChange)="toggle($event, userId)"> {{userId}} don't you do it..</nb-toggle>
-			<nb-toggle *ngIf=!isAdmin(userId) [checked]="false" (checkedChange)="toggle($event, userId)"> {{userId}} make me admin!</nb-toggle>
+		<div *ngFor="let userObj of users">
+			<nb-toggle *ngIf=isAdmin(userObj.user) [checked]="true" (checkedChange)="toggle($event, userObj.user, userObj.username)"> {{ userObj.username }} - don't you do it..</nb-toggle>
+			<nb-toggle *ngIf=!isAdmin(userObj.user) [checked]="false" (checkedChange)="toggle($event, userObj.user, userObj.username)"> {{ userObj.username }} - make me admin!</nb-toggle>
 		</div>
-
 		<div>
 			<h6>Active Admins:</h6>
-			<li *ngFor="let user of admins">User {{user}}</li>
+			<li *ngFor="let user of adminsNames">{{user}}</li>
 		</div> 
 
 		<div class="submit-button">
