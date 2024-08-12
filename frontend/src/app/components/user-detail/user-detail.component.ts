@@ -7,6 +7,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { NbUserModule } from '@nebular/theme';
 import { ChatService } from '../../services/sock/chat/chat.service';
 import { Router } from '@angular/router';
+import { BlockService } from '../../services/block/block.service';
 
 @Component({
   selector: 'app-user-detail',
@@ -42,11 +43,18 @@ export class UserDetailComponent implements OnChanges {
 	errorMessage: string | undefined;
 	userErrorMessage: string | undefined;
 
-	constructor(private userService: UserService, private friendsService: FriendsService, private chatService: ChatService, private router: Router) {
+	constructor(
+		private userService: UserService, 
+		private friendsService: FriendsService,
+		private chatService: ChatService, 
+		private blockService: BlockService,
+		private router: Router)
+	{
 		this.userService.getUser('current').subscribe((userData) => {
 			this.client_user = userData;
 		});
 	}
+
 	ngOnChanges(): void {
 		this.userErrorMessage = undefined;
 		this.userService.getUser(this.id).subscribe({
@@ -134,6 +142,18 @@ export class UserDetailComponent implements OnChanges {
 			}
 		});
 		this.isfriend = undefined;
+	}
+
+	block() {
+		console.log("block the mf 🪕");
+		this.blockService.createBlock(this.id).subscribe({
+			next: (data) => {
+				console.log("block data: " + data);
+			},
+			error: (e) => {
+				console.log("block error: " + e);
+			}
+		});
 	}
 
 	inviteChat(){

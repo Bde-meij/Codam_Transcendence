@@ -14,13 +14,17 @@ export class BlockService {
 		return this.http.get<any>(this.blockUrl + '/all-blocked', {});
 	}
 
+	createBlock(targetId : string) {
+		return this.http.post(this.blockUrl + '/new-block/' + targetId, {targetId});
+	}
+
 	// returns bool or HttpErrorResponse
-	isBlocked(userid: number){
-		return this.http.get<any>(this.blockUrl + '/is-blocked/' + userid.toString(), {});
+	isBlocked(userid: string){
+		return this.http.get<any>(this.blockUrl + '/is-blocked/' + userid, {});
 	}
 
 	// returns 
-	removeBlock(userid: number){
+	removeBlock(userid: string){
 		return this.http.delete<any>(this.blockUrl + '/delete-block-user/' + userid, {});
 	}
 }
