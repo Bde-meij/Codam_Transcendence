@@ -14,7 +14,8 @@ import { ChatService } from '../../../services/sock/chat/chat.service';
 })
 export class settingsChat {
 	roomName: string = '';
-	password: string = '';
+	oldPassword: string = '';
+	newPassword: string = '';
 	withPassword: boolean = false;
 	submitWithoutName: boolean = false;
 	roomType: string = '';
@@ -49,11 +50,11 @@ export class settingsChat {
 
 	submitForm() {
 	if (!this.withPassword)
-		this.password = '';
+		this.oldPassword = '';
 	if (!this.roomType)
 		this.roomType = "public";
 	if (this.roomName){
-		this.dialogRef.close({roomName: this.roomName, password: this.password, roomType: this.roomType, admins: this.admins});
+		this.dialogRef.close({roomName: this.roomName, oldPassword: this.oldPassword, newPassword: this.newPassword, roomType: this.roomType, admins: this.admins});
 	} else
 		this.submitWithoutName = true;
 	}

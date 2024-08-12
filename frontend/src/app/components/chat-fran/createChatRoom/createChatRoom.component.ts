@@ -24,8 +24,10 @@ export class createChatRoom {
   submitForm() {
     if (!this.withPassword)
       this.password = '';
-    if (this.roomName)
+    if (this.roomName){
+		console.log("roomtype:" , this.roomType);
       this.dialogRef.close({roomName: this.roomName, password: this.password, roomType: this.roomType});
+	}
     else
       this.submitWithoutName = true;
   }

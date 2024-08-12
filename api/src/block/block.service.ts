@@ -49,7 +49,7 @@ export class BlockService {
 	}
 
 	async createBlock(createBlockDto: CreateBlockDto): Promise<any> {
-		if (createBlockDto.sender === createBlockDto.target+1) {
+		if (createBlockDto.sender === createBlockDto.target) {
 			// console.log('Cannot block yourself! User id:', createBlockDto.sender);
 			throw new HttpException('Cannot block yourself', 400);
 		}

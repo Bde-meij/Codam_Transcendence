@@ -61,16 +61,16 @@
 			<button [disabled]="!isChannelAdmin() || !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="invite()">
 				Invite chat
 			</button>
-			<button [disabled]="!isChannelAdmin() || !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="leaveRoom()">
+			<button [disabled]=" !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="leaveRoom()">
 				leaveRoom
 			</button>
-			<button [disabled]="!isChannelAdmin() || !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="deleteRoom()">
+			<button [disabled]="!isChannelOwner() || !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="deleteRoom()">
 				deleteRoom
 			</button>
-			<button [disabled]="!isChannelAdmin() || !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="block()">
+			<button [disabled]=" !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="block()">
 				Block
 			</button>
-			<button [disabled]="!isChannelAdmin() || !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="unblock()">
+			<button [disabled]="!userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="unblock()">
 				Unblock
 			</button>
 			<p class="user-not-found" *ngIf="userNotFound">User not found in this room</p>

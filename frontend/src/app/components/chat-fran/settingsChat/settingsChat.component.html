@@ -21,9 +21,14 @@
 			<label for="passwordOption">With password</label>
 		</div>
 
-		<div class="password-input" *ngIf="roomType !== 'public'">
-			<label for="password"> Password:</label>
-			<input type="text" id="password" name="password" nbInput [(ngModel)]="password" [disabled]="roomType === 'public' || !withPassword">
+		<div class="oldpassword-input" *ngIf="roomType !== 'public'">
+			<label for="password"> old password:</label>
+			<input type="text" id="oldPassword" name="oldPassword" nbInput [(ngModel)]="oldPassword" [disabled]="roomType === 'public' || !withPassword">
+		</div>
+
+		<div class="newpassword-input" *ngIf="roomType !== 'public'">
+			<label for="password"> new password:</label>
+			<input type="text" id="newPassword" name="newPassword" nbInput [(ngModel)]="newPassword" [disabled]="roomType === 'public' || !withPassword">
 		</div>
 
 		<div *ngFor="let userId of selectedRoom!.users">

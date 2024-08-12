@@ -454,7 +454,7 @@ export class ChatService{
 	}
 
 	getBlocked() {
-		return this.http.get<Blocks[]>(this.blockUrl + '/all-blocked:', {});
+		return this.http.get<Blocks[]>(this.blockUrl + '/all-blocked', {});
 	}
 	
 	isBlocked(userid: number){
