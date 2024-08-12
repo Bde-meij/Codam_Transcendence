@@ -167,6 +167,9 @@ export class FranChatUiComponent implements AfterViewInit{
 
 	leaveRoom(roomName: string) {
 		this.chatService.leaveRoom(+this.roomsList[roomName].id, roomName, this.user.id);
+		this.chatService.getRoomsss().subscribe((chatRoomList: Record<string, Rooms>) => {
+			this.roomsList = chatRoomList;
+		});
 	}
 
 	getConnectedUsers() {
