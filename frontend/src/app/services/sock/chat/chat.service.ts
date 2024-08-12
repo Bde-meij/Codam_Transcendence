@@ -13,7 +13,6 @@ import { Blocks } from '../../../models/rooms.class';
 export class ChatService{
 	count = 0;
 	private chatSocket = io("/chat");
-	private blockUrl = '/api/block';
 	private unread = false;
 	user!: User;
 
@@ -448,17 +447,5 @@ export class ChatService{
 
 	get room(): Rooms | undefined {
 		return this.selectedRoom;
-	}
-
-	getBlocked() {
-		return this.http.get<Blocks[]>(this.blockUrl + '/all-blocked', {});
-	}
-	
-	isBlocked(userid: number){
-		return this.http.get<Blocks[]>(this.blockUrl + '/is-blocked/' + userid.toString(), {});
-	}
-
-	removeBlock(userid: number){
-		return this.http.get<Blocks[]>(this.blockUrl + '/delete-block-user/' + userid, {});
 	}
 }
