@@ -1,26 +1,32 @@
 import { Injectable, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { io } from 'socket.io-client';
 import { SockService } from '../sock.service';
 import { UserService } from '../../user/user.service';
 import { User } from '../../../models/user.class';
 import { skip } from 'rxjs/operators';
-import { MessageInterface, Rooms } from '../../../models/rooms.class';
-
+import { ErrorMessage, MessageInterface, Rooms } from '../../../models/rooms.class';
+import { Blocks } from '../../../models/rooms.class';
 @Injectable({
   providedIn: 'root'
 })
 export class ChatService{
 	count = 0;
 	private chatSocket = io("/chat");
+	private blockUrl = '/api/block';
 	private unread = false;
-	user?: User;
+	user!: User;
 
 	userss: string[] = [];
 	rooms: Rooms[] = []; 
 	roomss: Rooms[] = []; 
-
-	constructor(sockService: SockService, private userService: UserService) {
+	private selectedRoom?: Rooms;
+	constructor(
+				private http: HttpClient,
+				sockService: SockService, 
+				private userService: UserService) 
+	{
 		this.userService.getUser('current').subscribe((userData) => {
 			this.user = userData;
 		});
@@ -31,6 +37,7 @@ export class ChatService{
 		// });
 		// sockService.newSocketRegister("chatSocket");
 	}
+
 	ngOnInit(): void {
 		// console.log("dfd?");
 		// this.user$ = this.userService.getUser(0);
@@ -40,13 +47,15 @@ export class ChatService{
 		// this.user$ = this.userService.getUser(0);
 		// const sender = this.user$;
 		const messageObj = {
-			message : message,
-			sender : this.user?.nickname,
+			message: message,
+			sender_name: this.user?.nickname,
 			sender_id: this.user?.id,
-			room : room,
-			sender_avatar: avatar
+			sender_avatar: this.user?.avatar,
+			room: room,
+			type: 'text',
 		}
 		// console.log("sending msg");
+		// this.get_all_rooms();
 		this.chatSocket.emit('message', messageObj, (err: any) => {
 			if (err) {
 				// console.log("chat-sock error: ");
@@ -67,9 +76,20 @@ export class ChatService{
 		});
 	}
 
+	settingsChat(input: any): void {
+		// console.log("settingsChat called: " + room_name + ", status: " + status + ", password: " + password + ", admins: " + admins);
+		this.chatSocket.emit('settingsChat', input, (err: any) => {
+			if (err) {
+				// console.log("createRoom chat-sock error: ");
+				// console.log(err);
+				// console.log(err.message);
+			}
+		});
+	}
+
 	joinRoom(room_name: string, password: string): void {
 		// console.log("joinRoom name: " + room_name + ", password: " + password);
-		this.chatSocket.emit('joinRoom', {room_name, password}, (err: any) => {
+		this.chatSocket.emit('joinRoom', {room_name: room_name, user_id: this.user!.id, password: password, avatar: this.user!.avatar}, (err: any) => {
 			if (err) {
 				// console.log("joinRoom chat-sock error: ");
 				// console.log(err);
@@ -79,16 +99,16 @@ export class ChatService{
 		
 	}
 	
-	leaveRoom(room: string, userid: string) {
-		const num = Number(userid);
-		this.chatSocket.emit('leaveRoom', {room, num}, (err: any) => {
+	leaveRoom(roomid: number, room: string, user: string) {
+		const userid = Number(user);
+		this.chatSocket.emit('leaveRoom', {roomid, room, userid}, (err: any) => {
 			if (err) {
 				// console.log("leaveRoom chat-sock error: ");
 				// console.log(err);
 				// console.log(err.message);
 			}
 		});
-	  }
+	}
 
 	sendUserList(message: string): void {
 		this.chatSocket.emit('getUserList', message, (err: any) => {
@@ -139,7 +159,7 @@ export class ChatService{
 		});
 	  }
 	
-	  getRoomsss(): Observable<Record<string, Rooms>> {
+	getRoomsss(): Observable<Record<string, Rooms>> {
 		return new Observable<Record<string, Rooms>>((observer) => {
 		  this.chatSocket.on('getRoomss', (chatRoomList: Record<string, Rooms>) => {
 			observer.next(chatRoomList);
@@ -151,14 +171,46 @@ export class ChatService{
 		return new Observable((observer) => {
 			this.chatSocket.on('getConnectedUsers', (userss) => {
 				// console.log("getConnectedUsers: " + userss);
-				observer.next(userss);		
+				observer.next(userss);
 			});
 		});
 	}
 
+	update_public(): Observable<Rooms> {
+		return new Observable((observer) => {
+			this.chatSocket.on('update_public', (room: Rooms) => {
+				observer.next(room);
+			});
+		});
+	}
+
+	error_message(): Observable<ErrorMessage> {
+		return new Observable((observer) => {
+			this.chatSocket.on("error_message", (message) => {
+				observer.next(message);
+			});
+		});
+	}
+
+	get_all_blocked(): Observable<any> {
+		return new Observable((observer) => {
+			this.chatSocket.on("blocked", (message) => {
+				observer.next(message);
+			});
+		});
+	}
+	
 	update_client_room(): Observable<Rooms> {
 		return new Observable((observer) => {
 			this.chatSocket.on('update_client_room', (room: Rooms) => {
+				observer.next(room);
+			});
+		});
+	}
+
+	delete_room(): Observable<string> {
+		return new Observable((observer) => {
+			this.chatSocket.on('delete_room', (room: string) => {
 				observer.next(room);
 			});
 		});
@@ -184,9 +236,13 @@ export class ChatService{
 		});
 	}
 
-	muteUser(room: string, user: string){
-		const userid = Number(user);
-		this.chatSocket.emit('mute', {room, userid}, (err: any) => {
+	muteUser(room: string, user: string, avatar: string){
+		const data = {
+			room: room,
+			username: user,
+			avatar: avatar
+		}
+		this.chatSocket.emit('mute', data, (err: any) => {
 			if (err) {
 				// console.log("leaveRoom chat-sock error: ");
 				// console.log(err);
@@ -195,9 +251,14 @@ export class ChatService{
 		});
 	}
 
-	banUser(room: string, user: string){
-		const userid = Number(user);
-		this.chatSocket.emit('ban', {room, userid}, (err: any) => {
+	banUser(room: string, username: string, avatar: string){
+		console.log(`param check ban ${username}`);
+		const data = {
+			room: room,
+			username: username,
+			avatar: avatar
+		}
+		this.chatSocket.emit('ban', data, (err: any) => {
 			if (err) {
 				// console.log("banUser chat-sock error: ");
 				// console.log(err);
@@ -207,8 +268,12 @@ export class ChatService{
 	}
 
 	kickUser(room: string, user: string){
-		const userid = Number(user);
-		this.chatSocket.emit('kick', {room, userid}, (err: any) => {
+		console.log(`param check kickuser ${user}`);
+		const data = {
+			room: room,
+			username: user,
+		}
+		this.chatSocket.emit('kick', data, (err: any) => {
 			if (err) {
 				// console.log("kickUser chat-sock error: ");
 				// console.log(err);
@@ -217,9 +282,13 @@ export class ChatService{
 		});
 	}
 
-	blockUser(room: string, user: string){
-		const userid = Number(user);
-		this.chatSocket.emit('block', {room, userid}, (err: any) => {
+	invite(room: string, user: string){
+		console.log(`param check invite ${user}`);
+		const data = {
+			room: room,
+			username: user,
+		}
+		this.chatSocket.emit('createPrivateRoom', data, (err: any) => {
 			if (err) {
 				// console.log("kickUser chat-sock error: ");
 				// console.log(err);
@@ -228,11 +297,106 @@ export class ChatService{
 		});
 	}
 
-	battle(roomname: string, roomid: number, userid: number){
+	inviteChat(user: string){
+		const userid = Number(user);
+		console.log(`param check invite ${user}`);
+		this.chatSocket.emit('inviteChat', userid, (err: any) => {
+			if (err) {
+				// console.log("kickUser chat-sock error: ");
+				// console.log(err);
+				// console.log(err.message);
+			}
+		});
+	}
+
+
+	deleteRoom(roomid: number, room: string, user: string) {
+		const userid = Number(user);
+		this.chatSocket.emit('deleteRoom', {roomid, room, userid}, (err: any) => {
+			if (err) {
+				// console.log("deleteRoom chat-sock error: ");
+				// console.log(err);
+				// console.log(err.message);
+			}
+		});
+	}
+
+	setAdmin(room: number, userid: string){
+		console.log(`param check setadmin ${userid}`);
+		const data = {
+			room: room,
+			userid: (Number(userid)),
+		}
+		this.chatSocket.emit('setadmin', data, (err: any) => {
+			if (err) {
+				// console.log("setAdmin chat-sock error: ");
+				// console.log(err);
+				// console.log(err.message);
+			}
+		});
+	}
+
+	get_all_rooms(){
+		this.chatSocket.emit('all_rooms', {}, (err: any) => {
+			if (err) {
+				// console.log("kickUser chat-sock error: ");
+				// console.log(err);
+				// console.log(err.message);
+			}
+		});
+	}
+
+	blockUser(user: string, room: string){
+		this.chatSocket.emit('block', {user, room}, (err: any) => {
+			if (err) {
+				// console.log("kickUser chat-sock error: ");
+				// console.log(err);
+				// console.log(err.message);
+			}
+		});
+	}
+
+	unblockUser(user: string, room: string){
+		this.chatSocket.emit('unblock', {user, room}, (err: any) => {
+			if (err) {
+				// console.log("kickUser chat-sock error: ");
+				// console.log(err);
+				// console.log(err.message);
+			}
+		});
+	}
+
+	updateName(user: string){
+		const data = {
+			sender_name: user
+		}
+		this.chatSocket.emit('updateName', data, (err: any) => {
+			if (err) {
+				// console.log("kickUser chat-sock error: ");
+				// console.log(err);
+				// console.log(err.message);
+			}
+		});
+	}
+
+	last_open_room(room_name: string){
+		this.chatSocket.emit('last_open_room', room_name, (err: any) => {
+			if (err) {
+				// console.log("kickUser chat-sock error: ");
+				// console.log(err);
+				// console.log(err.message);
+			}
+		});
+	}
+
+
+	battle(roomname: string, roomid: number, userid: number, userName: string, avatar: string){
 		const data = {
 			roomid : roomid,
 			room_name : roomname,
 			userid: userid,
+			userName: userName,
+			avatar: avatar,
 		}
 		this.chatSocket.emit('inviteGame', data, (err: any) => {
 			if (err) {
@@ -243,10 +407,11 @@ export class ChatService{
 		});
 	}
 
-	joinBattle(roomnum: string, room: string){
+	joinBattle(roomnum: number, room: string, avatar: string){
 		const data = {
 			numroom: roomnum,
-			room: room
+			room: room,
+			avatar: avatar,
 		}
 		// if (this.user)
 			// console.log("joinBAttle chatservice: " + this.user.id + ", data.roomnum: " + data.numroom);
@@ -278,5 +443,25 @@ export class ChatService{
 
 	isUnread() {
 		return this.unread;
+	}
+
+	set room(room: Rooms) {
+		this.selectedRoom = room;
+	}
+
+	get room(): Rooms | undefined {
+		return this.selectedRoom;
+	}
+
+	getBlocked() {
+		return this.http.get<Blocks[]>(this.blockUrl + '/all-blocked', {});
+	}
+	
+	isBlocked(userid: number){
+		return this.http.get<Blocks[]>(this.blockUrl + '/is-blocked/' + userid.toString(), {});
+	}
+
+	removeBlock(userid: number){
+		return this.http.get<Blocks[]>(this.blockUrl + '/delete-block-user/' + userid, {});
 	}
 }
