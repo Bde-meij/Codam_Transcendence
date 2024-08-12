@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "class-validator": "^0.14.1",
-    "nebular": "^0.0.1"
-  }
-}
