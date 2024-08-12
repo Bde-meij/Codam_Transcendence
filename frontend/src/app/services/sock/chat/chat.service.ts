@@ -2,7 +2,6 @@ import { Injectable, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { io } from 'socket.io-client';
-import { SockService } from '../sock.service';
 import { UserService } from '../../user/user.service';
 import { User } from '../../../models/user.class';
 import { skip } from 'rxjs/operators';
@@ -24,7 +23,6 @@ export class ChatService{
 	private selectedRoom?: Rooms;
 	constructor(
 				private http: HttpClient,
-				sockService: SockService, 
 				private userService: UserService) 
 	{
 		this.userService.getUser('current').subscribe((userData) => {
@@ -35,7 +33,6 @@ export class ChatService{
 		// 	console.log("CHAT-SOCK EVENT: ");
 		// 	console.log(event, args);
 		// });
-		// sockService.newSocketRegister("chatSocket");
 	}
 
 	ngOnInit(): void {

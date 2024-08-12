@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NgIf } from '@angular/common';
 import { Router } from "@angular/router";
-import { SockService } from '../../services/sock/sock.service';
 import { Actor,Engine,Color,CollisionType,Keys,Vector } from "excalibur";
 import { makePlayers, playerMovement, addPlayerShadows, addShurikenShadows, updateShadows } from "./Players";
 import{ io }from "socket.io-client";
