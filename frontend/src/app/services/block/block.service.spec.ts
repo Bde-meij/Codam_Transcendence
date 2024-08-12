@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { SockService } from './sock.service';
+import { BlockService } from './block.service';
 
-describe('SockService', () => {
-  let service: SockService;
+describe('BlockService', () => {
+  let service: BlockService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(SockService);
+    service = TestBed.inject(BlockService);
   });
 
   it('should be created', () => {

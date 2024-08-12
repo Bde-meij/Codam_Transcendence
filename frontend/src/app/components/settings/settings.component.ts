@@ -4,10 +4,10 @@ import { ReactiveFormsModule, FormsModule, FormGroup, FormControl, Validators } 
 import { AuthService } from '../../services/auth/auth.service';
 import { UniqueNameValidator, forbiddenNameValidator } from '../../services/validator/name-validator.service';
 import { UserService } from '../../services/user/user.service';
-import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 import { UserDetailComponent } from '../user-detail/user-detail.component';
-import { User } from '../../models/user.class';
+import { Blocks } from '../../models/rooms.class';
+import { BlockService } from '../../services/block/block.service';
 
 @Component({
   selector: 'app-settings',
@@ -17,7 +17,12 @@ import { User } from '../../models/user.class';
   styleUrl: './settings.component.scss'
 })
 export class SettingsComponent implements OnInit {
-	constructor(private authService: AuthService, private userService: UserService, private nameValidator: UniqueNameValidator, private router: Router) {};
+	constructor(
+		private authService: AuthService, 
+		private userService: UserService, 
+		private blockService: BlockService,
+		private nameValidator: UniqueNameValidator
+	) {};
 
 	profileForm = new FormGroup({
 		nickname: new FormControl('', {
@@ -33,9 +38,8 @@ export class SettingsComponent implements OnInit {
 		}),
 	});
 
-	// newName : string = '';
 	errorMessage = "";
-	succesMessage = ""
+	succesMessage = "";
 	current_nickname : string | null | undefined;
 	current_user_id : string | undefined;
 	current_file: File | undefined;
@@ -60,6 +64,19 @@ export class SettingsComponent implements OnInit {
 				console.log("the e: ", e)
 			)
 		});
+		this.getBlockList();
+	}
+
+	blocklist : Blocks[] | undefined;
+	getBlockList() {
+		this.blockService.getBlocked().subscribe({
+			next: (data ) => {
+				this.blocklist = data
+			},
+			error: (e) => (
+				console.log("block error: ", e)
+			)
+		})
 	}
 
 	reload() {
@@ -95,10 +112,10 @@ export class SettingsComponent implements OnInit {
 	changeName() {
 		console.log(this.profileForm.value.nickname);
 		if (this.profileForm.value.nickname) {
-			// this.current_nickname = this.profileForm.value.nickname;
+			let new_nick = this.profileForm.value.nickname;
 			this.userService.changeName(this.profileForm.value.nickname).subscribe({
 				next: (data) => {
-					this.current_nickname = this.profileForm.value.nickname
+					this.current_nickname = new_nick;
 					console.log("changename data:", data);
 					this.succesMessage = data.message;
 					this.errorMessage = '';
@@ -151,6 +168,7 @@ export class SettingsComponent implements OnInit {
 					console.log("change avatar data error :", e.message);
 				}
 			});
+			this.preview = undefined;
 		}
 	}
 }

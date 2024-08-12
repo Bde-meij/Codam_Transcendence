@@ -3,6 +3,7 @@ import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, V
 import { NbAutocompleteModule, NbButtonModule, NbCardModule, NbChatModule, NbDialogConfig, NbDialogService, NbUserModule } from '@nebular/theme';
 import { ChatService } from '../../services/sock/chat/chat.service';
 import { UserService } from '../../services/user/user.service';
+import { BlockService } from '../../services/block/block.service';
 import { User } from '../../models/user.class';
 import { Blocks, ErrorMessage, MessageInterface, Rooms } from '../../models/rooms.class';
 import { NbThemeModule, NbLayoutModule} from '@nebular/theme';
@@ -69,6 +70,7 @@ export class FranChatUiComponent implements AfterViewInit{
 	constructor(
 		private chatService: ChatService, 
 		private userService: UserService, 
+		private blockService: BlockService,
 		private dialogService: NbDialogService,
 		private router: Router
 	) 
@@ -453,7 +455,7 @@ export class FranChatUiComponent implements AfterViewInit{
 	}
 
 	getLists(){
-		this.chatService.getBlocked().subscribe({
+		this.blockService.getBlocked().subscribe({
 			next: (data) => (
 				this.blockedList = data,
 				console.log("all blocked ", data)
