@@ -31,7 +31,7 @@ export class protectedChat {
 
 	submitForm() {
 	if (this.roomName){
-		this.dialogRef.close({roomid: this.selectedRoom!.id, password: this.Password});
+		this.dialogRef.close({roomid: this.selectedRoom!.id, password: this.Password, roomName: this.selectedRoom!.name});
 	} else
 		this.submitWithoutName = true;
 	}
