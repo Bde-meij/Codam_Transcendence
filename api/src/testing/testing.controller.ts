@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { CheckPasswordDto, DeleteRoomDto, RoomDto, UpdateNameDto, UpdatePasswordDto } from 'src/chat/chatRoom.dto';
@@ -13,6 +13,7 @@ import { CreateMatchDto } from 'src/game/dto/create-match.dto';
 import { UpdateMatchDto } from 'src/game/dto/update-match.dto';
 import { MatchService } from 'src/game/match.service';
 import { ChatRoomService } from 'src/chat/chatRoom.service';
+import { Chatroom } from 'src/chat/entities/chatRoom.entity';
 
 // !! DO NOT MAKE CALLS TO THIS ENDPOINT FOR REASONS OTHER THAN TESTING !!
 @Controller('testing')
@@ -201,6 +202,36 @@ export class TestingController {
 	// ----------------------------------------------CHATROOM ENDPOINTS----------------------------------------------
 	// --------------------------------------------------------------------------------------------------------------
 	// --------------------------------------------------------------------------------------------------------------
+
+	// get all chat rooms
+	@Get('chatroom')
+	async getChatrooms() {
+		const temp: Chatroom[] = await this.chatRoomService.getAllChatRooms();
+		// temp.forEach((room) => {
+		// 	room.userChatrooms.forEach((user) => {
+		// 		console.log(user.user);
+		// 	})
+		// })
+		for (var i = 0; i < 10; i++) {
+			console.log(i, await this.chatRoomService.getAllUsersInRoom(i));
+		}
+		return temp;
+	}
+
+	@Get('chatroom/users')
+	async getAllUsersInRoom(@Query() data: {id: number}) {
+		return await this.chatRoomService.getAllUsersInRoom(data.id);
+	}
+
+	@Get('chatroom/users-role')
+	async getAllUsersWithRoleInRoom(@Query() data: {id: number, role: string}) {
+		return await this.chatRoomService.getAllUsersWithRoleInRoom(data.id, data.role);
+	}
+
+	@Post('chatroom/adduser')
+	async addUserToRoom(@Body() data: {userId: number, roomId: number, role: 'string'}) {
+		return await this.chatRoomService.addUserToChatRoom(data.userId, data.roomId, data.role);
+	}
 
 	// creates a chat room
 	@Post('chatroom/create')
