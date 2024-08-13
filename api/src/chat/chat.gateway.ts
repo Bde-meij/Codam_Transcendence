@@ -331,8 +331,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		this.leave_user(data.userid, data.username, data.room);
 	}
 
-	@UseFilters(WsExceptionFilter)
-	@UsePipes(new ValidationPipe({ transform: true }))
+	// @UseFilters(WsExceptionFilter)
+	// @UsePipes(new ValidationPipe({ transform: true }))
 	@SubscribeMessage('deleteRoom')
 	async deleteRoom(
 	@MessageBody() data: DeleteRoomDto,
@@ -922,7 +922,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@SubscribeMessage('last_open_room') async last_open_room(
 	@MessageBody() data: RoomDto,
 	@ConnectedSocket() client: Socket) 
-	{	
+	{
 		client.data.room = data.name;
 	}
 
@@ -940,7 +940,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		this.chatRoomList[data.roomName].status = data.roomType;
 		this.chatRoomList[data.roomName].admins = data.admins;
 		const updatePW: UpdatePasswordDto = {
-			userid: this.chatRoomList[data.roomName].id,
+			id: this.chatRoomList[data.roomName].id,
 			oldPassword: data.oldPassword,
 			newPassword: data.newPassword
 		}

@@ -1,4 +1,4 @@
-import { IsAlpha, IsAlphanumeric, IsNumber, IsString, Length, IsNotEmpty, IsArray } from "class-validator";
+import { IsAlpha, IsAlphanumeric, IsNumber, IsString, Length, IsNotEmpty, IsArray, IsOptional } from "class-validator";
 
 export interface Rooms {
 	id: number;
@@ -70,10 +70,11 @@ export class createRoomDto{
 	status: string;
 	@IsString()
 	@IsAlphanumeric()
-	@IsNotEmpty()
 	@Length(3, 13)
+	@IsOptional()
 	username?: string;
 	@IsNumber()
+	@IsOptional()
 	userid?: number;
 	@IsString()
 	password: string;
@@ -105,7 +106,6 @@ export class RoomDto {
 	@IsAlphanumeric()
 	@IsNotEmpty()
 	name: string;
-	@IsString()
 	password: string; //true or false?
 }
 
@@ -123,6 +123,8 @@ export class DeleteRoomDto {
 	username: string;
 	@IsNumber()
 	userid: number;
+	@IsString()
+	password: string;
 }
 
 export class CheckPasswordDto {
@@ -137,7 +139,7 @@ export class UpdatePasswordDto {
 	@IsNotEmpty()
 	room?: string;
 	@IsNumber()
-	userid: number;
+	id: number;
 	@IsString()
 	oldPassword: string;
 	@IsString()
@@ -193,8 +195,10 @@ export class UserActionDto {
 	@IsNotEmpty()
 	@Length(3, 13)
 	username: string;
+	@IsOptional()
 	@IsString()
 	avatar: string;
+	@IsOptional()
 	@IsNumber()
 	userid: number;
 }

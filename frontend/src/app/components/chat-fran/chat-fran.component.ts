@@ -288,8 +288,8 @@ export class FranChatUiComponent implements AfterViewInit{
 		this.chatService.joinRoom(data, password);
 	}
 
-	leaveRoom(roomName: string) {
-		this.chatService.leaveRoom(+this.roomsList[roomName].id, roomName, this.user.id);
+	leaveRoom() {
+		this.chatService.leaveRoom(this.selectedRoom!.id, this.selectedRoom!.name, this.user.nickname, this.user.id);
 		this.chatService.getRoomsss().subscribe((chatRoomList: Record<string, Rooms>) => {
 			this.roomsList = chatRoomList;
 		});
@@ -447,10 +447,6 @@ export class FranChatUiComponent implements AfterViewInit{
 
 	get_all_rooms(){
 		this.chatService.get_all_rooms();
-	}
-
-	onAvatarClick(msg: any) {
-		console.log("Avatar clicked on!");
 	}
 
 	getLists(){

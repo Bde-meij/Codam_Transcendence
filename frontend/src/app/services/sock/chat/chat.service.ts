@@ -99,9 +99,9 @@ export class ChatService{
 		
 	}
 	
-	leaveRoom(roomid: number, room: string, user: string) {
-		const userid = Number(user);
-		this.chatSocket.emit('leaveRoom', {roomid, room, userid}, (err: any) => {
+	leaveRoom(roomid: number, room: string, username: string, useridStr: string) {
+		const userid = Number(useridStr);
+		this.chatSocket.emit('leaveRoom', {roomid: roomid, room: room, userid: userid, username: username}, (err: any) => {
 			if (err) {
 				// console.log("leaveRoom chat-sock error: ");
 				// console.log(err);
@@ -347,7 +347,7 @@ export class ChatService{
 	}
 
 	blockUser(user: string, room: string){
-		this.chatSocket.emit('block', {user, room}, (err: any) => {
+		this.chatSocket.emit('block', {username: user, room: room}, (err: any) => {
 			if (err) {
 				// console.log("kickUser chat-sock error: ");
 				// console.log(err);
@@ -357,7 +357,7 @@ export class ChatService{
 	}
 
 	unblockUser(user: string, room: string){
-		this.chatSocket.emit('unblock', {user, room}, (err: any) => {
+		this.chatSocket.emit('unblock', {username: user, room: room}, (err: any) => {
 			if (err) {
 				// console.log("kickUser chat-sock error: ");
 				// console.log(err);
@@ -380,7 +380,7 @@ export class ChatService{
 	}
 
 	last_open_room(room_name: string){
-		this.chatSocket.emit('last_open_room', room_name, (err: any) => {
+		this.chatSocket.emit('last_open_room', {name: room_name}, (err: any) => {
 			if (err) {
 				// console.log("kickUser chat-sock error: ");
 				// console.log(err);

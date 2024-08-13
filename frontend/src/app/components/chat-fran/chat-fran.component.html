@@ -15,7 +15,6 @@
             <label for="{{roomName}}" [class.selected]="roomsList[roomName] === selectedRoom">
 				<input type="radio" id="{{roomName}}" name="room" (change)="onSelect(roomsList[roomName])">
 				{{ roomName }}
-				<button class="leave-room-button" (click)="leaveRoom(roomName)">X</button>
 			</label>
 			</li>
 		  </ul>
@@ -38,7 +37,7 @@
 							 [reply]="this.user.nickname === msg.sender_name"
 							 [customMessageData]="msg.customMessageData">
 				<ng-template nbChatMessageAvatar>
-					<div (click)="onAvatarClick(msg)" style="cursor: pointer;">
+					<div>
 						<nb-user [name]="msg.sender_name!" [picture]="msg.sender_avatar!"></nb-user>
 					</div>
 				</ng-template>
