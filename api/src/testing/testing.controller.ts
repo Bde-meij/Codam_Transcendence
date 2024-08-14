@@ -223,6 +223,21 @@ export class TestingController {
 		return await this.chatRoomService.getAllUsersInRoom(data.id);
 	}
 
+	@Get('chatroom/users/rooms')
+	async getAllRoomsOfUser(@Query() data: {id: number}) {
+		return await this.chatRoomService.getAllRoomsOfUser(data.id);
+	}
+
+	@Get('chatroom/users/protected-rooms/not-user')
+	async getAllProtectedRoomsWhereNotUser(@Query() data: {id: number}) {
+		return await this.chatRoomService.getAllProtectedRoomsWhereNotUser(data.id);
+	}
+
+	@Get('chatroom/users/rooms-status')
+	async getAllRoomsOfUserStatus(@Query() data: {id: number, status: string}) {
+		return await this.chatRoomService.getAllRoomsOfUserStatus(data.id, data.status);
+	}
+
 	@Get('chatroom/users-role')
 	async getAllUsersWithRoleInRoom(@Query() data: {id: number, role: string}) {
 		return await this.chatRoomService.getAllUsersWithRoleInRoom(data.id, data.role);

@@ -29,6 +29,7 @@ export class ChatRoomService {
 		// Create chat room
 		const room: Chatroom = await this.roomRepo.save({
 			name: roomDto.name,
+			status: roomDto.status,
 			password: finalPassword,
 		});
 		this.addUserToChatRoom(roomDto.ownerId, room.id, 'owner');
@@ -157,7 +158,7 @@ export class ChatRoomService {
 		console.log("User", user.nickname, "added to room", room.name);
 		return await this.userChatroomRepo.save(userChatRoom);
 	}
-
+	
 	// Removes the user from the given room
 	async removeUserFromChatRoom(userId: number, roomId: number): Promise<void> {
 		await this.userChatroomRepo.delete({
@@ -165,12 +166,13 @@ export class ChatRoomService {
 			chatroom: {id: roomId}
 		});
 	}
-
+	
 	// Returns the user in chatroom
 	// Return null if user is not in chatroom
 	async findUserInChatRoom(userId: number, roomId: number): Promise<UserChatroom | null> {
 		const userChatRoom: UserChatroom = await this.userChatroomRepo.findOne({
 			where: {
+				banned: false,
 				user: {id: userId},
 				chatroom: {id: roomId},
 			}
@@ -193,7 +195,8 @@ export class ChatRoomService {
 				}
 			},
 			where: {
-				chatroom: {id: roomId}
+				banned: false,
+				chatroom: {id: roomId},
 			},
 			relations: {
 				user: true
@@ -202,7 +205,7 @@ export class ChatRoomService {
 		})
 	}
 
-	// Returns an array of all users in a room with the given role (owner/admin/user/banned)
+	// Returns an array of all users in a room with the given role (owner/admin/user)
 	async getAllUsersWithRoleInRoom(roomId: number, role: string) {
 		return await this.userChatroomRepo.find({
 			select: {
@@ -213,37 +216,124 @@ export class ChatRoomService {
 					nickname: true
 				}
 			},
-			
 			where: {
 				role: role,
+				banned: false,
+				chatroom: {id: roomId},
+			},
+			relations: {
+				user: true
+			}
+		})
+	}
+	
+	
+	// Returns an array of all the banned users in a room
+	async getAllBanned(roomId: number) {
+		return await this.userChatroomRepo.find({
+			select: {
+				role: true,
+				muted: true,
+				user: {
+					id: true,
+					nickname: true
+				}
+			},
+			where: {
+				banned: true,
 				chatroom: {id: roomId}
 			},
 			relations: {
 				user: true
 			}
-			
 		})
 	}
-
-
-	// NOT TESTED
+	
+	// Returns an array of all the muted users in a room
+	async getAllMuted(roomId: number) {
+		return await this.userChatroomRepo.find({
+			select: {
+				role: true,
+				muted: true,
+				user: {
+					id: true,
+					nickname: true
+				}
+			},
+			where: {
+				muted: true,
+				banned: false,
+				chatroom: {id: roomId}
+			},
+			relations: {
+				user: true
+			}
+		})
+	}
+	
+	// Returns an array of all the chatrooms the user is in
 	async getAllRoomsOfUser(userId: number) {
 		return await this.userChatroomRepo.find({
 			select: {
 				chatroom: {
 					id: true,
 					name: true,
+					status: true,
 				}
 			},
-			where: [
-				{user: {id: userId}, role: "admin"},
-				{user: {id: userId}, role: "owner"},
-				{user: {id: userId}, role: "user"},
-			],
+			where: {
+				banned: false,
+				user: {id: userId},
+			},
 			relations: {
 				chatroom: true
 			}
 		})
+	}
+	
+	// Returns an array of all the chatrooms the user is in that have a specific status (public/private/protected)
+	async getAllRoomsOfUserStatus(userId: number, roomStatus: string) {
+		return await this.userChatroomRepo.find({
+			select: {
+				chatroom: {
+					id: true,
+					name: true,
+					status: true,
+				}
+			},
+			where: {
+				banned: false,
+				user: {id: userId},
+				chatroom: {status: roomStatus},
+			},
+			relations: {
+				chatroom: true
+			}
+		})
+	}
+
+	// Returns an array of all protecter rooms the user hasn't joined
+	async getAllProtectedRoomsWhereNotUser(userId: number) {
+		const protectedRooms = await this.roomRepo.find({
+			select: {
+				id: true,
+				name: true,
+				userChatrooms: true,
+			},
+			where: {
+				status: 'protected',
+			},
+		});
+		console.log(protectedRooms);
+		var ret = [];
+		for (var room of protectedRooms) {
+			const userChatroom = await this.findUserInChatRoom(userId, room.id);
+			if (userChatroom == null) {
+				ret.push(room);
+			}
+		}
+		console.log(ret);
+		return (ret);
 	}
 
 	// Updates the user role in a room
@@ -257,6 +347,15 @@ export class ChatRoomService {
 		return await this.userChatroomRepo.save(userChatRoom);
 	}
 	
+	// Gives a weighting to each role. i.e. and owner is also an admin and is also a user
+	// owner > admin > user > (invalid role input lol)
+	getRoleWeight(role: string): number {
+		if (role === 'user') {return 1};
+		if (role === 'admin') {return 2};
+		if (role === 'owner') {return 3};
+		return (-1);
+	}
+
 	// Checks whether the user has a role inside a room. For example to check if they're admin or banned
 	// Return null if user is not in chatroom
 	async checkRole(userId: number, roomId: number, role: string): Promise<boolean | null> {
@@ -264,10 +363,11 @@ export class ChatRoomService {
 		if (!userChatRoom) {
 			return null;
 		}
-		if (role === 'admin' && userChatRoom.role === 'owner') {
-			return true;
-		}
-		return (userChatRoom.role === role);
+		// if (role === 'admin' && userChatRoom.role === 'owner') {
+		// 	return true;
+		// }
+		// return (userChatRoom.role === role);
+		return (this.getRoleWeight(userChatRoom.role) >= this.getRoleWeight(role));
 	}
 	
 	// Checks wether the user is muted
@@ -288,13 +388,52 @@ export class ChatRoomService {
 			return null;
 		}
 		// the owner or admins can not be muted?
-		if (userChatRoom.role === 'admin' || userChatRoom.role === 'owner') {
+		if (this.getRoleWeight(userChatRoom.role) > 1) {
 			return userChatRoom;
 		}
 		if (userChatRoom.muted == true) {
 			userChatRoom.muted = false;
 		} else {
 			userChatRoom.muted = true;
+		}
+		return await this.userChatroomRepo.save(userChatRoom);
+	}
+
+	// Checks wether the user is banned
+	// Return null if user is not in chatroom
+	async checkBanned(userId: number, roomId: number): Promise<boolean | null> {
+		var userChatRoom: UserChatroom = await this.userChatroomRepo.findOne({
+			where: {
+				user: {id: userId},
+				chatroom: {id: roomId},
+			}
+		});
+		if (!userChatRoom) {
+			return null;
+		}
+		return userChatRoom.banned;
+	}
+	
+	// If the user is banned, they are unbanned. If the user is NOT banned, they are banned
+	// Return null if user is not in chatroom
+	async toggleBanned(userId: number, roomId: number): Promise<UserChatroom | null> {
+		var userChatRoom: UserChatroom = await this.userChatroomRepo.findOne({
+			where: {
+				user: {id: userId},
+				chatroom: {id: roomId},
+			}
+		});
+		if (!userChatRoom) {
+			return null;
+		}
+		// the owner or admins can not be banned?
+		if (this.getRoleWeight(userChatRoom.role) > 1) {
+			return userChatRoom;
+		}
+		if (userChatRoom.banned == true) {
+			userChatRoom.banned = false;
+		} else {
+			userChatRoom.banned = true;
 		}
 		return await this.userChatroomRepo.save(userChatRoom);
 	}

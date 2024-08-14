@@ -21,6 +21,9 @@ export class Chatroom {
 	@Column({nullable: true, default: null})
 	password: string;
 
+	@Column({default: 'public'})
+	status: string;
+
 	@OneToMany(() => UserChatroom, (userChatroom) => userChatroom.chatroom)
 	userChatrooms: UserChatroom[];
 }
@@ -41,6 +44,9 @@ export class UserChatroom {
 
 	@Column({default: false})
 	muted: boolean;
+
+	@Column({default: false})
+	banned: boolean;
 }
 
 @Entity('chat_room_list')
