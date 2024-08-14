@@ -1,3 +1,4 @@
+import { User } from 'src/user/entities/user.entity';
 import {
 	Entity,
 	PrimaryGeneratedColumn,
@@ -9,16 +10,43 @@ import {
 	JoinTable
 } from 'typeorm';
 
-@Entity('chatRoom')
-export class ChatRoom {
+@Entity('chatroom')
+export class Chatroom {
+	@PrimaryGeneratedColumn()
+	id: number;
+	
+	@Column({nullable: false})
+	name: string;
+	
+	@Column({nullable: true, default: null})
+	password: string;
+
+	@Column({default: 'public'})
+	status: string;
+
+	@OneToMany(() => UserChatroom, (userChatroom) => userChatroom.chatroom)
+	userChatrooms: UserChatroom[];
+}
+
+@Entity('user_chatroom')
+export class UserChatroom {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	@Column({nullable: false})
-	name: string;
+	@ManyToOne(() => User, (user) => user.userChatrooms)
+	user: User;
 
-	@Column({nullable: true, default: null})
-	password: string;
+	@ManyToOne(() => Chatroom, (chatroom) => chatroom.userChatrooms)
+	chatroom: Chatroom;
+
+	@Column({default: 'user'})
+	role: string;
+
+	@Column({default: false})
+	muted: boolean;
+
+	@Column({default: false})
+	banned: boolean;
 }
 
 @Entity('chat_room_list')
@@ -96,3 +124,4 @@ export class ChatMessage {
 	@Column({ type: 'varchar', nullable: true })
 	sender_avatar: string;
 }
+

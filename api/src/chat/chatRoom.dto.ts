@@ -1,4 +1,5 @@
 import { IsAlpha, IsAlphanumeric, IsNumber, IsString, Length, IsNotEmpty, IsArray, IsOptional } from "class-validator";
+import { User } from "src/user/entities/user.entity";
 
 export interface Rooms {
 	id: number;
@@ -107,6 +108,9 @@ export class RoomDto {
 	@IsNotEmpty()
 	name: string;
 	password: string; //true or false?
+	ownerId: number;
+	status: string;
+
 }
 
 export class DeleteRoomDto {

@@ -41,8 +41,7 @@ export class BlockController {
 			sender: req.user.id,
 			target: blockId,
 		}
-		
-		return await this.blockService.deleteByBlockId(block);
+		await this.blockService.deleteByBlockId(block);
 	}
 	
 	@Delete('delete-block-user/:targetid')
@@ -52,6 +51,6 @@ export class BlockController {
 			sender: req.user.id,
 			target: targetId,
 		}
-		return await this.blockService.deleteByUserId(block);
+		await this.blockService.deleteByUserId(block);
 	}
 }

@@ -7,6 +7,22 @@
 	<div class="setting_column" *ngIf="current_user_id">
 		<h2> How Gary knows you: </h2>
 		<app-user-detail [id]="current_user_id"> </app-user-detail>
+
+		@if ((!blocklist) || (blocklist.length == 0) ) {
+			<h3> no blocklist </h3>
+		} @else {
+			<h3> Who we dont talk to : </h3>
+
+			@for (block of blocklist; track block.id) {
+				<ul>
+					<li>
+						<p>
+							{{block.target.nickname}} (they smell)
+						</p>
+					</li>
+				</ul>
+			}
+		}
 	</div>
 	<div class="setting_column">
 		<h2> The things to set: </h2>
@@ -16,9 +32,9 @@
 				<input type="checkbox" [(ngModel)]="is2faEnabled" (change)="onChange()">
 			</div>
 			<div>
-				<form [formGroup]="profileForm" (ngSubmit)="changeName()">
+				<form [formGroup]="profileForm" (ngSubmit)="changeName()" >
 					<span> Nickname: </span>
-					<input type="text" formControlName="nickname" maxlength="13" placeholder={{current_nickname}} />
+					<input type="text" formControlName="nickname" maxlength="13" placeholder={{current_nickname}} required/>
 					@if (profileForm.value.nickname != '') {
 						<button type="submit" [disabled]="!profileForm.valid">
 							send new nickname
@@ -27,7 +43,7 @@
 				</form>
 				<span> Avatar: </span>
 				<input type="file" (change)="selectFile($event)" > 
-				<button type="submit" (click)="changeAvatar()"> submit </button>
+				<button type="submit" (click)="changeAvatar()"> submit avatar </button>
 			</div>
 		</ul>
 	</div>

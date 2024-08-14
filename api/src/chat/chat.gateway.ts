@@ -148,7 +148,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			messages: [], 
 		};
 		//unique room id from database.
-		const CreateRoomDB: any =  await this.chatService.createChatRoom({name :  data.room_name, password: data.password })
+		const CreateRoomDB: any =  await this.chatService.createChatRoom({name :  data.room_name, password: data.password, ownerId: socket.data.userid, status: '' })
 		if (!CreateRoomDB){
 			this.emit_error_message(socket, `Room '${data.room_name}' already exists in the database, please pick another name`, 1, socket.data.room)
 			this.logger("already exist5,7 s");
@@ -163,7 +163,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		//adding invite user
 		var userid = null;
 		if (data.username){
-			userid = this.findUserId(data.username);	
+			userid = this.findUserId(data.username);
 		}
 		if (data.userid){
 			userid = data.userid;	
@@ -1405,13 +1405,13 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			{ room_name: 'Global', status: 'public', password: false, pw: ""},
 			{ room_name: 'Help', status: 'public', password: false, pw: "" },
 			{ room_name: 'Private', status: 'private', password: false, pw: "" },
-			{ room_name: 'Protected no pw', status: 'protected', password: true, pw: "" },
+			{ room_name: 'ProtectedNoPw', status: 'protected', password: true, pw: "" },
 			{ room_name: 'Protected', status: 'protected', password: true, pw: "test" },
 		];
-		var id = 59;
+		var id = 1;
 		for (const roomData of dummyRooms) {
 			const { room_name, status, password, pw } = roomData;
-			let chat = await this.chatService.createChatRoom({ name: room_name, password: pw })
+			let chat = await this.chatService.createChatRoom({ name: room_name, password: pw, status: 'public', ownerId: 88891 })
 			// let id_db = await this.chatService.idChatRoom({ name: room_name})
 			if (chat){
 				id = chat.id;
@@ -1426,7 +1426,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 					admins: [],
 					banned: [],
 					muted: {},
-					users: [],
+					users: [1],
 					status: status,
 					password: password,
 					messages: [],
@@ -1435,14 +1435,20 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			id++;
 		}
 		
-		this.chatRoomList["Global"].owner = 77600;
-		this.chatRoomList["Global"].admins.push(77600);
-		// this.chatRoomList["Help"].owner = 77600;
-		// this.chatRoomList["Help"].admins.push(77600);
-		// this.chatRoomList["Private"].owner = 77600;
-		this.chatRoomList["Protected"].users.push(776001);
-		// this.chatRoomList["Protected"].id = 58;
+		// this.chatRoomList["Global"].owner = 77600;
+		// this.chatRoomList["Global"].admins.push(77600);
+		// // this.chatRoomList["Help"].owner = 77600;
+		// // this.chatRoomList["Help"].admins.push(77600);
+		// // this.chatRoomList["Private"].owner = 77600;
+		// this.chatRoomList["Protected"].users.push(776001);
+		// // this.chatRoomList["Protected"].id = 58;
 
+
+		// this.chatRoomList["PrivatePW"].owner = 77600;
+		// this.chatRoomList["PrivatePW"].users.push(77600);
+		// this.chatRoomList["PrivatePW"].password = true;
+		// // const CreateRoomDB: any =  await this.chatService.createChatRoom({name :  "Global", password: ""})
+		// const CreateRoomDB: any =  await this.chatService.createChatRoom({name : "Global", password: "", ownerId: 1, status: '' })
 
 		// const updatepw: UpdatePasswordDto = {
 		// 	id: 33,
