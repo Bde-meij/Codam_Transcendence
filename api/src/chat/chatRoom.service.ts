@@ -171,10 +171,19 @@ export class ChatRoomService {
 	// Return null if user is not in chatroom
 	async findUserInChatRoom(userId: number, roomId: number): Promise<UserChatroom | null> {
 		const userChatRoom: UserChatroom = await this.userChatroomRepo.findOne({
+			select: {
+				user: {
+					id: true,
+					nickname: true,
+				}
+			},
 			where: {
 				banned: false,
 				user: {id: userId},
 				chatroom: {id: roomId},
+			},
+			relations: {
+				user: true
 			}
 		});
 		if (!userChatRoom) {
