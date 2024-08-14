@@ -1,4 +1,5 @@
 import { Blocks } from "src/block/entities/block.entity";
+import { UserChatroom } from "src/chat/entities/chatRoom.entity";
 import { FriendRequest } from "src/friends/entities/friend.entity";
 import { Match } from "src/game/entities/match.entity";
 import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
@@ -13,9 +14,6 @@ export class User {
 
 	@Column()
 	nickname: string;
-
-	// @Column("text", { array: true, default: "{}" })
-	// rooms: string[];
 	
 	@Column({default: "online"})
 	status: string;
@@ -52,4 +50,8 @@ export class User {
 
 	@Column({default: 0})
 	roomKey: number;
+
+
+	@OneToMany(() => UserChatroom, (userChatroom) => userChatroom.user)
+	userChatrooms: UserChatroom[];
 }
