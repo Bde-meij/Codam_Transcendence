@@ -982,7 +982,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			this.logger("joining pw protected room");
 			this.chatRoomList[data.roomName].users.push(client.data.userid)
 			const msg: MessageInterface = this.create_msg(`${client.data.nickname} has joined the channel`, data.roomid, data.roomName, client.data.userid, client.data.nickname, 'text', client.data.avatar)
-			this.io.to(data.roomid.toString()).emit("message", "Has joined the channel");
+			// this.io.to(data.roomid.toString()).emit("message", "Has joined the channel");
 			this.chatRoomList[data.roomName].messages.push(msg)
 			client.join(data.roomName);
 			client.emit("update_client_room", this.chatRoomList[data.roomName]);
@@ -1369,7 +1369,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			{ room_name: 'Protected no pw', status: 'protected', password: true, pw: "" },
 			{ room_name: 'Protected', status: 'protected', password: true, pw: "test" },
 		];
-		var id = 59;
+		var id = 1;
 		for (const roomData of dummyRooms) {
 			const { room_name, status, password, pw } = roomData;
 			let chat = await this.chatService.createChatRoom({ name: room_name, password: pw })

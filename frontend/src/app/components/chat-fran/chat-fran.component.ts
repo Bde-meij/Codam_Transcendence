@@ -16,7 +16,7 @@ import { settingsChat } from './settingsChat/settingsChat.component';
 import { protectedChat } from './protectedChat/protectedChat.component';
 
 let subbed = false;
-
+let pw = '';
 
 @Component({
 	selector: 'fran-chat-ui',
@@ -57,26 +57,23 @@ export class FranChatUiComponent implements AfterViewInit{
 	blockedList?: Blocks[];
 
 	async onSelect(room: Rooms): Promise<any> {
+		pw = '';
 		this.selectedRoom = room;
 		this.last_open_room();
 		console.log("users: ", room.users);
 		this.change_sender_avatar(room.name);
 		if (this.selectedRoom.password && !this.selectedRoom.users.includes(Number(this.user.id))){
 			var test = await this.passwordPopup(room);
+			console.log("input");
+			console.log(test);
+			this.joinRoom(room.name, pw);
 		}
 		else {
 			setTimeout(() => {
-				this.joinRoom(room.name, '');
+				this.joinRoom(room.name, pw);
 			}, 1320);
-		}
-		
-		// this.joinRoom(room.name, '');
-		
-		console.log("users: ", room.users);
-		// this.joinRoom(room.name, '');
-		
-		this.selectedRoom = room;
-		//console.log(room.messages);
+		}	
+		console.log("users: ", room.users);;
 	};
 
 	constructor(
@@ -290,6 +287,7 @@ export class FranChatUiComponent implements AfterViewInit{
 				}).onClose.subscribe((input: any) => {
 					if (input) {
 						console.log(input);
+						pw = input.password;
 						this.chatService.checkPassword(input);
 						setTimeout(() => {
 							this.onSelect(this.roomsList[input.roomName])
