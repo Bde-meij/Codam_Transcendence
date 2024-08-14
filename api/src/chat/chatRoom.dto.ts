@@ -38,7 +38,7 @@ export interface MessageInterface {
 	game?: boolean;
 	sender_avatar?: string;
 	type: string;
-	cutomMessageData?: {href: string, text: string};
+	customMessageData?: {text: string, roomkey: number};
 }
 
 export interface Rooms {
@@ -96,7 +96,7 @@ export class messageDto{
 	room: string;
 	@IsString()
 	type: string;
-	customMessageData: {href: string, text: string};
+	customMessageData: {text: string, roomkey: number};
 	@IsString()
 	sender_avatar: string;
 }
@@ -269,8 +269,10 @@ export class SettingsDto {
 	@IsString()
 	roomType: string;
 	@IsString()
+	@IsOptional()
 	oldPassword: string;
 	@IsString()
+	@IsOptional()
 	newPassword: string;
 	@IsArray()
 	admins: number[];

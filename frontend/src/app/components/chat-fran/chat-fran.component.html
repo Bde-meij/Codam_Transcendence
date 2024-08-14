@@ -27,26 +27,32 @@
 			<button (click)="settingsChat(selectedRoom)">Settings of {{selectedRoom.name}}</button>
 		</div>
 		  <nb-chat size="large" scrollbottom="true" [title]="selectedRoom.name">
-			<a *nbCustomMessage="'link'" href="/dashboard/game" (click)="joinBattle()">Join battle!</a>
-			<nb-chat-message *ngFor="let msg of selectedRoom.messages"
-							 [type]="msg.type"
-							 [message]="msg.message"
-							 [avatar]="msg.sender_avatar!"
-							 [sender]="msg.sender_name"
-							 [date]="msg.created"
-							 [reply]="this.user.nickname === msg.sender_name"
-							 [customMessageData]="msg.customMessageData">
+				<nb-chat-message *ngFor="let msg of selectedRoom.messages"
+				[type]="msg.type"
+				[message]="msg.message"
+				[avatar]="msg.sender_avatar!"
+				[sender]="msg.sender_name"
+				[date]="msg.created"
+				[reply]="this.user.nickname === msg.sender_name"
+				[customMessageData]="msg.customMessageData">
+				<button *nbCustomMessage="'custom'" (click)="joinBattle(msg)">Join battle!</button>
 				<ng-template nbChatMessageAvatar>
-					<div>
-						<nb-user [name]="msg.sender_name!" [picture]="msg.sender_avatar!"></nb-user>
-					</div>
-				</ng-template>
-			</nb-chat-message>
-			<nb-chat-form (send)="sendMessage($event)" [dropFiles]="false"></nb-chat-form>
+						<div>
+							<nb-user [name]="msg.sender_name!" [picture]="msg.sender_avatar!"></nb-user>
+						</div>
+					</ng-template>
+				</nb-chat-message>
+				<nb-chat-form (send)="sendMessage($event)" [dropFiles]="false"></nb-chat-form>
 		  </nb-chat>
 		  <div class="ban-kick-mute">
 			<button *ngIf="selectedRoom" mat-raised-button color="primary" (click)="battle()">
 				Battle
+			</button>
+			<button *ngIf="selectedRoom" mat-raised-button color="primary" (click)="leaveRoom()">
+				leave room
+			</button>
+			<button [disabled]="!isChannelOwner()" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="deleteRoom()">
+				deleteRoom
 			</button>
 		  <div [formGroup]="userNameForm" class="user-name-input">
 		  	<input type="text" formControlName="userName" maxlength="13" placeholder="their nickname"/>
@@ -62,12 +68,6 @@
 			</button>
 			<button [disabled]="!isChannelAdmin() || !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="invite()">
 				Invite chat
-			</button>
-			<button [disabled]=" !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="leaveRoom()">
-				leaveRoom
-			</button>
-			<button [disabled]="!isChannelOwner() || !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="deleteRoom()">
-				deleteRoom
 			</button>
 			<button [disabled]=" !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="block()">
 				Block

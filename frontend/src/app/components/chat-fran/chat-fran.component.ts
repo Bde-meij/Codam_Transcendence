@@ -13,6 +13,7 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { forbiddenNameValidator } from '../../services/validator/name-validator.service';
 import { Router } from '@angular/router';
 import { settingsChat } from './settingsChat/settingsChat.component';
+import { protectedChat } from './protectedChat/protectedChat.component';
 
 let subbed = false;
 
@@ -55,13 +56,25 @@ export class FranChatUiComponent implements AfterViewInit{
 	blockbool: boolean = false;
 	blockedList?: Blocks[];
 
-	onSelect(room: Rooms): void {
+	async onSelect(room: Rooms): Promise<any> {
 		this.selectedRoom = room;
 		this.last_open_room();
 		console.log("users: ", room.users);
 		this.change_sender_avatar(room.name);
-		this.joinRoom(room.name, '');
+		if (this.selectedRoom.password && !this.selectedRoom.users.includes(Number(this.user.id))){
+			var test = await this.passwordPopup(room);
+		}
+		else {
+			setTimeout(() => {
+				this.joinRoom(room.name, '');
+			}, 1320);
+		}
+		
+		// this.joinRoom(room.name, '');
+		
 		console.log("users: ", room.users);
+		// this.joinRoom(room.name, '');
+		
 		this.selectedRoom = room;
 		//console.log(room.messages);
 	};
@@ -197,14 +210,10 @@ export class FranChatUiComponent implements AfterViewInit{
 			this.roomsList[update_room.name] = update_room;
 		})
 
-		
-
 		this.chatService.delete_room().subscribe((room: string) => {
 			console.log(`delete_room: ${room}`);
 			delete this.roomsList[room];
 		})
-
-		
 	};
 
 	ngAfterViewInit() {
@@ -224,14 +233,9 @@ export class FranChatUiComponent implements AfterViewInit{
 
 	sendMessage(event: any) {
 		if (event.message) {
-			// this.get_all_rooms();
 			this.chatService.sendMessage(event.message, this.selectedRoom!.name, this.user!.avatar);
 		}
 		this.message = '';
-		//console.log("room users: " + this.room.users);
-		//console.log(this.room.users)
-
-		////console.log("chat-message sendmessage: " + this.room.name);
 	}
 
 	makenum(str: string){
@@ -262,17 +266,40 @@ export class FranChatUiComponent implements AfterViewInit{
 
 	settingsChat(room: Rooms) {
 		this.chatService.room = this.selectedRoom!;
-		this.dialogService.open(settingsChat, {context:{}
-		}).onClose.subscribe((input: any) => {
-			if (input) {
-				console.log(input);
-				console.log(input.roomName);
-				this.chatService.settingsChat(input);
-				setTimeout(() => {
-					this.onSelect(this.roomsList[input.roomName])
-				}, 300);
-			}
-		  });
+		this.chatService.giveUsernames(this.selectedRoom!.name)
+		setTimeout(() => {
+			this.dialogService.open(settingsChat, {context:{}
+			}).onClose.subscribe((input: any) => {
+				if (input) {
+					console.log(input);
+					console.log(input.roomName);
+					this.chatService.settingsChat(input);
+					setTimeout(() => {
+						this.onSelect(this.roomsList[input.roomName])
+					}, 300);
+				}
+			  });
+		}, 300);
+	}
+
+	passwordPopup(room: Rooms): Promise<string>  {
+		return new Promise((resolve) => {
+			this.chatService.room = this.selectedRoom!;
+			setTimeout(() => {
+				this.dialogService.open(protectedChat, {context:{}
+				}).onClose.subscribe((input: any) => {
+					if (input) {
+						console.log(input);
+						this.chatService.checkPassword(input);
+						setTimeout(() => {
+							this.onSelect(this.roomsList[input.roomName])
+						}, 300);
+					}
+					resolve(input.password);
+				});
+			}, 100);
+		
+		})
 	}
 
 	getRooms() {
@@ -284,7 +311,6 @@ export class FranChatUiComponent implements AfterViewInit{
 	}
 
 	joinRoom(data: string, password: string) {
-		////console.log("joinroom component: " + data);
 		this.chatService.joinRoom(data, password);
 	}
 
@@ -300,7 +326,6 @@ export class FranChatUiComponent implements AfterViewInit{
 	}
 	
 	sendUserList(data: string) {
-		////console.log("sendUserList: " + data);
 		this.chatService.sendUserList(data);
 	}
 
@@ -318,12 +343,20 @@ export class FranChatUiComponent implements AfterViewInit{
 	}
 
 	battle() {
-		this.router.navigate(['/dashboard/game']);
 		this.chatService.battle(this.selectedRoom!.name, +this.selectedRoom!.id, +this.user.id, this.user.nickname, this.user.avatar);
+		this.router.navigate(['/dashboard/game']);
 	}
 	
-	joinBattle() {
-		this.chatService.joinBattle(this.selectedRoom!.id, this.selectedRoom!.name, this.user.avatar);
+	// joinBattle(roomkey: number) {
+	// 	console.log("IT HEREE---------------------------");
+	// 	this.chatService.joinBattle(roomkey, this.selectedRoom!.name, this.user.avatar);
+	// 	this.router.navigate(['/dashboard', 'game']);
+	// }	
+	joinBattle(msg: any) {
+		console.log("IT HEREE1---------------------------", msg);
+		console.log("IT HEREE2---------------------------", msg.customMessageData);
+		console.log("IT HEREE3---------------------------", msg.customMessageData.roomkey);
+		this.chatService.joinBattle(msg.customMessageData.roomkey, this.selectedRoom!.name, this.user.avatar);
 		this.router.navigate(['/dashboard', 'game']);
 	}
 
