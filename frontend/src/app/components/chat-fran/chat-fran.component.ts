@@ -59,8 +59,7 @@ export class FranChatUiComponent implements AfterViewInit{
 	blockedList?: Blocks[];
 
 	async onSelect(room: Rooms): Promise<any> {
-		console.log("selecting room:", room);
-		pw = 'abcdIo';
+		pw = '';
 		joined = 1;
 		this.selectedRoom = room;
 		this.chatService.room = this.selectedRoom!
@@ -68,14 +67,14 @@ export class FranChatUiComponent implements AfterViewInit{
 		this.change_sender_avatar(room.name);
 		if (this.selectedRoom.password && !this.selectedRoom.users.includes(Number(this.user.id))){
 			var test = await this.passwordPopup(room);
-			console.log("input", test);
 			this.joinRoom(room.name, pw);
 			if (!this.selectedRoom.users.includes(Number(this.user.id)))
 				joined = 0;
-			// this.selectedRoom = room;
-		}
-		else {
-			this.joinRoom(room.name, pw);
+		}else {
+			setTimeout(() => {
+				this.joinRoom(room.name, pw);
+				this.selectedRoom = room;
+			}, 120);
 		}	
 		this.selectedRoom = room;
 		if (joined === 0){
@@ -128,9 +127,9 @@ export class FranChatUiComponent implements AfterViewInit{
 					if (newmessage.senderId > 0){
 						newmessage.sender_avatar = this.get_avatar(newmessage.senderId);
 						// if (!newmessage.sender_avatar){
-							this.userService.getAvatar(newmessage.senderId).subscribe((data) => (
-								newmessage.sender_avatar = URL.createObjectURL(data)
-							))
+						this.userService.getAvatar(newmessage.senderId).subscribe((data) => (
+							newmessage.sender_avatar = URL.createObjectURL(data)
+						))
 						// }
 					}
 					if (!this.blockbool){
@@ -181,7 +180,7 @@ export class FranChatUiComponent implements AfterViewInit{
 					type: 'text',
 					created: new Date(),
 				}
-				console.log(`error_message received ${message.message} - to ${message.room_name} - ${this.selectedRoom!.name}`);
+				console.log(`error_message received ${message.message} - to ${message.room_name} - ${this.selectedRoom?.name}`);
 				if (!this.roomsList[message.room_name])
 					this.roomsList[message.room_name];
 				this.roomsList[message.room_name].messages?.push(message);
@@ -198,9 +197,10 @@ export class FranChatUiComponent implements AfterViewInit{
 			})
 
 			this.chatService.selectRoom().subscribe((room: string) => {
-				setTimeout(() => {
-					this.onSelect(this.roomsList[room]);
-				}, 300);
+				// setTimeout(() => {
+				// 	this.onSelect(this.roomsList[room]);
+				// }, 300);
+				this.selectedRoom = this.roomsList[room];
 			})
 
 			this.chatService.update_single_user().subscribe((users: any) => {
@@ -290,7 +290,8 @@ export class FranChatUiComponent implements AfterViewInit{
 
 				this.chatService.createRoom(input.roomName, input.roomType, input.password, []);
 				setTimeout(() => {
-					this.onSelect(this.roomsList[input.roomName])
+					if (this.roomsList[input.roomName])
+						this.onSelect(this.roomsList[input.roomName])
 				}, 300);
 			}
 		  });
@@ -326,7 +327,7 @@ export class FranChatUiComponent implements AfterViewInit{
 					}
 					resolve();
 				});
-			}, 50);
+			}, 250);
 		
 		})
 	}
@@ -345,9 +346,6 @@ export class FranChatUiComponent implements AfterViewInit{
 
 	leaveRoom() {
 		this.chatService.leaveRoom(this.selectedRoom!.id, this.selectedRoom!.name, this.user.nickname, this.user.id);
-		this.chatService.getRoomsss().subscribe((chatRoomList: Record<string, Rooms>) => {
-			this.roomsList = chatRoomList;
-		});
 	}
 
 	getConnectedUsers() {
@@ -443,8 +441,8 @@ export class FranChatUiComponent implements AfterViewInit{
 	}
 
 	last_open_room(){
-		this.chatService.last_open_room(this.selectedRoom!.name);
-		console.log("open room: " + this.selectedRoom!.name);
+		if (this.selectedRoom)
+			this.chatService.last_open_room(this.selectedRoom.name);
 	}
 
 	setAdmin() {
