@@ -17,6 +17,8 @@ export class ChatService{
 	user!: User;
 
 	userss: string[] = [];
+	usernames: { user: string; username: string }[] = [];
+
 	rooms: Rooms[] = []; 
 	roomss: Rooms[] = []; 
 	private selectedRoom?: Rooms;
@@ -28,6 +30,10 @@ export class ChatService{
 			this.user = userData;
 		});
 
+		this.get_users_names().subscribe((usernames_list: any) => {
+			this.usernames = usernames_list;
+			console.log(this.usernames);
+		})
 		// this.chatSocket.onAny((event, ...args) => {
 		// 	console.log("CHAT-SOCK EVENT: ");
 		// 	console.log(event, args);
@@ -61,9 +67,20 @@ export class ChatService{
 		});
 	}
 
-	createRoom(room_name: string, status: string, password: string): void {
+	createRoom(room_name: string, status: string, password: string, users: number[]): void {
 		// console.log("createRoom called: " + room_name + ", status: " + status + ", password: " + password);
-		this.chatSocket.emit('createRoom', { room_name, status, password}, (err: any) => {
+		this.chatSocket.emit('createRoom', { room_name, status, password, users}, (err: any) => {
+			if (err) {
+				// console.log("createRoom chat-sock error: ");
+				// console.log(err);
+				// console.log(err.message);
+			}
+		});
+	}
+
+	giveUsernames(room: string): void {
+		// console.log("settingsChat called: " + room_name + ", status: " + status + ", password: " + password + ", admins: " + admins);
+		this.chatSocket.emit('give_usernames', room, (err: any) => {
 			if (err) {
 				// console.log("createRoom chat-sock error: ");
 				// console.log(err);
@@ -83,6 +100,16 @@ export class ChatService{
 		});
 	}
 
+	checkPassword(input: any): void {
+		this.chatSocket.emit('checkPassword', input, (err: any) => {
+		if (err) {
+				// console.log("createRoom chat-sock error: ");
+				// console.log(err);
+				// console.log(err.message);
+			}
+		});
+	}
+
 	joinRoom(room_name: string, password: string): void {
 		// console.log("joinRoom name: " + room_name + ", password: " + password);
 		this.chatSocket.emit('joinRoom', {room_name: room_name, user_id: this.user!.id, password: password, avatar: this.user!.avatar}, (err: any) => {
@@ -95,9 +122,9 @@ export class ChatService{
 		
 	}
 	
-	leaveRoom(roomid: number, room: string, user: string) {
-		const userid = Number(user);
-		this.chatSocket.emit('leaveRoom', {roomid, room, userid}, (err: any) => {
+	leaveRoom(roomid: number, room: string, username: string, useridStr: string) {
+		const userid = Number(useridStr);
+		this.chatSocket.emit('leaveRoom', {roomid: roomid, room: room, userid: userid, username: username}, (err: any) => {
 			if (err) {
 				// console.log("leaveRoom chat-sock error: ");
 				// console.log(err);
@@ -119,6 +146,7 @@ export class ChatService{
 	getMessages(): Observable<MessageInterface> {
 		return new Observable((observer) => {
 			this.chatSocket.on('message', (message) => {
+				console.log("IN CHAT SERVICE", message);
 				observer.next(message);
 				// console.log("getmessage");
 			});
@@ -196,6 +224,14 @@ export class ChatService{
 		});
 	}
 	
+	get_users_names(): Observable<any> {
+		return new Observable((observer) => {
+			this.chatSocket.on("usernames", (message) => {
+				observer.next(message);
+			});
+		});
+	}
+
 	update_client_room(): Observable<Rooms> {
 		return new Observable((observer) => {
 			this.chatSocket.on('update_client_room', (room: Rooms) => {
@@ -343,7 +379,7 @@ export class ChatService{
 	}
 
 	blockUser(user: string, room: string){
-		this.chatSocket.emit('block', {user, room}, (err: any) => {
+		this.chatSocket.emit('block', {username: user, room: room}, (err: any) => {
 			if (err) {
 				// console.log("kickUser chat-sock error: ");
 				// console.log(err);
@@ -353,7 +389,7 @@ export class ChatService{
 	}
 
 	unblockUser(user: string, room: string){
-		this.chatSocket.emit('unblock', {user, room}, (err: any) => {
+		this.chatSocket.emit('unblock', {username: user, room: room}, (err: any) => {
 			if (err) {
 				// console.log("kickUser chat-sock error: ");
 				// console.log(err);
@@ -376,7 +412,7 @@ export class ChatService{
 	}
 
 	last_open_room(room_name: string){
-		this.chatSocket.emit('last_open_room', room_name, (err: any) => {
+		this.chatSocket.emit('last_open_room', {name: room_name}, (err: any) => {
 			if (err) {
 				// console.log("kickUser chat-sock error: ");
 				// console.log(err);

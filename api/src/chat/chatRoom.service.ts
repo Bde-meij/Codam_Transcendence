@@ -42,13 +42,13 @@ export class ChatRoomService {
 
 	async deleteChatRoom(deleteRoomDto: DeleteRoomDto) {
 		const checkOldPassword: boolean = await this.checkPassword({
-			id: deleteRoomDto.id,
+			id: deleteRoomDto.roomid,
 			password: deleteRoomDto.password
 		});
 		if (!checkOldPassword)
 			return false;
-		await this.roomRepo.delete({id: deleteRoomDto.id});
-		await this.userChatroomRepo.delete({chatroom: {id: deleteRoomDto.id}});
+		await this.roomRepo.delete({id: deleteRoomDto.roomid});
+		await this.userChatroomRepo.delete({chatroom: {id: deleteRoomDto.roomid}});
 		return true;
 	}
 	

@@ -130,6 +130,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@SubscribeMessage("joinGame")
 	joinGame(client: Socket)
 	{
+		console.log(client.data.key, "JOINGAME---------------------------------------------------------------------------------------------------------------------------------------------------------");
 		if (client.data.key < 1)
 		{
 			if (this.findRoom(client))

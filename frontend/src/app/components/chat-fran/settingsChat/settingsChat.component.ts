@@ -19,31 +19,45 @@ export class settingsChat {
 	withPassword: boolean = false;
 	submitWithoutName: boolean = false;
 	roomType: string = '';
-
+	
+	users: { user: string; username: string }[] = [];
 	selectedRoom?: Rooms;
 	checked = false;
 	admins: number[] = [];
+	adminsNames: string[] = [];
 	constructor(protected dialogRef: NbDialogRef<settingsChat>, private chatService: ChatService) {}
 
 	ngOnInit(): void {
 		this.selectedRoom = this.chatService.room;
 		this.roomName = this.selectedRoom!.name;
-		this.admins = this.selectedRoom!.admins;
+		this.admins = this.selectedRoom!.admins
+		this.roomType = this.selectedRoom!.status;
+		this.users = this.chatService.usernames;
+		for (const a of this.admins){
+			for (const b of this.users){
+				if (b.user == a.toString()){
+					this.adminsNames.push(b.username);
+				}
+			}
+		} 
 	}
 	
-	isAdmin(userid: number){
-		if (this.selectedRoom!.admins.includes(userid))
+	isAdmin(userid: string){
+		if (this.selectedRoom!.admins.includes(Number(userid)))
 			return true;
 		return false;
 	}
 
-	toggle(checked: boolean, user: number) {
+	toggle(checked: boolean, user: string, username: string) {
+		// console.log(this.users);
 		this.checked = checked;
 		if (this.checked == false){
-			this.admins = this.admins.filter(adminId => adminId !== user);
+			this.admins = this.admins.filter(adminId => adminId !== Number(user));
+			this.adminsNames = this.adminsNames.filter(adminId => adminId !== username);
 		} else {
-			if (!this.admins.includes(user)){
-				this.admins.push(user);
+			if (!this.admins.includes(Number(user))){
+				this.admins.push(Number(user));
+				this.adminsNames.push(username);
 			}
 		}
 	}
