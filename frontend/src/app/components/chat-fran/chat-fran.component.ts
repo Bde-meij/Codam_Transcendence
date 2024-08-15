@@ -15,6 +15,7 @@ import { forbiddenNameValidator } from '../../services/validator/name-validator.
 import { Router } from '@angular/router';
 import { settingsChat } from './settingsChat/settingsChat.component';
 import { protectedChat } from './protectedChat/protectedChat.component';
+// import { ErrorService } from '../../services/sock/chat/error.service';
 
 let subbed = false;
 let pw = '';
@@ -88,7 +89,8 @@ export class FranChatUiComponent implements AfterViewInit{
 		private userService: UserService, 
 		private blockService: BlockService,
 		private dialogService: NbDialogService,
-		private router: Router
+		private router: Router,
+		// private errorService: ErrorService,
 	) 
 	{
 		this.userMap = new Map<number, string>();
@@ -141,7 +143,7 @@ export class FranChatUiComponent implements AfterViewInit{
 					
 				}
 				this.blockbool = false;
-			});
+		}});
 
 			this.chatService.update_client_room().subscribe((update_room: Rooms) => {
 				console.log(`update_client_room: ${update_room.name}`);
@@ -157,9 +159,9 @@ export class FranChatUiComponent implements AfterViewInit{
 			})
 
 			this.chatService.error_message().subscribe((msg: ErrorMessage) => {
-				console.log("Error message received")
-				let room_id = 0;
-				let room_name = 'Global';
+				// this.errorService.showError(msg);
+				// let room_id = 0;
+				// let room_name = 'Global';
 				
 				if (!msg.msg)
 					msg.msg = "Undefined error";
@@ -274,9 +276,9 @@ export class FranChatUiComponent implements AfterViewInit{
 		return Number(str);
 	}
 
-	createRoom(roomName: string, status: string, password: string, users: number[]) {
+	createRoom(roomName: string, status: string, password: string, userid: number) {
 		if (roomName) {
-		  this.chatService.createRoom(roomName, status, password, users);
+		  this.chatService.createRoom(roomName, status, password, userid);
 		  this.roomName = '';
 		}
 	}
@@ -288,7 +290,7 @@ export class FranChatUiComponent implements AfterViewInit{
 			if (input) {
 				console.log(input);
 
-				this.chatService.createRoom(input.roomName, input.roomType, input.password, []);
+				this.chatService.createRoom(input.roomName, input.roomType, input.password, +this.user.id);
 				setTimeout(() => {
 					if (this.roomsList[input.roomName])
 						this.onSelect(this.roomsList[input.roomName])
@@ -298,10 +300,9 @@ export class FranChatUiComponent implements AfterViewInit{
 	}
 
 	settingsChat(room: Rooms) {
-		this.chatService.room = this.selectedRoom!;
 		this.chatService.giveUsernames(this.selectedRoom!.name)
 		setTimeout(() => {
-			this.dialogService.open(settingsChat, {context:{}
+			this.dialogService.open(settingsChat, {context:{selectedRoom: this.selectedRoom, users: this.chatService.usernames}
 			}).onClose.subscribe((input: any) => {
 				if (input) {
 					console.log(input);
@@ -319,7 +320,7 @@ export class FranChatUiComponent implements AfterViewInit{
 		return new Promise((resolve) => {
 			this.chatService.room = this.selectedRoom!;
 			setTimeout(() => {
-				this.dialogService.open(protectedChat, {context:{}
+				this.dialogService.open(protectedChat, {context:{selectedRoom: this.selectedRoom}
 				}).onClose.subscribe((input: any) => {
 					if (input) {
 						pw = input.password;

@@ -1,7 +1,7 @@
 import { Injectable, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 import { UserService } from '../../user/user.service';
 import { User } from '../../../models/user.class';
 import { skip } from 'rxjs/operators';
@@ -14,7 +14,7 @@ import { BlockService } from '../../block/block.service';
 })
 export class ChatService{
 	count = 0;
-	private chatSocket = io("/chat");
+	chatSocket : Socket;
 	private unread = false;
 	user!: User;
 
@@ -32,7 +32,7 @@ export class ChatService{
 		this.userService.getUser('current').subscribe((userData) => {
 			this.user = userData;
 		});
-
+		this.chatSocket = io("/chat");
 		this.get_users_names().subscribe((usernames_list: any) => {
 			this.usernames = usernames_list;
 			console.log(this.usernames);
@@ -71,9 +71,10 @@ export class ChatService{
 		});
 	}
 
-	createRoom(room_name: string, status: string, password: string, users: number[]): void {
+	createRoom(room_name: string, status: string, password: string, userid: number): void {
 		// console.log("createRoom called: " + room_name + ", status: " + status + ", password: " + password);
-		this.chatSocket.emit('createRoom', { room_name, status, password, users}, (err: any) => {
+
+		this.chatSocket.emit('createRoom', { room_name: room_name, status: status, password: (password.length > 0)? password : undefined, userid: userid, password_bool: (password.length > 0)}, (err: any) => {
 			if (err) {
 				// console.log("createRoom chat-sock error: ");
 				// console.log(err);
@@ -116,7 +117,7 @@ export class ChatService{
 
 	joinRoom(room_name: string, password: string): void {
 		// console.log("joinRoom name: " + room_name + ", password: " + password);
-		this.chatSocket.emit('joinRoom', {room_name: room_name, user_id: this.user!.id, password: password, avatar: this.user!.avatar}, (err: any) => {
+		this.chatSocket.emit('joinRoom', {room_name: room_name, user_id: this.user!.id, password: (password.length > 0)? password : undefined, avatar: this.user!.avatar}, (err: any) => {
 			if (err) {
 				// console.log("joinRoom chat-sock error: ");
 				// console.log(err);

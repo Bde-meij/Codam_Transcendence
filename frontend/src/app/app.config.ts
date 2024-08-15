@@ -3,7 +3,6 @@ import { provideRouter, withComponentInputBinding, withRouterConfig } from '@ang
 import { routes } from './app.routes';
 import { AuthService } from './services/auth/auth.service';
 import { provideHttpClient, HTTP_INTERCEPTORS, withInterceptorsFromDi } from '@angular/common/http';
-import { CookieService } from 'ngx-cookie-service';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { ErrorInterceptor } from './interceptors/jwtToken.interceptor';
 import { NbChatModule, NbLayoutModule, NbSidebarService, NbThemeModule, NbCardModule, NbDialogModule } from '@nebular/theme';
@@ -25,7 +24,6 @@ export const appConfig: ApplicationConfig = {
 		{ provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
 		{ provide: PRECONNECT_CHECK_BLOCKLIST, useValue: window.location.hostname },
 		{ provide: AuthService },
-		{ provide: CookieService },
 		provideAnimationsAsync(),
 	]
 };

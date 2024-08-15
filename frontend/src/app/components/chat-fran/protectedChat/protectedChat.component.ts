@@ -3,7 +3,6 @@ import { Component, Input, Inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NbCardModule, NbCheckboxModule, NbDialogRef, NbToggleModule} from '@nebular/theme';
 import { Rooms } from '../../../models/rooms.class';
-import { ChatService } from '../../../services/sock/chat/chat.service';
 
 @Component({
   selector: 'app-protectedChat',
@@ -21,10 +20,9 @@ export class protectedChat {
 	
 	selectedRoom?: Rooms;
 	checked = false;
-	constructor(protected dialogRef: NbDialogRef<protectedChat>, private chatService: ChatService) {}
+	constructor(protected dialogRef: NbDialogRef<protectedChat>) {}
 
 	ngOnInit(): void {
-		this.selectedRoom = this.chatService.room;
 		this.roomName = this.selectedRoom!.name;
 	}
 	

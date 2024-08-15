@@ -1,4 +1,5 @@
-import { IsAlpha, IsAlphanumeric, IsNumber, IsString, Length, IsNotEmpty, IsArray, IsOptional, Matches } from "class-validator";
+import { Type } from "class-transformer";
+import { IsAlphanumeric, IsNumber, IsString, Length, IsNotEmpty, IsArray, IsOptional, IsBoolean, ValidateNested, Matches } from "class-validator";
 import { User } from "src/user/entities/user.entity";
 
 export interface Rooms {
@@ -80,8 +81,17 @@ export class createRoomDto{
 	@IsOptional()
 	userid?: number;
 	@IsString()
+	@IsOptional()
 	password: string;
+	@IsBoolean()
 	password_bool: boolean;
+}
+
+export class customMessageDto {
+	@IsString()
+	text: string;
+	@IsNumber()
+	roomkey: number;
 }
 
 export class messageDto{
@@ -90,7 +100,6 @@ export class messageDto{
         message: 'room_name can only contain letters, numbers, and spaces',
     })
 	message: string;
-	
 	@IsString()
 	@IsAlphanumeric()
 	@IsNotEmpty()
@@ -102,7 +111,9 @@ export class messageDto{
 	room: string;
 	@IsString()
 	type: string;
-	customMessageData: {text: string, roomkey: number};
+	@ValidateNested()
+	@Type(() => customMessageDto)
+	customMessageData: customMessageDto;
 	@IsString()
 	sender_avatar: string;
 }
@@ -112,8 +123,12 @@ export class RoomDto {
 	@IsAlphanumeric()
 	@IsNotEmpty()
 	name: string;
+	@IsString()
+	@IsOptional()
 	password: string; //true or false?
+	@IsNumber()
 	ownerId: number;
+	@IsString()
 	status: string;
 
 }
