@@ -132,8 +132,6 @@ export class DeleteRoomDto {
 	username: string;
 	@IsNumber()
 	userid: number;
-	@IsString()
-	password: string;
 }
 
 export class CheckPasswordDto {

@@ -163,8 +163,7 @@ export class UserDetailComponent implements OnChanges {
 			setTimeout(() => {
 				this.router.navigate(['/dashboard', 'franchat']);
 			}, 400);
-		}else
-			console.log("what is happening?");
+		}
 	}
 
 	routeProfile(){

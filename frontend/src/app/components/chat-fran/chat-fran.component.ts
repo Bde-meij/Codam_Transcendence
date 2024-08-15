@@ -60,7 +60,7 @@ export class FranChatUiComponent implements AfterViewInit{
 
 	async onSelect(room: Rooms): Promise<any> {
 		console.log("selecting room:", room);
-		pw = '';
+		pw = 'abcdIo';
 		joined = 1;
 		this.selectedRoom = room;
 		this.chatService.room = this.selectedRoom!
@@ -72,7 +72,9 @@ export class FranChatUiComponent implements AfterViewInit{
 			this.joinRoom(room.name, pw);
 			if (!this.selectedRoom.users.includes(Number(this.user.id)))
 				joined = 0;
-		}else {
+			// this.selectedRoom = room;
+		}
+		else {
 			this.joinRoom(room.name, pw);
 		}	
 		this.selectedRoom = room;
@@ -185,7 +187,7 @@ export class FranChatUiComponent implements AfterViewInit{
 				this.roomsList[message.room_name].messages?.push(message);
 			})
 
-			this.chatService.get_all_blocked().subscribe((blocked: any) => {
+			this.blockService.getBlocked().subscribe((blocked: any) => {
 				// console.log("blockedlist:", blocked);
 				this.blockedList = blocked
 			})
@@ -315,21 +317,16 @@ export class FranChatUiComponent implements AfterViewInit{
 	passwordPopup(room: Rooms): Promise<void>  {
 		return new Promise((resolve) => {
 			this.chatService.room = this.selectedRoom!;
-			console.log("password popup", this.chatService.room)
 			setTimeout(() => {
 				this.dialogService.open(protectedChat, {context:{}
 				}).onClose.subscribe((input: any) => {
 					if (input) {
-						console.log(input);
 						pw = input.password;
 						this.chatService.checkPassword(input);
-						// setTimeout(() => {
-						// 	this.onSelect(this.roomsList[input.roomName])
-						// }, 300);
 					}
 					resolve();
 				});
-			}, 100);
+			}, 50);
 		
 		})
 	}

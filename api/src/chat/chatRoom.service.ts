@@ -40,16 +40,9 @@ export class ChatRoomService {
 		};
 	}
 
-	async deleteChatRoom(deleteRoomDto: DeleteRoomDto) {
-		const checkOldPassword: boolean = await this.checkPassword({
-			id: deleteRoomDto.roomid,
-			password: deleteRoomDto.password
-		});
-		if (!checkOldPassword)
-			return false;
-		await this.roomRepo.delete({id: deleteRoomDto.roomid});
-		await this.userChatroomRepo.delete({chatroom: {id: deleteRoomDto.roomid}});
-		return true;
+	async deleteChatRoom(roomid: number) {
+		await this.userChatroomRepo.delete({chatroom: {id: roomid}});
+		await this.roomRepo.delete({id: roomid});
 	}
 	
 	async getAllChatRooms(): Promise<Chatroom[]> {
@@ -58,6 +51,8 @@ export class ChatRoomService {
 				id: true,
 				name: true,
 				userChatrooms: true,
+				status: true,
+
 			},
 			relations: {
 				userChatrooms: {

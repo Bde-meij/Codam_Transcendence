@@ -257,7 +257,7 @@ export class TestingController {
 	// deletes a chat room
 	@Delete('chatroom/delete')
 	async deleteChatRoom(@Body() data: DeleteRoomDto) {
-		return await this.chatRoomService.deleteChatRoom(data);
+		return await this.chatRoomService.deleteChatRoom(data.roomid);
 	}
 
 	// checks is a password is correct
