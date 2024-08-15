@@ -15,7 +15,7 @@ import { forbiddenNameValidator } from '../../services/validator/name-validator.
 import { Router } from '@angular/router';
 import { settingsChat } from './settingsChat/settingsChat.component';
 import { protectedChat } from './protectedChat/protectedChat.component';
-import { ErrorService } from '../../services/sock/chat/error.service';
+// import { ErrorService } from '../../services/sock/chat/error.service';
 
 let subbed = false;
 let pw = '';
@@ -89,7 +89,7 @@ export class FranChatUiComponent implements AfterViewInit{
 		private blockService: BlockService,
 		private dialogService: NbDialogService,
 		private router: Router,
-		private errorService: ErrorService,
+		// private errorService: ErrorService,
 	) 
 	{
 		this.userMap = new Map<number, string>();
@@ -139,7 +139,7 @@ export class FranChatUiComponent implements AfterViewInit{
 					
 				}
 				this.blockbool = false;
-			});
+		}});
 
 			this.chatService.update_client_room().subscribe((update_room: Rooms) => {
 				console.log(`update_client_room: ${update_room.name}`);

@@ -20,11 +20,8 @@
     "@angular/platform-browser": "^18.2.0",
     "@angular/platform-browser-dynamic": "^18.2.0",
     "@angular/router": "^18.2.0",
-    "@nebular/eva-icons": "^13.0.0",
-    "@nebular/theme": "^13.0.0",
+    "@nebular/theme": "^14.0.0",
     "excalibur": "^0.29.2",
-    "nebular": "^0.0.1",
-    "ngx-cookie-service": "^17.1.0",
     "rxjs": "~7.8.0",
     "socket.io-client": "^4.7.5",
     "tslib": "^2.6.3",
@@ -34,9 +31,6 @@
     "@angular-devkit/build-angular": "^18.2.0",
     "@angular/compiler-cli": "^18.2.0",
     "@types/auth0-js": "^9.21.5",
-    "@types/jasmine": "~5.1.0",
-    "jasmine-core": "~5.1.0",
-    "karma-jasmine-html-reporter": "~2.1.0",
     "typescript": "~5.4.2"
   },
   "optionalDependencies": {
