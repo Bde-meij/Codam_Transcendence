@@ -5,8 +5,10 @@ import { io } from 'socket.io-client';
 import { UserService } from '../../user/user.service';
 import { User } from '../../../models/user.class';
 import { skip } from 'rxjs/operators';
-import { ErrorMessage, MessageInterface, Rooms } from '../../../models/rooms.class';
+import { ErrorMessage, getAllUsersInRoomDTO, MessageInterface, Rooms } from '../../../models/rooms.class';
 import { Blocks } from '../../../models/rooms.class';
+import { BlockService } from '../../block/block.service';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -21,10 +23,11 @@ export class ChatService{
 
 	rooms: Rooms[] = []; 
 	roomss: Rooms[] = []; 
-	private selectedRoom?: Rooms;
+	selectedRoom?: Rooms;
 	constructor(
 				private http: HttpClient,
-				private userService: UserService) 
+				private userService: UserService,
+				private blockService: BlockService) 
 	{
 		this.userService.getUser('current').subscribe((userData) => {
 			this.user = userData;
@@ -43,6 +46,7 @@ export class ChatService{
 	ngOnInit(): void {
 		// console.log("dfd?");
 		// this.user$ = this.userService.getUser(0);
+
 	}
 
 	sendMessage(message: string, room: string, avatar: string): void {
@@ -208,6 +212,30 @@ export class ChatService{
 		});
 	}
 
+	update_all_users(): Observable<{ users: getAllUsersInRoomDTO[], roomid: string }> {
+		return new Observable((observer) => {
+			this.chatSocket.on('all-users', (users: getAllUsersInRoomDTO[], roomid: string) => {
+				observer.next({ users, roomid });
+			});
+		});
+	}
+
+	update_single_user(): Observable<{users: getAllUsersInRoomDTO, roomid: string}> {
+		return new Observable((observer) => {
+			this.chatSocket.on('add-one', (users: getAllUsersInRoomDTO, roomid: string) => {
+				observer.next({ users, roomid });
+			});
+		});
+	}
+	
+	selectRoom(): Observable<string> {
+		return new Observable((observer) => {
+			this.chatSocket.on('select', (room) => {
+				observer.next(room);
+			});
+		});
+	}
+
 	error_message(): Observable<ErrorMessage> {
 		return new Observable((observer) => {
 			this.chatSocket.on("error_message", (message) => {
@@ -331,8 +359,10 @@ export class ChatService{
 
 	inviteChat(user: string){
 		const userid = Number(user);
+		console.log(`param check invite`);
+		const p = { user: userid}
 		console.log(`param check invite ${user}`);
-		this.chatSocket.emit('inviteChat', userid, (err: any) => {
+		this.chatSocket.emit('inviteChat', p, (err: any) => {
 			if (err) {
 				// console.log("kickUser chat-sock error: ");
 				// console.log(err);
@@ -482,6 +512,15 @@ export class ChatService{
 	}
 
 	get room(): Rooms | undefined {
+		console.log(this.selectedRoom);
+		return this.selectedRoom;
+	}
+
+	get username_list(): { user: string; username: string }[]{
+		return this.usernames;
+	}
+
+	getSelected(){
 		return this.selectedRoom;
 	}
 }
