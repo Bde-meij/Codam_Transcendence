@@ -1,7 +1,7 @@
 import { Injectable, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 import { UserService } from '../../user/user.service';
 import { User } from '../../../models/user.class';
 import { skip } from 'rxjs/operators';
@@ -14,7 +14,7 @@ import { BlockService } from '../../block/block.service';
 })
 export class ChatService{
 	count = 0;
-	private chatSocket = io("/chat");
+	chatSocket : Socket;
 	private unread = false;
 	user!: User;
 
@@ -32,7 +32,7 @@ export class ChatService{
 		this.userService.getUser('current').subscribe((userData) => {
 			this.user = userData;
 		});
-
+		this.chatSocket = io("/chat");
 		this.get_users_names().subscribe((usernames_list: any) => {
 			this.usernames = usernames_list;
 			console.log(this.usernames);
