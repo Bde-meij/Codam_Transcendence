@@ -242,7 +242,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	updatePlayer(client: Socket, yPos: number)
 	{
 		var room = roomMap.get(client.data.room)
-		if (room != null)
+		if ((room != null) && (typeof(yPos) === "number" && yPos >= 35 && yPos <= 565))
 		{
 			if (client.id == room.leftPlayer.id)
 				room.leftPos = yPos;

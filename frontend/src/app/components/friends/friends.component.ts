@@ -40,35 +40,37 @@ export class FriendsComponent implements OnInit {
 	incoming?: FriendRequest[];
 	outgoing?: FriendRequest[];
 	errorMessage?: string | undefined;
+	bigErrorMessage?: string | undefined;
 
 	ngOnInit() {
 		this.getLists();
 	}
 
 	getLists() {
+		this.bigErrorMessage = undefined
 		this.friendsService.getFriends().subscribe({
 			next: (data) => (
-				this.friends = data,
-				console.log("all friends: ", data)
+				this.friends = data
 			),
 			error: (e) => (
-				console.error("all friends error: " + e))
+				this.bigErrorMessage = e
+			)
 		});
 		this.friendsService.getIncomingRequests().subscribe({
 			next: (data) => (
-				this.incoming = data,
-				console.log("all incoming: ", data)
+				this.incoming = data
 			),
 			error: (e) => (
-				console.error("all incoming error: " + e))
+				this.bigErrorMessage = e
+			)
 		});
 		this.friendsService.getOutgoingRequests().subscribe({
 			next: (data) => (
-				this.outgoing = data,
-				console.log("all outgoing: ", data)
+				this.outgoing = data
 			),
 			error: (e) => (
-				console.error("all outgoing error: " + e))
+				this.bigErrorMessage = e
+			)
 		});
 		this.errorMessage = undefined;
 	}
