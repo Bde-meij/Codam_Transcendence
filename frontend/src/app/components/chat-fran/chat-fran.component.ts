@@ -60,7 +60,7 @@ export class FranChatUiComponent implements AfterViewInit{
 	blockedList?: Blocks[];
 
 	async onSelect(room: Rooms): Promise<any> {
-		pw = '';
+		pw = 'a string';
 		joined = 1;
 		console.log(room);
 		this.selectedRoom = room;
@@ -76,8 +76,9 @@ export class FranChatUiComponent implements AfterViewInit{
 			setTimeout(() => {
 				this.joinRoom(room.name, pw);
 				this.selectedRoom = room;
-			}, 120);
+			}, 150);
 		}	
+		this.joinRoom(room.name, pw);
 		this.selectedRoom = room;
 		if (joined === 0){
 			this.selectedRoom = undefined;

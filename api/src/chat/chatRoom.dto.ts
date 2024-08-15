@@ -80,7 +80,7 @@ export class createRoomDto{
 	@IsNumber()
 	@IsOptional()
 	userid?: number;
-	@IsString()
+	// @IsString()
 	@IsOptional()
 	@IsEmpty()
 	password: string;

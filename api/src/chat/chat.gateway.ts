@@ -966,11 +966,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			this.logger("checkpassword: joining pw protected room");
 			this.chatRoomList[data.roomName].users.push(client.data.userid)
 			const msg: MessageInterface = this.create_msg(`${client.data.nickname} has joined the channel`, data.roomid, data.roomName, client.data.userid, client.data.nickname, 'text', client.data.avatar)
-			// this.io.to(data.roomid.toString()).emit("message", "Has joined the channel");
+			this.io.to(data.roomid.toString()).emit("message", "Has joined the channel");
 			// this.chatRoomList[data.roomName].messages.push(msg)
-			// client.join(data.roomName);
+			client.join(data.roomName);
 			client.emit("update_client_room", this.chatRoomList[data.roomName]);
-			client.emit("select", data.roomName);
+			// client.emit("select", data.roomName);
 		}
 		this.logger(checkpw);
 		this.logger(pw_bool);
