@@ -8,71 +8,71 @@ $nb-themes: nb-register-theme((
 	font-family-secondary: $font-stack,
 	// Heading styles
 	text-heading-1-font-family: $font-stack,
-	text-heading-1-font-size: 1em, // Adjusted to default browser value
-	text-heading-1-font-weight: 250%, // Bold
+	text-heading-1-font-size: 2em, // Adjusted to default browser value
+	text-heading-1-font-weight: 400, // Bold
 	text-heading-1-line-height: 1.2, // Adjust line height to default
   
 	text-heading-2-font-family: $font-stack,
-	text-heading-2-font-size: 1em, // Adjusted to default browser value
+	text-heading-2-font-size: 1.5em, // Adjusted to default browser value
 	text-heading-2-font-weight: 400, // Bold
 	text-heading-2-line-height: 1.3, // Adjust line height to default
   
 	text-heading-3-font-family: $font-stack,
-	text-heading-3-font-size: 1em, // Adjusted to default browser value
+	text-heading-3-font-size: 1.17em, // Adjusted to default browser value
 	text-heading-3-font-weight: 400, // Bold
 	text-heading-3-line-height: 1.4, // Adjust line height to default
   
 	text-heading-4-font-family: $font-stack,
 	text-heading-4-font-size: 1em, // Default browser value
-	text-heading-4-font-weight: 600, // Bold
+	text-heading-4-font-weight: 400, // Bold
 	text-heading-4-line-height: 1.5, // Adjust line height to default
   
 	text-heading-5-font-family: $font-stack,
-	text-heading-5-font-size: 1em, // Default browser value
+	text-heading-5-font-size: 0.83em, // Default browser value
 	text-heading-5-font-weight: 40, // Bold
 	text-heading-5-line-height: 1.5, // Adjust line height to default
   
 	text-heading-6-font-family: $font-stack,
-	text-heading-6-font-size: 1em, // Default browser value
+	text-heading-6-font-size: 0.67em, // Default browser value
 	text-heading-6-font-weight: 400, // Bold
 	text-heading-6-line-height: 1.5, // Adjust line height to default
   
 	// Subtitle styles
 	text-subtitle-font-family: $font-stack,
-	text-subtitle-font-size: 1rem,
+	text-subtitle-font-size: 0.9375rem,
 	text-subtitle-font-weight: 400,
 	text-subtitle-line-height: 1.5rem,
   
 	text-subtitle-2-font-family: $font-stack,
-	text-subtitle-2-font-size: 1rem,
+	text-subtitle-2-font-size: 0.8125rem,
 	text-subtitle-2-font-weight: 400,
 	text-subtitle-2-line-height: 1.5rem,
   
 	// Paragraph styles
 	text-paragraph-font-family: $font-stack,
-	text-paragraph-font-size: 1rem,
-	text-paragraph-font-weight: light,
+	text-paragraph-font-size: 0.9375rem,
+	text-paragraph-font-weight: 400,
 	text-paragraph-line-height: 1.5rem,
   
 	text-paragraph-2-font-family: $font-stack,
-	text-paragraph-2-font-size: 1rem,
+	text-paragraph-2-font-size: 0.8125rem,
 	text-paragraph-2-font-weight: 400,
 	text-paragraph-2-line-height: 1.125rem,
   
 	// Label styles
 	text-label-font-family: $font-stack,
-	text-label-font-size: 1rem,
+	text-label-font-size: 0.75rem,
 	text-label-font-weight: 400,
 	text-label-line-height: 1rem,
   
 	// Caption styles
 	text-caption-font-family: $font-stack,
-	text-caption-font-size: 1rem,
+	text-caption-font-size: 0.75rem,
 	text-caption-font-weight: 400,
 	text-caption-line-height: 1rem,
   
 	text-caption-2-font-family: $font-stack,
-	text-caption-2-font-size: 1rem,
+	text-caption-2-font-size: 0.75rem,
 	text-caption-2-font-weight: 400,
 	text-caption-2-line-height: 1rem,
   

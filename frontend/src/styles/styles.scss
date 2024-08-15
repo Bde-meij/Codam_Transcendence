@@ -1,35 +1,15 @@
-// install the framework styles
-
-
 /* You can add global styles to this file, and also import other style files */
-
+@use 'themes.scss' as *;
 
 // framework component styles
 @use '@nebular/theme/styles/globals' as *;
-@use './themes.scss' as *;
 
+// install the framework styles
 @include nb-install() {
-	@include nb-theme-global();
+  @include nb-theme-global();
 }
 
-
-
-nb-layout {
-	display: flex;
-	flex-direction: column;
-	height: 79vh;
-	overflow: hidden;
-  }
-  
-  nb-layout-column {
-	display: flex;
-	flex-direction: column;
-	justify-content: flex-start;
-	flex: 1;
-	overflow: hidden;
-  }
-
-// @import '@angular/material/prebuilt-themes/purple-green.css';
+@import '@angular/material/prebuilt-themes/purple-green.css';
 @import './base/typography.scss';
 @import './helpers/constants.scss';
 @import './modules/nav.scss';
@@ -37,7 +17,6 @@ nb-layout {
 @import './modules/header.scss';
 @import './modules/link.scss';
 @import './modules/paragraph.scss';
-@import './themes.scss';
 
 $dark-background: darken($background-color, 5%);
 
