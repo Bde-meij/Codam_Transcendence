@@ -148,7 +148,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			messages: [], 
 		};
 		//unique room id from database.
-		const CreateRoomDB: any =  await this.chatService.createChatRoom({name :  data.room_name, password: data.password })
+		const CreateRoomDB: any =  await this.chatService.createChatRoom({name :  data.room_name, password: data.password, ownerId: socket.data.userid, status: '' })
 		if (!CreateRoomDB){
 			this.emit_error_message(socket, `Room '${data.room_name}' already exists in the database, please pick another name`, 1, socket.data.room)
 			this.logger("already exist5,7 s");
@@ -163,7 +163,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		//adding invite user
 		var userid = null;
 		if (data.username){
-			userid = this.findUserId(data.username);	
+			userid = this.findUserId(data.username);
 		}
 		if (data.userid){
 			userid = data.userid;	

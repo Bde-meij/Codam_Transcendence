@@ -1,4 +1,5 @@
 import { IsAlphanumeric, IsNumber, IsString } from "class-validator";
+import { User } from "src/user/entities/user.entity";
 
 export interface Rooms {
 	id: number;
@@ -87,10 +88,13 @@ export class messageDto{
 	customMessageData: {href: string, text: string};
 	sender_avatar: string;
 }
-	
+
 export interface RoomDto {
 	name: string;
 	password: string; //true or false?
+	ownerId: number;
+	status: string;
+
 }
 
 export interface DeleteRoomDto {

@@ -78,12 +78,13 @@
 
 		@if (this.isself != undefined && this.isself == false) {
 			@if (this.isfriend == false) {
-				<button type="button" (click)="addFriend()"> add friend </button>
+				<button type="button" (click)="addFriend()"> become family </button>
 			} 
 			@if (this.isfriend == true) {
-				<button class="unfriend" type="button" (click)="deleteFriend()"> delete friend </button>
+				<button class="unfriend" type="button" (click)="deleteFriend()"> disown </button>
 			}
 			<button type="button" (click)="routeProfile()"> Profile </button>
+			<button class="unfriend" type="button" (click)="block()"> 🪕 block 🪕 </button>
 
 		}
 
@@ -98,45 +99,3 @@
 		<p> {{userErrorMessage}}</p>
 	</div>
 }
-
-<!-- @if (userErrorMessage == undefined) {
-	<div *ngIf="my_user" >
-		<nb-user [name]="my_user.nickname"
-				[picture]="my_user.avatar">
-		</nb-user>
-
-		@if(this.isfriend != undefined && this.isfriend == true) {
-			<button type="button" (click)="getStats()">Stats</button>
-			<button type="button" (click)="getMatches()">Matches</button>
-
-			@if (this.stats != undefined) {
-				<div><span>wins :</span> {{stats.wins}} </div>
-				<div><span>losses :</span> {{stats.losses}} </div>
-				<div><span>winrate :</span> {{stats.winrate}} </div>
-			}
-
-			@if (this.matches != undefined) {
-				<div><span>matches in json (sorry) :</span> {{ this.matches | json }} </div>
-			}
-		}
-
-		@if (this.isself != undefined && this.isself == false) {
-			@if (this.isfriend == false) {
-				<button type="button" (click)="addFriend()"> add friend </button>
-			} 
-			@if (this.isfriend == true) {
-				<button class="unfriend" type="button" (click)="deleteFriend()"> delete friend </button>
-			}
-		}
-
-		@if (this.errorMessage) {
-			<p class="unfriend" >{{this.errorMessage}}</p>
-		}
-
-	</div>
-} @else {
-	<div class="errorMessage">
-		<p> Why you upset Gary?? </p>
-		<p> {{userErrorMessage}}</p>
-	</div>
-} -->
