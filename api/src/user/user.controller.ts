@@ -152,10 +152,10 @@ export class UserController {
 
 	@Get('getUserByName/:name')
 	@UseGuards(JwtGuard)
-	async getUserIdByName(@Req() req, @Param('name') name: string) {
-		const user: User = await this.userService.findUserByName(name);
+	async getUserIdByName(@Req() req, @Query() data: NicknameDto) {
+		const user: User = await this.userService.findUserByName(data.nickname);
 		if (!user)
-			throw new HttpException('User ' + name + ' not found', HttpStatus.NOT_FOUND);
+			throw new HttpException('User ' + data.nickname + ' not found', HttpStatus.NOT_FOUND);
 		return user.id;
 	}
 }

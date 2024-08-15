@@ -35,8 +35,8 @@ export class UserService {
 		return this.http.get<any>(this.userUrl + '/name/' + id, {});
 	};
 
-	getUserIdByName(name: string) : Observable<any> {
-		return this.http.get<any>(this.userUrl + '/getUserByName/' + name, {});
+	getUserIdByName(nickname: string) : Observable<any> {
+		return this.http.get<any>(this.userUrl + '/getUserByName/', {params: {nickname: nickname}});
 	}
 
 	updateRoomKey(roomKey: number) {
