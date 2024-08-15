@@ -60,3 +60,12 @@ export interface Blocks {
 	target: User;
 	createdAt: Date;
 }
+
+export interface getAllUsersInRoomDTO{
+	role: string;
+	muted: boolean
+	user: {
+		id: number,
+		nickname: string,
+	}
+}

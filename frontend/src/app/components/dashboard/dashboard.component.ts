@@ -8,7 +8,7 @@ import { AsyncPipe, JsonPipe, NgIf } from '@angular/common';
 	selector: 'app-dashboard',
 	standalone: true,
 	imports: [RouterLink, RouterOutlet, LogoutComponent, AsyncPipe, JsonPipe, NgIf],
-	providers: [ChatService],
+	providers: [],
 	templateUrl: './dashboard.component.html',
 	styleUrl: './dashboard.component.scss'
 })

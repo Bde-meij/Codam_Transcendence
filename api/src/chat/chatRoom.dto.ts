@@ -118,3 +118,12 @@ export interface UpdateNameDto {
 	password: string;
 	newName: string;
 }
+
+export interface getAllUsersInRoomDTO{
+	role: string;
+	muted: boolean
+	user: {
+		id: number,
+		nickname: string,
+	}
+}

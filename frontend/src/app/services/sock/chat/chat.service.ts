@@ -5,8 +5,10 @@ import { io } from 'socket.io-client';
 import { UserService } from '../../user/user.service';
 import { User } from '../../../models/user.class';
 import { skip } from 'rxjs/operators';
-import { ErrorMessage, MessageInterface, Rooms } from '../../../models/rooms.class';
+import { ErrorMessage, getAllUsersInRoomDTO, MessageInterface, Rooms } from '../../../models/rooms.class';
 import { Blocks } from '../../../models/rooms.class';
+import { BlockService } from '../../block/block.service';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -21,10 +23,11 @@ export class ChatService{
 
 	rooms: Rooms[] = []; 
 	roomss: Rooms[] = []; 
-	private selectedRoom?: Rooms;
+	selectedRoom?: Rooms;
 	constructor(
 				private http: HttpClient,
-				private userService: UserService) 
+				private userService: UserService,
+				private blockService: BlockService) 
 	{
 		this.userService.getUser('current').subscribe((userData) => {
 			this.user = userData;
@@ -43,6 +46,7 @@ export class ChatService{
 	ngOnInit(): void {
 		// console.log("dfd?");
 		// this.user$ = this.userService.getUser(0);
+
 	}
 
 	sendMessage(message: string, room: string, avatar: string): void {
@@ -203,6 +207,22 @@ export class ChatService{
 		return new Observable((observer) => {
 			this.chatSocket.on('update_public', (room: Rooms) => {
 				observer.next(room);
+			});
+		});
+	}
+
+	update_all_users(): Observable<{ users: getAllUsersInRoomDTO[], roomid: string }> {
+		return new Observable((observer) => {
+			this.chatSocket.on('all-users', (users: getAllUsersInRoomDTO[], roomid: string) => {
+				observer.next({ users, roomid });
+			});
+		});
+	}
+
+	update_single_user(): Observable<{users: getAllUsersInRoomDTO, roomid: string}> {
+		return new Observable((observer) => {
+			this.chatSocket.on('add-one', (users: getAllUsersInRoomDTO, roomid: string) => {
+				observer.next({ users, roomid });
 			});
 		});
 	}
@@ -481,6 +501,7 @@ export class ChatService{
 	}
 
 	get room(): Rooms | undefined {
+		console.log(this.selectedRoom);
 		return this.selectedRoom;
 	}
 
@@ -488,16 +509,18 @@ export class ChatService{
 		return this.usernames;
 	}
 
-
+	getSelected(){
+		return this.selectedRoom;
+	}
 	getBlocked() {
-		return this.http.get<Blocks[]>(this.blockUrl + '/all-blocked', {});
+		return this.blockService.getBlocked();
 	}
 	
 	isBlocked(userid: number){
-		return this.http.get<Blocks[]>(this.blockUrl + '/is-blocked/' + userid.toString(), {});
+		return this.blockService.isBlocked(userid.toString());
 	}
 
 	removeBlock(userid: number){
-		return this.http.get<Blocks[]>(this.blockUrl + '/delete-block-user/' + userid, {});
+		return this.blockService.removeBlock(userid.toString());
 	}
 }

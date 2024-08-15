@@ -172,6 +172,9 @@ export class ChatRoomService {
 	async findUserInChatRoom(userId: number, roomId: number): Promise<UserChatroom | null> {
 		const userChatRoom: UserChatroom = await this.userChatroomRepo.findOne({
 			select: {
+				id: true,
+				role: true,
+				muted: true,
 				user: {
 					id: true,
 					nickname: true,
