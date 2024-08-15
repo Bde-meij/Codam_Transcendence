@@ -86,6 +86,9 @@ export class createRoomDto{
 
 export class messageDto{
 	@IsString()
+	@Matches(/^[a-zA-Z0-9]+$/, {
+        message: 'room_name can only contain letters, numbers, and spaces',
+    })
 	message: string;
 	
 	@IsString()
