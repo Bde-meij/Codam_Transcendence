@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsAlphanumeric, IsNumber, IsString, Length, IsNotEmpty, IsArray, IsOptional, IsBoolean, ValidateNested, Matches } from "class-validator";
+import { IsAlphanumeric, IsNumber, IsString, Length, IsNotEmpty, IsArray, IsOptional, IsBoolean, ValidateNested, Matches, IsEmpty } from "class-validator";
 import { User } from "src/user/entities/user.entity";
 
 export interface Rooms {
@@ -82,6 +82,7 @@ export class createRoomDto{
 	userid?: number;
 	@IsString()
 	@IsOptional()
+	@IsEmpty()
 	password: string;
 	@IsBoolean()
 	password_bool: boolean;
@@ -245,6 +246,14 @@ export class AddRemAdminDto {
 	userid: number;
 	@IsString()
 	avatar: string;
+}
+
+export class LastOpenRoomDto{
+	@IsString()
+	@Matches(/^[a-zA-Z0-9]+$/, {
+        message: 'room_name can only contain letters, numbers, and spaces',
+    })
+	name: string;
 }
 
 export class InviteGameDto {

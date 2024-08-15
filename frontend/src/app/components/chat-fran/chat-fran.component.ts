@@ -62,6 +62,7 @@ export class FranChatUiComponent implements AfterViewInit{
 	async onSelect(room: Rooms): Promise<any> {
 		pw = '';
 		joined = 1;
+		console.log(room);
 		this.selectedRoom = room;
 		this.chatService.room = this.selectedRoom!
 		this.last_open_room();
@@ -143,7 +144,7 @@ export class FranChatUiComponent implements AfterViewInit{
 					
 				}
 				this.blockbool = false;
-		}});
+			});
 
 			this.chatService.update_client_room().subscribe((update_room: Rooms) => {
 				console.log(`update_client_room: ${update_room.name}`);
@@ -160,8 +161,8 @@ export class FranChatUiComponent implements AfterViewInit{
 
 			this.chatService.error_message().subscribe((msg: ErrorMessage) => {
 				// this.errorService.showError(msg);
-				// let room_id = 0;
-				// let room_name = 'Global';
+				let room_id = 0;
+				let room_name = 'Global';
 				
 				if (!msg.msg)
 					msg.msg = "Undefined error";
@@ -213,6 +214,7 @@ export class FranChatUiComponent implements AfterViewInit{
 
 			subbed = true;
 		}
+		
 
 		this.chatService.getRoomsss().subscribe((chatRoomList: Record<string, Rooms>) => {
 			console.log("gettrooms: ", chatRoomList)

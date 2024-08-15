@@ -1,5 +1,5 @@
 import { UsePipes, NotAcceptableException, Injectable, ValidationPipe, UseFilters, ArgumentsHost, Catch, HttpException, BadRequestException } from '@nestjs/common';
-import { Rooms, RoomInfo, MessageInterface, RoomDto, messageDto, ErrorMessage, createRoomDto, CheckPasswordDto, UpdatePasswordDto, JoinRoomDto, LeaveRoomDto, DeleteRoomDto, UserActionDto, InviteChatDto, AddRemAdminDto, InviteGameDto, JoinBattleDto, UpdateRoomDto, SettingsDto, UpdateNameDto, UpdateUsernameDto, getAllUsersInRoomDTO } from './chatRoom.dto';
+import { Rooms, RoomInfo, MessageInterface, RoomDto, messageDto, ErrorMessage, createRoomDto, CheckPasswordDto, UpdatePasswordDto, JoinRoomDto, LeaveRoomDto, DeleteRoomDto, UserActionDto, InviteChatDto, AddRemAdminDto, InviteGameDto, JoinBattleDto, UpdateRoomDto, SettingsDto, UpdateNameDto, UpdateUsernameDto, getAllUsersInRoomDTO, LastOpenRoomDto } from './chatRoom.dto';
 import {
 	ConnectedSocket,
 	MessageBody,
@@ -837,9 +837,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@UseFilters(WsExceptionFilter)
 	@UsePipes(new ValidationPipe({ transform: true }))
 	@SubscribeMessage('last_open_room') async last_open_room(
-	@MessageBody() data: RoomDto,
+	@MessageBody() data: LastOpenRoomDto,
 	@ConnectedSocket() client: Socket) 
 	{
+		this.logger("lastopenroom: ", data.name);
 		if (this.chatRoomList[data.name])
 			client.data.room = data.name;
 	}
@@ -962,7 +963,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		let pw_bool = await this.chatService.checkPassword(checkpw);
 		if (pw_bool){
 			//joinroom
-			this.logger("joining pw protected room");
+			this.logger("checkpassword: joining pw protected room");
 			this.chatRoomList[data.roomName].users.push(client.data.userid)
 			const msg: MessageInterface = this.create_msg(`${client.data.nickname} has joined the channel`, data.roomid, data.roomName, client.data.userid, client.data.nickname, 'text', client.data.avatar)
 			// this.io.to(data.roomid.toString()).emit("message", "Has joined the channel");
@@ -1409,7 +1410,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				password: password,
 				messages: [],
 			};
-			id++;
 		}
 		this.chatRoomList["Global"].owner = 77600;
 		// this.chatRoomList["Global"].admins.push(77600);
@@ -1438,7 +1438,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			var admins = [];
 			var muted = [];
 			var banned = [];
-			var owner = -1;
+			var owner = 1;
 			for (const info of Userinfo){
 				if (info.role === 'user' || info.role === 'admin' || info.role === 'owner')
 					users.push(info.user.id);
@@ -1449,7 +1449,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				if (info.muted === true)
 					muted.push(info.user.id);
 				if (info.role === 'owner'){
-					owner = 0;
+					owner = 1;
 				}
 			}
 			var pw_bool = false;
