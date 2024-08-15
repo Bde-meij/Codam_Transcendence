@@ -97,12 +97,22 @@
 }
 
 .friends .yesno {
-	width: 90%;
+	width: 80%;
 	flex: 1;
 	min-width: 8em;
 	padding: 0.5em 0.5em 0 0.7em;
-	align-self: center;
+	margin-left: 15%;
 }
+
+// .friend_column .unfriend {
+// 	color: $contrast-color;
+// }
+
+// .friend_column .unfriend:hover {
+// 	background-color: $contrast-color;
+// 	color: $background-color;
+// }
+
 
 .refresh {
 	font-size: small;
