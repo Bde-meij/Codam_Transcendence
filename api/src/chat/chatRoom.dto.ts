@@ -1,4 +1,4 @@
-import { IsAlpha, IsAlphanumeric, IsNumber, IsString, Length, IsNotEmpty, IsArray, IsOptional } from "class-validator";
+import { IsAlpha, IsAlphanumeric, IsNumber, IsString, Length, IsNotEmpty, IsArray, IsOptional, Matches } from "class-validator";
 import { User } from "src/user/entities/user.entity";
 
 export interface Rooms {
@@ -65,7 +65,9 @@ export interface ErrorMessage{
 
 export class createRoomDto{
 	@IsString()
-	@IsAlphanumeric()
+	@Matches(/^[a-zA-Z0-9]+$/, {
+        message: 'room_name can only contain letters, numbers, and spaces',
+    })
 	room_name: string;
 	@IsString()
 	status: string;
@@ -208,10 +210,11 @@ export class UserActionDto {
 }
 
 export class InviteChatDto {
-	@IsString()
-	@IsAlphanumeric()
-	@IsNotEmpty()
-	@Length(3, 13)
+	// @IsString()
+	// @IsAlphanumeric()
+	// @IsNumber()
+	// @IsNotEmpty()
+	// @Length(3, 13)
 	user: string;
 }
 

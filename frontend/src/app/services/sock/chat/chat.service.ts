@@ -227,6 +227,14 @@ export class ChatService{
 			});
 		});
 	}
+	
+	selectRoom(): Observable<string> {
+		return new Observable((observer) => {
+			this.chatSocket.on('select', (room) => {
+				observer.next(room);
+			});
+		});
+	}
 
 	error_message(): Observable<ErrorMessage> {
 		return new Observable((observer) => {
@@ -351,8 +359,10 @@ export class ChatService{
 
 	inviteChat(user: string){
 		const userid = Number(user);
+		console.log(`param check invite`);
+		const p = { user: userid}
 		console.log(`param check invite ${user}`);
-		this.chatSocket.emit('inviteChat', userid, (err: any) => {
+		this.chatSocket.emit('inviteChat', p, (err: any) => {
 			if (err) {
 				// console.log("kickUser chat-sock error: ");
 				// console.log(err);

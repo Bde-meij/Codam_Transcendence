@@ -1,5 +1,5 @@
 import { UsePipes, NotAcceptableException, Injectable, ValidationPipe, UseFilters, ArgumentsHost, Catch, HttpException, BadRequestException } from '@nestjs/common';
-import { Rooms, RoomInfo, MessageInterface, RoomDto, messageDto, ErrorMessage, createRoomDto, CheckPasswordDto, UpdatePasswordDto, JoinRoomDto, LeaveRoomDto, DeleteRoomDto, UserActionDto, InviteChatDto, AddRemAdminDto, InviteGameDto, JoinBattleDto, UpdateRoomDto, SettingsDto, UpdateNameDto, UpdateUsernameDto } from './chatRoom.dto';
+import { Rooms, RoomInfo, MessageInterface, RoomDto, messageDto, ErrorMessage, createRoomDto, CheckPasswordDto, UpdatePasswordDto, JoinRoomDto, LeaveRoomDto, DeleteRoomDto, UserActionDto, InviteChatDto, AddRemAdminDto, InviteGameDto, JoinBattleDto, UpdateRoomDto, SettingsDto, UpdateNameDto, UpdateUsernameDto, getAllUsersInRoomDTO } from './chatRoom.dto';
 import {
 	ConnectedSocket,
 	MessageBody,
@@ -23,7 +23,7 @@ import { BaseWsExceptionFilter, WsResponse } from '@nestjs/websockets';
 import { WsExceptionFilter } from './exception';
 import passport from 'passport';
 
-var logger = 1;
+var logger = 0;
 
 @Injectable()
 @WebSocketGateway({
@@ -129,7 +129,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		);
 		if (Room) {
 			this.emit_error_message(socket, `Room '${data.room_name}' already exists, please pick another name`, 1, socket.data.room)
-			// this.logger("roomexists");
+			this.logger("roomexists");
 			// socket.emit('Room already exists, please pick another name',);
 			return;
 		}
@@ -341,6 +341,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			this.io.to(data.roomid.toString()).emit('delete_room', data.room);
 			for (const usersocket of sockets){
 				this.logger(`${usersocket.data.nickname} will delete room`)
+				this.chatService.removeUserFromChatRoom(usersocket.data.userid, data.roomid);
 				usersocket.leave(data.roomid.toString())
 			}
 		}
@@ -583,6 +584,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		this.update_client_rooms(room_id, room_name);
 		target.leave(room_id.toString());
 		this.logger(this.chatRoomList[room_name].users);
+		this.chatService.removeUserFromChatRoom(target.data.userid, room_id);
 		return true;
 	}
 
@@ -593,7 +595,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@MessageBody() data: InviteChatDto,
 	@ConnectedSocket() socket: Socket) 
 	{
-		
+		this.logger("getting invited for chat", data.user);
 		const nametarget = await this.findUsername(Number(data.user));
 		const nameroom = nametarget + socket.data.nickname;
 		for (const roomName in this.chatRoomList) {
@@ -734,7 +736,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			type: 'custom',
 			customMessageData: {text: 'Join battle ', roomkey: roomKey},
 		};
-		console.log("MESSAGE:", message);
+		this.logger("MESSAGE:", message);
 		this.io.in(data.roomid.toString()).emit('message', message);
 	}
 
@@ -745,7 +747,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@ConnectedSocket() client: Socket) 
 	{
 		// this.logger("joinbattle: " + data.numroom + ", room: " + data.room);
-		console.log(data.numroom, "IT JOINING---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+		this.logger(data.numroom, "IT JOINING---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 		this.userService.updateRoomKey(client.data.userid.toString(), data.numroom)
 		const room = this.findRoom(data.room, "kick");
 		const msg = this.create_msg(`User ${client.data.nickname} joined the battle`, room.id, room.name, client.data.userid, client.data.nickname, 'text', client.data.avatar)
@@ -1020,6 +1022,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			this.chatRoomList[data.roomName].messages.push(msg)
 			client.join(data.roomName);
 			client.emit("update_client_room", this.chatRoomList[data.roomName]);
+			client.emit("select", data.roomName);
 		}
 		this.logger(checkpw);
 		this.logger(pw_bool);
@@ -1304,6 +1307,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		this.chatRoomList[room_name].admins = this.chatRoomList[room_name].admins.filter((item: number) => item !== userid);
 		this.logger(`${username} has left ${room_name}`);
 		user.leave(room_name)
+		this.chatService.removeUserFromChatRoom(user.data.userid, this.chatRoomList[room_name].id);
+
 		this.update_client_rooms(this.chatRoomList[room_name].id, room_name);
 	}
 
@@ -1386,6 +1391,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		var userAdded = await this.chatService.addUserToChatRoom(socket.data.userid, roomid, status)
 		if (!userAdded){
 			socket.join(room.id.toString());
+			this.chatRoomList[room_name].users.push(socket.data.userid);
 			this.logger("!useradded joinroom - room, user not found or user already in room.");
 			return;
 		}
@@ -1407,7 +1413,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 		this.logger("sending users joinroom:")
 		const users = this.chatService.getAllUsersInRoom(roomid);
-		console.log(users);
+		this.logger(users);
 
 		this.io.to(roomid.toString()).emit('getConnectedUsers', this.connectedUsers);	
 		//only send messages		
@@ -1427,7 +1433,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			{ room_name: 'ProtectedNoPw', status: 'protected', password: true, pw: "" },
 			{ room_name: 'Protected', status: 'protected', password: true, pw: "test" },
 		];
-		var id = 59;
+		var id = 1;
 		for (const roomData of dummyRooms) {
 			const { room_name, status, password, pw } = roomData;
 			let chat = await this.chatService.createChatRoom({ ownerId:  77600, name: room_name, password: pw, status: status})

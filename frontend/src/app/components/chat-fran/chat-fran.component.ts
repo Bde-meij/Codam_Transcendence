@@ -18,6 +18,7 @@ import { protectedChat } from './protectedChat/protectedChat.component';
 
 let subbed = false;
 let pw = '';
+let joined = 0;
 
 @Component({
 	selector: 'fran-chat-ui',
@@ -60,6 +61,7 @@ export class FranChatUiComponent implements AfterViewInit{
 	async onSelect(room: Rooms): Promise<any> {
 		console.log("selecting room:", room);
 		pw = '';
+		joined = 1;
 		this.selectedRoom = room;
 		this.chatService.room = this.selectedRoom!
 		this.last_open_room();
@@ -68,15 +70,16 @@ export class FranChatUiComponent implements AfterViewInit{
 			var test = await this.passwordPopup(room);
 			console.log("input", test);
 			this.joinRoom(room.name, pw);
-		}
-		else {
-			setTimeout(() => {
-				this.joinRoom(room.name, pw);
-			}, 1320);
+			if (!this.selectedRoom.users.includes(Number(this.user.id)))
+				joined = 0;
+		}else {
+			this.joinRoom(room.name, pw);
 		}	
 		this.selectedRoom = room;
-
-		// console.log("users: ", room.users);;
+		if (joined === 0){
+			this.selectedRoom = undefined;
+		}
+		joined = 0;
 	};
 
 	constructor(
@@ -146,7 +149,7 @@ export class FranChatUiComponent implements AfterViewInit{
 				if (this.selectedRoom){
 					if (this.selectedRoom.name == update_room.name){
 						console.log("updated selected room");
-						// this.change_sender_avatar(this.selectedRoom.name);
+						this.change_sender_avatar(this.selectedRoom.name);
 						this.selectedRoom = update_room;
 					}
 				}
@@ -192,6 +195,12 @@ export class FranChatUiComponent implements AfterViewInit{
 				console.log(users);
 			})
 
+			this.chatService.selectRoom().subscribe((room: string) => {
+				setTimeout(() => {
+					this.onSelect(this.roomsList[room]);
+				}, 300);
+			})
+
 			this.chatService.update_single_user().subscribe((users: any) => {
 				console.log("update single user");
 				console.log(users);
@@ -214,6 +223,8 @@ export class FranChatUiComponent implements AfterViewInit{
 		this.chatService.update_public().subscribe((update_room: Rooms) => {
 			console.log(`update_public: ${update_room.name}`);
 			// console.log(update_room);
+			
+
 			if (update_room.messages){
 				for (let i = update_room.messages.length - 1; i >= 0; i--) {
 					const msg = update_room.messages[i];
@@ -225,6 +236,7 @@ export class FranChatUiComponent implements AfterViewInit{
 			}
 			
 			this.roomsList[update_room.name] = update_room;
+			this.change_sender_avatar(update_room.name);
 		})
 
 		this.chatService.delete_room().subscribe((room: string) => {
@@ -311,9 +323,9 @@ export class FranChatUiComponent implements AfterViewInit{
 						console.log(input);
 						pw = input.password;
 						this.chatService.checkPassword(input);
-						setTimeout(() => {
-							this.onSelect(this.roomsList[input.roomName])
-						}, 300);
+						// setTimeout(() => {
+						// 	this.onSelect(this.roomsList[input.roomName])
+						// }, 300);
 					}
 					resolve();
 				});
@@ -466,7 +478,7 @@ export class FranChatUiComponent implements AfterViewInit{
 		);
 	  }
 	
-	  async change_sender_avatar(room_name: string) {
+	async change_sender_avatar(room_name: string) {
 		const room = this.roomsList[room_name];
 		if (room && room.messages) {
 			for (const message of room.messages) {
@@ -482,9 +494,8 @@ export class FranChatUiComponent implements AfterViewInit{
 				}
 			}
 		}
-	  }
+	}
 	  
-
 	private userInRoom(userName: string): Observable<boolean> {
 		return this.userService.getUserIdByName(userName).pipe(
 			map((data: any) => {
