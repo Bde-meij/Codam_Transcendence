@@ -267,10 +267,9 @@ export class FranChatUiComponent implements AfterViewInit{
 	}
 
 	settingsChat(room: Rooms) {
-		this.chatService.room = this.selectedRoom!;
 		this.chatService.giveUsernames(this.selectedRoom!.name)
 		setTimeout(() => {
-			this.dialogService.open(settingsChat, {context:{}
+			this.dialogService.open(settingsChat, {context:{selectedRoom: this.selectedRoom, users: this.chatService.usernames}
 			}).onClose.subscribe((input: any) => {
 				if (input) {
 					console.log(input);
@@ -288,7 +287,7 @@ export class FranChatUiComponent implements AfterViewInit{
 		return new Promise((resolve) => {
 			this.chatService.room = this.selectedRoom!;
 			setTimeout(() => {
-				this.dialogService.open(protectedChat, {context:{}
+				this.dialogService.open(protectedChat, {context:{selectedRoom: this.selectedRoom}
 				}).onClose.subscribe((input: any) => {
 					if (input) {
 						console.log(input);
