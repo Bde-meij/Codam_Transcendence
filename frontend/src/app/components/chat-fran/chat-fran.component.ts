@@ -15,6 +15,7 @@ import { forbiddenNameValidator } from '../../services/validator/name-validator.
 import { Router } from '@angular/router';
 import { settingsChat } from './settingsChat/settingsChat.component';
 import { protectedChat } from './protectedChat/protectedChat.component';
+import { ErrorService } from '../../services/sock/chat/error.service';
 
 let subbed = false;
 let pw = '';
@@ -87,7 +88,8 @@ export class FranChatUiComponent implements AfterViewInit{
 		private userService: UserService, 
 		private blockService: BlockService,
 		private dialogService: NbDialogService,
-		private router: Router
+		private router: Router,
+		private errorService: ErrorService,
 	) 
 	{
 		this.userMap = new Map<number, string>();
@@ -125,12 +127,9 @@ export class FranChatUiComponent implements AfterViewInit{
 					});
 					if (newmessage.senderId > 0){
 						newmessage.sender_avatar = this.get_avatar(newmessage.senderId);
-						// if (!newmessage.sender_avatar){
-							this.userService.getAvatar(newmessage.senderId).subscribe((data) => (
-								newmessage.sender_avatar = URL.createObjectURL(data)
-							))
-						// }
-					}
+					this.userService.getAvatar(newmessage.senderId).subscribe((data) => (
+						newmessage.sender_avatar = URL.createObjectURL(data)
+					))
 					if (!this.blockbool){
 						// console.log("blockblool = faslse", this.blockbool);
 						this.roomsList[newmessage.room_name].messages?.push(newmessage);
@@ -156,33 +155,34 @@ export class FranChatUiComponent implements AfterViewInit{
 			})
 
 			this.chatService.error_message().subscribe((msg: ErrorMessage) => {
-				console.log("Error message received")
-				let room_id = 0;
-				let room_name = 'Global';
+				// this.errorService.showError(msg);
+				// let room_id = 0;
+				// let room_name = 'Global';
 				
-				if (!msg.msg)
-					msg.msg = "Undefined error";
-				if (this.selectedRoom){
-					room_id = this.selectedRoom?.id;
-					room_name = this.selectedRoom?.name;
-				} else if (msg.room){
-					room_id = this.roomsList[msg.room].id;
-					room_name = msg.room;
-				}
-				const message : MessageInterface = {
-					message: msg.msg,
-					roomId: room_id,
-					room_name: room_name,
-					senderId: -1,
-					sender_name: "System messager",
-					sender_avatar: '',
-					type: 'text',
-					created: new Date(),
-				}
-				console.log(`error_message received ${message.message} - to ${message.room_name} - ${this.selectedRoom!.name}`);
-				if (!this.roomsList[message.room_name])
-					this.roomsList[message.room_name];
-				this.roomsList[message.room_name].messages?.push(message);
+				// if (!msg.msg)
+				// 	msg.msg = "Undefined error";
+				// if (this.selectedRoom){
+				// 	room_id = this.selectedRoom?.id;
+				// 	room_name = this.selectedRoom?.name;
+				// } else if (msg.room){
+				// 	room_id = this.roomsList[msg.room].id;
+				// 	room_name = msg.room;
+				// }
+				// const message : MessageInterface = {
+				// 	message: msg.msg,
+				// 	roomId: room_id,
+				// 	room_name: room_name,
+				// 	senderId: -1,
+				// 	sender_name: "System messager",
+				// 	sender_avatar: '',
+				// 	type: 'text',
+				// 	created: new Date(),
+				// }
+				// console.log(`error_message ${message.message} - ${this.selectedRoom?.name}`);
+				// if (!this.roomsList[message.room_name])
+				// 	this.roomsList[message.room_name];
+				// console.log("error message naar " + message.room_name);
+				// this.roomsList[message.room_name].messages?.push(message);
 			})
 
 			this.chatService.get_all_blocked().subscribe((blocked: any) => {
@@ -272,9 +272,9 @@ export class FranChatUiComponent implements AfterViewInit{
 		return Number(str);
 	}
 
-	createRoom(roomName: string, status: string, password: string, users: number[]) {
+	createRoom(roomName: string, status: string, password: string, userid: number) {
 		if (roomName) {
-		  this.chatService.createRoom(roomName, status, password, users);
+		  this.chatService.createRoom(roomName, status, password, userid);
 		  this.roomName = '';
 		}
 	}
@@ -286,7 +286,7 @@ export class FranChatUiComponent implements AfterViewInit{
 			if (input) {
 				console.log(input);
 
-				this.chatService.createRoom(input.roomName, input.roomType, input.password, []);
+				this.chatService.createRoom(input.roomName, input.roomType, input.password, +this.user.id);
 				setTimeout(() => {
 					this.onSelect(this.roomsList[input.roomName])
 				}, 300);
