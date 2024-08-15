@@ -28,14 +28,15 @@ export class UserService {
 
 	// to request your own info, use 'current', otherwise use the userID.
 	getUser(id : string) : Observable<any> {
+		console.log("getting user: ", id);
 		if (id === 'current') {
 			return this.http.get<any>(this.userUrl + '/current', {});
 		}
 		return this.http.get<any>(this.userUrl + '/name/' + id, {});
 	};
 
-	getUserIdByName(name: string) : Observable<any> {
-		return this.http.get<any>(this.userUrl + '/getUserByName/' + name, {});
+	getUserIdByName(nickname: string) : Observable<any> {
+		return this.http.get<any>(this.userUrl + '/getUserByName/', {params: {nickname: nickname}});
 	}
 
 	updateRoomKey(roomKey: number) {

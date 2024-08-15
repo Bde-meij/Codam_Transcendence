@@ -3,7 +3,6 @@ import { Component, Input, Inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NbCardModule, NbCheckboxModule, NbDialogRef, NbToggleModule} from '@nebular/theme';
 import { Rooms } from '../../../models/rooms.class';
-import { ChatService } from '../../../services/sock/chat/chat.service';
 
 @Component({
   selector: 'app-settingsChat',
@@ -19,20 +18,17 @@ export class settingsChat {
 	withPassword: boolean = false;
 	submitWithoutName: boolean = false;
 	roomType: string = '';
-	
 	users: { user: string; username: string }[] = [];
 	selectedRoom?: Rooms;
 	checked = false;
 	admins: number[] = [];
 	adminsNames: string[] = [];
-	constructor(protected dialogRef: NbDialogRef<settingsChat>, private chatService: ChatService) {}
+	constructor(protected dialogRef: NbDialogRef<settingsChat>) {}
 
 	ngOnInit(): void {
-		this.selectedRoom = this.chatService.room;
 		this.roomName = this.selectedRoom!.name;
 		this.admins = this.selectedRoom!.admins
 		this.roomType = this.selectedRoom!.status;
-		this.users = this.chatService.usernames;
 		for (const a of this.admins){
 			for (const b of this.users){
 				if (b.user == a.toString()){
