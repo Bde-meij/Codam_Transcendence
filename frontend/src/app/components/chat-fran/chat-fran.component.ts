@@ -1,6 +1,6 @@
 import { CommonModule, NgFor, NgIf } from '@angular/common';
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, ViewChild } from '@angular/core';
-import { NbAutocompleteModule, NbButtonModule, NbCardModule, NbChatModule, NbDialogConfig, NbDialogService, NbUserModule } from '@nebular/theme';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, ViewChild } from '@angular/core';
+import { NbCardModule, NbChatModule, NbDialogConfig, NbDialogService, NbUserModule } from '@nebular/theme';
 import { ChatService } from '../../services/sock/chat/chat.service';
 import { UserService } from '../../services/user/user.service';
 import { BlockService } from '../../services/block/block.service';
@@ -260,9 +260,9 @@ export class FranChatUiComponent implements AfterViewInit{
 		return Number(str);
 	}
 
-	createRoom(roomName: string, status: string, password: string) {
+	createRoom(roomName: string, status: string, password: string, users: number[]) {
 		if (roomName) {
-		  this.chatService.createRoom(roomName, status, password);
+		  this.chatService.createRoom(roomName, status, password, users);
 		  this.roomName = '';
 		}
 	}
@@ -274,7 +274,7 @@ export class FranChatUiComponent implements AfterViewInit{
 			if (input) {
 				console.log(input);
 
-				this.chatService.createRoom(input.roomName, input.roomType, input.password);
+				this.chatService.createRoom(input.roomName, input.roomType, input.password, []);
 				setTimeout(() => {
 					this.onSelect(this.roomsList[input.roomName])
 				}, 300);
@@ -334,6 +334,13 @@ export class FranChatUiComponent implements AfterViewInit{
 		this.chatService.joinRoom(data, password);
 	}
 
+	leaveRoom() {
+		this.chatService.leaveRoom(this.selectedRoom!.id, this.selectedRoom!.name, this.user.nickname, this.user.id);
+		this.chatService.getRoomsss().subscribe((chatRoomList: Record<string, Rooms>) => {
+			this.roomsList = chatRoomList;
+		});
+	}
+
 	getConnectedUsers() {
 		this.chatService.getConnectedUsers();
 	}
@@ -356,12 +363,20 @@ export class FranChatUiComponent implements AfterViewInit{
 	}
 
 	battle() {
-		this.router.navigate(['/dashboard/game']);
 		this.chatService.battle(this.selectedRoom!.name, +this.selectedRoom!.id, +this.user.id, this.user.nickname, this.user.avatar);
+		this.router.navigate(['/dashboard/game']);
 	}
 	
-	joinBattle() {
-		this.chatService.joinBattle(this.selectedRoom!.id, this.selectedRoom!.name, this.user.avatar);
+	// joinBattle(roomkey: number) {
+	// 	console.log("IT HEREE---------------------------");
+	// 	this.chatService.joinBattle(roomkey, this.selectedRoom!.name, this.user.avatar);
+	// 	this.router.navigate(['/dashboard', 'game']);
+	// }	
+	joinBattle(msg: any) {
+		console.log("IT HEREE1---------------------------", msg);
+		console.log("IT HEREE2---------------------------", msg.customMessageData);
+		console.log("IT HEREE3---------------------------", msg.customMessageData.roomkey);
+		this.chatService.joinBattle(msg.customMessageData.roomkey, this.selectedRoom!.name, this.user.avatar);
 		this.router.navigate(['/dashboard', 'game']);
 	}
 
@@ -421,12 +436,6 @@ export class FranChatUiComponent implements AfterViewInit{
 	last_open_room(){
 		this.chatService.last_open_room(this.selectedRoom!.name);
 		console.log("open room: " + this.selectedRoom!.name);
-	}
-
-	leaveRoom() {
-		////console.log("chat-message component leaveRoom: " + room + ", id: " + userid);
-		this.chatService.leaveRoom(Number(this.selectedRoom!.id), this.selectedRoom!.name, this.user.id);
-		// ////console.log("chat-message sendmessage: " + this.room.name);
 	}
 
 	setAdmin() {
@@ -491,10 +500,6 @@ export class FranChatUiComponent implements AfterViewInit{
 
 	get_all_rooms(){
 		this.chatService.get_all_rooms();
-	}
-
-	onAvatarClick(msg: any) {
-		console.log("Avatar clicked on!");
 	}
 
 	getLists(){

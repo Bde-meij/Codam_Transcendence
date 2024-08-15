@@ -1,5 +1,5 @@
 import { UsePipes, NotAcceptableException, Injectable, ValidationPipe, UseFilters, ArgumentsHost, Catch, HttpException, BadRequestException } from '@nestjs/common';
-import { Rooms, RoomInfo, MessageInterface, RoomDto, messageDto, ErrorMessage, createRoomDto, CheckPasswordDto, UpdatePasswordDto, getAllUsersInRoomDTO } from './chatRoom.dto';
+import { Rooms, RoomInfo, MessageInterface, RoomDto, messageDto, ErrorMessage, createRoomDto, CheckPasswordDto, UpdatePasswordDto, JoinRoomDto, LeaveRoomDto, DeleteRoomDto, UserActionDto, InviteChatDto, AddRemAdminDto, InviteGameDto, JoinBattleDto, UpdateRoomDto, SettingsDto, UpdateNameDto, UpdateUsernameDto } from './chatRoom.dto';
 import {
 	ConnectedSocket,
 	MessageBody,
@@ -231,7 +231,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			sender_avatar: "",
 			created: new Date(),
 			type: data.type,
-			cutomMessageData: data.customMessageData
+			customMessageData: data.customMessageData
 		};
 		// //this.logger("room: " + data.room + ", socketdataid: " + socket.data.userid);
 		// this.addDate();
@@ -260,9 +260,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		socket.emit('getRooms', p);
 	}
 	
+	@UseFilters(WsExceptionFilter)
+	@UsePipes(new ValidationPipe({ transform: true }))
 	@SubscribeMessage('joinRoom')
 	async joinRoom(
-	@MessageBody() data: { room_name: string, user_id: number, password: string, avatar: string },
+	@MessageBody() data: JoinRoomDto,
 	@ConnectedSocket() socket: Socket,
 	) {
 		this.logger("joinRoom: " + data.room_name + ", socketid: " + socket.data.userid + ", nickname:" + socket.data.nickname + ", room:"+ data.room_name);
@@ -312,16 +314,20 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		}
 	}
 	
+	@UseFilters(WsExceptionFilter)
+	@UsePipes(new ValidationPipe({ transform: true }))
 	@SubscribeMessage('leaveRoom')
 	async leaveRoom(
-	@MessageBody() data: { roomid: number, room: string; userid: number },
+	@MessageBody() data: LeaveRoomDto,
 	@ConnectedSocket() client: Socket) {
 		this.leave_user(data.userid, client.data.nickname, data.room);
 	}
 
+	// @UseFilters(WsExceptionFilter)
+	// @UsePipes(new ValidationPipe({ transform: true }))
 	@SubscribeMessage('deleteRoom')
 	async deleteRoom(
-	@MessageBody() data: { roomid: number, room: string; username: string, userid: number },
+	@MessageBody() data: DeleteRoomDto,
 	@ConnectedSocket() client: Socket) {
 		const user = await this.findSocketUser(client.data.userid);
 		if (!user){
@@ -343,8 +349,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		this.logger("leaveroom succes");
 	}
 
+	@UseFilters(WsExceptionFilter)
+	@UsePipes(new ValidationPipe({ transform: true }))
 	@SubscribeMessage('changePassword') async changePassword(
-	@MessageBody() data: { password: string; room: string; userid: number, username: string  },
+	@MessageBody() data: UpdatePasswordDto,
 	@ConnectedSocket() client: Socket) 
 	{
 		const room = this.findRoom(data.room, "changePassword");
@@ -354,8 +362,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		// }
 	}
 	
+	@UseFilters(WsExceptionFilter)
+	@UsePipes(new ValidationPipe({ transform: true }))
 	@SubscribeMessage('mute') async mute(
-	@MessageBody() data: { room: string; username: string},
+	@MessageBody() data: UserActionDto,
 	@ConnectedSocket() client: Socket) 
 	{
 		const user = await this.userService.findUserByName(data.username)
@@ -385,8 +395,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		}
 	}
 
+	@UseFilters(WsExceptionFilter)
+	@UsePipes(new ValidationPipe({ transform: true }))
 	@SubscribeMessage('unMute') async unMute(
-	@MessageBody() data: { room: string; userid: number, username: string},
+	@MessageBody() data: UserActionDto,
 	@ConnectedSocket() client: Socket)
 	{
 		//check if room exists
@@ -400,8 +412,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		}
 	}
 	
+	@UseFilters(WsExceptionFilter)
+	@UsePipes(new ValidationPipe({ transform: true }))
 	@SubscribeMessage('ban') async ban(
-	@MessageBody() data: { room: string, username: string},
+	@MessageBody() data: UserActionDto,
 	@ConnectedSocket() client: Socket)
 	{
 		const user = await this.userService.findUserByName(data.username)
@@ -436,8 +450,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		}
 	}
 
+	@UseFilters(WsExceptionFilter)
+	@UsePipes(new ValidationPipe({ transform: true }))
 	@SubscribeMessage('unBan') async unban(
-	@MessageBody() data: { room: string; userid: number, username: string},
+	@MessageBody() data: UserActionDto,
 	@ConnectedSocket() client: Socket)
 	{
 		//this.logger("unBan: " + data.userid + ", in: " + data.room )
@@ -453,8 +469,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		//emit unban notification in chat
 	}
 
+	@UseFilters(WsExceptionFilter)
+	@UsePipes(new ValidationPipe({ transform: true }))
 	@SubscribeMessage('kick') async kick(
-	@MessageBody() data: { room: string; username: string},
+	@MessageBody() data: UserActionDto,
 	@ConnectedSocket() client: Socket) 
 	{
 		this.logger("kick: " + data.username + ", in: " + data.room )
@@ -489,11 +507,13 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		}
 	}
 
+	@UseFilters(WsExceptionFilter)
+	@UsePipes(new ValidationPipe({ transform: true }))
 	@SubscribeMessage('block') async block(
-	@MessageBody() data: { user: string; room: string},
+	@MessageBody() data: UserActionDto,
 	@ConnectedSocket() client: Socket) 
 	{
-		const user = await this.userService.findUserByName(data.user)
+		const user = await this.userService.findUserByName(data.username)
 		this.logger('blocking?');
 		if (!user)
 			return
@@ -517,11 +537,13 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		}
 	}
 
+	@UseFilters(WsExceptionFilter)
+	@UsePipes(new ValidationPipe({ transform: true }))
 	@SubscribeMessage('unblock') async unblock(
-	@MessageBody() data: { user: string, userid: number; },
+	@MessageBody() data: UserActionDto,
 	@ConnectedSocket() client: Socket) 
 	{
-		const user = await this.userService.findUserByName(data.user)
+		const user = await this.userService.findUserByName(data.username)
 		if (!user)
 			return
 		try{
@@ -565,22 +587,24 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 // inviteChat
+	@UseFilters(WsExceptionFilter)
+	@UsePipes(new ValidationPipe({ transform: true }))
 	@SubscribeMessage('inviteChat') async inviteChat(
-	@MessageBody() user: string,
+	@MessageBody() data: InviteChatDto,
 	@ConnectedSocket() socket: Socket) 
 	{
 		
-		const nametarget = await this.findUsername(Number(user));
+		const nametarget = await this.findUsername(Number(data.user));
 		const nameroom = nametarget + socket.data.nickname;
 		for (const roomName in this.chatRoomList) {
 			const room = this.chatRoomList[roomName];
 			if (room.users.length === 2 && room.status === 'private') {
 				// Check if both the specified user and socket.user are in the room
-				const hasBothUsers = room.users.includes(Number(user)) && room.users.includes(Number(user));
+				const hasBothUsers = room.users.includes(Number(data.user)) && room.users.includes(Number(data.user));
 				// If all conditions are met, return or perform any action you want
 				if (hasBothUsers) {
 					this.logger(`Room ${roomName} matches the criteria.`);
-					var invitesocket = await this.findSocketUser(Number(user))
+					var invitesocket = await this.findSocketUser(Number(data.user))
 					invitesocket.join(room.id.toString());
 					socket.join(room.id.toString());
 					//emit room
@@ -603,16 +627,16 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		socket.data.id = -1;
 		socket.data.name = nameroom;
 		this.chatRoomList[nameroom] = {
-			id: Number(user) + socket.data.userid,
+			id: Number(data.user) + socket.data.userid,
 			name: nameroom,
 			owner: socket.data.userid,
 			admins: [socket.data.userid],
 			banned: [],
 			muted: {},
-			users: [socket.data.userid, user],
+			users: [socket.data.userid, data.user],
 			status: "private",
 			password: false,
-			messages: [], 
+			messages: [],
 		};
 		//unique room id from database.
 		// const CreateRoomDB: any =  await this.chatService.createChatRoom({name :  nameroom, password: "" })
@@ -636,17 +660,18 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		this.channelUserList(nameroom);	
 	}
 
-	
+	@UseFilters(WsExceptionFilter)
+	@UsePipes(new ValidationPipe({ transform: true }))
 	@SubscribeMessage('addAdmin') async addAdmins(
-	@MessageBody() data: { roomid: number; room_name: string, userid: number, avatar: string },
-	@ConnectedSocket() client: Socket) 
+	@MessageBody() data: AddRemAdminDto,
+	@ConnectedSocket() client: Socket)
 	{
 		if (this.chatRoomList[data.room_name]){
 			if (this.chatRoomList[data.room_name].admins.includes(data.userid)){
 				const msg: MessageInterface = this.create_msg(`${data.userid} was already an admin.`, 
-					data.roomid, 
-					data.room_name, 
-					client.data.userid, 
+					data.roomid,
+					data.room_name,
+					client.data.userid,
 					client.data.nickname,
 					'text',
 					client.data.avatar
@@ -668,8 +693,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		}
 	}
 
+	@UseFilters(WsExceptionFilter)
+	@UsePipes(new ValidationPipe({ transform: true }))
 	@SubscribeMessage('removeAdmin') async removeAdmins(
-	@MessageBody() data: { roomid: number; room_name: string, userid: number, avatar: string },
+	@MessageBody() data: AddRemAdminDto,
 	@ConnectedSocket() client: Socket) 
 	{
 		if (this.chatRoomList[data.room_name]){
@@ -686,8 +713,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		}
 	}
 
+	@UseFilters(WsExceptionFilter)
+	@UsePipes(new ValidationPipe({ transform: true }))
 	@SubscribeMessage('inviteGame') async inviteGame(
-	@MessageBody() data: { roomid: number; room_name: string, userid: number, userName: string},
+	@MessageBody() data: InviteGameDto,
 	@ConnectedSocket() client: Socket)
 	{
 		const roomKey = getNewRoomKey(); // nummer
@@ -702,18 +731,22 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			sender_name: data.userName,
 			created: new Date(),
 			game: true,
-			type: 'link',
-			cutomMessageData: {href: '/dashboard/game', text: 'Join battle '},
+			type: 'custom',
+			customMessageData: {text: 'Join battle ', roomkey: roomKey},
 		};
+		console.log("MESSAGE:", message);
 		this.io.in(data.roomid.toString()).emit('message', message);
 	}
 
+	@UseFilters(WsExceptionFilter)
+	@UsePipes(new ValidationPipe({ transform: true }))
 	@SubscribeMessage('joinBattle') async joinBattle(
-	@MessageBody() data: { numroom: number, room: string, avatar: string },
+	@MessageBody() data: JoinBattleDto,
 	@ConnectedSocket() client: Socket) 
-	{	
+	{
 		// this.logger("joinbattle: " + data.numroom + ", room: " + data.room);
-		this.userService.updateRoomKey(client.data.userid.toString(), Number(data.numroom))
+		console.log(data.numroom, "IT JOINING---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+		this.userService.updateRoomKey(client.data.userid.toString(), data.numroom)
 		const room = this.findRoom(data.room, "kick");
 		const msg = this.create_msg(`User ${client.data.nickname} joined the battle`, room.id, room.name, client.data.userid, client.data.nickname, 'text', client.data.avatar)
 		this.io.to(room.id.toString()).emit('message', msg);
@@ -830,8 +863,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		return room;
 	}
 
+	@UseFilters(WsExceptionFilter)
+	@UsePipes(new ValidationPipe({ transform: true }))
 	@SubscribeMessage('updateRoom') async updateRoom(
-	@MessageBody() data: {user_id: number, user_name: string },
+	@MessageBody() data: UpdateRoomDto,
 	@ConnectedSocket() client: Socket) 
 	{	
 		this.logger(`updateRoom`);
@@ -853,11 +888,13 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		temp = {};
 	}
 
+	@UseFilters(WsExceptionFilter)
+	@UsePipes(new ValidationPipe({ transform: true }))
 	@SubscribeMessage('last_open_room') async last_open_room(
-	@MessageBody() room: string,
+	@MessageBody() data: RoomDto,
 	@ConnectedSocket() client: Socket) 
-	{	
-		client.data.room = room;
+	{
+		client.data.room = data.name;
 	}
 
 	@SubscribeMessage('give_usernames') async give_me_usernames(
@@ -877,9 +914,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		client.emit('usernames', users);
 	}
 	
-
+	@UseFilters(WsExceptionFilter)
+	@UsePipes(new ValidationPipe({ transform: true }))
 	@SubscribeMessage('settingsChat') async settingsChat(
-	@MessageBody() data: {roomName: string, roomType: string, oldPassword: string, newPassword: string, admins: number[]},
+	@MessageBody() data: SettingsDto,
 	@ConnectedSocket() client: Socket) 
 	{	
 		// this.logger("status == " + status);
@@ -923,16 +961,18 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		this.emit_error_message(client, `Settings changed for ${data.roomName}`, 1, data.roomName);
 	}
 
+	@UseFilters(WsExceptionFilter)
+	@UsePipes(new ValidationPipe({ transform: true }))
 	@SubscribeMessage('updateName') async check_name(
-	@MessageBody() data: {sender_name: string},
-	@ConnectedSocket() socket: Socket) 
+	@MessageBody() data: UpdateUsernameDto,
+	@ConnectedSocket() socket: Socket)
 	{	
 		this.change_msg_name(socket.data.userid, data.sender_name);
 		socket.data.nickname = data.sender_name
 		// this.logger("new name: ", socket.data.nickname);
 		
 	}
-	
+
 	@SubscribeMessage('all_rooms') async all_rooms(
 	@MessageBody()
 	@ConnectedSocket() client: Socket) 
@@ -940,11 +980,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		this.logger('Send all rooms to client');
 		this.updateAllUsers(client, this.chatRoomList)
 	}
-
 	@SubscribeMessage('client_update_room') async update_client_room(
 	@MessageBody() data: {user_id: number, user_name: string },
 	@ConnectedSocket() client: Socket) 
-	{	
+	{
 		this.logger(`client_update_room`);
 		var temp : Record<string, Rooms> = {};
 		Object.values(this.chatRoomList).forEach(room => {
@@ -1385,10 +1424,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			{ room_name: 'Global', status: 'public', password: false, pw: ""},
 			{ room_name: 'Help', status: 'public', password: false, pw: "" },
 			{ room_name: 'Private', status: 'private', password: false, pw: "" },
-			{ room_name: 'Protected no pw', status: 'protected', password: true, pw: "" },
+			{ room_name: 'ProtectedNoPw', status: 'protected', password: true, pw: "" },
 			{ room_name: 'Protected', status: 'protected', password: true, pw: "test" },
 		];
-		var id = 1;
+		var id = 59;
 		for (const roomData of dummyRooms) {
 			const { room_name, status, password, pw } = roomData;
 			let chat = await this.chatService.createChatRoom({ ownerId:  77600, name: room_name, password: pw, status: status})
@@ -1405,7 +1444,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 					admins: [],
 					banned: [],
 					muted: {},
-					users: [],
+					users: [1],
 					status: status,
 					password: password,
 					messages: [],
@@ -1422,6 +1461,12 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		this.chatRoomList["Protected"].users.push(776001);
 		// this.chatRoomList["Protected"].id = 58;
 
+
+		// this.chatRoomList["PrivatePW"].owner = 77600;
+		// this.chatRoomList["PrivatePW"].users.push(77600);
+		// this.chatRoomList["PrivatePW"].password = true;
+		// // const CreateRoomDB: any =  await this.chatService.createChatRoom({name :  "Global", password: ""})
+		// const CreateRoomDB: any =  await this.chatService.createChatRoom({name : "Global", password: "", ownerId: 1, status: '' })
 
 		// const updatepw: UpdatePasswordDto = {
 		// 	id: 33,

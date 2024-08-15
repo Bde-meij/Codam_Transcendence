@@ -31,7 +31,8 @@ export class settingsChat {
 		this.selectedRoom = this.chatService.room;
 		this.roomName = this.selectedRoom!.name;
 		this.admins = this.selectedRoom!.admins
-		this.users = this.chatService.username_list;
+		this.roomType = this.selectedRoom!.status;
+		this.users = this.chatService.usernames;
 		for (const a of this.admins){
 			for (const b of this.users){
 				if (b.user == a.toString()){

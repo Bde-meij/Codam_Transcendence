@@ -26,7 +26,7 @@ export interface MessageInterface {
 	game?: boolean;
 	sender_avatar?: string;
 	type: string;
-	customMessageData?: {href: string, text: string};
+	customMessageData?: {text: string, roomkey: number};
 }
 
 export interface messageDto{
@@ -35,7 +35,7 @@ export interface messageDto{
 	sender_id: number;
 	room: string;
 	type: string;
-	customMessageData: {href: string, text: string};
+	customMessageData: {text: string, roomkey: number};
 	sender_avatar: string;
 }
 

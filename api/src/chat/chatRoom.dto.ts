@@ -1,4 +1,4 @@
-import { IsAlphanumeric, IsNumber, IsString } from "class-validator";
+import { IsAlpha, IsAlphanumeric, IsNumber, IsString, Length, IsNotEmpty, IsArray, IsOptional } from "class-validator";
 import { User } from "src/user/entities/user.entity";
 
 export interface Rooms {
@@ -39,7 +39,7 @@ export interface MessageInterface {
 	game?: boolean;
 	sender_avatar?: string;
 	type: string;
-	cutomMessageData?: {href: string, text: string};
+	customMessageData?: {text: string, roomkey: number};
 }
 
 export interface Rooms {
@@ -65,10 +65,19 @@ export interface ErrorMessage{
 
 export class createRoomDto{
 	@IsString()
+	@IsAlphanumeric()
 	room_name: string;
-	status: string; 
+	@IsString()
+	status: string;
+	@IsString()
+	@IsAlphanumeric()
+	@Length(3, 13)
+	@IsOptional()
 	username?: string;
+	@IsNumber()
+	@IsOptional()
 	userid?: number;
+	@IsString()
 	password: string;
 	password_bool: boolean;
 }
@@ -79,17 +88,24 @@ export class messageDto{
 	
 	@IsString()
 	@IsAlphanumeric()
+	@IsNotEmpty()
+	@Length(3, 13)
 	sender_name: string;
 	@IsNumber()
 	sender_id: number;
 	@IsString()
 	room: string;
+	@IsString()
 	type: string;
-	customMessageData: {href: string, text: string};
+	customMessageData: {text: string, roomkey: number};
+	@IsString()
 	sender_avatar: string;
 }
 
-export interface RoomDto {
+export class RoomDto {
+	@IsString()
+	@IsAlphanumeric()
+	@IsNotEmpty()
 	name: string;
 	password: string; //true or false?
 	ownerId: number;
@@ -97,26 +113,181 @@ export interface RoomDto {
 
 }
 
-export interface DeleteRoomDto {
-	id: number;
+export class DeleteRoomDto {
+	@IsNumber()
+	roomid: number;
+	@IsString()
+	@IsAlphanumeric()
+	@IsNotEmpty()
+	room: string;
+	@IsString()
+	@IsAlphanumeric()
+	@IsNotEmpty()
+	@Length(3, 13)
+	username: string;
+	@IsNumber()
+	userid: number;
+	@IsString()
 	password: string;
 }
 
-export interface CheckPasswordDto {
+export class CheckPasswordDto {
+	@IsNumber()
 	id: number;
+	@IsString()
 	password: string;
 }
 
-export interface UpdatePasswordDto {
+export class UpdatePasswordDto {
+	@IsString()
+	@IsNotEmpty()
+	room?: string;
+	@IsNumber()
 	id: number;
+	@IsString()
 	oldPassword: string;
+	@IsString()
 	newPassword: string;
 }
 
-export interface UpdateNameDto {
+export class UpdateNameDto {
+	@IsNumber()
 	id: number;
+	@IsString()
 	password: string;
+	@IsString()
+	@IsAlphanumeric()
+	@IsNotEmpty()
 	newName: string;
+}
+
+export class JoinRoomDto {
+	@IsString()
+	@IsAlphanumeric()
+	@IsNotEmpty()
+	room_name: string;
+	@IsNumber()
+	user_id: number;
+	@IsString()
+	password: string;
+	@IsString()
+	avatar: string;
+}
+
+export class LeaveRoomDto {
+	@IsString()
+	@IsAlphanumeric()
+	@IsNotEmpty()
+	room: string
+	@IsNumber()
+	roomid: number
+	@IsString()
+	@IsAlphanumeric()
+	@IsNotEmpty()
+	@Length(3, 13)
+	username: string
+	@IsNumber()
+	userid: number
+}
+
+export class UserActionDto {
+	@IsString()
+	@IsNotEmpty()
+	room: string;
+	@IsString()
+	@IsAlphanumeric()
+	@IsNotEmpty()
+	@Length(3, 13)
+	username: string;
+	@IsOptional()
+	@IsString()
+	avatar: string;
+	@IsOptional()
+	@IsNumber()
+	userid: number;
+}
+
+export class InviteChatDto {
+	@IsString()
+	@IsAlphanumeric()
+	@IsNotEmpty()
+	@Length(3, 13)
+	user: string;
+}
+
+export class AddRemAdminDto {
+	@IsNumber()
+	roomid: number;
+	@IsString()
+	@IsAlphanumeric()
+	@IsNotEmpty()
+	room_name: string;
+	@IsNumber()
+	userid: number;
+	@IsString()
+	avatar: string;
+}
+
+export class InviteGameDto {
+	@IsNumber()
+	roomid: number;
+	@IsString()
+	@IsAlphanumeric()
+	@IsNotEmpty()
+	room_name: string;
+	@IsNumber()
+	userid: number;
+	@IsString()
+	@IsAlphanumeric()
+	@IsNotEmpty()
+	@Length(3, 13)
+	userName: string;
+}
+
+export class JoinBattleDto {
+	@IsNumber()
+	numroom: number;
+	@IsString()
+	@IsAlphanumeric()
+	@IsNotEmpty()
+	room: string;
+	@IsString()
+	avatar: string;
+}
+
+export class UpdateRoomDto {
+	@IsNumber()
+	user_id: number;
+	@IsString()
+	@IsAlphanumeric()
+	@IsNotEmpty()
+	@Length(3, 13)
+	user_name: string;
+}
+
+export class SettingsDto {
+	@IsString()
+	@IsAlphanumeric()
+	@IsNotEmpty()
+	roomName: string;
+	@IsString()
+	roomType: string;
+	@IsString()
+	@IsOptional()
+	oldPassword: string;
+	@IsString()
+	@IsOptional()
+	newPassword: string;
+	@IsArray()
+	admins: number[];
+}
+
+export class UpdateUsernameDto {
+	@IsString()
+	@IsAlphanumeric()
+	@IsNotEmpty()
+	@Length(3, 13)
+	sender_name: string;
 }
 
 export interface getAllUsersInRoomDTO{

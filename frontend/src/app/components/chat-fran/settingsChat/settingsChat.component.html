@@ -9,11 +9,10 @@
 			<label for="private">Private</label>
 			<input type="radio" id="protected" name="room_type" [(ngModel)]="roomType" value="protected">
 			<label for="protected">Protected</label>
-		</div>
+		</div>	
 
 		<div class="room-name-input">
-			<label for="roomName">Room name:</label>
-			<input type="text" id="roomName" name="roomName" nbInput [(ngModel)]="roomName" [readonly]="true" required>
+			<p for="roomName">Room name: {{roomName}}</p>
 		</div>
 
 		<div class="password-option" *ngIf="roomType === 'protected'">
