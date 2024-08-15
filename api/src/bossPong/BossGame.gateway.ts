@@ -4,7 +4,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { UserService } from 'src/user/user.service';
 import { Injectable } from '@nestjs/common';
 import { Server, Socket } from "socket.io";
-import {bounce} from "./vectorMath";
+import {bounce, pointDiff} from "./vectorMath";
 import { Room} from './Room';
 
 var numOfRooms: number = 0;
@@ -183,7 +183,6 @@ export class BossGameGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 	@SubscribeMessage('bouncePlayer')
 	bouncePlayer(client: Socket, playerPos)
 	{
-		// console.log("bouncePlayer", args[0], args[1], args[2], args[3]);
 		var room = roomMap.get(client.data.room);
 		room.shurikenSpeed = bounce(room.shurikenSpeed, [playerPos[0], playerPos[1]], room.bossPos);
 	}
@@ -191,6 +190,8 @@ export class BossGameGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 	@SubscribeMessage('updatePlayers')
 	updatePlayer(client: Socket, args)
 	{
-		client.in(client.data.room).emit("updatePlayerPos", args);
+		if ((typeof(args[0]) === "number") && (typeof(args[1]) === "number") 
+		&& (typeof(args[2]) === "number") && (typeof(args[3]) === "number"))
+			client.in(client.data.room).emit("updatePlayerPos", args);
 	}
 }
