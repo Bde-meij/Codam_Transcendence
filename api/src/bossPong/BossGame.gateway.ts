@@ -190,8 +190,8 @@ export class BossGameGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 	@SubscribeMessage('updatePlayers')
 	updatePlayer(client: Socket, args)
 	{
-		if ((typeof(args[0]) === "number") && (typeof(args[1]) === "number") 
-		&& (typeof(args[2]) === "number") && (typeof(args[3]) === "number"))
+		if (!args.empty() && ((typeof(args[0]) === "number") && (typeof(args[1]) === "number") 
+		&& (typeof(args[2]) === "number") && (typeof(args[3]) === "number")))
 			client.in(client.data.room).emit("updatePlayerPos", args);
 	}
 }
