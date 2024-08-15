@@ -523,15 +523,4 @@ export class ChatService{
 	getSelected(){
 		return this.selectedRoom;
 	}
-	getBlocked() {
-		return this.blockService.getBlocked();
-	}
-	
-	isBlocked(userid: number){
-		return this.blockService.isBlocked(userid.toString());
-	}
-
-	removeBlock(userid: number){
-		return this.blockService.removeBlock(userid.toString());
-	}
 }
