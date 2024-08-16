@@ -12,9 +12,12 @@
 		  <h3>Rooms:</h3>
 		  <ul>
 			<li *ngFor="let roomName of getRoomNames()" class="room-items">
-            <label for="{{roomName}}" [class.selected]="roomsList[roomName] === selectedRoom">
+            <label for="{{roomName}}" 
+				[class.selected]="roomsList[roomName] === selectedRoom"
+				[ngStyle]="{'color': isProtected(roomName) && !isJoined(roomName) ? 'red' : 'inherit'}">
 				<input type="radio" id="{{roomName}}" name="room" (change)="onSelect(roomsList[roomName])">
-				{{ roomName }}
+				<div *ngIf="!isJoined(roomName)">{{ roomName }}</div>
+				<div *ngIf="isJoined(roomName)">{{ roomName }}</div>
 			</label>
 			</li>
 		  </ul>

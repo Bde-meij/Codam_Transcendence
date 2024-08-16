@@ -80,9 +80,9 @@ export class createRoomDto{
 	@IsNumber()
 	@IsOptional()
 	userid?: number;
-	// @IsString()
+	@IsString()
 	@IsOptional()
-	@IsEmpty()
+	// @IsNotEmpty()
 	password: string;
 	@IsBoolean()
 	password_bool: boolean;
@@ -232,7 +232,29 @@ export class InviteChatDto {
 	// @IsNumber()
 	// @IsNotEmpty()
 	// @Length(3, 13)
+	@Matches(/^[a-zA-Z0-9]+$/, {
+        message: 'user can only contain letters, numbers, and spaces',
+    })
 	user: string;
+}
+
+export class InviteToChatDto {
+	// @IsString()
+	// @IsAlphanumeric()
+	// @IsNumber()
+	// @IsNotEmpty()
+	// @Length(3, 13)
+	@Matches(/^[a-zA-Z0-9]+$/, {
+        message: 'user can only contain letters, numbers, and spaces',
+    })
+	user: string;
+	@IsString()
+	@Matches(/^[a-zA-Z0-9]+$/, {
+        message: 'room_name can only contain letters, numbers, and spaces',
+    })
+	roomName: string;
+	@IsNumber()
+	roomId: number;
 }
 
 export class AddRemAdminDto {

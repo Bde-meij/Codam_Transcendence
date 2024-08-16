@@ -1,5 +1,5 @@
 import { UsePipes, NotAcceptableException, Injectable, ValidationPipe, UseFilters, ArgumentsHost, Catch, HttpException, BadRequestException } from '@nestjs/common';
-import { Rooms, RoomInfo, MessageInterface, RoomDto, messageDto, ErrorMessage, createRoomDto, CheckPasswordDto, UpdatePasswordDto, JoinRoomDto, LeaveRoomDto, DeleteRoomDto, UserActionDto, InviteChatDto, AddRemAdminDto, InviteGameDto, JoinBattleDto, UpdateRoomDto, SettingsDto, UpdateNameDto, UpdateUsernameDto, getAllUsersInRoomDTO, LastOpenRoomDto } from './chatRoom.dto';
+import { Rooms, RoomInfo, MessageInterface, RoomDto, messageDto, ErrorMessage, createRoomDto, CheckPasswordDto, UpdatePasswordDto, JoinRoomDto, LeaveRoomDto, DeleteRoomDto, UserActionDto, InviteChatDto, AddRemAdminDto, InviteGameDto, JoinBattleDto, UpdateRoomDto, SettingsDto, UpdateNameDto, UpdateUsernameDto, getAllUsersInRoomDTO, LastOpenRoomDto, InviteToChatDto } from './chatRoom.dto';
 import {
 	ConnectedSocket,
 	MessageBody,
@@ -188,8 +188,12 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@MessageBody() data: messageDto,
 	@ConnectedSocket() socket: Socket,
 	) {
+		if (data.message == 'c'){
+			this.createTestRooms();
+			this.getIdDb();
+		}
 		// this.getIdDb();
-
+		this.logger(this.chatRoomList[data.room]);
 		// this.logger(`nickname: ${socket.data.nickname} en ${data.sender_name}`);
 		if (socket.data.nickname != data.sender_name){
 			// this.logger("change msg name ", socket.data.userid, data.sender_name)
@@ -530,6 +534,26 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		this.logger(this.chatRoomList[room_name].users);
 		this.chatService.removeUserFromChatRoom(target.data.userid, room_id);
 		return true;
+	}
+
+	@UseFilters(WsExceptionFilter)
+	@UsePipes(new ValidationPipe({ transform: true }))
+	@SubscribeMessage('invite-to-chat') async inviteToChat(
+	@MessageBody() data: InviteToChatDto,
+	@ConnectedSocket() socket: Socket) 
+	{
+		this.logger("getting invited for chat", data.user);
+		const userid = await this.findUserId(data.user);
+		if (!userid){
+			//emit error;
+		}
+		/*todo 
+			check if already in room
+			check frontend params
+		*/ 
+		var invitesocket = await this.findSocketUser(Number(data.user))
+		invitesocket.join(data.roomId.toString());
+		socket.join(data.roomId.toString());
 	}
 
 // inviteChat
@@ -967,10 +991,13 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			this.chatRoomList[data.roomName].users.push(client.data.userid)
 			const msg: MessageInterface = this.create_msg(`${client.data.nickname} has joined the channel`, data.roomid, data.roomName, client.data.userid, client.data.nickname, 'text', client.data.avatar)
 			this.io.to(data.roomid.toString()).emit("message", "Has joined the channel");
-			// this.chatRoomList[data.roomName].messages.push(msg)
+			this.chatRoomList[data.roomName].messages.push(msg)
 			client.join(data.roomName);
 			client.emit("update_client_room", this.chatRoomList[data.roomName]);
-			// client.emit("select", data.roomName);
+			client.emit("select", data.roomName);
+		}
+		else{
+			this.emit_error_message(client, "Wrong password", 0);
 		}
 		this.logger(checkpw);
 		this.logger(pw_bool);
@@ -991,6 +1018,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 	private async updateRefresh(client: Socket, userid: number){{	
+		this.logger("updaterefresh");
 		await this.get_all_blocked(userid, client);
 		var temp : Record<string, Rooms> = {};
 		Object.values(this.chatRoomList).forEach(room => {
@@ -1348,7 +1376,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		if (!userAdded){
 			// socket.join(room.id.toString());
 			// this.chatRoomList[room_name].users.push(socket.data.userid);
-			// socket.emit("select", "");
+			// socket.emit("select", room_name);
 			this.logger("!useradded joinroom - room, user not found or user already in room.");
 			return;
 		}

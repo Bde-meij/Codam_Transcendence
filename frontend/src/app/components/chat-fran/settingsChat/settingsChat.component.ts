@@ -24,7 +24,7 @@ export class settingsChat {
 	admins: number[] = [];
 	adminsNames: string[] = [];
 	constructor(protected dialogRef: NbDialogRef<settingsChat>) {}
-
+	god: string = 'No Owner';
 	ngOnInit(): void {
 		this.roomName = this.selectedRoom!.name;
 		this.admins = this.selectedRoom!.admins
@@ -34,6 +34,8 @@ export class settingsChat {
 				if (b.user == a.toString()){
 					this.adminsNames.push(b.username);
 				}
+				if(b.user === this.selectedRoom?.owner.toString())
+					this.god = b.username;
 			}
 		} 
 	}
@@ -64,7 +66,7 @@ export class settingsChat {
 	if (!this.roomType)
 		this.roomType = "public";
 	if (this.roomName){
-		this.dialogRef.close({roomName: this.roomName, oldPassword: this.oldPassword, newPassword: this.newPassword, roomType: this.roomType, admins: this.admins});
+		this.dialogRef.close({roomName: this.roomName, oldPassword: this.oldPassword, newPassword: this.newPassword, roomType: this.selectedRoom?.status, admins: this.admins});
 	} else
 		this.submitWithoutName = true;
 	}
