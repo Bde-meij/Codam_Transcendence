@@ -344,10 +344,10 @@ export class ChatService{
 	}
 
 	invite(room: string, user: string){
-		console.log(`param check invite ${user}`);
+		console.log(`param check invite() invite-to-chat ${user}`);
 		const data = {
 			roomName: room,
-			roomId: this.selectedRoom?.id,
+			roomId: Number(this.selectedRoom?.id),
 			user: user,
 
 		}
@@ -362,7 +362,7 @@ export class ChatService{
 
 	inviteChat(user: string){
 		const userid = Number(user);
-		console.log(`param check invite`);
+		console.log(`param check inviteChat`);
 		const p = { user: userid}
 		console.log(`param check invite ${user}`);
 		this.chatSocket.emit('inviteChat', p, (err: any) => {

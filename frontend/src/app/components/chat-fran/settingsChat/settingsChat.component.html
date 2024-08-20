@@ -32,7 +32,7 @@
 
 		<div *ngFor="let userObj of users">
 			<nb-toggle *ngIf=isAdmin(userObj.user) [checked]="true" (checkedChange)="toggle($event, userObj.user, userObj.username)"  [disabled]="userObj.user === this.selectedRoom!.owner">> {{ userObj.username }} - don't you do it..</nb-toggle>
-			<nb-toggle *ngIf=!isAdmin(userObj.user) [checked]="false" (checkedChange)="toggle($event, userObj.user, userObj.username)"> {{ userObj.username }} - make me admin!</nb-toggle>
+			<nb-toggle *ngIf=!isAdmin(userObj.user)&&!isGod(userObj.user)  [checked]="false" (checkedChange)="toggle($event, userObj.user, userObj.username)"> {{ userObj.username }} - make me admin!</nb-toggle>
 		</div>
 		<div>
 			<h6>God of Room: {{this.god}}</h6>

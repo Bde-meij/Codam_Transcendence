@@ -60,16 +60,16 @@
 		  <div [formGroup]="userNameForm" class="user-name-input">
 		  	<input type="text" formControlName="userName" maxlength="13" placeholder="their nickname"/>
 		  </div>
-			<button [disabled]="!isChannelAdmin() || !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="mute()">
+			<button [disabled]="(!isChannelAdmin() && !isChannelOwner()) || !userNameForm.value.userName " *ngIf="selectedRoom" mat-raised-button color="primary" (click)="mute()">
 				Mute
 			</button>
-			<button [disabled]="!isChannelAdmin() || !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="ban()">
+			<button [disabled]="(!isChannelAdmin() && !isChannelOwner()) || !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="ban()">
 				Ban
 			</button>
-			<button [disabled]="!isChannelAdmin() || !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="kick()">
+			<button [disabled]="(!isChannelAdmin() && !isChannelOwner()) || !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="kick()">
 				Kick
 			</button>
-			<button [disabled]="!isChannelAdmin() || !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="invite()">
+			<button [disabled]="(!isChannelAdmin() && !isChannelOwner()) || !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="invite()">
 				Invite chat
 			</button>
 			<button [disabled]=" !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="block()">

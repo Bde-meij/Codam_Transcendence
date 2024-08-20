@@ -186,7 +186,8 @@ export class FranChatUiComponent implements AfterViewInit{
 				if (this.selectedRoom){
 					room_id = this.selectedRoom?.id;
 					room_name = this.selectedRoom?.name;
-				} else if (msg.room){
+				}
+				if (msg.room){
 					room_id = this.roomsList[msg.room].id;
 					room_name = msg.room;
 				}

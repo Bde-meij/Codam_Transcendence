@@ -97,8 +97,8 @@ export class customMessageDto {
 
 export class messageDto{
 	@IsString()
-	@Matches(/^[a-zA-Z0-9]+$/, {
-        message: 'room_name can only contain letters, numbers, and spaces',
+	@Matches(/^[a-zA-Z0-9\s.,!?@#$%^&*()_+=-]*$/, {
+        message: 'Invalid input: Only alphanumeric characters, spaces, and limited punctuation are allowed.',
     })
 	message: string;
 	@IsString()
@@ -244,16 +244,18 @@ export class InviteToChatDto {
 	// @IsNumber()
 	// @IsNotEmpty()
 	// @Length(3, 13)
-	@Matches(/^[a-zA-Z0-9]+$/, {
-        message: 'user can only contain letters, numbers, and spaces',
-    })
+	// @Matches(/^[a-zA-Z0-9]+$/, {
+    //     message: 'user can only contain letters, numbers, and spaces',
+    // })
 	user: string;
-	@IsString()
-	@Matches(/^[a-zA-Z0-9]+$/, {
-        message: 'room_name can only contain letters, numbers, and spaces',
-    })
+	// @IsString()
+	// @Matches(/^[a-zA-Z0-9]+$/, {
+    //     message: 'room_name can only contain letters, numbers, and spaces',
+    // })
 	roomName: string;
-	@IsNumber()
+	// @IsNumber({allowNaN: false}, {
+    //     message: 'isNumber can only contain numbers',
+    // })
 	roomId: number;
 }
 
