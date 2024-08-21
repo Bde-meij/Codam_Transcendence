@@ -563,6 +563,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		const userid = await this.findUserId(data.user);
 		if (!userid){
 			this.emit_error_message(socket, 'User nor found', 0, data.roomName);
+			return;
 		}
 		if (this.chatRoomList[data.roomName].users.includes(userid)){
 			this.logger("User already in chatroom", data.user);
