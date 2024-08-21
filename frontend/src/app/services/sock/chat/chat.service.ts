@@ -303,6 +303,7 @@ export class ChatService{
 			username: user,
 			avatar: avatar
 		}
+		console.log("muting?");
 		this.chatSocket.emit('mute', data, (err: any) => {
 			if (err) {
 				// console.log("leaveRoom chat-sock error: ");

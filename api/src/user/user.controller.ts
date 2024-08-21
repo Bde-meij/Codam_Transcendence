@@ -150,7 +150,7 @@ export class UserController {
 		await this.userService.updateRoomKey(req.user.id, key);
 	}
 
-	@Get('getUserByName/:name')
+	@Get('getUserByName')
 	@UseGuards(JwtGuard)
 	async getUserIdByName(@Req() req, @Query() data: NicknameDto) {
 		const user: User = await this.userService.findUserByName(data.nickname);

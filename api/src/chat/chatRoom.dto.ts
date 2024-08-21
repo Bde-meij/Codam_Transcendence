@@ -66,7 +66,7 @@ export interface ErrorMessage{
 
 export class createRoomDto{
 	@IsString()
-	@Matches(/^[a-zA-Z0-9]+$/, {
+	@Matches(/^[a-zA-Z0-9\s.,!?@#$%^&*()_+=-]*$/, {
         message: 'room_name can only contain letters, numbers, and spaces',
     })
 	room_name: string;
@@ -141,11 +141,6 @@ export class DeleteRoomDto {
 	@IsAlphanumeric()
 	@IsNotEmpty()
 	room: string;
-	@IsString()
-	@IsAlphanumeric()
-	@IsNotEmpty()
-	@Length(3, 13)
-	username: string;
 	@IsNumber()
 	userid: number;
 }

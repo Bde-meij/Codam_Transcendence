@@ -65,12 +65,11 @@ export class FranChatUiComponent implements AfterViewInit{
 		if (room == undefined){
 			return;
 		}
-		if (this.selectedRoom === room) {
-			this.selectedRoom = undefined;  // Deselect if the same room is selected again
-		  } else {
-			this.selectedRoom = room;
-		  }
-		
+		// if (this.selectedRoom === room) {
+		// 	this.selectedRoom = undefined;  // Deselect if the same room is selected again
+		//   } else {
+		// 	this.selectedRoom = room;
+		// }
 		console.log(room);
 		this.selectedRoom = room;
 		this.chatService.room = this.selectedRoom!
@@ -90,6 +89,11 @@ export class FranChatUiComponent implements AfterViewInit{
 				this.selectedRoom = room;
 			}, 150);
 		}	
+		else{
+			setTimeout(() => {
+				this.joinRoom(room.name, pw);
+			}, 150);
+		}
 		this.selectedRoom = room;
 		if (joined === 0){
 			this.selectedRoom = undefined;
@@ -132,12 +136,14 @@ export class FranChatUiComponent implements AfterViewInit{
 		
 		if (!subbed) {
 			this.chatService.getMessages().subscribe((newmessage: any ) => {
-				console.log("getmessage:", this.roomsList);
+				console.log("getmessage: roomlist:", this.roomsList);
 				if (this.roomsList[newmessage.room_name]?.messages) {
 					console.log(this.selectedRoom?.name);
-					setTimeout(() => {
-						this.onSelect(this.roomsList[newmessage.room_name]);
-					}, 300);
+					// setTimeout(() => {
+					// 	this.onSelect(this.roomsList[newmessage.room_name]);
+					// }, 300);
+					console.log("blocked list:");
+					console.log(this.blockedList);
 					this.blockedList?.forEach(block => {
 						if (block.target.id == newmessage.senderId)
 							// console.log("already blocked?");
@@ -285,9 +291,11 @@ export class FranChatUiComponent implements AfterViewInit{
 			this.onSelect(this.roomsList[room]);
 		}, 100);
 	}
+
 	sendMessage(event: any) {
 		if (event.message) {
 			console.log("avatar: ", this.user.avatar)
+			this.selecting_room(this.selectedRoom!.name);
 			this.chatService.sendMessage(event.message, this.selectedRoom!.name, this.user!.avatar);
 		}
 		this.message = '';
@@ -427,6 +435,7 @@ export class FranChatUiComponent implements AfterViewInit{
 	mute() {
 		this.userInRoom(this.userNameForm.value.userName).subscribe((userIsInRoom) => {
 			if (userIsInRoom) {
+				this.selecting_room(this.selectedRoom!.name);
 				this.chatService.muteUser(this.selectedRoom!.name, this.userNameForm.value.userName, this.user.avatar);
 				this.userNotFound = false;
 			}
@@ -438,6 +447,7 @@ export class FranChatUiComponent implements AfterViewInit{
 	ban() {
 		this.userInRoom(this.userNameForm.value.userName).subscribe((userIsInRoom) => {
 			if (userIsInRoom) {
+				this.selecting_room(this.selectedRoom!.name);
 				this.chatService.banUser(this.selectedRoom!.name, this.userNameForm.value.userName, this.user.avatar);
 				this.userNotFound = false;
 			}
@@ -449,6 +459,7 @@ export class FranChatUiComponent implements AfterViewInit{
 	kick() {
 		this.userInRoom(this.userNameForm.value.userName).subscribe((userIsInRoom) => {
 			if (userIsInRoom) {
+				this.selecting_room(this.selectedRoom!.name);
 				this.chatService.kickUser(this.selectedRoom!.name, this.userNameForm.value.userName);
 				this.userNotFound = false;
 			}
@@ -458,6 +469,7 @@ export class FranChatUiComponent implements AfterViewInit{
 	}
 
 	invite() {
+		this.selecting_room(this.selectedRoom!.name);
 		this.chatService.invite(this.selectedRoom!.name, this.userNameForm.value.userName);
 	}
 

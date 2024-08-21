@@ -413,9 +413,15 @@ export class ChatRoomService {
 			where: {
 				user: {id: userId},
 				chatroom: {id: roomId},
+			},
+			relations: {
+				user: true,
+				chatroom: true,
 			}
 		});
+		console.log("userChatRoom:",userChatRoom);
 		if (!userChatRoom) {
+			console.log("null");
 			return null;
 		}
 		return userChatRoom.banned;
