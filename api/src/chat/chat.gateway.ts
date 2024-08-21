@@ -392,7 +392,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		if (this.isOwner(Number(userid), data.room)){
 			this.logger("user is owner, can't be banned");
 			const msg = this.create_msg(`${data.username} can't be banned, he is the channel owner`, room.id, room.name, client.data.userid, client.data.nickname, 'text', client.data.avatar)
-			client.in(room.id.toString()).emit("message", msg)
+			this.io.in(room.id.toString()).emit("message", msg)
 			return;
 		}
 		if (this.isAdmin(client.data.userid, data.room) || this.isOwner(client.data.userid, data.room)){
@@ -1085,7 +1085,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	private async updateRefresh(client: Socket, userid: number){{	
 		this.logger("updaterefresh");
-		this.getIdDb();
+		// this.getIdDb();
 		await this.get_all_blocked(userid, client);
 		var temp : Record<string, Rooms> = {};
 		Object.values(this.chatRoomList).forEach(room => {
