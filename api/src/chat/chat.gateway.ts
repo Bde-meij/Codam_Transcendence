@@ -1,5 +1,5 @@
 import { UsePipes, NotAcceptableException, Injectable, ValidationPipe, UseFilters, ArgumentsHost, Catch, HttpException, BadRequestException } from '@nestjs/common';
-import { Rooms, RoomInfo, MessageInterface, RoomDto, messageDto, ErrorMessage, createRoomDto, CheckPasswordDto, UpdatePasswordDto, JoinRoomDto, LeaveRoomDto, DeleteRoomDto, UserActionDto, InviteChatDto, AddRemAdminDto, InviteGameDto, JoinBattleDto, UpdateRoomDto, SettingsDto, UpdateNameDto, UpdateUsernameDto, getAllUsersInRoomDTO, LastOpenRoomDto, InviteToChatDto } from './chatRoom.dto';
+import { Rooms, RoomInfo, MessageInterface, RoomDto, messageDto, ErrorMessage, createRoomDto, CheckPasswordDto, UpdatePasswordDto, JoinRoomDto, LeaveRoomDto, DeleteRoomDto, UserActionDto, InviteChatDto, AddRemAdminDto, InviteGameDto, JoinBattleDto, UpdateRoomDto, SettingsDto, UpdateNameDto, UpdateUsernameDto, getAllUsersInRoomDTO, LastOpenRoomDto, InviteToChatDto, giveUsernameDTO, CheckPassworddDto } from './chatRoom.dto';
 import {
 	ConnectedSocket,
 	MessageBody,
@@ -24,7 +24,7 @@ import { WsExceptionFilter } from './exception';
 import passport from 'passport';
 import { FriendsService } from 'src/friends/friends.service';
 
-var logger = 0;
+var logger = 1;
 
 @Injectable()
 @WebSocketGateway({
@@ -581,6 +581,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		const addUser = await this.chatService.addUserToChatRoom(userid, data.roomId, 'user');
 		if (!addUser){
 			this.logger("user not added to database.");
+			return;
 		}
 		const msg: MessageInterface = {
 			message: `${data.user} has been invited and joined the channel`,
@@ -924,14 +925,14 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 	@SubscribeMessage('give_usernames') async give_me_usernames(
-	@MessageBody() room: string,
+	@MessageBody() room: giveUsernameDTO,
 	@ConnectedSocket() client: Socket) 
 	{	
 		this.logger("give_me_usernames() give username");
 		const users: { user: string; username: string }[] = [];
-		if (!this.chatRoomList[room])
+		if (!this.chatRoomList[room.room])
 			return;
-		for (const user of this.chatRoomList[room].users) {
+		for (const user of this.chatRoomList[room.room].users) {
 			let username = await this.findUsername(user);
 			if (username){
 				users.push({user: user.toString(), username: username});
@@ -1010,29 +1011,30 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		this.logger('Send all rooms to client');
 		this.updateAllUsers(client, this.chatRoomList)
 	}
-	@SubscribeMessage('client_update_room') async update_client_room(
-	@MessageBody() data: {user_id: number, user_name: string },
-	@ConnectedSocket() client: Socket) 
-	{
-		this.logger(`client_update_room`);
-		var temp : Record<string, Rooms> = {};
-		Object.values(this.chatRoomList).forEach(room => {
-			if (room.users.includes(data.user_id) || room.status == "public" || room.status =="protected")
-				temp[room.name] = room;
-			if (data.user_id == this.system_id){
-				this.logger("updateroom system")
-				// this.findSocketUser(data.user_name);
-				this.updateAllUsers(client, this.chatRoomList);
-				client.emit('getConnectedUsers', this.connectedUsers);
-				return;
-			}
-		});
-		client.emit('getRoomss', temp);
-		temp = {};
-	}
+
+	// @SubscribeMessage('client_update_room') async update_client_room(
+	// @MessageBody() data: {user_id: number, user_name: string },
+	// @ConnectedSocket() client: Socket) 
+	// {
+	// 	this.logger(`client_update_room`);
+	// 	var temp : Record<string, Rooms> = {};
+	// 	Object.values(this.chatRoomList).forEach(room => {
+	// 		if (room.users.includes(data.user_id) || room.status == "public" || room.status =="protected")
+	// 			temp[room.name] = room;
+	// 		if (data.user_id == this.system_id){
+	// 			this.logger("updateroom system")
+	// 			// this.findSocketUser(data.user_name);
+	// 			this.updateAllUsers(client, this.chatRoomList);
+	// 			client.emit('getConnectedUsers', this.connectedUsers);
+	// 			return;
+	// 		}
+	// 	});
+	// 	client.emit('getRoomss', temp);
+	// 	temp = {};
+	// }
 
 	@SubscribeMessage('checkPassword') async checkPassword(
-	@MessageBody() data: { password: string; roomid: number; roomName: string },
+	@MessageBody() data: CheckPassworddDto,
 	@ConnectedSocket() client: Socket) 
 	{
 		this.logger("checkpassword:", data.password, "roomname:",data.roomName);
@@ -1051,7 +1053,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			}
 			this.logger("checkpassword: joining pw protected room");
 			this.chatRoomList[data.roomName].users.push(client.data.userid)
-			const msg: MessageInterface = this.create_msg(`${client.data.nickname} has joined the channel checkpw`, data.roomid, data.roomName, client.data.userid, client.data.nickname, 'text', client.data.avatar)
+			const msg: MessageInterface = this.create_msg(`${client.data.nickname} has joined the channel`, data.roomid, data.roomName, client.data.userid, client.data.nickname, 'text', client.data.avatar)
 			this.io.to(data.roomid.toString()).emit("message", msg);
 			this.chatRoomList[data.roomName].messages.push(msg)
 			client.join(data.roomName);
@@ -1541,7 +1543,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			var admins = [];
 			var muted = [];
 			var banned = [];
-			var owner = 77600;
+			var owner = 0;
 			for (const info of Userinfo){
 				if (info.role === 'user' || info.role === 'admin' || info.role === 'owner')
 					users.push(info.user.id);
@@ -1552,22 +1554,22 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				if (info.muted === true)
 					muted.push(info.user.id);
 				if (info.role === 'owner'){
-					owner = 1;
+					owner = info.user.id;
 				}
 			}
 			var pw_bool = false;
 			if (db_room.status === 'protected'){
 				pw_bool = true;
 			}
-			// if (db_room.name == 'Global'){
-			// 	owner = 77600;
-			// }
+			if (db_room.name == 'Global'){
+				owner = 77600;
+			}
 			this.chatRoomList[db_room.name] = {
 				id: db_room.id,
 				name: db_room.name,
 				owner: owner,
 				admins: admins,
-				banned: [],
+				banned: banned,
 				muted: {},
 				users: users,
 				status: db_room.status,
