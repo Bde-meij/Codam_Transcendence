@@ -109,6 +109,9 @@ export class messageDto{
 	@IsNumber()
 	sender_id: number;
 	@IsString()
+	@Matches(/^[a-zA-Z0-9\s.,!?@#$%^&*()_+=-]*$/, {
+        message: 'room_name can only contain letters, numbers, and spaces',
+    })
 	room: string;
 	@IsString()
 	type: string;
@@ -121,8 +124,9 @@ export class messageDto{
 
 export class RoomDto {
 	@IsString()
-	@IsAlphanumeric()
-	@IsNotEmpty()
+	@Matches(/^[a-zA-Z0-9\s.,!?@#$%^&*()_+=-]*$/, {
+        message: 'room_name can only contain letters, numbers, and spaces',
+    })
 	name: string;
 	@IsString()
 	@IsOptional()
@@ -138,8 +142,9 @@ export class DeleteRoomDto {
 	@IsNumber()
 	roomid: number;
 	@IsString()
-	@IsAlphanumeric()
-	@IsNotEmpty()
+	@Matches(/^[a-zA-Z0-9\s.,!?@#$%^&*()_+=-]*$/, {
+        message: 'room_name can only contain letters, numbers, and spaces',
+    })
 	room: string;
 	@IsNumber()
 	userid: number;
@@ -158,15 +163,18 @@ export class CheckPassworddDto {
 	@IsString()
 	password: string;
 	@IsString()
-	@IsAlphanumeric()
-	@IsNotEmpty()
+	@Matches(/^[a-zA-Z0-9\s.,!?@#$%^&*()_+=-]*$/, {
+        message: 'room_name can only contain letters, numbers, and spaces',
+    })
 	roomName: string;
 
 }
 
 export class UpdatePasswordDto {
 	@IsString()
-	@IsNotEmpty()
+	@Matches(/^[a-zA-Z0-9\s.,!?@#$%^&*()_+=-]*$/, {
+        message: 'room_name can only contain letters, numbers, and spaces',
+    })
 	room?: string;
 	@IsNumber()
 	id: number;
@@ -189,8 +197,9 @@ export class UpdateNameDto {
 
 export class JoinRoomDto {
 	@IsString()
-	@IsAlphanumeric()
-	@IsNotEmpty()
+	@Matches(/^[a-zA-Z0-9\s.,!?@#$%^&*()_+=-]*$/, {
+        message: 'room_name can only contain letters, numbers, and spaces',
+    })
 	room_name: string;
 	@IsNumber()
 	user_id: number;
@@ -202,8 +211,9 @@ export class JoinRoomDto {
 
 export class LeaveRoomDto {
 	@IsString()
-	@IsAlphanumeric()
-	@IsNotEmpty()
+	@Matches(/^[a-zA-Z0-9\s.,!?@#$%^&*()_+=-]*$/, {
+        message: 'room_name can only contain letters, numbers, and spaces',
+    })
 	room: string
 	@IsNumber()
 	roomid: number
@@ -218,7 +228,9 @@ export class LeaveRoomDto {
 
 export class UserActionDto {
 	@IsString()
-	@IsNotEmpty()
+	@Matches(/^[a-zA-Z0-9\s.,!?@#$%^&*()_+=-]*$/, {
+        message: 'room_name can only contain letters, numbers, and spaces',
+    })
 	room: string;
 	@IsString()
 	@IsAlphanumeric()
@@ -234,11 +246,6 @@ export class UserActionDto {
 }
 
 export class InviteChatDto {
-	// @IsString()
-	// @IsAlphanumeric()
-	// @IsNumber()
-	// @IsNotEmpty()
-	// @Length(3, 13)
 	@Matches(/^[a-zA-Z0-9]+$/, {
         message: 'user can only contain letters, numbers, and spaces',
     })
@@ -248,15 +255,11 @@ export class InviteChatDto {
 export class InviteToChatDto {
 	@IsString()
 	@IsAlphanumeric()
-	@IsNumber()
 	@IsNotEmpty()
 	@Length(3, 13)
-	@Matches(/^[a-zA-Z0-9]+$/, {
-        message: 'user can only contain letters, numbers, and spaces',
-    })
 	user: string;
 	@IsString()
-	@Matches(/^[a-zA-Z0-9]+$/, {
+	@Matches(/^[a-zA-Z0-9\s.,!?@#$%^&*()_+=-]*$/, {
         message: 'room_name can only contain letters, numbers, and spaces',
     })
 	roomName: string;
@@ -270,8 +273,9 @@ export class AddRemAdminDto {
 	@IsNumber()
 	roomid: number;
 	@IsString()
-	@IsAlphanumeric()
-	@IsNotEmpty()
+	@Matches(/^[a-zA-Z0-9\s.,!?@#$%^&*()_+=-]*$/, {
+        message: 'room_name can only contain letters, numbers, and spaces',
+    })
 	room_name: string;
 	@IsNumber()
 	userid: number;
@@ -281,7 +285,7 @@ export class AddRemAdminDto {
 
 export class LastOpenRoomDto{
 	@IsString()
-	@Matches(/^[a-zA-Z0-9]+$/, {
+	@Matches(/^[a-zA-Z0-9\s.,!?@#$%^&*()_+=-]*$/, {
         message: 'room_name can only contain letters, numbers, and spaces',
     })
 	name: string;
@@ -289,8 +293,8 @@ export class LastOpenRoomDto{
 
 export class giveUsernameDTO{
 	@IsString()
-	@Matches(/^[a-zA-Z0-9]+$/, {
-        message: 'room can only contain letters, numbers, and spaces',
+	@Matches(/^[a-zA-Z0-9\s.,!?@#$%^&*()_+=-]*$/, {
+        message: 'room_name can only contain letters, numbers, and spaces',
     })
 	room: string;
 }
@@ -299,8 +303,9 @@ export class InviteGameDto {
 	@IsNumber()
 	roomid: number;
 	@IsString()
-	@IsAlphanumeric()
-	@IsNotEmpty()
+	@Matches(/^[a-zA-Z0-9\s.,!?@#$%^&*()_+=-]*$/, {
+        message: 'room_name can only contain letters, numbers, and spaces',
+    })
 	room_name: string;
 	@IsNumber()
 	userid: number;
@@ -315,8 +320,9 @@ export class JoinBattleDto {
 	@IsNumber()
 	numroom: number;
 	@IsString()
-	@IsAlphanumeric()
-	@IsNotEmpty()
+	@Matches(/^[a-zA-Z0-9\s.,!?@#$%^&*()_+=-]*$/, {
+        message: 'room_name can only contain letters, numbers, and spaces',
+    })
 	room: string;
 	@IsString()
 	avatar: string;
@@ -334,8 +340,9 @@ export class UpdateRoomDto {
 
 export class SettingsDto {
 	@IsString()
-	@IsAlphanumeric()
-	@IsNotEmpty()
+	@Matches(/^[a-zA-Z0-9\s.,!?@#$%^&*()_+=-]*$/, {
+        message: 'room_name can only contain letters, numbers, and spaces',
+    })
 	roomName: string;
 	@IsString()
 	roomType: string;
