@@ -1,5 +1,5 @@
 import { NgFor, NgIf } from '@angular/common';
-import { Component, Input, Inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NbCardModule, NbCheckboxModule, NbDialogRef, NbToggleModule} from '@nebular/theme';
 import { Rooms } from '../../../models/rooms.class';
@@ -11,7 +11,7 @@ import { Rooms } from '../../../models/rooms.class';
   templateUrl: './settingsChat.component.html',
   styleUrl: './settingsChat.component.scss'
 })
-export class settingsChat {
+export class settingsChat{
 	roomName: string = '';
 	oldPassword: string = '';
 	newPassword: string = '';
@@ -24,24 +24,35 @@ export class settingsChat {
 	admins: number[] = [];
 	adminsNames: string[] = [];
 	constructor(protected dialogRef: NbDialogRef<settingsChat>) {}
-
+	god: string = 'No Owner';
 	ngOnInit(): void {
 		this.roomName = this.selectedRoom!.name;
 		this.admins = this.selectedRoom!.admins
 		this.roomType = this.selectedRoom!.status;
+		console.log(this.selectedRoom?.owner.toString());
 		for (const a of this.admins){
 			for (const b of this.users){
 				if (b.user == a.toString()){
 					this.adminsNames.push(b.username);
 				}
+				if(b.user === this.selectedRoom?.owner.toString())
+					this.god = b.username;
 			}
 		} 
+		for (const b of this.users){
+			if(b.user === this.selectedRoom?.owner.toString())
+				this.god = b.username;
+		}
 	}
 	
 	isAdmin(userid: string){
 		if (this.selectedRoom!.admins.includes(Number(userid)))
 			return true;
 		return false;
+	}
+
+	isGod(userid: string){
+		return (this.selectedRoom!.owner == userid);
 	}
 
 	toggle(checked: boolean, user: string, username: string) {
@@ -64,7 +75,7 @@ export class settingsChat {
 	if (!this.roomType)
 		this.roomType = "public";
 	if (this.roomName){
-		this.dialogRef.close({roomName: this.roomName, oldPassword: this.oldPassword, newPassword: this.newPassword, roomType: this.roomType, admins: this.admins});
+		this.dialogRef.close({roomName: this.roomName, oldPassword: this.oldPassword, newPassword: this.newPassword, roomType: this.selectedRoom?.status, admins: this.admins});
 	} else
 		this.submitWithoutName = true;
 	}

@@ -72,9 +72,9 @@ export class ChatService{
 	}
 
 	createRoom(room_name: string, status: string, password: string, userid: number): void {
-		// console.log("createRoom called: " + room_name + ", status: " + status + ", password: " + password);
+		console.log("createRoom called: " + room_name + ", status: " + status + ", password: " + password);
 
-		this.chatSocket.emit('createRoom', { room_name: room_name, status: status, password: (password.length > 0)? password : undefined, userid: userid, password_bool: (password.length > 0)}, (err: any) => {
+		this.chatSocket.emit('createRoom', { room_name: room_name, status: status, password: password, userid: userid, password_bool: (password.length > 0)}, (err: any) => {
 			if (err) {
 				// console.log("createRoom chat-sock error: ");
 				// console.log(err);
@@ -303,6 +303,7 @@ export class ChatService{
 			username: user,
 			avatar: avatar
 		}
+		console.log("muting?");
 		this.chatSocket.emit('mute', data, (err: any) => {
 			if (err) {
 				// console.log("leaveRoom chat-sock error: ");
@@ -344,12 +345,14 @@ export class ChatService{
 	}
 
 	invite(room: string, user: string){
-		console.log(`param check invite ${user}`);
+		console.log(`param check invite() invite-to-chat ${user}`);
 		const data = {
-			room: room,
-			username: user,
+			roomName: room,
+			roomId: Number(this.selectedRoom?.id),
+			user: user,
+
 		}
-		this.chatSocket.emit('createPrivateRoom', data, (err: any) => {
+		this.chatSocket.emit('invite-to-chat', data, (err: any) => {
 			if (err) {
 				// console.log("kickUser chat-sock error: ");
 				// console.log(err);
@@ -360,7 +363,7 @@ export class ChatService{
 
 	inviteChat(user: string){
 		const userid = Number(user);
-		console.log(`param check invite`);
+		console.log(`param check inviteChat`);
 		const p = { user: userid}
 		console.log(`param check invite ${user}`);
 		this.chatSocket.emit('inviteChat', p, (err: any) => {

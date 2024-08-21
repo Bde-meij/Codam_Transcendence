@@ -3,11 +3,11 @@
 	<nb-card-body>
 	  <form (ngSubmit)="submitForm()">
 		<div class="radio-buttons">
-			<input type="radio" id="public" name="room_type" [(ngModel)]="roomType" value="public">
+			<input type="radio" id="public" name="room_type" [(ngModel)]="roomType" value="public" [disabled]=true>
 			<label for="public">Public</label>
-			<input type="radio" id="private" name="room_type" [(ngModel)]="roomType" value="private">
+			<input type="radio" id="private" name="room_type" [(ngModel)]="roomType" value="private" [disabled]=true>
 			<label for="private">Private</label>
-			<input type="radio" id="protected" name="room_type" [(ngModel)]="roomType" value="protected">
+			<input type="radio" id="protected" name="room_type" [(ngModel)]="roomType" value="protected" [disabled]=true >
 			<label for="protected">Protected</label>
 		</div>	
 
@@ -32,8 +32,11 @@
 
 		<div *ngFor="let userObj of users">
 			<nb-toggle *ngIf=isAdmin(userObj.user) [checked]="true" (checkedChange)="toggle($event, userObj.user, userObj.username)"  [disabled]="userObj.user === this.selectedRoom!.owner">> {{ userObj.username }} - don't you do it..</nb-toggle>
-			<nb-toggle *ngIf=!isAdmin(userObj.user) [checked]="false" (checkedChange)="toggle($event, userObj.user, userObj.username)"> {{ userObj.username }} - make me admin!</nb-toggle>
+			<nb-toggle *ngIf=!isAdmin(userObj.user)&&!isGod(userObj.user)  [checked]="false" (checkedChange)="toggle($event, userObj.user, userObj.username)"> {{ userObj.username }} - make me admin!</nb-toggle>
 		</div>
+		<div>
+			<h6>God of Room: {{this.god}}</h6>
+		</div> 
 		<div>
 			<h6>Active Admins:</h6>
 			<li *ngFor="let user of adminsNames">{{user}}</li>
