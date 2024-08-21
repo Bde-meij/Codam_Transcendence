@@ -9,8 +9,6 @@ import { FriendStatus } from 'src/friends/entities/friend.entity';
 import { CreateBlockDto } from 'src/block/dto/create-block.dto';
 import { BlockService } from 'src/block/block.service';
 import { DeleteBlockDto } from 'src/block/dto/delete-block.dto';
-import { CreateMatchDto } from 'src/game/dto/create-match.dto';
-import { UpdateMatchDto } from 'src/game/dto/update-match.dto';
 import { MatchService } from 'src/game/match.service';
 import { ChatRoomService } from 'src/chat/chatRoom.service';
 import { Chatroom } from 'src/chat/entities/chatRoom.entity';
@@ -175,25 +173,6 @@ export class TestingController {
 			target: targetId,
 		}
 		return await this.blockService.deleteByUserId(block);
-	}
-
-	
-	// --------------------------------------------------------------------------------------------------------------
-	// --------------------------------------------------------------------------------------------------------------
-	// ------------------------------------------------MATCH ENDPOINTS-----------------------------------------------
-	// --------------------------------------------------------------------------------------------------------------
-	// --------------------------------------------------------------------------------------------------------------
-	
-	// creates a match
-	@Post('match/create')
-	async createMatch(@Body() data: CreateMatchDto) {
-		return await this.matchService.createMatch(data);
-	}
-	
-	// updates a match score and sets the winner
-	@Patch('match/update')
-	async updateMatch(@Body() data: UpdateMatchDto) {
-		return await this.matchService.updateMatch(data);
 	}
 	
 
