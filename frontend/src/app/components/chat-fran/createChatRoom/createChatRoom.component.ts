@@ -7,6 +7,7 @@ import { UserService } from '../../../services/user/user.service';
 import { ChatService } from '../../../services/sock/chat/chat.service';
 import { Rooms } from '../../../models/rooms.class';
 import { User } from '../../../models/user.class';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-createChatRoom',
@@ -57,27 +58,33 @@ export class createChatRoom {
     	this.withPassword = true;
   	}
 
-  	addUser() {
-		if (this.userToAddName === this.currentUsername) {
-			this.userInRoom = true;
-			this.userNotFound = false;
-			return;
-		}
-		this.getSelectedUserId().subscribe((userExists) => {
-			if (!userExists) {
-				this.userNotFound = true;
-				this.userInRoom = false;
-				return;
-			}
-			this.userNotFound = false;
-			if (this.users.includes(this.userToAddId)) {
-				this.userInRoom = true;
-				return;
-			}
-			this.userInRoom = false;
-			this.users.push(this.userToAddId);
+  addUser() {
+    if (this.userToAddName === this.currentUsername) {
+      this.userInRoom = true;
+      this.userNotFound = false;
+      return;
+    }
+    this.getSelectedUserId().subscribe({
+			next: (userExists) => {
+				if (!userExists) {
+        	this.userNotFound = true;
+        	this.userInRoom = false;
+        	return;
+        }
+        this.userNotFound = false;
+        if (this.users.includes(this.userToAddId)) {
+          this.userInRoom = true;
+          return;
+        }
+        this.userInRoom = false;
+        this.users.push(this.userToAddId);
+			},
+			error: (error : HttpErrorResponse) => (
+				console.log("Error message: ", error.message)
+			)
 		})
-  	}
+
+  }
 
 	private getSelectedUserId(): Observable<boolean> {
 		return this.userService.getUserIdByName(this.userToAddName).pipe(
@@ -86,7 +93,7 @@ export class createChatRoom {
 				return true;
 			}),
 			catchError((error) => {
-				console.error('Error fetching user ID:', error);
+				// console.error('Error fetching user ID:', error);
 				return of(false);
 			})
 		);

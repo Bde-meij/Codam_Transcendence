@@ -20,10 +20,12 @@ export class UserController {
 	@UseGuards(JwtGuard)
 	async getUser(@Req() req, @Res() res) {
 		const user : User = await this.userService.findUserById(req.user.id);
-		if (!user)
+		if (!user) {
+			res.clearCookie('access_token');
+			res.clearCookie('refresh_token');
 			return res.status(HttpStatus.NOT_FOUND).json({message: 'Current user not found'});
+		}
 		return res.status(HttpStatus.OK).json(user);
-		// return user;
 	}
 	
 	// check if this nickname is taken

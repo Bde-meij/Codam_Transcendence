@@ -1,5 +1,5 @@
 import { Injectable, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { UserService } from '../../user/user.service';
@@ -24,10 +24,16 @@ export class ChatService{
 	selectedRoom?: Rooms;
 	constructor() {
 		this.chatSocket = io("/chat");
-		this.get_users_names().subscribe((usernames_list: any) => {
-			this.usernames = usernames_list;
-			console.log(this.usernames);
-		})
+
+		this.get_users_names().subscribe({
+			next: (usernames_list: any) => (
+				this.usernames = usernames_list,
+				console.log(this.usernames)
+			),
+			error: (error : HttpErrorResponse) => (
+				console.log("Error message: ", error.message)
+			)
+		});
 	}
 
 	sendMessage(user: User, message: string, room: string, avatar: string): void {
