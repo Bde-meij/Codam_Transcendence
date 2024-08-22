@@ -22,11 +22,7 @@ export class ChatService{
 	rooms: Rooms[] = []; 
 	roomss: Rooms[] = []; 
 	selectedRoom?: Rooms;
-	constructor(
-				private http: HttpClient,
-				private userService: UserService,
-				private blockService: BlockService) 
-	{
+	constructor() {
 		this.chatSocket = io("/chat");
 		this.get_users_names().subscribe((usernames_list: any) => {
 			this.usernames = usernames_list;
@@ -487,7 +483,6 @@ export class ChatService{
 			user_id : user.id,
 			user_name : user.nickname,
 		}
-		// console.log(`updateRoom`);
 		this.chatSocket.emit('updateRoom', data, (err: any) => {
 			if (err) {
 				// console.log("updateRoom chat-sock error: ");

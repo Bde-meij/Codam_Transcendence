@@ -46,6 +46,7 @@ export class GameComponent implements OnInit, OnDestroy
 	});
 
 	gameSrv: any
+	
 	ngOnInit()
 	{
 		this.screenResize();

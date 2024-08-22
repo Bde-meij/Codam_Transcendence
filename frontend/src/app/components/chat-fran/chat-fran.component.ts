@@ -312,7 +312,6 @@ export class FranChatUiComponent implements AfterViewInit{
 			//console.log("avatar: ", this.user.avatar)
 			this.selecting_room(this.selectedRoom!.name);
 			this.chatService.sendMessage(this.user, event.message, this.selectedRoom!.name, this.user!.avatar);
-
 		}
 		this.message = '';
 	}
