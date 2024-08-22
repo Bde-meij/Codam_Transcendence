@@ -6,7 +6,7 @@ import { UniqueNameValidator, forbiddenNameValidator } from '../../services/vali
 import { UserService } from '../../services/user/user.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { UserDetailComponent } from '../user-detail/user-detail.component';
-import { Blocks } from '../../models/rooms.class';
+import { Blocks } from '../../models/blocks.class';
 import { BlockService } from '../../services/block/block.service';
 
 @Component({
@@ -122,17 +122,11 @@ export class SettingsComponent implements OnInit {
 				},
 				error: (e: HttpErrorResponse) => {
 					this.errorMessage = e.message;
-					// this.succesMessage = '';
 					console.log("changename data error :", e.message);
 				}
 			});
 			this.profileForm.value.nickname = undefined;
 		};
-		// window.location.reload();
-		
-		// this.router.navigate([this.router.url]);
-		// this.router.navigate(['/dashboard/settings/'], {});
-		// console.log("NAVIGATE")
 	}
 
 	preview: string | undefined;
@@ -147,7 +141,6 @@ export class SettingsComponent implements OnInit {
 
 				const reader = new FileReader();
 				reader.onload = (e: any) => {
-					// console.log("e.target.result: ", e.target.result);
 					this.preview = e.target.result;
 				};
 				reader.readAsDataURL(this.current_file);
