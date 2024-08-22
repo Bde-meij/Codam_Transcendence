@@ -70,7 +70,7 @@ export class FranChatUiComponent implements AfterViewInit{
 		//   } else {
 		// 	this.selectedRoom = room;
 		// }
-		console.log(room);
+		//console.log(room);
 		this.selectedRoom = room;
 		this.chatService.room = this.selectedRoom!
 		this.last_open_room();
@@ -99,7 +99,7 @@ export class FranChatUiComponent implements AfterViewInit{
 			this.selectedRoom = undefined;
 		}
 		joined = 0;
-		console.log("selected:", this.selectedRoom?.name);
+		//console.log("selected:", this.selectedRoom?.name);
 
 	};
 
@@ -136,20 +136,20 @@ export class FranChatUiComponent implements AfterViewInit{
 		
 		if (!subbed) {
 			this.chatService.getMessages().subscribe((newmessage: any ) => {
-				console.log("getmessage: roomlist:", this.roomsList);
+				//console.log("getmessage: roomlist:", this.roomsList);
 				if (this.roomsList[newmessage.room_name]?.messages) {
-					console.log(this.selectedRoom?.name);
+					//console.log(this.selectedRoom?.name);
 					this.getLists();
 					if (this.selectedRoom){
 						if (this.selectedRoom!.name == newmessage.room_name){
 							this.selecting_room(newmessage.room_name);
 						}
 					}
-					console.log("blocked lists:");
-					console.log(this.blockedList);
+					//console.log("blocked lists:");
+					//console.log(this.blockedList);
 					this.blockedList?.forEach(block => {
 						if (block.target.id == newmessage.senderId){
-							console.log("already blocked:",newmessage.senderId);
+							//console.log("already blocked:",newmessage.senderId);
 							this.blockbool = true;
 							return;	
 						}
@@ -174,12 +174,12 @@ export class FranChatUiComponent implements AfterViewInit{
 			});
 
 			this.chatService.update_client_room().subscribe((update_room: Rooms) => {
-				console.log(`update_client_room: ${update_room.name}`);
-				console.log(update_room);
+				//console.log(`update_client_room: ${update_room.name}`);
+				//console.log(update_room);
 				this.roomsList[update_room.name] = update_room;
 				if (this.selectedRoom){
 					if (this.selectedRoom.name == update_room.name){
-						console.log("updated selected room");
+						//console.log("updated selected room");
 						this.change_sender_avatar(this.selectedRoom.name);
 						// this.selecting_room(this.selectedRoom.name);
 					}
@@ -211,20 +211,20 @@ export class FranChatUiComponent implements AfterViewInit{
 					type: 'text',
 					created: new Date(),
 				}
-				console.log(`error_message received ${message.message} - to ${message.room_name} - ${this.selectedRoom?.name}`);
+				//console.log(`error_message received ${message.message} - to ${message.room_name} - ${this.selectedRoom?.name}`);
 				if (!this.roomsList[message.room_name])
 					this.roomsList[message.room_name];
 				this.roomsList[message.room_name].messages?.push(message);
 			})
 
 			this.blockService.getBlocked().subscribe((blocked: any) => {
-				console.log("blockedlist:", blocked);
+				//console.log("blockedlist:", blocked);
 				this.blockedList = blocked
 			})
 		 
 			this.chatService.update_all_users().subscribe((users: any) => {
-				console.log("update all user");
-				console.log(users);
+				//console.log("update all user");
+				//console.log(users);
 			})
 
 			this.chatService.selectRoom().subscribe((room: string) => {
@@ -240,25 +240,25 @@ export class FranChatUiComponent implements AfterViewInit{
 			})
 
 			this.chatService.update_single_user().subscribe((users: any) => {
-				console.log("update single user");
-				console.log(users);
+				//console.log("update single user");
+				//console.log(users);
 			})
 			subbed = true;
 		}
 		
 
 		this.chatService.getRoomsss().subscribe((chatRoomList: Record<string, Rooms>) => {
-			console.log("gettrooms: ", chatRoomList)
+			//console.log("gettrooms: ", chatRoomList)
 			this.roomsList = chatRoomList;
 		});
 
 		this.chatService.getConnectedUsers().subscribe((userList: any) => {
-			console.log("getConnectedUsers: ", userList)
+			//console.log("getConnectedUsers: ", userList)
 			this.userss = userList;
 		})
 
 		this.chatService.update_public().subscribe((update_room: Rooms) => {
-			console.log(`update_public: ${update_room.name}`);
+			//console.log(`update_public: ${update_room.name}`);
 			// console.log(update_room);
 			if (update_room.messages){
 				for (let i = update_room.messages.length - 1; i >= 0; i--) {
@@ -279,16 +279,16 @@ export class FranChatUiComponent implements AfterViewInit{
 		})
 
 		this.chatService.delete_room().subscribe((room: string) => {
-			console.log(`delete_room: ${room}`);
+			//console.log(`delete_room: ${room}`);
 			delete this.roomsList[room];
 		})
 	};
 
 	ngAfterViewInit() {
-		console.log("afterviewcheckedINIT");
+		//console.log("afterviewcheckedINIT");
 		
 		if (!this.selectedRoom){
-			console.log("updating page");
+			//console.log("updating page");
 			setTimeout(() => {
 				this.chatService.updatePage();
 			}, 200);
@@ -300,7 +300,7 @@ export class FranChatUiComponent implements AfterViewInit{
 	}
 
 	selecting_room(room: string){
-		console.log("selecting_room:", room);
+		//console.log("selecting_room:", room);
 		setTimeout(() => {
 			this.onSelect(this.roomsList[room]);
 		}, 100);
@@ -308,7 +308,7 @@ export class FranChatUiComponent implements AfterViewInit{
 
 	sendMessage(event: any) {
 		if (event.message) {
-			console.log("avatar: ", this.user.avatar)
+			//console.log("avatar: ", this.user.avatar)
 			this.selecting_room(this.selectedRoom!.name);
 			this.chatService.sendMessage(event.message, this.selectedRoom!.name, this.user!.avatar);
 		}
@@ -331,7 +331,7 @@ export class FranChatUiComponent implements AfterViewInit{
 			context: {}
 		  }).onClose.subscribe((input: any) => {
 			if (input) {
-				console.log(input);
+				//console.log(input);
 
 				this.chatService.createRoom(input.roomName, input.roomType, input.password, +this.user.id);
 				setTimeout(() => {
@@ -348,8 +348,8 @@ export class FranChatUiComponent implements AfterViewInit{
 			this.dialogService.open(settingsChat, {context:{selectedRoom: this.selectedRoom, users: this.chatService.usernames}
 			}).onClose.subscribe((input: any) => {
 				if (input) {
-					console.log(input);
-					console.log(input.roomName);
+					//console.log(input);
+					//console.log(input.roomName);
 					this.chatService.settingsChat(input);
 					setTimeout(() => {
 						this.onSelect(this.roomsList[input.roomName])
@@ -439,9 +439,9 @@ export class FranChatUiComponent implements AfterViewInit{
 	// 	this.router.navigate(['/dashboard', 'game']);
 	// }	
 	joinBattle(msg: any) {
-		console.log("IT HEREE1---------------------------", msg);
-		console.log("IT HEREE2---------------------------", msg.customMessageData);
-		console.log("IT HEREE3---------------------------", msg.customMessageData.roomkey);
+		//console.log("IT HEREE1---------------------------", msg);
+		//console.log("IT HEREE2---------------------------", msg.customMessageData);
+		//console.log("IT HEREE3---------------------------", msg.customMessageData.roomkey);
 		this.chatService.joinBattle(msg.customMessageData.roomkey, this.selectedRoom!.name, this.user.avatar);
 		this.router.navigate(['/dashboard', 'game']);
 	}
@@ -519,9 +519,9 @@ export class FranChatUiComponent implements AfterViewInit{
 	setAdmin() {
 		this.userInRoom(this.userNameForm.value.userName).subscribe((userIsInRoom) => {
 			if (userIsInRoom) {
-				////console.log("chat-message component leaveRoom: " + room + ", id: " + userid);
+				//console.log("chat-message component leaveRoom: " + room + ", id: " + userid);
 				this.chatService.setAdmin(this.selectedRoom!.id, this.userNameForm.value.userName);
-				// ////console.log("chat-message sendmessage: " + this.room.name);
+				//console.log("chat-message sendmessage: " + this.room.name);
 			}
 		});
 	}
@@ -536,7 +536,7 @@ export class FranChatUiComponent implements AfterViewInit{
 	}
 
 	storeUser(userid: number): Observable<void> {
-		console.log("storeUser");
+		//console.log("storeUser");
 		return this.userService.getAvatar(userid.toString()).pipe(
 		  map((data) => {
 			this.userMap.set(userid, URL.createObjectURL(data));
@@ -582,8 +582,7 @@ export class FranChatUiComponent implements AfterViewInit{
 	getLists(){
 		this.blockService.getBlocked().subscribe({
 			next: (data) => (
-				this.blockedList = data,
-				console.log("all blocked ", data)
+				this.blockedList = data
 			),
 			error: (e) => (
 				console.error("all blocked error: " + e))

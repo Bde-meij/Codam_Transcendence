@@ -20,7 +20,7 @@ import { DeleteBlockDto } from 'src/block/dto/delete-block.dto';
 import { ChatRoomService } from './chatRoom.service';
 import { WsExceptionFilter } from './exception';
 
-var logger = 1;
+var logger = 0;
 
 @Injectable()
 @WebSocketGateway({
@@ -181,6 +181,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@MessageBody() data: messageDto,
 	@ConnectedSocket() socket: Socket,
 	) {
+		console.log(this.connectedUsers);
 		this.logger(this.chatRoomList[data.room]);
 		if (socket.data.nickname != data.sender_name){
 			// this.logger("change msg name ", socket.data.userid, data.sender_name)
@@ -1153,7 +1154,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		// this.logger(`findSocketUser ${userid}`);
 		const sockets = await this.io.fetchSockets();
 		for (const socketId of sockets) {
-			console.log("findsocketuser:", socketId.data.userid);
+			this.logger("findsocketuser:", socketId.data.userid);
 			if (socketId.data.userid == userid){
 				this.logger(`socket ${userid} found ${socketId.data.nickname}`);
 				return socketId;
@@ -1507,7 +1508,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		const temp: number[] = [];
 		const sockets = await this.io.fetchSockets();
 		for (const socketId of sockets) {
-			if (!this.connectedUsers.includes(socketId.data.userid)){
+			if (!this.connectedUsers.includes(socketId.data.userid) && socketId.data.userid){
 				this.connectedUsers.push(socketId.data.userid);
 			}
 			temp.push(socketId.data.userid);
