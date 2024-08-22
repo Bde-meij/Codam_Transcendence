@@ -83,7 +83,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				this.connectedUsers.push(client.data.userid);
 			}
 			else{
-				console.log("else disconnecting?");
 				var p = this.findSocketUser(client.data.userid);
 				(await p).emit('reload', true);
 				client.disconnect();
