@@ -20,7 +20,7 @@ import { DeleteBlockDto } from 'src/block/dto/delete-block.dto';
 import { ChatRoomService } from './chatRoom.service';
 import { WsExceptionFilter } from './exception';
 
-var logger = 0;
+var logger = 1;
 
 @Injectable()
 @WebSocketGateway({
@@ -937,13 +937,17 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		}
 		if (data.newPassword != ''){
 			this.chatRoomList[data.roomName].password = true;
-			if (!this.chatService.updatePassword(updatePW)){
+			if (!await this.chatService.updatePassword(updatePW)){
 				this.logger("updatepw error pw true");
+				this.emit_error_message(client, `wrong password for ${data.roomName}, settings not changed`, 1, data.roomName);
+				return;
 			}
 		} else{
-			if (!this.chatService.updatePassword(updatePW)){
+			if (!await this.chatService.updatePassword(updatePW)){
 				this.logger("updatepw error pw false");
 				this.chatRoomList[data.roomName].password = false;
+				this.emit_error_message(client, `wrong password for ${data.roomName}, settings not changed`, 1, data.roomName);
+				return;
 			}
 		}
 		if (data.roomType == "public"){
