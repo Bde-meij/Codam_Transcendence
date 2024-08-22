@@ -181,7 +181,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@MessageBody() data: messageDto,
 	@ConnectedSocket() socket: Socket,
 	) {
-		console.log(this.connectedUsers);
 		this.logger(this.chatRoomList[data.room]);
 		if (socket.data.nickname != data.sender_name){
 			// this.logger("change msg name ", socket.data.userid, data.sender_name)

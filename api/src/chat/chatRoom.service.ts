@@ -132,7 +132,7 @@ export class ChatRoomService {
 	// Adds user the the userchatroom table
 	// Returns null if the user or the chatroom isn't found
 	async addUserToChatRoom(userId: number, roomId: number, role: string): Promise<UserChatroom | null> {
-		console.log("adding user:", userId, roomId, role);
+		// console.log("adding user:", userId, roomId, role);
 		const exists: UserChatroom = await this.findUserInChatRoom(userId, roomId);
 		if (exists) {
 			return (null);
@@ -150,7 +150,7 @@ export class ChatRoomService {
 			chatroom: room,
 			role: role,
 		});
-		console.log("User", user.nickname, "added to room", room.name);
+		// console.log("User", user.nickname, "added to room", room.name);
 		return await this.userChatroomRepo.save(userChatRoom);
 	}
 	
@@ -331,7 +331,7 @@ export class ChatRoomService {
 				status: 'protected',
 			},
 		});
-		console.log(protectedRooms);
+		//console.log(protectedRooms);
 		var ret = [];
 		for (var room of protectedRooms) {
 			const userChatroom = await this.findUserInChatRoom(userId, room.id);
@@ -339,7 +339,7 @@ export class ChatRoomService {
 				ret.push(room);
 			}
 		}
-		console.log(ret);
+		//console.log(ret);
 		return (ret);
 	}
 
@@ -434,9 +434,8 @@ export class ChatRoomService {
 				chatroom: {id: roomId},
 			}
 		});
-		console.log(userChatRoom);
+		//console.log(userChatRoom);
 		if (!userChatRoom) {
-			console.log("1");
 			return null;
 		}
 		// the owner or admins can not be banned?
@@ -445,11 +444,11 @@ export class ChatRoomService {
 		}
 		if (userChatRoom.banned == true) {
 			userChatRoom.banned = false;
-			console.log("toggleBanned( false");
+			//console.log("toggleBanned( false");
 
 		} else {
 			userChatRoom.banned = true;
-			console.log("toggleBanned( true");
+			//console.log("toggleBanned( true");
 
 		}
 		return await this.userChatroomRepo.save(userChatRoom);

@@ -93,7 +93,6 @@ export class FranChatUiComponent implements AfterViewInit{
 				this.joinRoom(room.name, pw);
 			}, 150);
 		}
-		this.selectedRoom
 		this.selectedRoom = room;
 		if (joined === 0){
 			this.selectedRoom = undefined;
@@ -215,6 +214,7 @@ export class FranChatUiComponent implements AfterViewInit{
 				if (!this.roomsList[message.room_name])
 					this.roomsList[message.room_name];
 				this.roomsList[message.room_name].messages?.push(message);
+				this.selecting_room(message.room_name);
 			})
 
 			this.blockService.getBlocked().subscribe((blocked: any) => {
