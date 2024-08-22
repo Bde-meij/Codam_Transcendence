@@ -86,10 +86,15 @@ export class SettingsComponent implements OnInit {
 	onChange() {
 		if (this.is2faEnabled) {
 			this.isChecked = true;
-			this.authService.setUp2FA().subscribe( data => {
-				this.qrCode = data.qrCode;
-				this.secret = data.secret;
-			});
+			this.authService.setUp2FA().subscribe({
+				next: (data: any) => {
+					this.qrCode = data.qrCode;
+					this.secret = data.secret;
+				},
+				error: (e: any) => (
+					console.log("2FA setup error: ", e)
+				)
+			})
 		}
 		else {
 			this.isChecked = false;

@@ -6,6 +6,7 @@ import { Observable, catchError, map, of } from 'rxjs';
 import { UserService } from '../../../services/user/user.service';
 import { ChatService } from '../../../services/sock/chat/chat.service';
 import { Rooms } from '../../../models/rooms.class';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-createChatRoom',
@@ -32,13 +33,23 @@ export class createChatRoom {
   roomsList: Record<string, Rooms> = {};
 
   constructor(protected dialogRef: NbDialogRef<createChatRoom>, private userService: UserService, private chatService: ChatService) {
-    this.userService.getUser('current').subscribe((userData) => (
-			this.currentUsername = userData.nickname,
-      this.usersByName.push(this.currentUsername)
-		));
-    this.chatService.getRoomsss().subscribe((chatRoomList: Record<string, Rooms>) => {
-			this.roomsList = chatRoomList;
-		});
+    this.userService.getUser('current').subscribe({
+			next: (userData: any) => {
+				this.currentUsername = userData.nickname,
+        this.usersByName.push(this.currentUsername)
+			},
+			error: (error : HttpErrorResponse) => (
+				console.log("Error message: ", error.message)
+			)
+		})
+    this.chatService.getRoomsss().subscribe({
+			next: (chatRoomList: Record<string, Rooms>) => {
+				this.roomsList = chatRoomList;
+			},
+			error: (error : HttpErrorResponse) => (
+				console.log("Error message: ", error.message)
+			)
+		})
   }
 
   submitForm() {
@@ -67,20 +78,26 @@ export class createChatRoom {
       this.userNotFound = false;
       return;
     }
-    this.getSelectedUserId().subscribe((userExists) => {
-      if (!userExists) {
-        this.userNotFound = true;
+    this.getSelectedUserId().subscribe({
+			next: (userExists) => {
+				if (!userExists) {
+          this.userNotFound = true;
+          this.userInRoom = false;
+          return;
+        }
+        this.userNotFound = false;
+        if (this.users.includes(this.userToAddId)) {
+          this.userInRoom = true;
+          return;
+        }
         this.userInRoom = false;
-        return;
-      }
-      this.userNotFound = false;
-      if (this.users.includes(this.userToAddId)) {
-        this.userInRoom = true;
-        return;
-      }
-      this.userInRoom = false;
-      this.users.push(this.userToAddId);
-    })
+        this.users.push(this.userToAddId);
+			},
+			error: (error : HttpErrorResponse) => (
+				console.log("Error message: ", error.message)
+			)
+		})
+
   }
 
   private getSelectedUserId(): Observable<boolean> {

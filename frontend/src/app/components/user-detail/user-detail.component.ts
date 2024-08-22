@@ -50,8 +50,14 @@ export class UserDetailComponent implements OnChanges {
 		private blockService: BlockService,
 		private router: Router)
 	{
-		this.userService.getUser('current').subscribe((userData) => {
-			this.client_user = userData;
+		this.userService.getUser('current').subscribe({
+			next: (userData) => (
+				this.client_user = userData
+			),
+			error: (error : HttpErrorResponse) => (
+				console.log("user error message: ", error.message),
+				this.userErrorMessage = error.message
+			)
 		});
 	}
 
@@ -67,17 +73,28 @@ export class UserDetailComponent implements OnChanges {
 				console.log("user error message: ", error.message),
 				this.userErrorMessage = error.message
 			)
-		})
+		});
 
-		this.userService.getAvatar(this.id).subscribe((data) => (
-			this.tempUser.avatar = URL.createObjectURL(data)
-		))
+		this.userService.getAvatar(this.id).subscribe({
+			next: (data) => (
+				this.tempUser.avatar = URL.createObjectURL(data)
+			),
+			error: (error : HttpErrorResponse) => (
+				console.log("getAvatar error message: ", error.message),
+				this.userErrorMessage = error.message
+			)
+		});
+		
 		this.friendsService.isFriend(this.id).subscribe({
-			next: (data) => {
-				console.log("isFriend: ", data)
+			next: (data: any) => (
+				console.log("isFriend: ", data),
 				this.isself = data.self,
 				this.isfriend = data.friend
-			}
+			),
+			error: (error : HttpErrorResponse) => (
+				console.log("getAvatar error message: ", error.message),
+				this.userErrorMessage = error.message
+			)
 		});
 		this.my_user = this.tempUser;
 		this.matches = undefined;
