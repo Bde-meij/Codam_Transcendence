@@ -97,7 +97,7 @@ export class customMessageDto {
 
 export class messageDto{
 	@IsString()
-	@Matches(/^[a-zA-Z0-9\s.,!?@#$%^&*()_+=-]*$/, {
+	@Matches(/^[a-zA-Z0-9\s.,!?@#$%^&:*()_+=-]*$/, {
         message: 'Invalid input: Only alphanumeric characters, spaces, and limited punctuation are allowed.',
     })
 	message: string;
