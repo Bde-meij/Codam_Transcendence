@@ -937,13 +937,17 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		}
 		if (data.newPassword != ''){
 			this.chatRoomList[data.roomName].password = true;
-			if (!this.chatService.updatePassword(updatePW)){
+			if (!await this.chatService.updatePassword(updatePW)){
 				this.logger("updatepw error pw true");
+				this.emit_error_message(client, `wrong password for ${data.roomName}, settings not changed`, 1, data.roomName);
+				return;
 			}
 		} else{
-			if (!this.chatService.updatePassword(updatePW)){
+			if (!await this.chatService.updatePassword(updatePW)){
 				this.logger("updatepw error pw false");
 				this.chatRoomList[data.roomName].password = false;
+				this.emit_error_message(client, `wrong password for ${data.roomName}, settings not changed`, 1, data.roomName);
+				return;
 			}
 		}
 		if (data.roomType == "public"){
@@ -960,10 +964,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			});
 			await Promise.all(userPromises);
 		}
-		this.emit_error_message(client, `Settings changed for ${data.roomName}`, 1, data.roomName);
 		this.logger("settings changed for:", this.chatRoomList[data.roomName].id, data.roomName);
 		this.logger(this.chatRoomList[data.roomName]);
 		this.update_client_rooms(this.chatRoomList[data.roomName].id, data.roomName);
+		this.emit_error_message(client, `Settings changed for ${data.roomName}`, 1, data.roomName);
+
 
 	}
 
