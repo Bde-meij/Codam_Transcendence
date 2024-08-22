@@ -26,7 +26,7 @@
 		<div *ngIf="!selectedRoom">Select or create a room</div>
 		<div class="chat-column" *ngIf="selectedRoom"> 
 
-		<div *ngIf="selectedRoom!.owner === this.user.id">
+		<div *ngIf="selectedRoom?.owner === this.user?.id">
 			<button (click)="settingsChat(selectedRoom)">Settings of {{selectedRoom.name}}</button>
 		</div>
 		  <nb-chat size="large" scrollbottom="true" [title]="selectedRoom.name">
@@ -36,7 +36,7 @@
 				[avatar]="msg.sender_avatar!"
 				[sender]="msg.sender_name"
 				[date]="msg.created"
-				[reply]="this.user.nickname === msg.sender_name"
+				[reply]="this.user?.nickname === msg.sender_name"
 				[customMessageData]="msg.customMessageData">
 				<button *nbCustomMessage="'custom'" (click)="joinBattle(msg)">Join battle!</button>
 				<ng-template nbChatMessageAvatar>

@@ -86,14 +86,14 @@ export class UserDetailComponent implements OnChanges {
 		});
 		
 		this.friendsService.isFriend(this.id).subscribe({
-			next: (data: any) => (
+			next: (data) => (
 				console.log("isFriend: ", data),
 				this.isself = data.self,
 				this.isfriend = data.friend
 			),
-			error: (error : HttpErrorResponse) => (
-				console.log("getAvatar error message: ", error.message),
-				this.userErrorMessage = error.message
+			error: (error: HttpErrorResponse) => (
+				console.log("friendService error message: ", error.message ),
+				this.errorMessage = error.message
 			)
 		});
 		this.my_user = this.tempUser;
