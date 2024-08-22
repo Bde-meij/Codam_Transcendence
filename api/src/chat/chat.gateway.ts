@@ -86,7 +86,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				this.connectedUsers.push(client.data.userid);
 			this.io.emit('getConnectedUsers', this.connectedUsers);
 			this.getConnectedUsers();
-			this.updateStatusFriends(client.data.userid);
+			// this.updateStatusFriends(client.data.userid);
 			this.get_all_blocked(client.data.userid, client);
 			this.updateRefresh(client, client.data.userid);
 
@@ -617,7 +617,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 					var invitesocket = await this.findSocketUser(Number(data.user))
 					invitesocket.join(room.id.toString());
 					socket.join(room.id.toString());
-					socket.emit("select", room.name);
+					if (socket.data.room == room.name)
+						socket.emit("select", room.name);
+					this.update_client_rooms(data.user, roomName);
 					//emit room
 					return;
 				}
@@ -630,8 +632,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		);
 		if (Room) {
 			this.emit_error_message(socket, `Room '${nameroom}' already exists, please pick another name`, 1, socket.data.room)
-			// this.logger("roomexists");
-			// socket.emit('Room already exists, please pick another name',);
 			return;
 		}
 		//this.logger("createRoom called: " + nameroom);
@@ -650,14 +650,15 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			messages: [],
 		};
 		//unique room id from database.
-		// const CreateRoomDB: any =  await this.chatService.createChatRoom({name :  nameroom, password: "" })
-		// if (!CreateRoomDB){
-		// 	this.emit_error_message(socket, `Room '${nameroom}' already exists in the database, please pick another name`, 1, socket.data.room)
-		// 	this.logger("already exist5,7 s");
-		// 	return;
-		// }
-		// this.chatRoomList[nameroom].id = CreateRoomDB.id;
-		// socket.data.id = CreateRoomDB.id;
+		const roomdto: RoomDto = {name: nameroom, password: "", ownerId: socket.data.userid, status: "private"}
+		const CreateRoomDB: any =  await this.chatService.createChatRoom(roomdto)
+		if (!CreateRoomDB){
+			this.emit_error_message(socket, `Room '${nameroom}' already exists in the database, please pick another name`, 1, socket.data.room)
+			this.logger("already exist5,7 s");
+			return;
+		}
+		this.chatRoomList[nameroom].id = CreateRoomDB.id;
+		socket.data.id = CreateRoomDB.id;
 		this.logger(`joining ${socket.data.id}`);
 		this.logger(`joining ${this.chatRoomList[nameroom].id}`);
 	
@@ -669,8 +670,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		this.update_client_rooms(this.chatRoomList[nameroom].id, nameroom);
 		// socket.emit('getRoomss', this.chatRoomList);
 		this.channelUserList(nameroom);	
-		socket.emit("select", nameroom);
-
+		if (socket.data.room == nameroom)
+			socket.emit("select", nameroom);
 	}
 
 	@UseFilters(WsExceptionFilter)

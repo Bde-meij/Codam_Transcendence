@@ -141,7 +141,7 @@ export class FranChatUiComponent implements AfterViewInit{
 					console.log(this.selectedRoom?.name);
 					this.getLists();
 					if (this.selectedRoom){
-						if (this.selectedRoom?.name == newmessage.room_name){
+						if (this.selectedRoom!.name == newmessage.room_name){
 							this.selecting_room(newmessage.room_name);
 						}
 					}
