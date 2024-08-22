@@ -26,11 +26,10 @@ export class protectedChat {
 		this.roomName = this.selectedRoom!.name;
 	}
 	
-
 	submitForm() {
 	if (this.roomName){
 		this.dialogRef.close({roomid: this.selectedRoom!.id, password: this.Password, roomName: this.selectedRoom!.name});
-	} else
+	}else
 		this.submitWithoutName = true;
 	}
 }

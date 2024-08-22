@@ -65,11 +65,6 @@ export class FranChatUiComponent implements AfterViewInit{
 		if (room == undefined){
 			return;
 		}
-		// if (this.selectedRoom === room) {
-		// 	this.selectedRoom = undefined;  // Deselect if the same room is selected again
-		//   } else {
-		// 	this.selectedRoom = room;
-		// }
 		//console.log(room);
 		this.selectedRoom = room;
 		this.chatService.room = this.selectedRoom!
@@ -98,8 +93,6 @@ export class FranChatUiComponent implements AfterViewInit{
 			this.selectedRoom = undefined;
 		}
 		joined = 0;
-		//console.log("selected:", this.selectedRoom?.name);
-
 	};
 
 	constructor(
@@ -125,13 +118,13 @@ export class FranChatUiComponent implements AfterViewInit{
 				updateOn: 'change',
 			}),
 		});
+
 		this.userService.getUser('current').subscribe((userData: User) => {
 			this.user = userData;
 			if (this.user){
 				this.updateName();
-			}else{
-				window.location.reload();
-			}
+			}else
+				console.log("no user");
 		});
 		
 		if (!subbed) {
@@ -140,11 +133,6 @@ export class FranChatUiComponent implements AfterViewInit{
 				if (this.roomsList[newmessage.room_name]?.messages) {
 					//console.log(this.selectedRoom?.name);
 					this.getLists();
-					// if (this.selectedRoom){
-					// 	if (this.selectedRoom!.name == newmessage.room_name){
-					// 		this.selecting_room(newmessage.room_name);
-					// 	}
-					// }
 					//console.log("blocked lists:");
 					//console.log(this.blockedList);
 					this.blockedList?.forEach(block => {
@@ -160,7 +148,6 @@ export class FranChatUiComponent implements AfterViewInit{
 						this.userService.getAvatar(newmessage.senderId).subscribe((data) => (
 							newmessage.sender_avatar = URL.createObjectURL(data)
 						))
-						// }
 					}
 					if (!this.blockbool){
 						// console.log("blockblool = faslse", this.blockbool);
@@ -168,7 +155,6 @@ export class FranChatUiComponent implements AfterViewInit{
 					}
 					else
 						this.blockbool = false;
-					
 				}
 				this.blockbool = false;
 			});
@@ -223,11 +209,6 @@ export class FranChatUiComponent implements AfterViewInit{
 				this.blockedList = blocked
 			})
 		 
-			this.chatService.update_all_users().subscribe((users: any) => {
-				//console.log("update all user");
-				//console.log(users);
-			})
-
 			this.chatService.selectRoom().subscribe((room: string) => {
 				// console.log("selectRoom:", room);
 				this.selecting_room(room);
@@ -240,13 +221,12 @@ export class FranChatUiComponent implements AfterViewInit{
 
 			})
 
-			this.chatService.update_single_user().subscribe((users: any) => {
+			this.chatService.reload().subscribe((users: any) => {
 				console.log("reload");
 				window.location.reload();
 			})
 			subbed = true;
 		}
-		
 
 		this.chatService.getRoomsss().subscribe((chatRoomList: Record<string, Rooms>) => {
 			//console.log("gettrooms: ", chatRoomList)
@@ -287,7 +267,6 @@ export class FranChatUiComponent implements AfterViewInit{
 
 	ngAfterViewInit() {
 		//console.log("afterviewcheckedINIT");
-		
 		if (!this.selectedRoom){
 			//console.log("updating page");
 			setTimeout(() => {
@@ -329,11 +308,10 @@ export class FranChatUiComponent implements AfterViewInit{
 
 	userCreatesRoom() {
 		this.dialogService.open(createChatRoom, {
-			context: {}
+			context: { currentUsername: this.user.nickname, roomslist: this.roomsList}
 		  }).onClose.subscribe((input: any) => {
 			if (input) {
 				//console.log(input);
-
 				this.chatService.createRoom(input.roomName, input.roomType, input.password, +this.user.id);
 				setTimeout(() => {
 					if (this.roomsList[input.roomName])
@@ -374,7 +352,6 @@ export class FranChatUiComponent implements AfterViewInit{
 					resolve();
 				});
 			}, 250);
-		
 		})
 	}
 
@@ -434,11 +411,6 @@ export class FranChatUiComponent implements AfterViewInit{
 		this.router.navigate(['/dashboard/game']);
 	}
 	
-	// joinBattle(roomkey: number) {
-	// 	console.log("IT HEREE---------------------------");
-	// 	this.chatService.joinBattle(roomkey, this.selectedRoom!.name, this.user.avatar);
-	// 	this.router.navigate(['/dashboard', 'game']);
-	// }	
 	joinBattle(msg: any) {
 		//console.log("IT HEREE1---------------------------", msg);
 		//console.log("IT HEREE2---------------------------", msg.customMessageData);
@@ -566,14 +538,14 @@ export class FranChatUiComponent implements AfterViewInit{
 	private userInRoom(userName: string): Observable<boolean> {
 		return this.userService.getUserIdByName(userName).pipe(
 			map((data: any) => {
-			  this.selectedUserID = data;
-			  return this.selectedRoom!.users.includes(this.selectedUserID!);
+				this.selectedUserID = data;
+				return this.selectedRoom!.users.includes(this.selectedUserID!);
 			}),
 			catchError((error) => {
-			  console.error('Error fetching user ID:', error);
-			  return of(false); // Return false or handle error as needed
+				console.error('Error fetching user ID:', error);
+				return of(false);
 			})
-		  );
+		);
 	}
 
 	get_all_rooms(){
