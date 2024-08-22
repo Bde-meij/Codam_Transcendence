@@ -1,6 +1,5 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { CreateMatchDto } from './dto/create-match.dto';
-import { UpdateMatchDto } from './dto/update-match.dto';
+import { SaveMatchDto } from './dto/create-match.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Match, MatchStatus } from './entities/match.entity';
 import { Repository } from 'typeorm';
@@ -11,83 +10,42 @@ import { MatchStats } from './entities/stats.entity';
 
 @Injectable()
 export class MatchService {
-	constructor(@InjectRepository(Match) private readonly matchRepo: Repository<Match>, private readonly userService: UserService, private readonly statsService: StatsService) {}
-	
-	async createMatch(createMatchDto: CreateMatchDto) {
-		// Games should only be create by the backend, these errors should never happen
-		// if (createMatchDto.leftPlayerId === createMatchDto.rightPlayerId) {
-		// 	throw new HttpException('Cannot create game with yourself', 400);
-		// }
-		const leftPlayer: User = await this.userService.findUserById(createMatchDto.leftPlayerId);
+	constructor(
+		@InjectRepository(Match) private readonly matchRepo: Repository<Match>,
+		private readonly userService: UserService,
+		private readonly statsService: StatsService
+	) {}
+
+	async saveMatch(saveMatchDto: SaveMatchDto) {
+		const leftPlayer: User = await this.userService.findUserById(saveMatchDto.leftPlayerId);
 		if (!leftPlayer) {
-			// console.log('Left player not found! User id:', createMatchDto.leftPlayerId);
-			throw new HttpException('Left player not found', 404);
+			console.log("left player", saveMatchDto.leftPlayerId, "not found!");
+			return ;
 		}
-		const rightPlayer: User = await this.userService.findUserById(createMatchDto.rightPlayerId);
+		const rightPlayer: User = await this.userService.findUserById(saveMatchDto.rightPlayerId);
 		if (!rightPlayer) {
-			// console.log('Right player not found! User id:', createMatchDto.rightPlayerId);
-			throw new HttpException('Right player not found', 404);
+			console.log("right player", saveMatchDto.rightPlayerId, "not found!");
+			return ;
+		}
+		let winner: User;
+		if (saveMatchDto.leftPlayerScore > saveMatchDto.rightPlayerScore) {
+			winner = leftPlayer;
+			this.statsService.updateWins(leftPlayer.id);
+			this.statsService.updateLosses(rightPlayer.id);
+		} else {
+			winner = rightPlayer;
+			this.statsService.updateWins(rightPlayer.id);
+			this.statsService.updateLosses(leftPlayer.id);
 		}
 		const match: Match = await this.matchRepo.save({
 			leftPlayer: leftPlayer,
 			rightPlayer: rightPlayer,
-			type: createMatchDto.type
+			leftPlayerScore: saveMatchDto.leftPlayerScore,
+			rightPlayerScore: saveMatchDto.rightPlayerScore,
+			winningPlayer: winner,
+			status: MatchStatus.FINISHED,
+			type: saveMatchDto.type
 		});
-		// console.log('Match created:\n', match);
-		return {
-			id: match.id,
-			type: match.type,
-			status: match.status,
-			leftPlayer: {
-				id: match.leftPlayer.id,
-				nickname: match.leftPlayer.nickname
-			},
-			rightPlayer: {
-				id: match.rightPlayer.id,
-				nickname: match.rightPlayer.nickname
-			},
-			createdAt: match.createdAt,
-		};
-	}
-	
-	async updateMatch(updateMatchDto: UpdateMatchDto) {
-		if (updateMatchDto.leftPlayerScore == updateMatchDto.rightPlayerScore) {
-			// console.log('Match cannot end in a tie!');
-			throw new HttpException('Match cannot end in a tie', 400);
-		}
-		const match: Match = await this.matchRepo.findOne({
-			where: {
-				id: updateMatchDto.id,
-				status: MatchStatus.ONGOING,
-			},
-			relations: {
-				leftPlayer: true,
-				rightPlayer: true,
-			}
-		});
-		if (!match) {
-			// console.log('Valid match could not be found!');
-			throw new HttpException('Invalid match update', 400);
-		}
-		let winner: User;
-		if (updateMatchDto.leftPlayerScore > updateMatchDto.rightPlayerScore) {
-			winner = match.leftPlayer;
-			this.statsService.updateWins(match.leftPlayer.id);
-			this.statsService.updateLosses(match.rightPlayer.id);
-		} else {
-			winner = match.rightPlayer;
-			this.statsService.updateWins(match.rightPlayer.id);
-			this.statsService.updateLosses(match.leftPlayer.id);
-		}
-		await this.matchRepo.update(
-			{id: updateMatchDto.id},
-			{
-				leftPlayerScore: updateMatchDto.leftPlayerScore,
-				rightPlayerScore: updateMatchDto.rightPlayerScore,
-				winningPlayer: winner,
-				status: MatchStatus.FINISHED,
-			}
-		)
 	}
 
 	async getUserMatches(targetId: number): Promise<Match[]> {
@@ -150,13 +108,6 @@ export class MatchService {
 	}
 
 	async deleteMatch(matchId: number) {
-		// console.log("DELETING MATCH:", matchId);
-		const match: Match = await this.matchRepo.findOne({
-			where: {id: matchId}
-		});
-		if (!match) {
-			throw new HttpException('Match not found', 404);
-		}
 		this.matchRepo.delete({id: matchId});
 	}
 
