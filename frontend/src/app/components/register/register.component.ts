@@ -3,7 +3,6 @@ import { ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angula
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { NgIf, NgOptimizedImage } from '@angular/common';
-import { AuthService } from '../../services/auth/auth.service';
 import { UniqueNameValidator, forbiddenNameValidator } from '../../services/validator/name-validator.service';
 import { UserService } from '../../services/user/user.service';
 
@@ -31,7 +30,6 @@ export class RegisterComponent {
 		}),
 	});
 
-	// newName : string = '';
 	errorMessage = "";
 
 	register() {

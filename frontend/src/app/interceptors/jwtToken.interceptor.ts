@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest, HttpErrorResponse, HttpClient, HttpHandlerFn, HttpEventType } from "@angular/common/http";
 import { Observable, throwError, BehaviorSubject } from "rxjs";
 import { catchError, switchMap, filter, take } from "rxjs/operators";
-// import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 
 @Injectable()
@@ -12,7 +12,7 @@ export class ErrorInterceptor implements HttpInterceptor {
   	private refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
 	constructor(
-		// private snackBar: MatSnackBar, 
+		private snackBar: MatSnackBar, 
 		private router: Router, private http: HttpClient) {}
 
 	intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<unknown>> {
@@ -45,13 +45,13 @@ export class ErrorInterceptor implements HttpInterceptor {
 				}),
 				catchError(error => {
 					this.isRefreshing = false;	
-					// this.snackBar.open('Session expired, please login again', 'Login', {
-					// 	duration: 5000,
-					// 	horizontalPosition: 'center',
-					// 	verticalPosition: 'top',
-					// }).onAction().subscribe(() => {
-					// 	this.router.navigate(['/welcome']);
-					// });
+					this.snackBar.open('Session expired, please login again', 'Login', {
+						duration: 5000,
+						horizontalPosition: 'center',
+						verticalPosition: 'top',
+					}).onAction().subscribe(() => {
+						this.router.navigate(['/welcome']);
+					});
 
 					return throwError(() => new Error('Session expired'));
 				})

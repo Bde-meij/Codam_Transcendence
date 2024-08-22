@@ -6,8 +6,6 @@ import { UserService } from '../../user/user.service';
 import { User } from '../../../models/user.class';
 import { skip } from 'rxjs/operators';
 import { ErrorMessage, getAllUsersInRoomDTO, MessageInterface, Rooms } from '../../../models/rooms.class';
-import { Blocks } from '../../../models/rooms.class';
-import { BlockService } from '../../block/block.service';
 
 @Injectable({
   providedIn: 'root'
@@ -24,11 +22,8 @@ export class ChatService{
 	rooms: Rooms[] = []; 
 	roomss: Rooms[] = []; 
 	selectedRoom?: Rooms;
-	constructor(
-				private http: HttpClient,
-				private userService: UserService,
-				private blockService: BlockService) 
-	{
+	constructor( private userService: UserService) {
+		// TO DO : handle when userservice returns an httperror 
 		this.userService.getUser('current').subscribe((userData) => {
 			this.user = userData;
 		});
@@ -37,16 +32,6 @@ export class ChatService{
 			this.usernames = usernames_list;
 			console.log(this.usernames);
 		})
-		// this.chatSocket.onAny((event, ...args) => {
-		// 	console.log("CHAT-SOCK EVENT: ");
-		// 	console.log(event, args);
-		// });
-	}
-
-	ngOnInit(): void {
-		// console.log("dfd?");
-		// this.user$ = this.userService.getUser(0);
-
 	}
 
 	sendMessage(message: string, room: string, avatar: string): void {

@@ -1,9 +1,6 @@
-import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-// import { UserInterface } from '../../models/user.class';
-import { Observable, catchError } from 'rxjs';
-import { Router } from '@angular/router';
-import { User } from '../../models/user.class';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +9,7 @@ export class UserService {
 	private userUrl = "/api/user";
 	private matchUrl = "/api/match";
 
-	constructor(private http: HttpClient, private router: Router) { };
+	constructor(private http: HttpClient) { };
 
 	register(nickname : string) {
 		return this.http.post(this.userUrl + '/register', { nickname });
@@ -53,7 +50,6 @@ export class UserService {
 	getAvatar(id: string) : Observable<Blob> {
 		if (id === 'current')
 			return this.http.get(this.userUrl + '/getAvatar/current', {responseType: 'blob'});
-		// console.log("getavatar called");
 		return this.http.get(this.userUrl + '/getAvatar/' + id, {responseType: 'blob'});
 	}
 

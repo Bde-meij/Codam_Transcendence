@@ -1,9 +1,6 @@
 @import '../../../styles/styles.scss';
 
 .welcome {
-	// z-index: 2;
-	// background-size: 100%;
-	// background-image: url("/assets/gifs/door.gif");
 	min-height: 600px; 
 	height: auto;
 }
@@ -25,10 +22,3 @@
 	font-size: larger;
 	font-weight: bolder;
 }
-
-// .welcome_button:hover::after {
-// 	background: url("/assets/gifs/door2.gif");
-// }
-
-
-
