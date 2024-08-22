@@ -108,7 +108,6 @@ export class FranChatUiComponent implements AfterViewInit{
 		private blockService: BlockService,
 		private dialogService: NbDialogService,
 		private router: Router,
-		// private errorService: ErrorService,
 	) 
 	{
 		this.userMap = new Map<number, string>();
@@ -130,6 +129,8 @@ export class FranChatUiComponent implements AfterViewInit{
 			this.user = userData;
 			if (this.user){
 				this.updateName();
+			}else{
+				window.location.reload();
 			}
 		});
 		
@@ -139,11 +140,11 @@ export class FranChatUiComponent implements AfterViewInit{
 				if (this.roomsList[newmessage.room_name]?.messages) {
 					//console.log(this.selectedRoom?.name);
 					this.getLists();
-					if (this.selectedRoom){
-						if (this.selectedRoom!.name == newmessage.room_name){
-							this.selecting_room(newmessage.room_name);
-						}
-					}
+					// if (this.selectedRoom){
+					// 	if (this.selectedRoom!.name == newmessage.room_name){
+					// 		this.selecting_room(newmessage.room_name);
+					// 	}
+					// }
 					//console.log("blocked lists:");
 					//console.log(this.blockedList);
 					this.blockedList?.forEach(block => {
@@ -180,7 +181,7 @@ export class FranChatUiComponent implements AfterViewInit{
 					if (this.selectedRoom.name == update_room.name){
 						//console.log("updated selected room");
 						this.change_sender_avatar(this.selectedRoom.name);
-						// this.selecting_room(this.selectedRoom.name);
+						this.selecting_room(this.selectedRoom.name);
 					}
 				}
 			})
@@ -240,8 +241,8 @@ export class FranChatUiComponent implements AfterViewInit{
 			})
 
 			this.chatService.update_single_user().subscribe((users: any) => {
-				//console.log("update single user");
-				//console.log(users);
+				console.log("reload");
+				window.location.reload();
 			})
 			subbed = true;
 		}
@@ -290,7 +291,7 @@ export class FranChatUiComponent implements AfterViewInit{
 		if (!this.selectedRoom){
 			//console.log("updating page");
 			setTimeout(() => {
-				this.chatService.updatePage();
+				this.chatService.updatePage(this.user);
 			}, 200);
 		}
 		Object.values(this.roomsList).forEach(room => {
@@ -310,7 +311,7 @@ export class FranChatUiComponent implements AfterViewInit{
 		if (event.message) {
 			//console.log("avatar: ", this.user.avatar)
 			this.selecting_room(this.selectedRoom!.name);
-			this.chatService.sendMessage(event.message, this.selectedRoom!.name, this.user!.avatar);
+			this.chatService.sendMessage(this.user, event.message, this.selectedRoom!.name, this.user!.avatar);
 		}
 		this.message = '';
 	}
@@ -386,7 +387,7 @@ export class FranChatUiComponent implements AfterViewInit{
 	}
 
 	joinRoom(data: string, password: string) {
-		this.chatService.joinRoom(data, password);
+		this.chatService.joinRoom(this.user, data, password);
 	}
 
 	leaveRoom() {
