@@ -129,6 +129,8 @@ export class FranChatUiComponent implements AfterViewInit{
 			this.user = userData;
 			if (this.user){
 				this.updateName();
+			}else{
+				window.location.reload();
 			}
 		});
 		
@@ -289,7 +291,7 @@ export class FranChatUiComponent implements AfterViewInit{
 		if (!this.selectedRoom){
 			//console.log("updating page");
 			setTimeout(() => {
-				this.chatService.updatePage();
+				this.chatService.updatePage(this.user);
 			}, 200);
 		}
 		Object.values(this.roomsList).forEach(room => {
@@ -309,7 +311,7 @@ export class FranChatUiComponent implements AfterViewInit{
 		if (event.message) {
 			//console.log("avatar: ", this.user.avatar)
 			this.selecting_room(this.selectedRoom!.name);
-			this.chatService.sendMessage(event.message, this.selectedRoom!.name, this.user!.avatar);
+			this.chatService.sendMessage(this.user, event.message, this.selectedRoom!.name, this.user!.avatar);
 
 		}
 		this.message = '';
@@ -386,7 +388,7 @@ export class FranChatUiComponent implements AfterViewInit{
 	}
 
 	joinRoom(data: string, password: string) {
-		this.chatService.joinRoom(data, password);
+		this.chatService.joinRoom(this.user, data, password);
 	}
 
 	leaveRoom() {
