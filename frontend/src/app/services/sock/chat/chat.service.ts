@@ -84,8 +84,9 @@ export class ChatService{
 	}
 
 	giveUsernames(room: string): void {
+		
 		// console.log("settingsChat called: " + room_name + ", status: " + status + ", password: " + password + ", admins: " + admins);
-		this.chatSocket.emit('give_usernames', room, (err: any) => {
+		this.chatSocket.emit('give_usernames', {room}, (err: any) => {
 			if (err) {
 				// console.log("createRoom chat-sock error: ");
 				// console.log(err);
@@ -232,6 +233,14 @@ export class ChatService{
 	selectRoom(): Observable<string> {
 		return new Observable((observer) => {
 			this.chatSocket.on('select', (room) => {
+				observer.next(room);
+			});
+		});
+	}
+
+	getBlockedList(): Observable<any> {
+		return new Observable((observer) => {
+			this.chatSocket.on('blocked', (room) => {
 				observer.next(room);
 			});
 		});

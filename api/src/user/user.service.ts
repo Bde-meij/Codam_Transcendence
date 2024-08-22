@@ -57,7 +57,7 @@ export class UserService {
 	
 	async findUserByName(name: string) {
 		const user = await this.userRepo.findOne({where: {nickname :name}});
-		console.log(user);
+		// console.log(user);
 		return user;
 	}
 

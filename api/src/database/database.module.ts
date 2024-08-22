@@ -22,7 +22,7 @@ import { User } from 'src/user/entities/user.entity';
 				password: configService.getOrThrow('POSTGRES_PASSWORD'),
 				database: configService.getOrThrow('POSTGRES_DB'),
 				synchronize: configService.getOrThrow('POSTGRES_SYNC'),
-				logging: true,
+				logging: false,
 				entities: [
 					User,
 					FriendRequest,

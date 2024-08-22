@@ -29,7 +29,7 @@ export class settingsChat{
 		this.roomName = this.selectedRoom!.name;
 		this.admins = this.selectedRoom!.admins
 		this.roomType = this.selectedRoom!.status;
-		console.log(this.selectedRoom?.owner.toString());
+		//console.log(this.selectedRoom?.owner.toString());
 		for (const a of this.admins){
 			for (const b of this.users){
 				if (b.user == a.toString()){
