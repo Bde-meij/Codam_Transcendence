@@ -960,10 +960,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			});
 			await Promise.all(userPromises);
 		}
-		this.emit_error_message(client, `Settings changed for ${data.roomName}`, 1, data.roomName);
 		this.logger("settings changed for:", this.chatRoomList[data.roomName].id, data.roomName);
 		this.logger(this.chatRoomList[data.roomName]);
 		this.update_client_rooms(this.chatRoomList[data.roomName].id, data.roomName);
+		this.emit_error_message(client, `Settings changed for ${data.roomName}`, 1, data.roomName);
+
 
 	}
 
