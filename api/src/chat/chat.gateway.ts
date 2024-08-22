@@ -20,7 +20,7 @@ import { DeleteBlockDto } from 'src/block/dto/delete-block.dto';
 import { ChatRoomService } from './chatRoom.service';
 import { WsExceptionFilter } from './exception';
 
-var logger = 1;
+var logger = 0;
 
 @Injectable()
 @WebSocketGateway({
