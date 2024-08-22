@@ -6,7 +6,6 @@ import { UserService } from '../../user/user.service';
 import { User } from '../../../models/user.class';
 import { skip } from 'rxjs/operators';
 import { ErrorMessage, getAllUsersInRoomDTO, MessageInterface, Rooms } from '../../../models/rooms.class';
-import { Blocks } from '../../../models/rooms.class';
 import { BlockService } from '../../block/block.service';
 
 @Injectable({
@@ -33,21 +32,9 @@ export class ChatService{
 			this.usernames = usernames_list;
 			console.log(this.usernames);
 		})
-		// this.chatSocket.onAny((event, ...args) => {
-		// 	console.log("CHAT-SOCK EVENT: ");
-		// 	console.log(event, args);
-		// });
-	}
-
-	ngOnInit(): void {
-		// console.log("dfd?");
-		// this.user$ = this.userService.getUser(0);
-
 	}
 
 	sendMessage(user: User, message: string, room: string, avatar: string): void {
-		// this.user$ = this.userService.getUser(0);
-		// const sender = this.user$;
 		const messageObj = {
 			message: message,
 			sender_name: user.nickname,
@@ -56,8 +43,6 @@ export class ChatService{
 			room: room,
 			type: 'text',
 		}
-		// console.log("sending msg");
-		// this.get_all_rooms();
 		this.chatSocket.emit('message', messageObj, (err: any) => {
 			if (err) {
 				// console.log("chat-sock error: ");

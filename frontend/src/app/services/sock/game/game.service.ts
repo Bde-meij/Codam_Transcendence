@@ -22,7 +22,6 @@ export class GameService{
 		{
 			this.gameSocket.on('assignNumber', (playNum: number) =>
 			{
-				// console.log("player assigned with", playNum);
 				observ.next(playNum);
 			});
 		});
@@ -34,7 +33,6 @@ export class GameService{
 		{
 			this.gameSocket.on('assignNames', (playNames: string[]) =>
 			{
-				// console.log("player assigned with", playNames);
 				observ.next(playNames);
 			});
 		});
@@ -46,7 +44,6 @@ export class GameService{
 		{
 			this.gameSocket.on("updatePlayerPos", (yPos: number) =>
 			{
-				// console.log("receive playerpos");
 				observ.next(yPos);
 			});
 		});
@@ -58,7 +55,6 @@ export class GameService{
 		{
 			this.gameSocket.on("flappyGravity", (yPos: number[]) =>
 			{
-				// console.log("receive playerpos");
 				observ.next(yPos);
 			});
 		});
@@ -125,7 +121,6 @@ export class GameService{
 		{
 			this.gameSocket.on("abortGame", (playerName: string) =>
 			{
-				// console.log("abortGame service called");
 				observ.next(playerName);
 			});
 		});
@@ -133,7 +128,6 @@ export class GameService{
 
 	joinGame()
 	{
-		// console.log("joining gaime");
 		this.gameSocket.emit("joinGame");
 	}
 

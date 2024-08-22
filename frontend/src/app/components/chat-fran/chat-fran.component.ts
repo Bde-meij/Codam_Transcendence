@@ -5,7 +5,8 @@ import { ChatService } from '../../services/sock/chat/chat.service';
 import { UserService } from '../../services/user/user.service';
 import { BlockService } from '../../services/block/block.service';
 import { User } from '../../models/user.class';
-import { Blocks, ErrorMessage, getAllUsersInRoomDTO, MessageInterface, Rooms } from '../../models/rooms.class';
+import { Blocks } from '../../models/blocks.class'
+import { ErrorMessage, getAllUsersInRoomDTO, MessageInterface, Rooms } from '../../models/rooms.class';
 import { NbThemeModule, NbLayoutModule} from '@nebular/theme';
 import { UserDetailComponent } from '../user-detail/user-detail.component';	
 import { createChatRoom } from './createChatRoom/createChatRoom.component';
@@ -15,7 +16,6 @@ import { forbiddenNameValidator } from '../../services/validator/name-validator.
 import { Router } from '@angular/router';
 import { settingsChat } from './settingsChat/settingsChat.component';
 import { protectedChat } from './protectedChat/protectedChat.component';
-// import { ErrorService } from '../../services/sock/chat/error.service';
 
 let subbed = false;
 let pw = '';

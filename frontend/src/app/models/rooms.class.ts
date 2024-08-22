@@ -29,36 +29,10 @@ export interface MessageInterface {
 	customMessageData?: {text: string, roomkey: number};
 }
 
-export interface messageDto{
-	message: string;
-	sender_name: string;
-	sender_id: number;
-	room: string;
-	type: string;
-	customMessageData: {text: string, roomkey: number};
-	sender_avatar: string;
-}
-
 export interface ErrorMessage{
 	msg: string;
 	status_code: number;
 	room?: string;
-}
-
-export interface createRoomDto{
-	room_name: string,
-	status: string, 
-	username?: string,
-	userid?: number,
-	password: string,
-	password_bool: boolean,
-}
-
-export interface Blocks {
-	id: number;
-	sender: User;
-	target: User;
-	createdAt: Date;
 }
 
 export interface getAllUsersInRoomDTO{
