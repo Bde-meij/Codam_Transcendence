@@ -45,7 +45,7 @@ export class FranChatUiComponent implements AfterViewInit{
 	selectedUser: any;
 	selectedUserID?: number;
 	message: string | undefined;
-	user!: User;
+	user?: User;
 	messages: string[] = [];
 
 	roomsList: Record<string, Rooms> = {};
@@ -70,15 +70,15 @@ export class FranChatUiComponent implements AfterViewInit{
 		this.chatService.room = this.selectedRoom!
 		this.last_open_room();
 		this.change_sender_avatar(room.name);
-		if (this.selectedRoom.password && !this.selectedRoom.users.includes(Number(this.user.id))){
+		if (this.selectedRoom.password && !this.selectedRoom.users.includes(Number(this.user?.id))){
 			var test = await this.passwordPopup(room);
 			setTimeout(() => {
 				this.joinRoom(room.name, pw);
-				if (this.selectedRoom! &&!this.selectedRoom!.users.includes(Number(this.user.id))){
+				if (this.selectedRoom! &&!this.selectedRoom!.users.includes(Number(this.user?.id))){
 					joined = 0;
 				}
 			}, 150);
-		}else if (this.selectedRoom! && !this.selectedRoom.users.includes(Number(this.user.id))){
+		}else if (this.selectedRoom! && !this.selectedRoom.users.includes(Number(this.user?.id))){
 			setTimeout(() => {
 				this.joinRoom(room.name, pw);
 				this.selectedRoom = room;
@@ -270,7 +270,8 @@ export class FranChatUiComponent implements AfterViewInit{
 		if (!this.selectedRoom){
 			//console.log("updating page");
 			setTimeout(() => {
-				this.chatService.updatePage(this.user);
+				if (this.user)
+					this.chatService.updatePage(this.user);
 			}, 200);
 		}
 		Object.values(this.roomsList).forEach(room => {
@@ -290,7 +291,8 @@ export class FranChatUiComponent implements AfterViewInit{
 		if (event.message) {
 			//console.log("avatar: ", this.user.avatar)
 			this.selecting_room(this.selectedRoom!.name);
-			this.chatService.sendMessage(this.user, event.message, this.selectedRoom!.name, this.user!.avatar);
+			if (this.user)
+				this.chatService.sendMessage(this.user, event.message, this.selectedRoom!.name, this.user!.avatar);
 		}
 		this.message = '';
 	}
@@ -308,11 +310,12 @@ export class FranChatUiComponent implements AfterViewInit{
 
 	userCreatesRoom() {
 		this.dialogService.open(createChatRoom, {
-			context: { currentUsername: this.user.nickname, roomslist: this.roomsList}
+			context: { currentUsername: this.user?.nickname, roomslist: this.roomsList}
 		  }).onClose.subscribe((input: any) => {
 			if (input) {
 				//console.log(input);
-				this.chatService.createRoom(input.roomName, input.roomType, input.password, +this.user.id);
+				if (this.user)
+					this.chatService.createRoom(input.roomName, input.roomType, input.password, +this.user.id);
 				setTimeout(() => {
 					if (this.roomsList[input.roomName])
 						this.onSelect(this.roomsList[input.roomName])
@@ -364,11 +367,13 @@ export class FranChatUiComponent implements AfterViewInit{
 	}
 
 	joinRoom(data: string, password: string) {
-		this.chatService.joinRoom(this.user, data, password);
+		if (this.user)
+			this.chatService.joinRoom(this.user, data, password);
 	}
 
 	leaveRoom() {
-		this.chatService.leaveRoom(this.selectedRoom!.id, this.selectedRoom!.name, this.user.nickname, this.user.id);
+		if (this.user)
+			this.chatService.leaveRoom(this.selectedRoom!.id, this.selectedRoom!.name, this.user.nickname, this.user.id);
 		this.selectedRoom = undefined;
 	}
 
@@ -398,16 +403,20 @@ export class FranChatUiComponent implements AfterViewInit{
 	}
 
 	isChannelOwner(): boolean {
-		return +this.user.id === +this.selectedRoom!.owner;
+		if (this.user)
+			return +this.user.id === +this.selectedRoom!.owner;
+		return false;
 	}
 
 	isChannelAdmin(): boolean {
-		const userIdToNbr = +this.user.id;
+		var userIdToNbr = 0;
+		if (this.user)
+			userIdToNbr = +this.user.id;
 		return this.selectedRoom!.admins.includes(userIdToNbr);
 	}
 
 	battle() {
-		this.chatService.battle(this.selectedRoom!.name, +this.selectedRoom!.id, +this.user.id, this.user.nickname, this.user.avatar);
+		this.chatService.battle(this.selectedRoom!.name, +this.selectedRoom!.id, +this.user!.id, this.user!.nickname, this.user!.avatar);
 		this.router.navigate(['/dashboard/game']);
 	}
 	
@@ -415,7 +424,8 @@ export class FranChatUiComponent implements AfterViewInit{
 		//console.log("IT HEREE1---------------------------", msg);
 		//console.log("IT HEREE2---------------------------", msg.customMessageData);
 		//console.log("IT HEREE3---------------------------", msg.customMessageData.roomkey);
-		this.chatService.joinBattle(msg.customMessageData.roomkey, this.selectedRoom!.name, this.user.avatar);
+		if (this.user)
+			this.chatService.joinBattle(msg.customMessageData.roomkey, this.selectedRoom!.name, this.user.avatar);
 		this.router.navigate(['/dashboard', 'game']);
 	}
 
@@ -423,7 +433,8 @@ export class FranChatUiComponent implements AfterViewInit{
 		this.userInRoom(this.userNameForm.value.userName).subscribe((userIsInRoom) => {
 			if (userIsInRoom) {
 				this.selecting_room(this.selectedRoom!.name);
-				this.chatService.muteUser(this.selectedRoom!.name, this.userNameForm.value.userName, this.user.avatar);
+				if (this.user)
+					this.chatService.muteUser(this.selectedRoom!.name, this.userNameForm.value.userName, this.user.avatar);
 				this.userNotFound = false;
 			}
 			else
@@ -435,7 +446,8 @@ export class FranChatUiComponent implements AfterViewInit{
 		this.userInRoom(this.userNameForm.value.userName).subscribe((userIsInRoom) => {
 			if (userIsInRoom) {
 				this.selecting_room(this.selectedRoom!.name);
-				this.chatService.banUser(this.selectedRoom!.name, this.userNameForm.value.userName, this.user.avatar);
+				if (this.user)
+					this.chatService.banUser(this.selectedRoom!.name, this.userNameForm.value.userName, this.user.avatar);
 				this.userNotFound = false;
 			}
 			else
@@ -461,7 +473,8 @@ export class FranChatUiComponent implements AfterViewInit{
 	}
 
 	deleteRoom(){
-		this.chatService.deleteRoom(Number(this.selectedRoom!.id), this.selectedRoom!.name, this.user.id);
+		if (this.user)
+			this.chatService.deleteRoom(Number(this.selectedRoom!.id), this.selectedRoom!.name, this.user.id);
 	}
 
 	block(){
@@ -473,7 +486,8 @@ export class FranChatUiComponent implements AfterViewInit{
 	}
 
 	updateName(){
-		this.chatService.updateName(this.user.nickname);
+		if (this.user)
+			this.chatService.updateName(this.user.nickname);
 	}
 
 	last_open_room(){
@@ -486,7 +500,7 @@ export class FranChatUiComponent implements AfterViewInit{
 	}
 
 	isJoined(room: string){
-		return (this.roomsList[room].users.includes(Number(this.user.id)));
+		return (this.roomsList[room].users.includes(Number(this.user?.id)));
 	}
 
 	setAdmin() {
