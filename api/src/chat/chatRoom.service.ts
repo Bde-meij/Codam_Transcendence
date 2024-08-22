@@ -419,9 +419,7 @@ export class ChatRoomService {
 				chatroom: true,
 			}
 		});
-		console.log("userChatRoom:",userChatRoom);
 		if (!userChatRoom) {
-			console.log("null");
 			return null;
 		}
 		return userChatRoom.banned;
@@ -436,7 +434,9 @@ export class ChatRoomService {
 				chatroom: {id: roomId},
 			}
 		});
+		console.log(userChatRoom);
 		if (!userChatRoom) {
+			console.log("1");
 			return null;
 		}
 		// the owner or admins can not be banned?
@@ -445,9 +445,47 @@ export class ChatRoomService {
 		}
 		if (userChatRoom.banned == true) {
 			userChatRoom.banned = false;
+			console.log("toggleBanned( false");
+
 		} else {
 			userChatRoom.banned = true;
+			console.log("toggleBanned( true");
+
 		}
 		return await this.userChatroomRepo.save(userChatRoom);
+	}
+
+	async banUser(userId: number, roomId: number) {
+		var userChatRoom: UserChatroom = await this.userChatroomRepo.findOne({
+			where: {
+				user: {id: userId},
+				chatroom: {id: roomId},
+				banned: false,
+			}
+		});
+		if (!userChatRoom) {
+			return;
+		}
+		if (this.getRoleWeight(userChatRoom.role) > 1) {
+			return;
+		}
+		await this.userChatroomRepo.update({id: userChatRoom.id}, {banned: true});
+	}
+	
+	async unbanUser(userId: number, roomId: number) {
+		var userChatRoom: UserChatroom = await this.userChatroomRepo.findOne({
+			where: {
+				user: {id: userId},
+				chatroom: {id: roomId},
+				banned: true,
+			}
+		});
+		if (!userChatRoom) {
+			return;
+		}
+		if (this.getRoleWeight(userChatRoom.role) > 1) {
+			return;
+		}
+		await this.userChatroomRepo.update({id: userChatRoom.id}, {banned: false});
 	}
 }

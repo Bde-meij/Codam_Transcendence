@@ -246,10 +246,8 @@ export class UserActionDto {
 }
 
 export class InviteChatDto {
-	@Matches(/^[a-zA-Z0-9]+$/, {
-        message: 'user can only contain letters, numbers, and spaces',
-    })
-	user: string;
+	@IsNumber()
+	user: number;
 }
 
 export class InviteToChatDto {
