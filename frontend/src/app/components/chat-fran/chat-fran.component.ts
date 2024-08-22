@@ -108,7 +108,6 @@ export class FranChatUiComponent implements AfterViewInit{
 		private blockService: BlockService,
 		private dialogService: NbDialogService,
 		private router: Router,
-		// private errorService: ErrorService,
 	) 
 	{
 		this.userMap = new Map<number, string>();
@@ -139,11 +138,11 @@ export class FranChatUiComponent implements AfterViewInit{
 				if (this.roomsList[newmessage.room_name]?.messages) {
 					//console.log(this.selectedRoom?.name);
 					this.getLists();
-					if (this.selectedRoom){
-						if (this.selectedRoom!.name == newmessage.room_name){
-							this.selecting_room(newmessage.room_name);
-						}
-					}
+					// if (this.selectedRoom){
+					// 	if (this.selectedRoom!.name == newmessage.room_name){
+					// 		this.selecting_room(newmessage.room_name);
+					// 	}
+					// }
 					//console.log("blocked lists:");
 					//console.log(this.blockedList);
 					this.blockedList?.forEach(block => {
@@ -180,7 +179,7 @@ export class FranChatUiComponent implements AfterViewInit{
 					if (this.selectedRoom.name == update_room.name){
 						//console.log("updated selected room");
 						this.change_sender_avatar(this.selectedRoom.name);
-						// this.selecting_room(this.selectedRoom.name);
+						this.selecting_room(this.selectedRoom.name);
 					}
 				}
 			})
@@ -240,8 +239,8 @@ export class FranChatUiComponent implements AfterViewInit{
 			})
 
 			this.chatService.update_single_user().subscribe((users: any) => {
-				//console.log("update single user");
-				//console.log(users);
+				console.log("reload");
+				window.location.reload();
 			})
 			subbed = true;
 		}
@@ -311,6 +310,7 @@ export class FranChatUiComponent implements AfterViewInit{
 			//console.log("avatar: ", this.user.avatar)
 			this.selecting_room(this.selectedRoom!.name);
 			this.chatService.sendMessage(event.message, this.selectedRoom!.name, this.user!.avatar);
+
 		}
 		this.message = '';
 	}

@@ -20,7 +20,7 @@ import { DeleteBlockDto } from 'src/block/dto/delete-block.dto';
 import { ChatRoomService } from './chatRoom.service';
 import { WsExceptionFilter } from './exception';
 
-var logger = 0;
+var logger = 1;
 
 @Injectable()
 @WebSocketGateway({
@@ -79,8 +79,16 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			client.data.nickname = user.nickname;
 			client.data.userid = (Number(user.id));
 			client.data.room = '';
-			if (!this.connectedUsers.includes(client.data.userid))
+			if (!this.connectedUsers.includes(client.data.userid)){
 				this.connectedUsers.push(client.data.userid);
+			}
+			else{
+				console.log("else disconnecting?");
+				var p = this.findSocketUser(client.data.userid);
+				(await p).emit('reload', true);
+				client.disconnect();
+				return;
+			}
 			this.io.emit('getConnectedUsers', this.connectedUsers);
 			this.getConnectedUsers();
 			// this.updateStatusFriends(client.data.userid);
@@ -97,7 +105,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	handleDisconnect(client: any) {
 		const userid = client.data.userid;
 		const index = this.connectedUsers.indexOf(userid);
-
+		this.logger("disconnecting");
 		this.userService.updateStatus(userid, "offline");
 		if (index > -1) {
 			this.connectedUsers.splice(index, 1);
@@ -182,13 +190,15 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@ConnectedSocket() socket: Socket,
 	) {
 		this.logger(this.chatRoomList[data.room]);
+		this.logger(this.getConnectedUsers());
+
 		if (socket.data.nickname != data.sender_name){
 			// this.logger("change msg name ", socket.data.userid, data.sender_name)
 			this.change_msg_name(socket.data.userid, data.sender_name);
 			socket.data.nickname = data.sender_name
 		}
 		// this.name_changer(socket, data.sender_name);
-		this.logger("handleMessage: " + data.room + ", by: " + socket.data.nickname);
+		this.logger("handleMessage: " + data.room + ", by: " + socket.data.nickname + ", msg:", data.message);
 		const Room = this.findRoom(data.room, "message");
 		if (!Room){
 			this.logger(`Room doesn't exist`);
@@ -1100,8 +1110,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		await this.get_all_blocked(userid, client);
 		var temp : Record<string, Rooms> = {};
 		Object.values(this.chatRoomList).forEach(room => {
-			if (room.users.includes(userid) || room.status == "public" || room.status =="protected")
+			if (room.users.includes(userid) || room.status == "public" || room.status == "protected")
 				temp[room.name] = room;
+			if (room.users.includes(userid) || room.status == "public"){
+				client.join(room.id.toString());
+			}
 		});
 		client.emit('getRoomss', temp);
 		client.emit('getConnectedUsers', this.connectedUsers);
@@ -1416,10 +1429,12 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		if (room.users.includes(socket.data.userid)){
 			this.logger("in userlist when joinroom");
 			socket.join(room.id.toString());
-			this.update_client_rooms(roomid, room_name);
+			// this.update_client_rooms(roomid, room_name);
 			if (await this.isConnected(socket, socket.data.userid, room.id)){
 				this.logger("socket already connect and joined.");
 				socket.data.room = room_name;
+				// this.update_client_rooms(roomid, room_name);
+				// socket.emit("select", room_name);
 				return;
 			}
 		}

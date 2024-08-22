@@ -224,7 +224,7 @@ export class ChatService{
 
 	update_single_user(): Observable<{users: getAllUsersInRoomDTO, roomid: string}> {
 		return new Observable((observer) => {
-			this.chatSocket.on('add-one', (users: getAllUsersInRoomDTO, roomid: string) => {
+			this.chatSocket.on('reload', (users: getAllUsersInRoomDTO, roomid: string) => {
 				observer.next({ users, roomid });
 			});
 		});
