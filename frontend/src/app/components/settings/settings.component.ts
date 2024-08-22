@@ -109,7 +109,7 @@ export class SettingsComponent implements OnInit {
 				console.log('Verification response:', response);
 			},
 			error: (e) => { 
-				console.error('Error verifying user input:', e);
+				// console.error('Error verifying user input:', e);
 			}
 		});
 	}

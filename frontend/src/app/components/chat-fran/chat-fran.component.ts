@@ -640,7 +640,7 @@ export class FranChatUiComponent implements AfterViewInit{
 				return this.selectedRoom!.users.includes(this.selectedUserID!);
 			}),
 			catchError((error) => {
-				console.error('Error fetching user ID:', error);
+				// console.error('Error fetching user ID:', error);
 				return of(false);
 			})
 		);

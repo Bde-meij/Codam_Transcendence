@@ -26,7 +26,7 @@ export class TwofaComponent {
 				this.router.navigate(['/dashboard/home']);
 		},
 		error: (e: any) => {
-			console.error('Error verifying user input:', e);
+			// console.error('Error verifying user input:', e);
 		}
 	});
   }

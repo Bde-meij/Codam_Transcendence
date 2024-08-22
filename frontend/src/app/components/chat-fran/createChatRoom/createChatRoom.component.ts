@@ -93,7 +93,7 @@ export class createChatRoom {
 				return true;
 			}),
 			catchError((error) => {
-				console.error('Error fetching user ID:', error);
+				// console.error('Error fetching user ID:', error);
 				return of(false);
 			})
 		);
