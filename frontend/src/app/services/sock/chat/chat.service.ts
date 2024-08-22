@@ -191,15 +191,7 @@ export class ChatService{
 		});
 	}
 
-	update_all_users(): Observable<{ users: getAllUsersInRoomDTO[], roomid: string }> {
-		return new Observable((observer) => {
-			this.chatSocket.on('all-users', (users: getAllUsersInRoomDTO[], roomid: string) => {
-				observer.next({ users, roomid });
-			});
-		});
-	}
-
-	update_single_user(): Observable<{users: getAllUsersInRoomDTO, roomid: string}> {
+	reload(): Observable<{users: getAllUsersInRoomDTO, roomid: string}> {
 		return new Observable((observer) => {
 			this.chatSocket.on('reload', (users: getAllUsersInRoomDTO, roomid: string) => {
 				observer.next({ users, roomid });
@@ -265,19 +257,17 @@ export class ChatService{
 
 	getAllRoomsExceptFirst(): Observable<string[]> {
 		return new Observable<string[]>((observer) => {
-		  this.chatSocket.on('getRooms', (rooms: string[]) => {
-			// console.log("getAllRooms: ", rooms);
-			observer.next(rooms);
-		  });
+			this.chatSocket.on('getRooms', (rooms: string[]) => {
+				observer.next(rooms);
+		 	});
 		}).pipe(
-		  skip(1) // Skip the first emitted value
+			skip(1) 
 		);
 	  }
 
 	getAllRooms(): Observable<string[]> {
 		return new Observable((observer) => {
 			this.chatSocket.on('getAllRooms', (message) => {
-				// console.log("getAllRooms: " + message);
 				observer.next(message);
 			});
 		});
@@ -465,10 +455,6 @@ export class ChatService{
 			room: room,
 			avatar: avatar,
 		}
-		// if (this.user)
-			// console.log("joinBAttle chatservice: " + this.user.id + ", data.roomnum: " + data.numroom);
-		// else
-			// console.log("joinbattle nouser")
 		this.chatSocket.emit('joinBattle', data, (err: any) => {
 			if (err) {
 				// console.log("joinBattle chat-sock error: ");

@@ -23,8 +23,10 @@ export class settingsChat{
 	checked = false;
 	admins: number[] = [];
 	adminsNames: string[] = [];
-	constructor(protected dialogRef: NbDialogRef<settingsChat>) {}
 	god: string = 'No Owner';
+
+	constructor(protected dialogRef: NbDialogRef<settingsChat>) {}
+	
 	ngOnInit(): void {
 		this.roomName = this.selectedRoom!.name;
 		this.admins = this.selectedRoom!.admins
@@ -40,7 +42,7 @@ export class settingsChat{
 			}
 		} 
 		for (const b of this.users){
-			if(b.user === this.selectedRoom?.owner.toString())
+			if (b.user === this.selectedRoom?.owner.toString())
 				this.god = b.username;
 		}
 	}
@@ -61,7 +63,7 @@ export class settingsChat{
 		if (this.checked == false){
 			this.admins = this.admins.filter(adminId => adminId !== Number(user));
 			this.adminsNames = this.adminsNames.filter(adminId => adminId !== username);
-		} else {
+		}else {
 			if (!this.admins.includes(Number(user))){
 				this.admins.push(Number(user));
 				this.adminsNames.push(username);
