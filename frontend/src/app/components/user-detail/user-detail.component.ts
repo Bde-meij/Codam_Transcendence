@@ -73,11 +73,15 @@ export class UserDetailComponent implements OnChanges {
 			this.tempUser.avatar = URL.createObjectURL(data)
 		))
 		this.friendsService.isFriend(this.id).subscribe({
-			next: (data) => {
-				console.log("isFriend: ", data)
+			next: (data) => (
+				console.log("isFriend: ", data),
 				this.isself = data.self,
 				this.isfriend = data.friend
-			}
+			),
+			error: (error: HttpErrorResponse) => (
+				console.log("friendService error message: ", error.message ),
+				this.errorMessage = error.message
+			)
 		});
 		this.my_user = this.tempUser;
 		this.matches = undefined;

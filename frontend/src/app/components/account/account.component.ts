@@ -21,8 +21,9 @@ export class AccountComponent implements OnInit {
 	constructor(private userService: UserService){}
 
 	ngOnInit(): void {
-		this.userService.getUser('current').subscribe(data => 
-			this.my_id = data.id
+		this.userService.getUser('current').subscribe(
+			(data) => 
+				this.my_id = data.id
 		);		
 	};
 }

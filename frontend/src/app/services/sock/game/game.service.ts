@@ -1,12 +1,16 @@
 import { Injectable } from '@angular/core';
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 import { Observable } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
 
 export class GameService{
-	gameSocket = io("/game");
+	gameSocket : Socket;
+
+	constructor() {
+		this.gameSocket = io("/game");
+	}	
 	
 	connect() {
 		return this.gameSocket.connect();
