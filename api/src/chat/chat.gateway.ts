@@ -9,7 +9,6 @@ import {
 	SubscribeMessage,
 	WebSocketGateway,
 	WebSocketServer,
-	WsException,
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
@@ -20,7 +19,6 @@ import { CreateBlockDto } from 'src/block/dto/create-block.dto';
 import { DeleteBlockDto } from 'src/block/dto/delete-block.dto';
 import { ChatRoomService } from './chatRoom.service';
 import { WsExceptionFilter } from './exception';
-import { FriendsService } from 'src/friends/friends.service';
 
 var logger = 1;
 
@@ -43,7 +41,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				private blockService: BlockService, 
 				private authService: AuthService, 
 				private userService: UserService,
-				private friendsService: FriendsService,
 	) 
 	{
 		this.chatRoomList = {};
@@ -1519,20 +1516,21 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		this.io.emit('getConnectedUsers', this.connectedUsers);
 	}
 
-	private async updateStatusFriends(userid: number){
-		const myfriends = await this.friendsService.findFriends(userid);
-		// this.logger("updatestatus:", myfriends);
-		if (myfriends){
-			for (const f in myfriends){
-				if (this.connectedUsers.includes(myfriends[f].id.toString())){
-					this.userService.updateStatus(userid, "online");
-				}
-				else{
-					this.userService.updateStatus(myfriends[f].id, "offline");
-				}
-			}
-		}
-	}
+	// private async updateStatusFriends(userid: number){
+	// 	const myfriends = await this.friendsService.findFriends(userid);
+	// 	// this.logger("updatestatus:", myfriends);
+	// 	if (myfriends){
+	// 		for (const f in myfriends){
+	// 			if (this.connectedUsers.includes(myfriends[f].id.toString())){
+	// 				this.userService.updateStatus(userid, "online");
+	// 			}
+	// 			else{
+	// 				this.userService.updateStatus(myfriends[f].id, "offline");
+	// 			}
+	// 		}
+	// 	}
+	// }
+
 	private async getIdDb() {
 		var id = 0;
 		const db_rooms = await this.chatService.getAllChatRooms();

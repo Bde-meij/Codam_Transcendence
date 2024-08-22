@@ -18,7 +18,7 @@
 			<input type="checkbox" id="passwordOption" name="passwordOption" [(ngModel)]="withPassword" value="false" >
 			<label for="passwordOption">With password</label>
 		</div>
-		<div class="password-input" *ngIf="roomType !== 'public'">
+		<div class="password-input" *ngIf="roomType == 'protected'">
 			<label for="password"> Password:</label>
 			<input type="text" id="password" name="password" nbInput [(ngModel)]="password" [disabled]="roomType !== 'protected' || !withPassword">
 		</div>

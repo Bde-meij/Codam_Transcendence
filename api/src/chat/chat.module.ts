@@ -10,7 +10,7 @@ import { User } from 'src/user/entities/user.entity';
 import { FriendsModule } from 'src/friends/friends.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Chatroom, User, UserChatroom]), AuthModule, BlockModule, UserModule, FriendsModule],
+  imports: [TypeOrmModule.forFeature([Chatroom, User, UserChatroom]), AuthModule, BlockModule, UserModule],
   providers: [ChatGateway, ChatRoomService],
   exports: [ChatGateway, ChatRoomService]
 })
