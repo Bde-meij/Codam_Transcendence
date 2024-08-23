@@ -1,5 +1,6 @@
 <h3> What Gary knows about you: </h3>
 <div *ngIf="my_id">
 	<app-user-detail [id]="my_id"></app-user-detail>
+	<h3> To change yourself, go to <button [routerLink]="['/dashboard/settings']"> settings </button></h3>
 </div>
-<h3> To change yourself, go to <button [routerLink]="['/dashboard/settings']"> settings </button></h3>
+<p *ngIf="!my_id" class="error_message">{{errorMsg}}</p>

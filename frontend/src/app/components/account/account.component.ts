@@ -17,6 +17,7 @@ import { RouterLink } from '@angular/router';
 })
 export class AccountComponent implements OnInit {
 	my_id?: string;
+	errorMsg: string = "";
 
 	constructor(private userService: UserService){}
 
@@ -26,7 +27,8 @@ export class AccountComponent implements OnInit {
 				this.my_id = data.id
 			),
 			error: (error : HttpErrorResponse) => (
-				console.log("Error message: ", error.message)
+				console.log("Error message: ", error.message),
+				this.errorMsg = error.message
 			)
 		});
 	};

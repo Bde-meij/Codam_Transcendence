@@ -1,9 +1,11 @@
 <!-- Create Room Section -->
-<div class="create-room-column">
+<div class="create-room-column" *ngIf="!errorMsg">
 	<button (click)="userCreatesRoom()">Create a room</button>
 </div>
 
-<nb-layout>
+<p *ngIf="errorMsg" class="error_message">{{errorMsg}}</p>
+
+<nb-layout *ngIf="!errorMsg">
 	<nb-layout-column>
 	  <!-- Main Content Container -->
 	  <div class="chat-room_container">

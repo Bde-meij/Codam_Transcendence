@@ -48,6 +48,7 @@ export class FranChatUiComponent implements AfterViewInit{
 	message: string | undefined;
 	user?: User;
 	messages: string[] = [];
+	errorMsg: string = '';
 
 	roomsList: Record<string, Rooms> = {};
 	userMap: Map<number, string>;
@@ -108,6 +109,22 @@ export class FranChatUiComponent implements AfterViewInit{
 	};
 
 	ngOnInit() {
+		this.userService.getUser('current').subscribe({
+			next: (userData: User) => {
+				this.user = userData;
+				if (this.user) {
+					this.updateName();
+				}
+			},
+			error: (error : HttpErrorResponse) => (
+				console.log("Error message: ", error.message),
+				this.errorMsg = error.message
+			)
+		});
+
+		if (this.errorMsg)
+			return;
+
 		this.getLists();
 		this.userNameForm = new FormGroup({
 			userName: new FormControl('', {
@@ -119,18 +136,6 @@ export class FranChatUiComponent implements AfterViewInit{
 				updateOn: 'change',
 			}),
 		});
-		
-		this.userService.getUser('current').subscribe({
-			next: (userData: User) => {
-				this.user = userData;
-				if (this.user) {
-					this.updateName();
-				}
-			},
-			error: (error : HttpErrorResponse) => (
-				console.log("Error message: ", error.message)
-			)
-		})
 		
 		if (!subbed) {
 			this.chatService.getMessages().subscribe({
@@ -656,7 +661,9 @@ export class FranChatUiComponent implements AfterViewInit{
 				this.blockedList = data
 			),
 			error: (e: any) => (
-				console.error("all blocked error: " + e))
+				console.log("all blocked error: " + e),
+				this.errorMsg = e
+			),
 		});
 	}
 }
