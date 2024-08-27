@@ -61,7 +61,7 @@ export interface Rooms {
 export interface ErrorMessage{
 	msg: string;
 	status_code: number;
-	room?: string;
+	room?: number;
 }
 
 export class createRoomDto{
@@ -108,11 +108,8 @@ export class messageDto{
 	sender_name: string;
 	@IsNumber()
 	sender_id: number;
-	@IsString()
-	@Matches(/^[a-zA-Z0-9\s.,!?@#$%^&*()_+=-]*$/, {
-        message: 'room_name can only contain letters, numbers, and spaces',
-    })
-	room: string;
+	@IsNumber()
+	room: number;
 	@IsString()
 	type: string;
 	@ValidateNested()
@@ -202,6 +199,8 @@ export class JoinRoomDto {
     })
 	room_name: string;
 	@IsNumber()
+	roomid: number;
+	@IsNumber()
 	user_id: number;
 	@IsString()
 	password: string;
@@ -232,6 +231,8 @@ export class UserActionDto {
         message: 'room_name can only contain letters, numbers, and spaces',
     })
 	room: string;
+	@IsNumber()
+	roomId: number;
 	@IsString()
 	@IsAlphanumeric()
 	@IsNotEmpty()
@@ -342,6 +343,8 @@ export class SettingsDto {
         message: 'room_name can only contain letters, numbers, and spaces',
     })
 	roomName: string;
+	@IsNumber()
+	roomId: number;
 	@IsString()
 	roomType: string;
 	@IsString()
