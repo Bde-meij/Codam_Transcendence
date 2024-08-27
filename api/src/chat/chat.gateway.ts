@@ -89,12 +89,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				client.disconnect();
 				return;
 			}
-			this.io.emit('getConnectedUsers', this.connectedUsers);
 			this.getConnectedUsers();
-			// this.updateStatusFriends(client.data.userid);
 			this.get_all_blocked(client.data.userid, client);
 			this.updateRefresh(client, client.data.userid);
-
 		} catch {
 			this.logger(client.id, "connection refused");
 			client.disconnect();
@@ -102,17 +99,16 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		}	
 	}
 	
-	handleDisconnect(client: any) {
-		const userid = client.data.userid;
-		const index = this.connectedUsers.indexOf(userid);
-		this.logger("disconnecting");
-		this.userService.updateStatus(userid, "offline");
+	handleDisconnect(client: Socket) {
+		this.logger("handleDisconnect()");
+		const index = this.connectedUsers.indexOf(client.data.userid);
+		this.userService.updateStatus(client.data.userid, "offline");
 		if (index > -1) {
 			this.connectedUsers.splice(index, 1);
-			this.logger(`${userid} disconnected: ${client.data.nickname} on ${index} `);
+			this.logger(`${client.data.userid} disconnected: ${client.data.nickname} on ${index} `);
 		}
 		client.disconnect();
-		this.io.emit('getConnectedUsers', this.connectedUsers);
+		this.getConnectedUsers();
 	}
 	
 	@UseFilters(WsExceptionFilter)
