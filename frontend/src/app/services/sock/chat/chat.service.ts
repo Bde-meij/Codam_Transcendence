@@ -36,7 +36,7 @@ export class ChatService{
 		});
 	}
 
-	sendMessage(user: User, message: string, room: string, avatar: string): void {
+	sendMessage(user: User, message: string, room: number, avatar: string): void {
 		const messageObj = {
 			message: message,
 			sender_name: user.nickname,
@@ -66,7 +66,7 @@ export class ChatService{
 		});
 	}
 
-	giveUsernames(room: string): void {
+	giveUsernames(room: number): void {
 		
 		// console.log("settingsChat called: " + room_name + ", status: " + status + ", password: " + password + ", admins: " + admins);
 		this.chatSocket.emit('give_usernames', {room}, (err: any) => {
@@ -99,9 +99,9 @@ export class ChatService{
 		});
 	}
 
-	joinRoom(user: User, room_name: string, password: string): void {
+	joinRoom(user: User, room_name: string, password: string, roomid: number): void {
 		// console.log("joinRoom name: " + room_name + ", password: " + password);
-		this.chatSocket.emit('joinRoom', {room_name: room_name, user_id: user.id, password: (password.length > 0)? password : undefined, avatar: user!.avatar}, (err: any) => {
+		this.chatSocket.emit('joinRoom', {room_name: room_name, roomid: roomid, user_id: user.id, password: (password.length > 0)? password : undefined, avatar: user!.avatar}, (err: any) => {
 			if (err) {
 				// console.log("joinRoom chat-sock error: ");
 				// console.log(err);
@@ -172,9 +172,9 @@ export class ChatService{
 		});
 	  }
 	
-	getRoomsss(): Observable<Record<string, Rooms>> {
-		return new Observable<Record<string, Rooms>>((observer) => {
-		  this.chatSocket.on('getRoomss', (chatRoomList: Record<string, Rooms>) => {
+	getRoomsss(): Observable<Record<number, Rooms>> {
+		return new Observable<Record<number, Rooms>>((observer) => {
+		  this.chatSocket.on('getRoomss', (chatRoomList: Record<number, Rooms>) => {
 			observer.next(chatRoomList);
 		  });
 		});
@@ -205,7 +205,7 @@ export class ChatService{
 		});
 	}
 	
-	selectRoom(): Observable<string> {
+	selectRoom(): Observable<number> {
 		return new Observable((observer) => {
 			this.chatSocket.on('select', (room) => {
 				observer.next(room);
@@ -253,9 +253,9 @@ export class ChatService{
 		});
 	}
 
-	delete_room(): Observable<string> {
+	delete_room(): Observable<number> {
 		return new Observable((observer) => {
-			this.chatSocket.on('delete_room', (room: string) => {
+			this.chatSocket.on('delete_room', (room: number) => {
 				observer.next(room);
 			});
 		});
@@ -455,11 +455,12 @@ export class ChatService{
 		});
 	}
 
-	joinBattle(roomnum: number, room: string, avatar: string){
+	joinBattle(roomnum: number, room: string, avatar: string, room_id: number){
 		const data = {
 			numroom: roomnum,
 			room: room,
 			avatar: avatar,
+			room_id: room_id,
 		}
 		this.chatSocket.emit('joinBattle', data, (err: any) => {
 			if (err) {

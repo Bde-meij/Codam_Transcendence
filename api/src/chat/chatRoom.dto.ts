@@ -288,6 +288,8 @@ export class LastOpenRoomDto{
         message: 'room_name can only contain letters, numbers, and spaces',
     })
 	name: string;
+	@IsNumber()
+	room_id: number;
 }
 
 export class giveUsernameDTO{
@@ -296,6 +298,8 @@ export class giveUsernameDTO{
         message: 'room_name can only contain letters, numbers, and spaces',
     })
 	room: string;
+	@IsNumber()
+	room_id: number;
 }
 
 export class InviteGameDto {
@@ -323,6 +327,8 @@ export class JoinBattleDto {
         message: 'room_name can only contain letters, numbers, and spaces',
     })
 	room: string;
+	@IsNumber()
+	room_id: number;
 	@IsString()
 	avatar: string;
 }

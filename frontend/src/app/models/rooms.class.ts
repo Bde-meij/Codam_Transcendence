@@ -32,7 +32,7 @@ export interface MessageInterface {
 export interface ErrorMessage{
 	msg: string;
 	status_code: number;
-	room?: string;
+	room?: number;
 }
 
 export interface getAllUsersInRoomDTO{

@@ -18,7 +18,7 @@ export class WsExceptionFilter implements ExceptionFilter {
 		var e_msg: ErrorMessage = {
 			status_code: 0,
 			msg: "Error message undefined",
-			room: "Global",
+			room: 0,
 		};
 		if (exception instanceof BadRequestException) {
 			let response = exception.getResponse();
