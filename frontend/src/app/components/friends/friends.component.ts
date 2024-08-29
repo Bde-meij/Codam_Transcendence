@@ -1,6 +1,5 @@
-import { Component, OnChanges, OnInit } from '@angular/core';
-// import { FAKE_FRIENDS, User } from '../../models/user.class';
-import { JsonPipe, NgFor, NgIf, UpperCasePipe } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
+import { NgFor, NgIf, UpperCasePipe } from '@angular/common';
 import { UserDetailComponent } from '../user-detail/user-detail.component';
 import { FriendsService } from '../../services/friends/friends.service';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -18,7 +17,7 @@ export interface Friend {
 @Component({
   selector: 'app-friends',
   standalone: true,
-  imports: [ReactiveFormsModule, NgFor, NgIf, UpperCasePipe, UserDetailComponent, RouterLink, JsonPipe],
+  imports: [ReactiveFormsModule, NgFor, NgIf, UpperCasePipe, UserDetailComponent, RouterLink],
   templateUrl: './friends.component.html',
   styleUrl: './friends.component.scss'
 })
@@ -97,6 +96,7 @@ export class FriendsComponent implements OnInit {
 		console.log("accept request: ", request);
 		this.friendsService.acceptIncomingRequest(request.id).subscribe({
 			next: (data) => {
+				this.errorMessage = '';
 				console.log("accept friendrequest data: " + data)
 			},
 			error: (e : HttpErrorResponse) => {
@@ -111,6 +111,7 @@ export class FriendsComponent implements OnInit {
 		console.log("delete request: ", request);
 		this.friendsService.deleteRequest(request.id).subscribe({
 			next: (data) => {
+				this.errorMessage = '';
 				console.log("delete friendrequest data: " + data)
 			},
 			error: (e : HttpErrorResponse) => {
@@ -126,6 +127,7 @@ export class FriendsComponent implements OnInit {
 		this.selectedFriend = undefined;
 		this.friendsService.deleteFriend(friend.id).subscribe({
 			next: (data) => {
+				this.errorMessage = '';
 				console.log("delete friend data: " + data)
 			},
 			error: (e : HttpErrorResponse) => {
@@ -145,6 +147,7 @@ export class FriendsComponent implements OnInit {
 			console.log("sending this name: ", this.friendForm.value.friendName);
 			this.friendsService.addFriendNick(this.friendForm.value.friendName).subscribe({
 				next: (data) => {
+					this.errorMessage = '';
 					console.log("send friendrequest data: " + data)
 				},
 				error: (e : HttpErrorResponse) => {

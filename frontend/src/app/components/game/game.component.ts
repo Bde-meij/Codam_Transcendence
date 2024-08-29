@@ -26,7 +26,6 @@ export class GameComponent implements OnInit, OnDestroy
 	rightPlayer = (new Player(this.width*0.9, this.height/2)).returnAct();
 	squareBall = (new Ball(this.width/2, this.height/2).returnAct());
 	ballShadows = addAfterImage(this.squareBall);
-	router = new Router;
 	texts = new Texts;
 
 	hitXWall: boolean = false;
@@ -46,6 +45,8 @@ export class GameComponent implements OnInit, OnDestroy
 	});
 
 	gameSrv: any
+
+	constructor(private router: Router) {}
 	
 	ngOnInit()
 	{

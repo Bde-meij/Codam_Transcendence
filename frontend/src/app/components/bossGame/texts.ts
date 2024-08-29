@@ -2,7 +2,6 @@ import { Label, Color, TextAlign, Font } from "excalibur";
 
 export class Texts
 {
-
 	timer = new Label({
 		color: Color.White,
 		x: 400,

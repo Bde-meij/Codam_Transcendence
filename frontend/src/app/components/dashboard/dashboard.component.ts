@@ -2,12 +2,12 @@ import { Component } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink, RouterOutlet } from '@angular/router';
 import { ChatService } from '../../services/sock/chat/chat.service';
 import { LogoutComponent } from '../logout/logout.component';
-import { AsyncPipe, JsonPipe, NgIf } from '@angular/common';
+import { NgIf } from '@angular/common';
 
 @Component({
 	selector: 'app-dashboard',
 	standalone: true,
-	imports: [RouterLink, RouterOutlet, LogoutComponent, AsyncPipe, JsonPipe, NgIf],
+	imports: [RouterLink, RouterOutlet, LogoutComponent, NgIf],
 	providers: [ChatService],
 	templateUrl: './dashboard.component.html',
 	styleUrl: './dashboard.component.scss'
