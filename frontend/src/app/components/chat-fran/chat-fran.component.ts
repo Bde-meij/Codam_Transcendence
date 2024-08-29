@@ -1,13 +1,13 @@
 import { CommonModule, NgFor, NgIf } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { NbCardModule, NbChatModule, NbDialogService, NbUserModule } from '@nebular/theme';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, ViewChild } from '@angular/core';
+import { NbCardModule, NbChatModule, NbDialogConfig, NbDialogService, NbUserModule } from '@nebular/theme';
 import { ChatService } from '../../services/sock/chat/chat.service';
 import { UserService } from '../../services/user/user.service';
 import { BlockService } from '../../services/block/block.service';
 import { User } from '../../models/user.class';
 import { Blocks } from '../../models/blocks.class'
-import { ErrorMessage, MessageInterface, Rooms } from '../../models/rooms.class';
-import { NbLayoutModule} from '@nebular/theme';
+import { ErrorMessage, getAllUsersInRoomDTO, MessageInterface, Rooms } from '../../models/rooms.class';
+import { NbThemeModule, NbLayoutModule} from '@nebular/theme';
 import { UserDetailComponent } from '../user-detail/user-detail.component';	
 import { createChatRoom } from './createChatRoom/createChatRoom.component';
 import { Observable, of, map, catchError } from 'rxjs';
@@ -39,7 +39,7 @@ let joined = 0;
 	templateUrl: './chat-fran.component.html',
 	styleUrl: './chat-fran.component.scss',
 })
-export class FranChatUiComponent implements OnInit, AfterViewInit{
+export class FranChatUiComponent implements AfterViewInit{
 	@ViewChild('messageContainer') messageContainer!: ElementRef;
 	@ViewChild('messageInput') messageInput!: ElementRef;
 
@@ -336,6 +336,12 @@ export class FranChatUiComponent implements OnInit, AfterViewInit{
 			setTimeout(() => {
 				if (this.user)
 					this.chatService.updatePage(this.user);
+				setTimeout(() => {
+					if (!this.roomsList['Global'] && !this.roomsList['Help']){
+						window.location.reload();
+						console.log("Reload due to list");
+					}
+				}, 200);
 			}, 200);
 		}
 		Object.values(this.roomsList).forEach(room => {
@@ -639,8 +645,8 @@ export class FranChatUiComponent implements OnInit, AfterViewInit{
 				this.selectedUserID = data;
 				return this.selectedRoom!.users.includes(this.selectedUserID!);
 			}),
-			catchError((error: HttpErrorResponse) => {
-				console.log('Error fetching user ID:', error);
+			catchError((error) => {
+				// console.error('Error fetching user ID:', error);
 				return of(false);
 			})
 		);
