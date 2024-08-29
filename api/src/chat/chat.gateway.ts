@@ -1245,12 +1245,14 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		this.chatService.removeUserFromChatRoom(userid, this.chatRoomList[room_name].id)
 		if (!this.change_owner(room_name, userid)){
 			if (this.chatRoomList[room_name].users.length == 0){
+				if (room_name == 'Global'){
+					return;
+				}
 				this.io.to(this.chatRoomList[room_name].id.toString()).emit('delete_room', room_name);
 				this.logger("room deleted cause owner left.");
 				this.chatService.deleteChatRoom(this.chatRoomList[room_name].id)
 				this.delete_room(this.chatRoomList[room_name].id, room_name);
-				delete this.chatRoomList[room_name];
-				
+				delete this.chatRoomList[room_name];		
 			}
 		} else{
 			this.logger("owner changed");
