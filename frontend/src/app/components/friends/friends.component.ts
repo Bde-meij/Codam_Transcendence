@@ -52,7 +52,7 @@ export class FriendsComponent implements OnInit {
 				this.friends = data
 			),
 			error: (e : HttpErrorResponse) => (
-				this.bigErrorMessage = e
+				this.bigErrorMessage = e.message
 			)
 		});
 		this.friendsService.getIncomingRequests().subscribe({
@@ -60,7 +60,7 @@ export class FriendsComponent implements OnInit {
 				this.incoming = data
 			),
 			error: (e : HttpErrorResponse) => (
-				this.bigErrorMessage = e
+				this.bigErrorMessage = e.message
 			)
 		});
 		this.friendsService.getOutgoingRequests().subscribe({
@@ -68,7 +68,7 @@ export class FriendsComponent implements OnInit {
 				this.outgoing = data
 			),
 			error: (e : HttpErrorResponse) => (
-				this.bigErrorMessage = e
+				this.bigErrorMessage = e.message
 			)
 		});
 		this.errorMessage = undefined;
