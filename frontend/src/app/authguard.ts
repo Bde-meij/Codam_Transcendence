@@ -32,6 +32,6 @@ export class AuthGuard{
 	  }
 
 	private handleError(error: HttpErrorResponse): void{
-		// console.error('Unauthorized exception |', error, '|');
+		console.error('Unauthorized exception |', error, '|');
 	}
 }
