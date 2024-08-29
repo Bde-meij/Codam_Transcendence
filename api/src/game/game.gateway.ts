@@ -50,7 +50,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				throw new NotAcceptableException();
 			var payload = await this.authService.verifyJwtAccessToken(token);
 			var user = await this.userService.findUserById(payload.id);
-			if ((!user) || (user.status === "in game"))
+			if (!user)
 				throw new NotAcceptableException();
 			client.data.userid = user.id;
 			client.data.nick = user.nickname;
