@@ -50,7 +50,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				throw new NotAcceptableException();
 			var payload = await this.authService.verifyJwtAccessToken(token);
 			var user = await this.userService.findUserById(payload.id);
-			if ((!user) || (this.isPlaying(user.id)))
+			if ((!user) || (user.status === "in game"))
 				throw new NotAcceptableException();
 			client.data.userid = user.id;
 			client.data.nick = user.nickname;
@@ -75,18 +75,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			return (1);
 		}
 		return (0);
-	}
-
-	isPlaying(id: number) : boolean
-	{
-		roomMap.forEach((roomObj, roomName) =>
-		{
-			if ((roomObj.leftId == id) || (roomObj.rightId == id))
-			{
-				return true ;
-			}
-		})
-		return false ;
 	}
 
 	declareWinner(room: Room, client: Socket)
