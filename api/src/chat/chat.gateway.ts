@@ -322,6 +322,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			this.io.to(room.id.toString()).emit('message', msg);
 			if (this.isAdmin(client.data.userid, data.room) || this.isOwner(client.data.userid, data.room)){
 				this.chatService.toggleMute(data.userid, this.chatRoomList[data.room].id);
+			this.update_client_rooms(room.id, room.name);
 			}
 			return;
 		}
@@ -337,12 +338,13 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			this.chatRoomList[data.room].messages.push(msg);
 			this.logger(`muted: ${room.name} ${userid}: ${room.muted[userid]} send to ${room.id.toString()}`)
 			this.chatService.toggleMute(data.userid, this.chatRoomList[data.room].id);
+			this.update_client_rooms(room.id, room.name);
 		}
 		else{
 			const msg = this.create_msg(`${user.nickname} not enough permissions.`, room.id, room.name, client.data.userid, client.data.nickname, 'text', client.data.avatar)
 			this.io.to(room.id.toString()).emit('message', msg);
+			this.chatRoomList[data.room].messages.push(msg);
 		}
-		this.update_client_rooms(room.id, room.name);
 
 	}
 
@@ -1407,10 +1409,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			{ room_name: 'Global', status: 'public', password: false, pw: ""},
 			{ room_name: 'Help', status: 'public', password: false, pw: "" },
 			{ room_name: 'Private', status: 'private', password: false, pw: "" },
-			{ room_name: 'ProtectedNoPw', status: 'protected', password: true, pw: "pw" },
 			{ room_name: 'Protected', status: 'protected', password: true, pw: "test" },
-			{ room_name: 'Test', status: 'protected', password: true, pw: "test" },
-
 		];
 		for (const roomData of dummyRooms) {
 			const { room_name, status, password, pw } = roomData;

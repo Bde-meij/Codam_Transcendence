@@ -25,7 +25,7 @@ export class UserService {
 
 	// to request your own info, use 'current', otherwise use the userID.
 	getUser(id : string) : Observable<any> {
-		console.log("getting user: ", id);
+		// console.log("getting user: ", id);
 		if (id === 'current') {
 			return this.http.get<any>(this.userUrl + '/current', {});
 		}

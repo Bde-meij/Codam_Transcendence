@@ -87,7 +87,7 @@ export class UserDetailComponent implements OnChanges {
 		
 		this.friendsService.isFriend(this.id).subscribe({
 			next: (data) => (
-				console.log("isFriend: ", data),
+				// console.log("isFriend: ", data),
 				this.isself = data.self,
 				this.isfriend = data.friend
 			),

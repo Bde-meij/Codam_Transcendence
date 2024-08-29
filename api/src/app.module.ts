@@ -26,7 +26,7 @@ import { ChannelModule } from './chat/chat.module';
 		GameModule,
 		BossGameModule,
 		DatabaseModule,
-		TestingModule,
+		// TestingModule,
 		FriendsModule,
 		ChannelModule,
 		BlockModule,
