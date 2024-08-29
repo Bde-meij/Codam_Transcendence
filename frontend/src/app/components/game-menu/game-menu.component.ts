@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { UserService } from '../../services/user/user.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-game-menu',
@@ -20,9 +21,9 @@ export class GameMenuComponent {
         {
           this.router.navigate(['/dashboard/game']);
         },
-        error: () =>
+        error: (e: HttpErrorResponse ) =>
         {
-          console.log("error: failed to update 'roomkey'")
+          console.log("error: ", e, " failed to update 'roomkey'")
         }
       }
     );
@@ -35,9 +36,9 @@ export class GameMenuComponent {
           {
             this.router.navigate(['/dashboard/game']);
           },
-          error: () =>
+          error: (e: HttpErrorResponse ) =>
           {
-            console.log("error: failed to update 'roomkey'")
+            console.log("error: ", e, " failed to update 'roomkey'")
           }
         }
       );
@@ -50,9 +51,9 @@ export class GameMenuComponent {
           {
             this.router.navigate(['/dashboard/bossPong']);
           },
-          error: () =>
+          error: (e: HttpErrorResponse ) =>
           {
-            console.log("error: failed to update 'roomkey'")
+            console.log("error: ", e, " failed to update 'roomkey'")
           }
         }
       );
@@ -65,9 +66,9 @@ export class GameMenuComponent {
           {
             this.router.navigate(['/dashboard/bossPong']);
           },
-          error: () =>
+          error: (e: HttpErrorResponse ) =>
           {
-            console.log("error: failed to update 'roomkey'")
+            console.log("error: ", e, " failed to update 'roomkey'")
           }
         }
       );
