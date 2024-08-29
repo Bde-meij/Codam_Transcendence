@@ -63,7 +63,7 @@ export class createChatRoom {
       return;
     }
     this.getSelectedUserId().subscribe({
-			next: (userExists) => {
+			next: (userExists : any) => {
 				if (!userExists) {
         	this.userNotFound = true;
         	this.userInRoom = false;

@@ -36,7 +36,7 @@ export class RegisterComponent {
 		console.log("registered name: ", this.profileForm.value.nickname);
 		if (this.profileForm.value.nickname) {
 			this.userService.register(this.profileForm.value.nickname).subscribe({
-				next: (data) => {
+				next: (data : any) => {
 					console.log("registered name data: ", data),
 					this.errorMessage = "",
 					this.router.navigate(['/dashboard/home'])

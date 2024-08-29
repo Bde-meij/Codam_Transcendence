@@ -52,15 +52,15 @@ export class SettingsComponent implements OnInit {
 	verificationRes: string = "";
 
 	ngOnInit(): void {
-		this.authService.is2FAEnabled().subscribe(data =>
+		this.authService.is2FAEnabled().subscribe((data : any) =>
 			this.is2faEnabled = data.isTwoFAEnabled
 		);
 		this.userService.getUser('current').subscribe({
-			next: (data ) => {
+			next: (data : any) => {
 				this.current_user_id = data.id
 				this.current_nickname = data.nickname
 			},
-			error: (e) => (
+			error: (e : HttpErrorResponse ) => (
 				console.log("the e: ", e)
 			)
 		});
@@ -70,10 +70,10 @@ export class SettingsComponent implements OnInit {
 	blocklist : Blocks[] | undefined;
 	getBlockList() {
 		this.blockService.getBlocked().subscribe({
-			next: (data ) => {
+			next: (data : any) => {
 				this.blocklist = data
 			},
-			error: (e) => (
+			error: (e : HttpErrorResponse ) => (
 				console.log("block error: ", e)
 			)
 		})
@@ -104,11 +104,11 @@ export class SettingsComponent implements OnInit {
 
 	verifyUserInput() {
 		this.authService.verify2FA(this.userInput).subscribe({
-			next: (response) => {
+			next: (response : any) => {
 				this.verificationRes = response.message;
 				console.log('Verification response:', response);
 			},
-			error: (e) => { 
+			error: (e : HttpErrorResponse) => { 
 				console.log('Error verifying user input:', e);
 			}
 		});
@@ -119,7 +119,7 @@ export class SettingsComponent implements OnInit {
 		if (this.profileForm.value.nickname) {
 			let new_nick = this.profileForm.value.nickname;
 			this.userService.changeName(this.profileForm.value.nickname).subscribe({
-				next: (data) => {
+				next: (data : any) => {
 					this.current_nickname = new_nick;
 					console.log("changename data:", data);
 					this.succesMessage = data.message;
@@ -156,7 +156,7 @@ export class SettingsComponent implements OnInit {
 	changeAvatar() {
 		if (this.current_file) {
 			this.userService.uploadAvatar(this.current_file).subscribe({
-				next: (data) => {
+				next: (data : any) => {
 					console.log("change avatar data:", data);
 					this.succesMessage = data.message;
 					this.errorMessage = '';

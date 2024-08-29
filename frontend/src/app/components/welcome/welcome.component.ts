@@ -17,9 +17,11 @@ export class WelcomeComponent implements OnInit {
 	clicked = false;
 
 	constructor(route: ActivatedRoute) {
-		route.data.subscribe(data =>
+		route.data.subscribe(((data : any) =>
 			this.title = data['title']
-		)
+		), ((error: any) => 
+			console.log(error)
+		))
 	}
 
 	ngOnInit() {

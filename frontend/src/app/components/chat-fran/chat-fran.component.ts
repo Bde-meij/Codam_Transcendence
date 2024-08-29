@@ -639,8 +639,8 @@ export class FranChatUiComponent implements OnInit, AfterViewInit{
 				this.selectedUserID = data;
 				return this.selectedRoom!.users.includes(this.selectedUserID!);
 			}),
-			catchError((error) => {
-				// console.error('Error fetching user ID:', error);
+			catchError((error: HttpErrorResponse) => {
+				console.log('Error fetching user ID:', error);
 				return of(false);
 			})
 		);

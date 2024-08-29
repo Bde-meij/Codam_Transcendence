@@ -17,7 +17,7 @@ export class DashboardComponent {
 	unread = this.chatService.isUnread();
 
 	constructor(private chatService: ChatService, private router: Router, route: ActivatedRoute) {
-		route.data.subscribe(data =>
+		route.data.subscribe((data : any) =>
 			this.title = data['title']
 		)
 	};

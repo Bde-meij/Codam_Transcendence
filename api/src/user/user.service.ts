@@ -23,7 +23,7 @@ export class UserService {
 	}
 	
 	async createUser(userData: CreateUserDto): Promise<User> {
-		// console.error("NEW USER 2:", userData);
+		// console.log("NEW USER 2:", userData);
 		const userExists = await this.userRepo.findOne({
 			select: {
 				id: true,

@@ -22,7 +22,7 @@ export class AccountComponent implements OnInit {
 
 	ngOnInit(): void {
 		this.userService.getUser('current').subscribe({
-			next: (data) => (
+			next: (data : any) => (
 				this.my_id = data.id
 			),
 			error: (error : HttpErrorResponse) => (
