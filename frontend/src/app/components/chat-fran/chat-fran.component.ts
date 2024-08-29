@@ -363,6 +363,7 @@ export class FranChatUiComponent implements OnInit, AfterViewInit{
 			this.selecting_room(this.selectedRoom!.name);
 			if (this.user)
 				this.chatService.sendMessage(this.user, event.message, this.selectedRoom!.name, this.user!.avatar);
+			this.selecting_room(this.selectedRoom!.name);
 		}
 		this.message = '';
 	}
