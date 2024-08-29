@@ -656,7 +656,7 @@ export class FranChatUiComponent implements AfterViewInit{
 				this.blockedList = data
 			),
 			error: (e: any) => (
-				console.error("all blocked error: " + e))
+				console.log("all blocked error: " + e))
 		});
 	}
 }
