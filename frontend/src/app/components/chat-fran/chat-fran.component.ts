@@ -336,6 +336,12 @@ export class FranChatUiComponent implements OnInit, AfterViewInit{
 			setTimeout(() => {
 				if (this.user)
 					this.chatService.updatePage(this.user);
+				setTimeout(() => {
+					if (!this.roomsList['Global'] && !this.roomsList['Help']){
+						window.location.reload();
+						console.log("Reload due to list");
+					}
+				}, 200);
 			}, 200);
 		}
 		Object.values(this.roomsList).forEach(room => {
@@ -609,7 +615,7 @@ export class FranChatUiComponent implements OnInit, AfterViewInit{
 	storeUser(userid: number): Observable<void> {
 		//console.log("storeUser");
 		return this.userService.getAvatar(userid.toString()).pipe(
-		  map((data) => {
+		  map((data: any) => {
 			this.userMap.set(userid, URL.createObjectURL(data));
 		  })
 		);
