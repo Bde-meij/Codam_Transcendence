@@ -15,7 +15,7 @@ export class AuthGuard{
 
 	canActivate(): Observable<boolean> {
 		return this.authService.getLogStatus().pipe(
-			map(data => {
+			map((data: any) => {
 				if (data.loggedIn) {
 				return true;
 				} else {
@@ -23,7 +23,7 @@ export class AuthGuard{
 				return false;
 				}
 			}),
-			catchError(error => {
+			catchError((error : HttpErrorResponse) => {
 				this.handleError(error);
 				this.router.navigate(['/welcome']);
 				return of(false);
