@@ -1,0 +1,49 @@
+<nb-card>
+	<nb-card-header><h6>Change settings of {{this.selectedRoom!.name}}</h6></nb-card-header>
+	<nb-card-body>
+	  <form (ngSubmit)="submitForm()">
+		<div class="radio-buttons">
+			<input type="radio" id="public" name="room_type" [(ngModel)]="roomType" value="public">
+			<label for="public">Public</label>
+			<input type="radio" id="private" name="room_type" [(ngModel)]="roomType" value="private">
+			<label for="private">Private</label>
+			<input type="radio" id="protected" name="room_type" [(ngModel)]="roomType" value="protected">
+			<label for="protected">Protected</label>
+		</div>	
+
+		<div class="room-name-input">
+			<p for="roomName">Room name: {{roomName}}</p>
+		</div>
+
+		<div class="password-option" *ngIf="roomType === 'protected'">
+			<input type="checkbox" id="passwordOption" name="passwordOption" [(ngModel)]="withPassword" value="false" >
+			<label for="passwordOption">With password</label>
+		</div>
+
+		<div class="oldpassword-input" *ngIf="roomType === 'protected'">
+			<label for="password"> old password:</label>
+			<input type="text" id="oldPassword" name="oldPassword" nbInput [(ngModel)]="oldPassword" [disabled]="roomType !== 'protected' || !withPassword">
+		</div>
+
+		<div class="newpassword-input" *ngIf="roomType === 'protected'">
+			<label for="password"> new password:</label>
+			<input type="text" id="newPassword" name="newPassword" nbInput [(ngModel)]="newPassword" [disabled]="roomType !== 'protected' || !withPassword">
+		</div>
+
+		<div *ngFor="let userObj of users">
+			<nb-toggle *ngIf=isAdmin(userObj.user) [checked]="true" (checkedChange)="toggle($event, userObj.user, userObj.username)"  [disabled]="userObj.user === this.selectedRoom!.owner">> {{ userObj.username }} - don't you do it..</nb-toggle>
+			<nb-toggle *ngIf=!isAdmin(userObj.user) [checked]="false" (checkedChange)="toggle($event, userObj.user, userObj.username)"> {{ userObj.username }} - make me admin!</nb-toggle>
+		</div>
+		<div>
+			<h6>Active Admins:</h6>
+			<li *ngFor="let user of adminsNames">{{user}}</li>
+		</div> 
+
+		<div class="submit-button">
+			<button nbButton type="submit">Submit</button>
+			<div *ngIf="submitWithoutName" class="error">Please give your room a name</div>
+		</div>
+		
+	  </form>
+	</nb-card-body>
+  </nb-card>

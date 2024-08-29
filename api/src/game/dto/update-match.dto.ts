@@ -1,5 +1,5 @@
 export class UpdateMatchDto {
-	id: string;
+	id: number;
 
 	leftPlayerScore: number;
 

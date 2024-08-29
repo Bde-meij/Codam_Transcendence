@@ -4,17 +4,23 @@ import { User } from '../../models/user.class';
 import { UserService } from '../../services/user/user.service';
 import { FriendsService } from '../../services/friends/friends.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { NbUserModule } from '@nebular/theme';
+import { ChatService } from '../../services/sock/chat/chat.service';
+import { Router } from '@angular/router';
+import { BlockService } from '../../services/block/block.service';
 
 @Component({
   selector: 'app-user-detail',
   standalone: true,
-  imports: [NgIf, UpperCasePipe, JsonPipe],
+  imports: [NgIf, UpperCasePipe, JsonPipe, NbUserModule],
   templateUrl: './user-detail.component.html',
   styleUrl: './user-detail.component.scss'
 })
 export class UserDetailComponent implements OnChanges {
 	@Input()id!: string;
 	my_user?: User;
+	client_user!: User
+	text: string = "Chat!"
 
 	tempUser = {
 		id: '',
@@ -26,17 +32,28 @@ export class UserDetailComponent implements OnChanges {
 	stats : undefined | {
 		wins : undefined,
 		losses : undefined,
-		winrate: undefined
+		winrate: undefined,
+		ranking: undefined
 	};
 
 	matches: any | undefined;
-
+	
 	isfriend?: boolean;
 	isself?: boolean;
 	errorMessage: string | undefined;
 	userErrorMessage: string | undefined;
 
-	constructor(private userService: UserService, private friendsService: FriendsService) {};
+	constructor(
+		private userService: UserService, 
+		private friendsService: FriendsService,
+		private chatService: ChatService, 
+		private blockService: BlockService,
+		private router: Router)
+	{
+		this.userService.getUser('current').subscribe((userData) => {
+			this.client_user = userData;
+		});
+	}
 
 	ngOnChanges(): void {
 		this.userErrorMessage = undefined;
@@ -125,5 +142,32 @@ export class UserDetailComponent implements OnChanges {
 			}
 		});
 		this.isfriend = undefined;
+	}
+
+	block() {
+		console.log("block the mf 🪕");
+		this.blockService.createBlock(this.id).subscribe({
+			next: (data) => {
+				console.log("block data: " + data);
+			},
+			error: (e) => {
+				console.log("block error: " + e);
+			}
+		});
+	}
+
+	inviteChat(){
+		if (this.my_user?.id != this.client_user.id)
+		{
+			this.chatService.inviteChat(this.id);
+			setTimeout(() => {
+				this.router.navigate(['/dashboard', 'franchat']);
+			}, 400);
+		}else
+			console.log("what is happening?");
+	}
+
+	routeProfile(){
+		this.router.navigate(['/dashboard', "detail" ,	 this.id]);
 	}
 }

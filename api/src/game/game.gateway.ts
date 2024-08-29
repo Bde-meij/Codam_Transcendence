@@ -55,6 +55,8 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			client.data.userid = user.id;
 			client.data.nick = user.nickname;
 			client.data.key = user.roomKey;
+			await this.userService.updateStatus(client.data.userid, "in game");
+
 			client.emit("connectSignal");
 		}
 		catch
@@ -70,7 +72,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		if ((room.lScore == 0) && (room.rScore == 0))
 		{
 			if (room.hasStarted == true)
-				this.matchService.deleteMatch(room.id);
+				this.matchService.deleteMatch(+room.id);
 			room.serverRef.in(room.name).emit("abortGame", "");
 			return (1);
 		}
@@ -81,7 +83,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	{
 		var updateMatchDto: UpdateMatchDto =
 		{
-			id: room.id,
+			id: +room.id,
 			leftPlayerScore: room.lScore,
 			rightPlayerScore: room.rScore
 		};
@@ -115,12 +117,20 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			roomMap.delete(room.name);
 		}
 		this.userService.updateRoomKey(client.data.userid, 0);
+		setTimeout(async() =>{{
+			const user = await this.userService.findUserById(client.data.userid);
+			if (!user)
+				return ;
+			if (user.status !== "offline")
+				await this.userService.updateStatus(client.data.userid, "online");
+		}},500);
 	}
 
 	// INITIALIZATIONS
 	@SubscribeMessage("joinGame")
 	joinGame(client: Socket)
 	{
+		console.log(client.data.key, "JOINGAME---------------------------------------------------------------------------------------------------------------------------------------------------------");
 		if (client.data.key < 1)
 		{
 			if (this.findRoom(client))
@@ -192,8 +202,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	
 	async startGame(room: Room)
 	{
-		// console.log(room.name, "has started");
-		// prohibits same-player games
 		if (room.leftId == room.rightId)
 			this.abortGame(room);
 		if ((((room.key < 0) != true) == false) == true)
@@ -211,11 +219,11 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		[room.leftPlayer.data.nick, room.rightPlayer.data.nick]);
 		
 		const match = await this.matchService.createMatch({
-			leftPlayerId: room.leftId.toString(),
-			rightPlayerId: room.rightId.toString(),
+			leftPlayerId: room.leftId,
+			rightPlayerId: room.rightId,
 			type: MatchType.PUBLIC
 		});
-		room.id = match.id;
+		room.id = match.id.toString();
 
 		if (room.key < 0)
 		{
@@ -234,13 +242,13 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	updatePlayer(client: Socket, yPos: number)
 	{
 		var room = roomMap.get(client.data.room)
-		if (room != null)
+		if ((room != null) && (typeof(yPos) === "number" && yPos >= 35 && yPos <= 565))
 		{
 			if (client.id == room.leftPlayer.id)
 				room.leftPos = yPos;
 			if (client.id == room.rightPlayer.id)
 				room.rightPos = yPos;
-			room.checkPlayerCollision();
+			room.checkCollision();
 			client.in(room.name).emit("updatePlayerPos", yPos);
 		}
 	}
@@ -260,8 +268,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		if (room != null)
 		{
 			room.moveBall();
-			room.checkPlayerCollision();
-			room.checkWallBounce();
+			room.checkCollision();
 			if (room.checkScoring())
 				roomMap.delete(room.name);
 			else

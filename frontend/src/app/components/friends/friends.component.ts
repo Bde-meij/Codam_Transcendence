@@ -1,6 +1,6 @@
 import { Component, OnChanges, OnInit } from '@angular/core';
 // import { FAKE_FRIENDS, User } from '../../models/user.class';
-import { NgFor, NgIf, UpperCasePipe } from '@angular/common';
+import { JsonPipe, NgFor, NgIf, UpperCasePipe } from '@angular/common';
 import { UserDetailComponent } from '../user-detail/user-detail.component';
 import { FriendsService } from '../../services/friends/friends.service';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -12,24 +12,13 @@ import { FriendRequest } from '../../models/friendrequest.class';
 export interface Friend {
 	id: string;
 	nickname: string;
+	status:string;
 }
-
-export const FAKE_FRIENDS: Friend[] = [
-	{ id: "12", nickname: 'Dr. Nice' },
-	{ id: "13", nickname: 'Bombasto'},
-	{ id: "14", nickname: 'Celeritas'},
-	{ id: "15", nickname: 'Magneta'},
-	{ id: "16", nickname: 'RubberMan'},
-	{ id: "17", nickname: 'Dynama'},
-	{ id: "18", nickname: 'Dr. IQ'},
-	{ id: "19", nickname: 'Magma'},
-	{ id: "20", nickname: 'Tornado'}
-];
 
 @Component({
   selector: 'app-friends',
   standalone: true,
-  imports: [ReactiveFormsModule, NgFor, NgIf, UpperCasePipe, UserDetailComponent, RouterLink],
+  imports: [ReactiveFormsModule, NgFor, NgIf, UpperCasePipe, UserDetailComponent, RouterLink, JsonPipe],
   templateUrl: './friends.component.html',
   styleUrl: './friends.component.scss'
 })
@@ -51,35 +40,37 @@ export class FriendsComponent implements OnInit {
 	incoming?: FriendRequest[];
 	outgoing?: FriendRequest[];
 	errorMessage?: string | undefined;
+	bigErrorMessage?: string | undefined;
 
 	ngOnInit() {
 		this.getLists();
 	}
 
 	getLists() {
+		this.bigErrorMessage = undefined
 		this.friendsService.getFriends().subscribe({
 			next: (data) => (
-				this.friends = data,
-				console.log("all friends: ", data)
+				this.friends = data
 			),
 			error: (e) => (
-				console.error("all friends error: " + e))
+				this.bigErrorMessage = e
+			)
 		});
 		this.friendsService.getIncomingRequests().subscribe({
 			next: (data) => (
-				this.incoming = data,
-				console.log("all incoming: ", data)
+				this.incoming = data
 			),
 			error: (e) => (
-				console.error("all incoming error: " + e))
+				this.bigErrorMessage = e
+			)
 		});
 		this.friendsService.getOutgoingRequests().subscribe({
 			next: (data) => (
-				this.outgoing = data,
-				console.log("all outgoing: ", data)
+				this.outgoing = data
 			),
 			error: (e) => (
-				console.error("all outgoing error: " + e))
+				this.bigErrorMessage = e
+			)
 		});
 		this.errorMessage = undefined;
 	}

@@ -166,7 +166,11 @@ export class GameComponent implements OnInit, OnDestroy
 			this.game.remove(this.ballShadows[1]);
 			this.game.remove(this.ballShadows[0]);
 			this.texts.winText.text = pName+"\nis the winner!";
-			setTimeout(() =>{{this.ngOnDestroy();}},2000);
+			setTimeout(() =>{{
+				if (window.location.pathname === '/dashboard/game') {
+					this.router.navigate(['/dashboard/game-menu']);
+				}
+			}},2000);
 			this.game.add(this.texts.winText);
 		});
 	}
@@ -204,7 +208,11 @@ export class GameComponent implements OnInit, OnDestroy
 			this.game.remove(this.texts.waitText);
 			this.game.remove(this.texts.leftPNameText);
 			this.game.remove(this.texts.rightPNameText);
-			setTimeout(() =>{{this.ngOnDestroy();}},2000);
+			setTimeout(() =>{{
+				if (window.location.pathname === '/dashboard/game') {
+					this.router.navigate(['/dashboard/game-menu']);
+				}
+			}},2000);
 			this.game.add(this.texts.abortText);
 		});
 	}
@@ -224,7 +232,5 @@ export class GameComponent implements OnInit, OnDestroy
 		this.game.stop();
 		this.game.canvas.remove();
 		this.gameSrv.disconnect();
-		this.gameSrv.ngOnDestroy();
-		this.router.navigate(['/dashboard/game-menu']);
 	}
 }

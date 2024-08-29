@@ -2,9 +2,9 @@ import { User } from "src/user/entities/user.entity";
 import { CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('block')
-export class Block {
+export class Blocks {
 	@PrimaryGeneratedColumn()
-	id: string;
+	id: number;
 
 	@ManyToOne(() => User, (user) => user.blockOut)
 	sender: User;

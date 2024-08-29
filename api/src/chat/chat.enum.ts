@@ -1,0 +1,5 @@
+export enum USERID {
+	SYSTEM = -1,
+	INACTIVE = 'INACTIVE',
+	PENDING = 'PENDING',
+  }

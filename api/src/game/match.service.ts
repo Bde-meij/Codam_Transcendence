@@ -6,10 +6,12 @@ import { Match, MatchStatus } from './entities/match.entity';
 import { Repository } from 'typeorm';
 import { UserService } from 'src/user/user.service';
 import { User } from 'src/user/entities/user.entity';
+import { StatsService } from './stats.service';
+import { MatchStats } from './entities/stats.entity';
 
 @Injectable()
 export class MatchService {
-	constructor(@InjectRepository(Match) private readonly matchRepo: Repository<Match>, private readonly userService: UserService) {}
+	constructor(@InjectRepository(Match) private readonly matchRepo: Repository<Match>, private readonly userService: UserService, private readonly statsService: StatsService) {}
 	
 	async createMatch(createMatchDto: CreateMatchDto) {
 		// Games should only be create by the backend, these errors should never happen
@@ -70,8 +72,12 @@ export class MatchService {
 		let winner: User;
 		if (updateMatchDto.leftPlayerScore > updateMatchDto.rightPlayerScore) {
 			winner = match.leftPlayer;
+			this.statsService.updateWins(match.leftPlayer.id);
+			this.statsService.updateLosses(match.rightPlayer.id);
 		} else {
 			winner = match.rightPlayer;
+			this.statsService.updateWins(match.rightPlayer.id);
+			this.statsService.updateLosses(match.leftPlayer.id);
 		}
 		await this.matchRepo.update(
 			{id: updateMatchDto.id},
@@ -84,7 +90,7 @@ export class MatchService {
 		)
 	}
 
-	async getUserMatches(targetId: string): Promise<Match[]> {
+	async getUserMatches(targetId: number): Promise<Match[]> {
 		if (!await this.userService.userExists(targetId)) {
 			// console.log('User not found! User id:', targetId);
 			throw new HttpException('User not found', 404);
@@ -123,29 +129,27 @@ export class MatchService {
 		// console.log('User matches:\n', matches);
 		return matches;
 	}
-
-	async getUserStats(targetId: string) {
-		const matches: Match[] = await this.getUserMatches(targetId);
-		if (matches.length == 0) {
-			return {
-				wins: 0,
-				losses: 0,
-				winrate: "n/a",
-			};
+	
+	async getUserStats(targetId: number) {
+		const user = await this.userService.findUserById(targetId);
+		if (!user){
+			throw new HttpException('User not found', 404);
 		}
-		let wins: number = 0;
-		matches.forEach((match) => {
-			if (match.winningPlayer.id == targetId)
-				wins++;
-		})
+		const stats: MatchStats = await this.statsService.getStats(targetId);
+		let winrate: string;
+		if (stats.wins + stats.losses == 0)
+			winrate = "n/a";
+		else
+			winrate = (stats.wins / (stats.wins + stats.losses) * 100).toFixed(2) + "%";
 		return {
-			wins: wins,
-			losses: matches.length - wins,
-			winrate: (wins / matches.length * 100).toFixed(2) + "%",
+			wins: stats.wins,
+			losses: stats.losses,
+			winrate: winrate,
+			ranking: await this.statsService.getRanking(targetId)
 		};
 	}
 
-	async deleteMatch(matchId: string) {
+	async deleteMatch(matchId: number) {
 		// console.log("DELETING MATCH:", matchId);
 		const match: Match = await this.matchRepo.findOne({
 			where: {id: matchId}

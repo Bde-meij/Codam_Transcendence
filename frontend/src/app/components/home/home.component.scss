@@ -25,7 +25,7 @@
 }
 .home_game_button:hover {
 	color: linen;
-	background-color: transparent;
+	background-color: slategray;
 }
 
 .home_settings_button {
@@ -48,5 +48,6 @@
 	background-size: 100%;
 	background-image: url('/assets/gifs/rotating_gear.gif');
 	color: linen;
+	background-color: transparent;
 	font-weight: bolder;
 }

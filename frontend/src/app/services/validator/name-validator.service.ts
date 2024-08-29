@@ -19,9 +19,10 @@ export class UniqueNameValidator implements AsyncValidator {
 	constructor(private userService: UserService) {}
 
 	validate(control: AbstractControl): Observable<ValidationErrors | null> {
+		console.log("validator: ", control.value);
 		return this.userService.isNameTaken(control.value).pipe(
 			map((isTaken) => (isTaken ? {uniqueName: true} : null)),
-			catchError(() => of(null)),
+			catchError(() => of({uniqueName: false})),
 		);
 	}
 }

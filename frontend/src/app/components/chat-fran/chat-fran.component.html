@@ -1,0 +1,90 @@
+<!-- Create Room Section -->
+<div class="create-room-column">
+	<button (click)="userCreatesRoom()">Create a room</button>
+</div>
+
+<nb-layout>
+	<nb-layout-column>
+	  <!-- Main Content Container -->
+	  <div class="chat-room_container">
+		<!-- Rooms List -->
+		<div class="rooms-list">
+		  <h3>Rooms:</h3>
+		  <ul>
+			<li *ngFor="let roomName of getRoomNames()" class="room-items">
+            <label for="{{roomName}}" [class.selected]="roomsList[roomName] === selectedRoom">
+				<input type="radio" id="{{roomName}}" name="room" (change)="onSelect(roomsList[roomName])">
+				{{ roomName }}
+			</label>
+			</li>
+		  </ul>
+		</div>
+		<!-- Chat Box -->
+		<div *ngIf="!selectedRoom">Select or create a room</div>
+		<div class="chat-column" *ngIf="selectedRoom"> 
+
+		<div *ngIf="selectedRoom!.owner === this.user.id">
+			<button (click)="settingsChat(selectedRoom)">Settings of {{selectedRoom.name}}</button>
+		</div>
+		  <nb-chat size="large" scrollbottom="true" [title]="selectedRoom.name">
+				<nb-chat-message *ngFor="let msg of selectedRoom.messages"
+				[type]="msg.type"
+				[message]="msg.message"
+				[avatar]="msg.sender_avatar!"
+				[sender]="msg.sender_name"
+				[date]="msg.created"
+				[reply]="this.user.nickname === msg.sender_name"
+				[customMessageData]="msg.customMessageData">
+				<button *nbCustomMessage="'custom'" (click)="joinBattle(msg)">Join battle!</button>
+				<ng-template nbChatMessageAvatar>
+						<div>
+							<nb-user [name]="msg.sender_name!" [picture]="msg.sender_avatar!"></nb-user>
+						</div>
+					</ng-template>
+				</nb-chat-message>
+				<nb-chat-form (send)="sendMessage($event)" [dropFiles]="false"></nb-chat-form>
+		  </nb-chat>
+		  <div class="ban-kick-mute">
+			<button *ngIf="selectedRoom" mat-raised-button color="primary" (click)="battle()">
+				Battle
+			</button>
+			<button *ngIf="selectedRoom" mat-raised-button color="primary" (click)="leaveRoom()">
+				leave room
+			</button>
+			<button [disabled]="!isChannelOwner()" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="deleteRoom()">
+				deleteRoom
+			</button>
+		  <div [formGroup]="userNameForm" class="user-name-input">
+		  	<input type="text" formControlName="userName" maxlength="13" placeholder="their nickname"/>
+		  </div>
+			<button [disabled]="!isChannelAdmin() || !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="mute()">
+				Mute
+			</button>
+			<button [disabled]="!isChannelAdmin() || !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="ban()">
+				Ban
+			</button>
+			<button [disabled]="!isChannelAdmin() || !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="kick()">
+				Kick
+			</button>
+			<button [disabled]="!isChannelAdmin() || !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="invite()">
+				Invite chat
+			</button>
+			<button [disabled]=" !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="block()">
+				Block
+			</button>
+			<button [disabled]="!userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="unblock()">
+				Unblock
+			</button>
+			<p class="user-not-found" *ngIf="userNotFound">User not found in this room</p>
+		</div>
+		</div>
+		<!-- User List -->
+		<div class="user-list">
+		  <h3>Users:</h3>
+		  <nb-card *ngFor="let m of userss">
+			<app-user-detail [id]=m></app-user-detail>
+		  </nb-card>
+		</div>
+	  </div>
+	</nb-layout-column>
+  </nb-layout>

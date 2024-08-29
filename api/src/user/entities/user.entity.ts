@@ -1,4 +1,5 @@
-import { Block } from "src/block/entities/block.entity";
+import { Blocks } from "src/block/entities/block.entity";
+import { UserChatroom } from "src/chat/entities/chatRoom.entity";
 import { FriendRequest } from "src/friends/entities/friend.entity";
 import { Match } from "src/game/entities/match.entity";
 import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
@@ -9,13 +10,10 @@ export const defaultAvatarUrl: string = "/uploads/default_avatar.png";
 export class User {
 
 	@PrimaryColumn()
-	id: string;
+	id: number;
 
 	@Column()
 	nickname: string;
-
-	// @Column("text", { array: true, default: "{}" })
-	// rooms: string[];
 	
 	@Column({default: "online"})
 	status: string;
@@ -29,11 +27,11 @@ export class User {
 	@OneToMany(() => FriendRequest, (friend) => friend.target)
 	friendIn: FriendRequest[];
 
-	@OneToMany(() => Block, (block) => block.sender)
-	blockOut: Block[];
+	@OneToMany(() => Blocks, (block) => block.sender)
+	blockOut: Blocks[];
 
-	@OneToMany(() => Block, (block) => block.target)
-	blockIn: Block[];
+	@OneToMany(() => Blocks, (block) => block.target)
+	blockIn: Blocks[];
 
 	@OneToMany(() => Match, (match) => match.winningPlayer)
 	matchWinningPlayer: Match[];
@@ -52,4 +50,8 @@ export class User {
 
 	@Column({default: 0})
 	roomKey: number;
+
+
+	@OneToMany(() => UserChatroom, (userChatroom) => userChatroom.user)
+	userChatrooms: UserChatroom[];
 }

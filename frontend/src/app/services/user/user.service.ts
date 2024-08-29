@@ -1,4 +1,4 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 // import { UserInterface } from '../../models/user.class';
 import { Observable, catchError } from 'rxjs';
@@ -22,17 +22,22 @@ export class UserService {
 		return this.http.post<any>(this.userUrl + '/changename', { nickname })
 	}
 
-	isNameTaken (nickname: string) : Observable<boolean> {
-		return this.http.get<boolean>(this.userUrl + '/isnametaken/' + nickname);
+	isNameTaken(nickname: string) : Observable<any> {
+		return this.http.get<any>(this.userUrl + '/isnametaken', {params: {nickname: nickname}});
 	}
 
 	// to request your own info, use 'current', otherwise use the userID.
 	getUser(id : string) : Observable<any> {
+		console.log("getting user: ", id);
 		if (id === 'current') {
 			return this.http.get<any>(this.userUrl + '/current', {});
 		}
 		return this.http.get<any>(this.userUrl + '/name/' + id, {});
 	};
+
+	getUserIdByName(nickname: string) : Observable<any> {
+		return this.http.get<any>(this.userUrl + '/getUserByName/', {params: {nickname: nickname}});
+	}
 
 	updateRoomKey(roomKey: number) {
 		return this.http.post(this.userUrl + '/update-roomkey/' + roomKey.toString(), {});

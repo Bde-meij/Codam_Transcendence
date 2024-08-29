@@ -1,0 +1,159 @@
+@import '../../../styles/helpers/constants.scss';
+@import '../../../styles/base/typography.scss';
+@import '@nebular/theme/styles/globals';
+
+nb-layout {
+	display: flex;
+	flex-direction: column;
+	height: 79vh;
+	overflow: hidden;
+  }
+  
+  nb-layout-column {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	flex: 1;
+	overflow: hidden;
+  }
+
+  .create-room-column {
+	width: 100%;
+	background-color: $column-color;
+	padding: 10px;
+	text-align: center;
+	margin-bottom: 20px;
+  }
+  
+  .create-room-column button {
+	padding: 10px 20px;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+  }
+  
+  .chat-room_container {
+	margin-left: auto;
+  	margin-right: auto;
+	display: flex;
+	justify-content: space-between;
+	width: 100%;
+	height: 65vh;
+  }
+  
+  .rooms-list, .user-list {
+	width: 30%;
+	background-color: $column-color;
+	padding: 10px;
+	border-radius: 5px;
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+	overflow-y: auto;
+  }
+  
+  .rooms-list {
+	margin-right: 20px;
+  }
+
+  .rooms-list input[type="radio"] {
+	display: none;
+  }
+
+  .rooms-list label {
+	display: block;
+	width: 100%;
+	padding: 8px;
+	border: 1px solid transparent;
+	border-radius: 5px;
+	cursor: pointer;
+	text-align: center;
+	background-color: $button-color;
+  }
+  
+  .room-items input[type="radio"]:checked + label {
+	border: 1px solid $font-color;
+  }
+  
+  .rooms-list label:hover {
+	background-color: $font-color;
+	color: $background-color;
+  }
+  
+  .user-list {
+	margin-left: 20px;
+  }
+  
+  .rooms-list h3, .user-list h3 {
+	margin-top: 0;
+  }
+  
+  .rooms-list ul {
+	list-style-type: none;
+	padding: 0;
+  }
+  
+  .rooms-list li {
+	margin-bottom: 10px;
+  }
+  
+  .rooms-list button {
+	display: block;
+	width: 100%;
+	padding: 8px;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+  }
+  
+  .chat-column {
+	flex: 1;
+	background-color: $column-color;
+	padding: 20px;
+	border-radius: 5px;
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .friends {
+	margin: 0 0 2em 0;
+	list-style-type: none;
+	padding: 0;
+	width: 15em;
+}
+
+.ban-kick-mute {
+	padding: 20px;
+	flex: auto;
+	text-align: center;
+}
+
+.user-name-input {
+	margin: 10px;
+}
+
+.user-not-found {
+	color: rgb(255, 74, 74);
+}
+
+.leave-room-button {
+    background: transparent;
+    border: none;
+    color: red;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0;
+    font-size: 1rem;
+    margin-left: 0.5rem;
+  }
+
+  .leave-room-button:hover {
+    color: darkred;
+  }
+
+
+  .room-items label {
+    margin-bottom: 0.5rem;
+  }
+
+  .selected {
+    font-weight: bold;
+    color: rgb(9, 104, 15);
+  }
