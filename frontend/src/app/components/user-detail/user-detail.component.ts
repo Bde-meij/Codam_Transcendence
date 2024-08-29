@@ -1,5 +1,5 @@
 import { JsonPipe, NgIf, UpperCasePipe } from '@angular/common';
-import { Component, Input, OnChanges, OnInit } from '@angular/core';
+import { Component, Input, OnChanges } from '@angular/core';
 import { User } from '../../models/user.class';
 import { UserService } from '../../services/user/user.service';
 import { FriendsService } from '../../services/friends/friends.service';
@@ -51,7 +51,7 @@ export class UserDetailComponent implements OnChanges {
 		private router: Router)
 	{
 		this.userService.getUser('current').subscribe({
-			next: (userData) => (
+			next: (userData : any) => (
 				this.client_user = userData
 			),
 			error: (error : HttpErrorResponse) => (
@@ -64,7 +64,7 @@ export class UserDetailComponent implements OnChanges {
 	ngOnChanges(): void {
 		this.userErrorMessage = undefined;
 		this.userService.getUser(this.id).subscribe({
-			next: (data) => (
+			next: (data : any) => (
 				this.tempUser.id = data.id,
 				this.tempUser.nickname = data.nickname,
 				this.tempUser.status = data.status
@@ -76,7 +76,7 @@ export class UserDetailComponent implements OnChanges {
 		});
 
 		this.userService.getAvatar(this.id).subscribe({
-			next: (data) => (
+			next: (data : any) => (
 				this.tempUser.avatar = URL.createObjectURL(data)
 			),
 			error: (error : HttpErrorResponse) => (
@@ -86,7 +86,7 @@ export class UserDetailComponent implements OnChanges {
 		});
 		
 		this.friendsService.isFriend(this.id).subscribe({
-			next: (data) => (
+			next: (data : any) => (
 				// console.log("isFriend: ", data),
 				this.isself = data.self,
 				this.isfriend = data.friend
@@ -105,7 +105,7 @@ export class UserDetailComponent implements OnChanges {
 		this.errorMessage = undefined;
 		this.matches = undefined;
 		this.userService.getStats(this.id).subscribe({
-			next: (data) => (
+			next: (data : any) => (
 				console.log('user-detail stat data:', data),
 				this.stats = data
 			),
@@ -120,7 +120,7 @@ export class UserDetailComponent implements OnChanges {
 		this.errorMessage = undefined;
 		this.stats = undefined;
 		this.userService.getMatches(this.id).subscribe({
-			next: (data) => (
+			next: (data : any) => (
 				this.matches = data,
 				console.log('user-detail match data:', data)
 			),
@@ -135,7 +135,7 @@ export class UserDetailComponent implements OnChanges {
 		if (this.isfriend === undefined)
 			return;
 		this.friendsService.addFriendId(this.id).subscribe({
-			next: (data) => {
+			next: (data : any) => {
 				console.log("send friendrequest data: " + data)
 			},
 			error: (e : HttpErrorResponse) => {
@@ -150,7 +150,7 @@ export class UserDetailComponent implements OnChanges {
 		if (this.isfriend === undefined)
 			return;
 		this.friendsService.deleteFriend(this.id).subscribe({
-			next: (data) => {
+			next: (data : any ) => {
 				console.log("delete friend data: " + data)
 			},
 			error: (e : HttpErrorResponse) => {
@@ -164,10 +164,10 @@ export class UserDetailComponent implements OnChanges {
 	block() {
 		console.log("block the mf 🪕");
 		this.blockService.createBlock(this.id).subscribe({
-			next: (data) => {
+			next: (data : any ) => {
 				console.log("block data: " + data);
 			},
-			error: (e) => {
+			error: (e : HttpErrorResponse ) => {
 				console.log("block error: " + e);
 			}
 		});

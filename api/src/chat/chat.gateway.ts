@@ -761,7 +761,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		  	this.chatRoomList[roomId].messages?.push(message);
 		  this.logger(`Message added to room ${roomId}:`, message);
 		} else {
-		//   console.error(`Room with ID ${roomId} not found`);
+		//   console.log(`Room with ID ${roomId} not found`);
 		}
 	}
 

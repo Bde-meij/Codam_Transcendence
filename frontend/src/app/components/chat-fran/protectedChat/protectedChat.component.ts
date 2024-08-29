@@ -1,6 +1,6 @@
 import { NgFor, NgIf } from '@angular/common';
-import { Component, Input, Inject } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { NbCardModule, NbCheckboxModule, NbDialogRef, NbToggleModule} from '@nebular/theme';
 import { Rooms } from '../../../models/rooms.class';
 
@@ -11,7 +11,7 @@ import { Rooms } from '../../../models/rooms.class';
   templateUrl: './protectedChat.component.html',
   styleUrl: './protectedChat.component.scss'
 })
-export class protectedChat {
+export class protectedChat implements OnInit {
 	roomName: string = '';
 	Password: string = '';
 	withPassword: boolean = false;

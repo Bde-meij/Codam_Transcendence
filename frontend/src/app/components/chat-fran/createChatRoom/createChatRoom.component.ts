@@ -1,12 +1,10 @@
 import { NgFor, NgIf } from '@angular/common';
-import { Component, Inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NbCardModule, NbDialogRef } from '@nebular/theme';
 import { Observable, catchError, map, of } from 'rxjs';
 import { UserService } from '../../../services/user/user.service';
-import { ChatService } from '../../../services/sock/chat/chat.service';
 import { Rooms } from '../../../models/rooms.class';
-import { User } from '../../../models/user.class';
 import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
@@ -65,7 +63,7 @@ export class createChatRoom {
       return;
     }
     this.getSelectedUserId().subscribe({
-			next: (userExists) => {
+			next: (userExists : any) => {
 				if (!userExists) {
         	this.userNotFound = true;
         	this.userInRoom = false;
@@ -93,7 +91,7 @@ export class createChatRoom {
 				return true;
 			}),
 			catchError((error) => {
-				// console.error('Error fetching user ID:', error);
+				console.log('Error fetching user ID:', error);
 				return of(false);
 			})
 		);

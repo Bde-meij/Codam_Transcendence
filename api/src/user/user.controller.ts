@@ -142,7 +142,7 @@ export class UserController {
 				unlinkSync(resolvedAvatarPath);
 		}
 		this.userService.updateAvatar(req.user.id, file.path);
-		console.log("MY DATA: ", file);
+		// console.log("MY DATA: ", file);
 		return res.status(HttpStatus.OK).json({message: 'Avatar uploaded'});
 	}
 

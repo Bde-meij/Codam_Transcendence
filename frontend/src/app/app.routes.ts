@@ -25,7 +25,6 @@ export const routes: Routes = [
 	{
 		path: 'welcome',
 		component: WelcomeComponent,
-		// data: { title: "Gary's basement" }
 		data: {title: constTitle}
 	},
 	{
@@ -83,8 +82,7 @@ export const routes: Routes = [
 				canActivate: [AuthGuard],
 			},
 			{
-				path: 'detail/:id', 
-				// data: {id: routes.thisArg},
+				path: 'detail/:id',
 				component: UserDetailComponent,
 				canActivate: [AuthGuard]
 			},

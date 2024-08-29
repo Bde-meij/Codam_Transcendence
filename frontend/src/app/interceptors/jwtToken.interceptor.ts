@@ -43,7 +43,8 @@ export class ErrorInterceptor implements HttpInterceptor {
 					this.refreshTokenSubject.next(token);
 					return next.handle(this.addToken(req, token.access_token))
 				}),
-				catchError(error => {
+				catchError((error : any) => {
+					console.log("handle error: ", error),
 					this.isRefreshing = false;	
 					this.snackBar.open('Session expired, please login again', 'Login', {
 						duration: 5000,

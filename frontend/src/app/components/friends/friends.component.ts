@@ -1,6 +1,5 @@
-import { Component, OnChanges, OnInit } from '@angular/core';
-// import { FAKE_FRIENDS, User } from '../../models/user.class';
-import { JsonPipe, NgFor, NgIf, UpperCasePipe } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
+import { NgFor, NgIf, UpperCasePipe } from '@angular/common';
 import { UserDetailComponent } from '../user-detail/user-detail.component';
 import { FriendsService } from '../../services/friends/friends.service';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -18,7 +17,7 @@ export interface Friend {
 @Component({
   selector: 'app-friends',
   standalone: true,
-  imports: [ReactiveFormsModule, NgFor, NgIf, UpperCasePipe, UserDetailComponent, RouterLink, JsonPipe],
+  imports: [ReactiveFormsModule, NgFor, NgIf, UpperCasePipe, UserDetailComponent, RouterLink],
   templateUrl: './friends.component.html',
   styleUrl: './friends.component.scss'
 })
@@ -49,26 +48,26 @@ export class FriendsComponent implements OnInit {
 	getLists() {
 		this.bigErrorMessage = undefined
 		this.friendsService.getFriends().subscribe({
-			next: (data) => (
+			next: (data : any) => (
 				this.friends = data
 			),
-			error: (e) => (
+			error: (e : HttpErrorResponse) => (
 				this.bigErrorMessage = e
 			)
 		});
 		this.friendsService.getIncomingRequests().subscribe({
-			next: (data) => (
+			next: (data : any) => (
 				this.incoming = data
 			),
-			error: (e) => (
+			error: (e : HttpErrorResponse) => (
 				this.bigErrorMessage = e
 			)
 		});
 		this.friendsService.getOutgoingRequests().subscribe({
-			next: (data) => (
+			next: (data : any) => (
 				this.outgoing = data
 			),
-			error: (e) => (
+			error: (e : HttpErrorResponse) => (
 				this.bigErrorMessage = e
 			)
 		});
@@ -96,7 +95,8 @@ export class FriendsComponent implements OnInit {
 	acceptIncoming(request: FriendRequest) {
 		console.log("accept request: ", request);
 		this.friendsService.acceptIncomingRequest(request.id).subscribe({
-			next: (data) => {
+			next: (data : any) => {
+				this.errorMessage = '';
 				console.log("accept friendrequest data: " + data)
 			},
 			error: (e : HttpErrorResponse) => {
@@ -110,7 +110,8 @@ export class FriendsComponent implements OnInit {
 	deleteRequest(request: FriendRequest) {
 		console.log("delete request: ", request);
 		this.friendsService.deleteRequest(request.id).subscribe({
-			next: (data) => {
+			next: (data : any) => {
+				this.errorMessage = '';
 				console.log("delete friendrequest data: " + data)
 			},
 			error: (e : HttpErrorResponse) => {
@@ -125,7 +126,8 @@ export class FriendsComponent implements OnInit {
 		console.log("delete friend: ", friend);
 		this.selectedFriend = undefined;
 		this.friendsService.deleteFriend(friend.id).subscribe({
-			next: (data) => {
+			next: (data : any ) => {
+				this.errorMessage = '';
 				console.log("delete friend data: " + data)
 			},
 			error: (e : HttpErrorResponse) => {
@@ -144,7 +146,8 @@ export class FriendsComponent implements OnInit {
 		if (this.friendForm.value.friendName) {
 			console.log("sending this name: ", this.friendForm.value.friendName);
 			this.friendsService.addFriendNick(this.friendForm.value.friendName).subscribe({
-				next: (data) => {
+				next: (data : any ) => {
+					this.errorMessage = '';
 					console.log("send friendrequest data: " + data)
 				},
 				error: (e : HttpErrorResponse) => {
