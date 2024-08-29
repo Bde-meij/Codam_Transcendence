@@ -26,11 +26,17 @@ export class StatsService {
 
 	async updateWins(userId: number) {
 		let stats: MatchStats = await this.getStats(userId);
+		if (!stats) {
+			return ;
+		}
 		await this.statsRepo.update({id: userId}, {wins: stats.wins + 1, rating: stats.rating + 1});
 	}
 
 	async updateLosses(userId: number) {
 		let stats: MatchStats = await this.getStats(userId);
+		if (!stats) {
+			return ;
+		}
 		await this.statsRepo.update({id: userId}, {losses: stats.losses + 1, rating: stats.rating - 1});
 	}
 	
