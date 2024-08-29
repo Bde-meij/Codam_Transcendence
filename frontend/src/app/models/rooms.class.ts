@@ -1,5 +1,3 @@
-import { User } from "./user.class";
-
 export interface Rooms {
 	id: number;
 	name: string;

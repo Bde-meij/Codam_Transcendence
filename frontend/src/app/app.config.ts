@@ -5,7 +5,7 @@ import { AuthService } from './services/auth/auth.service';
 import { provideHttpClient, HTTP_INTERCEPTORS, withInterceptorsFromDi } from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { ErrorInterceptor } from './interceptors/jwtToken.interceptor';
-import { NbChatModule, NbLayoutModule, NbSidebarService, NbThemeModule, NbCardModule, NbDialogModule } from '@nebular/theme';
+import { NbChatModule, NbLayoutModule, NbThemeModule, NbCardModule, NbDialogModule } from '@nebular/theme';
 import { PRECONNECT_CHECK_BLOCKLIST } from '@angular/common';
 
 export const appConfig: ApplicationConfig = {

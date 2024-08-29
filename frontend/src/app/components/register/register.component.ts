@@ -1,15 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
-import { NgIf, NgOptimizedImage } from '@angular/common';
+import { NgIf } from '@angular/common';
 import { UniqueNameValidator, forbiddenNameValidator } from '../../services/validator/name-validator.service';
 import { UserService } from '../../services/user/user.service';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, NgOptimizedImage, NgIf],
+  imports: [ReactiveFormsModule, NgIf],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss'
 })
@@ -38,7 +38,8 @@ export class RegisterComponent {
 			this.userService.register(this.profileForm.value.nickname).subscribe({
 				next: (data) => {
 					console.log("registered name data: ", data),
-					this.router.navigate(['/dashboard/home']);
+					this.errorMessage = "",
+					this.router.navigate(['/dashboard/home'])
 				},
 				error: (e : HttpErrorResponse) => {
 					this.errorMessage = e.message,

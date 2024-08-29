@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AsyncPipe, NgIf } from '@angular/common';
+import { NgIf } from '@angular/common';
 import { ReactiveFormsModule, FormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth/auth.service';
 import { UniqueNameValidator, forbiddenNameValidator } from '../../services/validator/name-validator.service';
@@ -12,7 +12,7 @@ import { BlockService } from '../../services/block/block.service';
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [ReactiveFormsModule, NgIf, FormsModule, AsyncPipe, UserDetailComponent],
+  imports: [ReactiveFormsModule, NgIf, FormsModule, UserDetailComponent],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.scss'
 })
@@ -109,7 +109,7 @@ export class SettingsComponent implements OnInit {
 				console.log('Verification response:', response);
 			},
 			error: (e) => { 
-				// console.error('Error verifying user input:', e);
+				console.log('Error verifying user input:', e);
 			}
 		});
 	}

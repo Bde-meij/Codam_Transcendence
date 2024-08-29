@@ -1,5 +1,5 @@
 import { JsonPipe, NgIf, UpperCasePipe } from '@angular/common';
-import { Component, Input, OnChanges, OnInit } from '@angular/core';
+import { Component, Input, OnChanges } from '@angular/core';
 import { User } from '../../models/user.class';
 import { UserService } from '../../services/user/user.service';
 import { FriendsService } from '../../services/friends/friends.service';

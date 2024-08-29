@@ -4,12 +4,3 @@ export interface game{
 	uniquekey?: number;
 	enemyid?: number; 
 }
-
-export interface gameresult{
-	user1
-	user2
-	user3?
-	user4?
-	who won
-	gamemode
-}
