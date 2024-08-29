@@ -30,7 +30,7 @@ export class TwofaComponent {
   }
 
   cancel() {
-	this.authService.logout().subscribe();
+	// this.authService.logout().subscribe();
     this.router.navigate(['/welcome']);
   }
 }
