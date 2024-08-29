@@ -54,7 +54,7 @@ export class AuthService {
 	}
 
 	async verifyJwtRefreshToken(token: string) {
-		console.log('verifying refresh token...')
+		// console.log('verifying refresh token...')
 		const invalidatedToken = await this.tokenRepo.findOne({where: {token: token}});
 		if (invalidatedToken)
 			throw new UnauthorizedException('Old refresh token (verify)');

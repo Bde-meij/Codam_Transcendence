@@ -22,7 +22,7 @@ export class JwtRefreshGuard implements CanActivate {
 		} catch(err) {
 			response.clearCookie('access_token');
 			response.clearCookie('refresh_token');
-			console.log('Refresh token validation failed (JWT refresh guard): ', err);
+			// console.log('Refresh token validation failed (JWT refresh guard): ', err);
 			throw new UnauthorizedException('Invalid refresh token');
 		}
 		return true;
@@ -30,7 +30,7 @@ export class JwtRefreshGuard implements CanActivate {
 
 	private extractTokenFromHeader(request: Request, token_name: string): string | undefined {
 		const token = request.cookies[token_name]
-		console.log("jwt guard: extractTokenFromHeader():", token);
+		// console.log("jwt guard: extractTokenFromHeader():", token);
 		return (token);
 	}
 }
