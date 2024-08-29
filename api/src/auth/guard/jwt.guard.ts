@@ -20,7 +20,7 @@ export class JwtGuard implements CanActivate {
 				throw new UnauthorizedException('2FA not verified');
 			request['user'] = payload;
 		} catch(err) {
-			console.log('Access token validation failed (JWT guard): ', err);
+			// console.log('Access token validation failed (JWT guard): ', err);
 			throw new UnauthorizedException('Invalid access token');
 		}
 		return true;
