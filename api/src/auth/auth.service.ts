@@ -1,8 +1,6 @@
-import { Session, HttpStatus, Injectable, Req, Res, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MongoExpiredSessionError, Repository } from 'typeorm';
-import { User } from 'src/user/entities/user.entity';
-import { Request, Response } from 'express';
+import { Repository } from 'typeorm';
 import { UserService } from 'src/user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -67,6 +65,11 @@ export class AuthService {
 					secret: this.configService.getOrThrow("JWT_REFRESH_SECRET"),
 				}
 			);
+			const user = await this.userService.userExists(payload.id);
+			if (!user) {
+				console.log('Refresh token valid, but user not found')
+				throw new NotFoundException();
+			}
 			return payload;
 		}
 		catch(error) {

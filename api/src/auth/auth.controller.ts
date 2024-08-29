@@ -9,6 +9,7 @@ import {
 	HttpStatus,
 	Param,
 	HttpException,
+	UnauthorizedException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Request, Response, Express, response } from 'express';
@@ -31,7 +32,9 @@ export class AuthController {
 	// Returns: {loggedIn: true} on success - 401 Unauthorized on failure
 	@Get('isloggedin')
 	@UseGuards(JwtGuard)
-	async checkLoggedIn() {
+	async checkLoggedIn(@Req() req) {
+		// if (!await this.userService.findUserById(req.user.id))
+		// 	throw new UnauthorizedException("Did you really just delete yourself from the database while you were logged in to see what happens??");
 		// console.log('GET: auth/isloggedin');
 		return {loggedIn: true};
 	}

@@ -40,16 +40,9 @@ export class ChatRoomService {
 		};
 	}
 
-	async deleteChatRoom(deleteRoomDto: DeleteRoomDto) {
-		const checkOldPassword: boolean = await this.checkPassword({
-			id: deleteRoomDto.roomid,
-			password: deleteRoomDto.password
-		});
-		if (!checkOldPassword)
-			return false;
-		await this.roomRepo.delete({id: deleteRoomDto.roomid});
-		await this.userChatroomRepo.delete({chatroom: {id: deleteRoomDto.roomid}});
-		return true;
+	async deleteChatRoom(roomid: number) {
+		await this.userChatroomRepo.delete({chatroom: {id: roomid}});
+		await this.roomRepo.delete({id: roomid});
 	}
 	
 	async getAllChatRooms(): Promise<Chatroom[]> {
@@ -58,6 +51,8 @@ export class ChatRoomService {
 				id: true,
 				name: true,
 				userChatrooms: true,
+				status: true,
+
 			},
 			relations: {
 				userChatrooms: {
@@ -137,7 +132,7 @@ export class ChatRoomService {
 	// Adds user the the userchatroom table
 	// Returns null if the user or the chatroom isn't found
 	async addUserToChatRoom(userId: number, roomId: number, role: string): Promise<UserChatroom | null> {
-		console.log("adding user:", userId, roomId, role);
+		// console.log("adding user:", userId, roomId, role);
 		const exists: UserChatroom = await this.findUserInChatRoom(userId, roomId);
 		if (exists) {
 			return (null);
@@ -155,7 +150,7 @@ export class ChatRoomService {
 			chatroom: room,
 			role: role,
 		});
-		console.log("User", user.nickname, "added to room", room.name);
+		// console.log("User", user.nickname, "added to room", room.name);
 		return await this.userChatroomRepo.save(userChatRoom);
 	}
 	
@@ -336,7 +331,7 @@ export class ChatRoomService {
 				status: 'protected',
 			},
 		});
-		console.log(protectedRooms);
+		//console.log(protectedRooms);
 		var ret = [];
 		for (var room of protectedRooms) {
 			const userChatroom = await this.findUserInChatRoom(userId, room.id);
@@ -344,7 +339,7 @@ export class ChatRoomService {
 				ret.push(room);
 			}
 		}
-		console.log(ret);
+		//console.log(ret);
 		return (ret);
 	}
 
@@ -418,6 +413,10 @@ export class ChatRoomService {
 			where: {
 				user: {id: userId},
 				chatroom: {id: roomId},
+			},
+			relations: {
+				user: true,
+				chatroom: true,
 			}
 		});
 		if (!userChatRoom) {
@@ -435,6 +434,7 @@ export class ChatRoomService {
 				chatroom: {id: roomId},
 			}
 		});
+		//console.log(userChatRoom);
 		if (!userChatRoom) {
 			return null;
 		}
@@ -444,9 +444,47 @@ export class ChatRoomService {
 		}
 		if (userChatRoom.banned == true) {
 			userChatRoom.banned = false;
+			//console.log("toggleBanned( false");
+
 		} else {
 			userChatRoom.banned = true;
+			//console.log("toggleBanned( true");
+
 		}
 		return await this.userChatroomRepo.save(userChatRoom);
+	}
+
+	async banUser(userId: number, roomId: number) {
+		var userChatRoom: UserChatroom = await this.userChatroomRepo.findOne({
+			where: {
+				user: {id: userId},
+				chatroom: {id: roomId},
+				banned: false,
+			}
+		});
+		if (!userChatRoom) {
+			return;
+		}
+		if (this.getRoleWeight(userChatRoom.role) > 1) {
+			return;
+		}
+		await this.userChatroomRepo.update({id: userChatRoom.id}, {banned: true});
+	}
+	
+	async unbanUser(userId: number, roomId: number) {
+		var userChatRoom: UserChatroom = await this.userChatroomRepo.findOne({
+			where: {
+				user: {id: userId},
+				chatroom: {id: roomId},
+				banned: true,
+			}
+		});
+		if (!userChatRoom) {
+			return;
+		}
+		if (this.getRoleWeight(userChatRoom.role) > 1) {
+			return;
+		}
+		await this.userChatroomRepo.update({id: userChatRoom.id}, {banned: false});
 	}
 }

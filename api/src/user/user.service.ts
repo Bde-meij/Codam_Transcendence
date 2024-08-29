@@ -23,7 +23,7 @@ export class UserService {
 	}
 	
 	async createUser(userData: CreateUserDto): Promise<User> {
-		console.error("NEW USER 2:", userData);
+		// console.error("NEW USER 2:", userData);
 		const userExists = await this.userRepo.findOne({
 			select: {
 				id: true,
@@ -57,7 +57,7 @@ export class UserService {
 	
 	async findUserByName(name: string) {
 		const user = await this.userRepo.findOne({where: {nickname :name}});
-		console.log(user);
+		// console.log(user);
 		return user;
 	}
 
@@ -134,8 +134,6 @@ export class UserService {
 	}
 
 	async updateRoomKey(userId: number, roomKey: number) {
-		if (!await this.userExists(userId))
-			throw new HttpException("User not found!", 404);
 		await this.userRepo.update({id: userId}, {roomKey: roomKey});
 	}
 }

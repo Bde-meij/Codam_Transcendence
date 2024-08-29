@@ -6,7 +6,7 @@ import { UniqueNameValidator, forbiddenNameValidator } from '../../services/vali
 import { UserService } from '../../services/user/user.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { UserDetailComponent } from '../user-detail/user-detail.component';
-import { Blocks } from '../../models/rooms.class';
+import { Blocks } from '../../models/blocks.class';
 import { BlockService } from '../../services/block/block.service';
 
 @Component({
@@ -86,10 +86,15 @@ export class SettingsComponent implements OnInit {
 	onChange() {
 		if (this.is2faEnabled) {
 			this.isChecked = true;
-			this.authService.setUp2FA().subscribe( data => {
-				this.qrCode = data.qrCode;
-				this.secret = data.secret;
-			});
+			this.authService.setUp2FA().subscribe({
+				next: (data: any) => {
+					this.qrCode = data.qrCode;
+					this.secret = data.secret;
+				},
+				error: (e: any) => (
+					console.log("2FA setup error: ", e)
+				)
+			})
 		}
 		else {
 			this.isChecked = false;
@@ -104,7 +109,7 @@ export class SettingsComponent implements OnInit {
 				console.log('Verification response:', response);
 			},
 			error: (e) => { 
-				console.error('Error verifying user input:', e);
+				// console.error('Error verifying user input:', e);
 			}
 		});
 	}
@@ -122,17 +127,11 @@ export class SettingsComponent implements OnInit {
 				},
 				error: (e: HttpErrorResponse) => {
 					this.errorMessage = e.message;
-					// this.succesMessage = '';
 					console.log("changename data error :", e.message);
 				}
 			});
 			this.profileForm.value.nickname = undefined;
 		};
-		// window.location.reload();
-		
-		// this.router.navigate([this.router.url]);
-		// this.router.navigate(['/dashboard/settings/'], {});
-		// console.log("NAVIGATE")
 	}
 
 	preview: string | undefined;
@@ -147,7 +146,6 @@ export class SettingsComponent implements OnInit {
 
 				const reader = new FileReader();
 				reader.onload = (e: any) => {
-					// console.log("e.target.result: ", e.target.result);
 					this.preview = e.target.result;
 				};
 				reader.readAsDataURL(this.current_file);

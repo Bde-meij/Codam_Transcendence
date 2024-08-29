@@ -12,9 +12,12 @@
 		  <h3>Rooms:</h3>
 		  <ul>
 			<li *ngFor="let roomName of getRoomNames()" class="room-items">
-            <label for="{{roomName}}" [class.selected]="roomsList[roomName] === selectedRoom">
+            <label for="{{roomName}}" 
+				[class.selected]="roomsList[roomName] === selectedRoom"
+				[ngStyle]="{'color': isProtected(roomName) && !isJoined(roomName) ? 'red' : 'inherit'}">
 				<input type="radio" id="{{roomName}}" name="room" (change)="onSelect(roomsList[roomName])">
-				{{ roomName }}
+				<div *ngIf="!isJoined(roomName)">{{ roomName }}</div>
+				<div *ngIf="isJoined(roomName)">{{ roomName }}</div>
 			</label>
 			</li>
 		  </ul>
@@ -23,7 +26,7 @@
 		<div *ngIf="!selectedRoom">Select or create a room</div>
 		<div class="chat-column" *ngIf="selectedRoom"> 
 
-		<div *ngIf="selectedRoom!.owner === this.user.id">
+		<div *ngIf="selectedRoom?.owner === this.user?.id">
 			<button (click)="settingsChat(selectedRoom)">Settings of {{selectedRoom.name}}</button>
 		</div>
 		  <nb-chat size="large" scrollbottom="true" [title]="selectedRoom.name">
@@ -33,7 +36,7 @@
 				[avatar]="msg.sender_avatar!"
 				[sender]="msg.sender_name"
 				[date]="msg.created"
-				[reply]="this.user.nickname === msg.sender_name"
+				[reply]="this.user?.nickname === msg.sender_name"
 				[customMessageData]="msg.customMessageData">
 				<button *nbCustomMessage="'custom'" (click)="joinBattle(msg)">Join battle!</button>
 				<ng-template nbChatMessageAvatar>
@@ -57,16 +60,16 @@
 		  <div [formGroup]="userNameForm" class="user-name-input">
 		  	<input type="text" formControlName="userName" maxlength="13" placeholder="their nickname"/>
 		  </div>
-			<button [disabled]="!isChannelAdmin() || !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="mute()">
+			<button [disabled]="(!isChannelAdmin() && !isChannelOwner()) || !userNameForm.value.userName " *ngIf="selectedRoom" mat-raised-button color="primary" (click)="mute()">
 				Mute
 			</button>
-			<button [disabled]="!isChannelAdmin() || !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="ban()">
+			<button [disabled]="(!isChannelAdmin() && !isChannelOwner()) || !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="ban()">
 				Ban
 			</button>
-			<button [disabled]="!isChannelAdmin() || !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="kick()">
+			<button [disabled]="(!isChannelAdmin() && !isChannelOwner()) || !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="kick()">
 				Kick
 			</button>
-			<button [disabled]="!isChannelAdmin() || !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="invite()">
+			<button [disabled]="(!isChannelAdmin() && !isChannelOwner()) || !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="invite()">
 				Invite chat
 			</button>
 			<button [disabled]=" !userNameForm.value.userName" *ngIf="selectedRoom" mat-raised-button color="primary" (click)="block()">

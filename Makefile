@@ -2,7 +2,7 @@ NAME = v1
 
 all: up
 
-re: data clean build up
+re: clean build up
 
 build: 
 	docker compose build

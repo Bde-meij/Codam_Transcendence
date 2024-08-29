@@ -11,7 +11,9 @@ export class ErrorInterceptor implements HttpInterceptor {
 	private isRefreshing = false;
   	private refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
-	constructor(private snackBar: MatSnackBar, private router: Router, private http: HttpClient) {}
+	constructor(
+		private snackBar: MatSnackBar, 
+		private router: Router, private http: HttpClient) {}
 
 	intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<unknown>> {
 		const clonedReq = req.clone({

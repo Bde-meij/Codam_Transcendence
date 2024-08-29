@@ -2,6 +2,8 @@ import { User } from "src/user/entities/user.entity";
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 export enum MatchType {
+	CLASSIC = "classic",
+	FLAPPY = "flappy",
 	PUBLIC = "public",
 	PRIVATE = "private",
 	SPECIAL = "special"

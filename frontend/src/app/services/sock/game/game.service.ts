@@ -1,12 +1,16 @@
 import { Injectable } from '@angular/core';
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 import { Observable } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
 
 export class GameService{
-	gameSocket = io("/game");
+	gameSocket : Socket;
+
+	constructor() {
+		this.gameSocket = io("/game");
+	}	
 	
 	connect() {
 		return this.gameSocket.connect();
@@ -22,7 +26,6 @@ export class GameService{
 		{
 			this.gameSocket.on('assignNumber', (playNum: number) =>
 			{
-				// console.log("player assigned with", playNum);
 				observ.next(playNum);
 			});
 		});
@@ -34,7 +37,6 @@ export class GameService{
 		{
 			this.gameSocket.on('assignNames', (playNames: string[]) =>
 			{
-				// console.log("player assigned with", playNames);
 				observ.next(playNames);
 			});
 		});
@@ -46,7 +48,6 @@ export class GameService{
 		{
 			this.gameSocket.on("updatePlayerPos", (yPos: number) =>
 			{
-				// console.log("receive playerpos");
 				observ.next(yPos);
 			});
 		});
@@ -58,7 +59,6 @@ export class GameService{
 		{
 			this.gameSocket.on("flappyGravity", (yPos: number[]) =>
 			{
-				// console.log("receive playerpos");
 				observ.next(yPos);
 			});
 		});
@@ -125,7 +125,6 @@ export class GameService{
 		{
 			this.gameSocket.on("abortGame", (playerName: string) =>
 			{
-				// console.log("abortGame service called");
 				observ.next(playerName);
 			});
 		});
@@ -133,7 +132,6 @@ export class GameService{
 
 	joinGame()
 	{
-		// console.log("joining gaime");
 		this.gameSocket.emit("joinGame");
 	}
 

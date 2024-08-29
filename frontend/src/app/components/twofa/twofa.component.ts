@@ -20,14 +20,13 @@ export class TwofaComponent {
 
   verifyUserInput() {
 	this.authService.verify2FA(this.userInput).subscribe({
-		next: (response) => {
+		next: (response: any) => {
 			this.verificationRes = response;
-			// console.log('Verification response:', response.message);
 			if (this.verificationRes.status)
 				this.router.navigate(['/dashboard/home']);
 		},
-		error: (e) => {
-			console.error('Error verifying user input:', e);
+		error: (e: any) => {
+			// console.error('Error verifying user input:', e);
 		}
 	});
   }

@@ -1,5 +1,5 @@
 <nb-card>
-	<nb-card-header><h6>Change protected of {{this.selectedRoom!.name}}</h6></nb-card-header>
+	<nb-card-header><h6>Change protected of {{selectedRoom!.name}}</h6></nb-card-header>
 	<nb-card-body>
 	  <form (ngSubmit)="submitForm()">
 		<div class="room-name-input">
@@ -8,7 +8,7 @@
 		</div>
 
 		<div class="password-input">
-			<label for="password"> Give me Password:</label>
+			<label for="Password"> Give me Password:</label>
 			<input type="text" id="Password" name="Password" nbInput [(ngModel)]="Password">
 		</div>
 

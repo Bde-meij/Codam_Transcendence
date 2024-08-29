@@ -24,6 +24,7 @@ export class WsExceptionFilter implements ExceptionFilter {
 			let response = exception.getResponse();
 			e_msg.status_code = exception.getStatus();
 			let responses: string | object = exception.getResponse();
+			// console.log(response);
 			try {
 				if (typeof responses === 'string') {
 					responses = JSON.parse(responses);
@@ -46,6 +47,7 @@ export class WsExceptionFilter implements ExceptionFilter {
 				console.log("Error handling responses:", error);
 			}
 		}
+		console.log(exception);
 		console.log("WsExceptionFilter unexpected error");
 	}
 }

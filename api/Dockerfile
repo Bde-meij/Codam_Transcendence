@@ -1,4 +1,4 @@
-FROM node:21.7.1 AS development
+FROM node:22.1.0 AS development
 
 WORKDIR /src/app
 
@@ -14,7 +14,7 @@ EXPOSE 3000
 
 #PRODUCTION#
 
-FROM node:21.7.1 AS production
+FROM node:22.1.0 AS production
 
 ARG NODE_ENV=production
 ENV NODE_ENV=$(NODE_ENV)

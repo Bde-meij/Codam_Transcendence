@@ -5,7 +5,8 @@ import { ChatService } from '../../services/sock/chat/chat.service';
 import { UserService } from '../../services/user/user.service';
 import { BlockService } from '../../services/block/block.service';
 import { User } from '../../models/user.class';
-import { Blocks, ErrorMessage, getAllUsersInRoomDTO, MessageInterface, Rooms } from '../../models/rooms.class';
+import { Blocks } from '../../models/blocks.class'
+import { ErrorMessage, getAllUsersInRoomDTO, MessageInterface, Rooms } from '../../models/rooms.class';
 import { NbThemeModule, NbLayoutModule} from '@nebular/theme';
 import { UserDetailComponent } from '../user-detail/user-detail.component';	
 import { createChatRoom } from './createChatRoom/createChatRoom.component';
@@ -15,7 +16,7 @@ import { forbiddenNameValidator } from '../../services/validator/name-validator.
 import { Router } from '@angular/router';
 import { settingsChat } from './settingsChat/settingsChat.component';
 import { protectedChat } from './protectedChat/protectedChat.component';
-import { ErrorService } from '../../services/sock/chat/error.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 let subbed = false;
 let pw = '';
@@ -45,7 +46,7 @@ export class FranChatUiComponent implements AfterViewInit{
 	selectedUser: any;
 	selectedUserID?: number;
 	message: string | undefined;
-	user!: User;
+	user?: User;
 	messages: string[] = [];
 
 	roomsList: Record<string, Rooms> = {};
@@ -60,22 +61,34 @@ export class FranChatUiComponent implements AfterViewInit{
 	blockedList?: Blocks[];
 
 	async onSelect(room: Rooms): Promise<any> {
-		console.log("selecting room:", room);
-		pw = '';
+		pw = 'a string';
 		joined = 1;
+		if (room == undefined){
+			return;
+		}
+		//console.log(room);
 		this.selectedRoom = room;
 		this.chatService.room = this.selectedRoom!
 		this.last_open_room();
 		this.change_sender_avatar(room.name);
-		if (this.selectedRoom.password && !this.selectedRoom.users.includes(Number(this.user.id))){
+		if (this.selectedRoom.password && !this.selectedRoom.users.includes(Number(this.user?.id))){
 			var test = await this.passwordPopup(room);
-			console.log("input", test);
-			this.joinRoom(room.name, pw);
-			if (!this.selectedRoom.users.includes(Number(this.user.id)))
-				joined = 0;
-		}else {
-			this.joinRoom(room.name, pw);
-		}	
+			setTimeout(() => {
+				this.joinRoom(room.name, pw);
+				if (this.selectedRoom! &&!this.selectedRoom!.users.includes(Number(this.user?.id))){
+					joined = 0;
+				}
+			}, 150);
+		}else if (this.selectedRoom! && !this.selectedRoom.users.includes(Number(this.user?.id))){
+			setTimeout(() => {
+				this.joinRoom(room.name, pw);
+				this.selectedRoom = room;
+			}, 150);
+		}else{
+			setTimeout(() => {
+				this.joinRoom(room.name, pw);
+			}, 150);
+		}
 		this.selectedRoom = room;
 		if (joined === 0){
 			this.selectedRoom = undefined;
@@ -89,7 +102,6 @@ export class FranChatUiComponent implements AfterViewInit{
 		private blockService: BlockService,
 		private dialogService: NbDialogService,
 		private router: Router,
-		private errorService: ErrorService,
 	) 
 	{
 		this.userMap = new Map<number, string>();
@@ -107,151 +119,223 @@ export class FranChatUiComponent implements AfterViewInit{
 				updateOn: 'change',
 			}),
 		});
-		this.userService.getUser('current').subscribe((userData: User) => {
-			this.user = userData;
-			if (this.user){
-				this.updateName();
-			}
-		});
+		
+		this.userService.getUser('current').subscribe({
+			next: (userData: User) => {
+				this.user = userData;
+				if (this.user) {
+					this.updateName();
+				}
+			},
+			error: (error : HttpErrorResponse) => (
+				console.log("Error message: ", error.message)
+			)
+		})
 		
 		if (!subbed) {
-			this.chatService.getMessages().subscribe((newmessage: any ) => {
-				console.log("getmessage:", this.roomsList);
-				if (this.roomsList[newmessage.room_name]?.messages) {
-					// console.log("New message");
-					this.blockedList?.forEach(block => {
-						if (block.target.id == newmessage.senderId)
-							// console.log("already blocked?");
-							this.blockbool = true;
-							return;	
-					});
-					if (newmessage.senderId > 0){
-						newmessage.sender_avatar = this.get_avatar(newmessage.senderId);
-					this.userService.getAvatar(newmessage.senderId).subscribe((data) => (
-						newmessage.sender_avatar = URL.createObjectURL(data)
-					))
-					if (!this.blockbool){
-						// console.log("blockblool = faslse", this.blockbool);
-						this.roomsList[newmessage.room_name].messages?.push(newmessage);
+			this.chatService.getMessages().subscribe({
+				next: (newmessage: any) => {
+					//console.log("getmessage: roomlist:", this.roomsList);
+					if (this.roomsList[newmessage.room_name]?.messages) {
+						//console.log(this.selectedRoom?.name);
+						this.getLists();
+						//console.log("blocked lists:");
+						//console.log(this.blockedList);
+						this.blockedList?.forEach(block => {
+							if (block.target.id == newmessage.senderId){
+								//console.log("already blocked:",newmessage.senderId);
+								this.blockbool = true;
+								return;	
+							}
+						});
+						if (newmessage.senderId > 0){
+							newmessage.sender_avatar = this.get_avatar(newmessage.senderId);
+							// if (!newmessage.sender_avatar){
+							this.userService.getAvatar(newmessage.senderId).subscribe({
+								next: (data: any) => {
+									newmessage.sender_avatar = URL.createObjectURL(data)
+								},
+								error: (error : HttpErrorResponse) => (
+									console.log("Error message: ", error.message)
+								)
+							})
+							// }
+						}
+						if (!this.blockbool){
+							// console.log("blockblool = faslse", this.blockbool);
+							this.roomsList[newmessage.room_name].messages?.push(newmessage);
 					}
 					else
 						this.blockbool = false;
-					
-				}
-				this.blockbool = false;
-			});
-
-			this.chatService.update_client_room().subscribe((update_room: Rooms) => {
-				console.log(`update_client_room: ${update_room.name}`);
-				console.log(update_room);
-				this.roomsList[update_room.name] = update_room;
-				if (this.selectedRoom){
-					if (this.selectedRoom.name == update_room.name){
-						console.log("updated selected room");
-						this.change_sender_avatar(this.selectedRoom.name);
-						this.selectedRoom = update_room;
 					}
-				}
+					this.blockbool = false;
+					},
+				error: (error : HttpErrorResponse) => (
+					console.log("Error message: ", error.message)
+				)
 			})
 
-			this.chatService.error_message().subscribe((msg: ErrorMessage) => {
-				// this.errorService.showError(msg);
-				// let room_id = 0;
-				// let room_name = 'Global';
-				
-				// if (!msg.msg)
-				// 	msg.msg = "Undefined error";
-				// if (this.selectedRoom){
-				// 	room_id = this.selectedRoom?.id;
-				// 	room_name = this.selectedRoom?.name;
-				// } else if (msg.room){
-				// 	room_id = this.roomsList[msg.room].id;
-				// 	room_name = msg.room;
-				// }
-				// const message : MessageInterface = {
-				// 	message: msg.msg,
-				// 	roomId: room_id,
-				// 	room_name: room_name,
-				// 	senderId: -1,
-				// 	sender_name: "System messager",
-				// 	sender_avatar: '',
-				// 	type: 'text',
-				// 	created: new Date(),
-				// }
-				// console.log(`error_message ${message.message} - ${this.selectedRoom?.name}`);
-				// if (!this.roomsList[message.room_name])
-				// 	this.roomsList[message.room_name];
-				// console.log("error message naar " + message.room_name);
-				// this.roomsList[message.room_name].messages?.push(message);
+			this.chatService.update_client_room().subscribe({
+				next: (update_room: Rooms) => {
+					//console.log(`update_client_room: ${update_room.name}`);
+					//console.log(update_room);
+					this.roomsList[update_room.name] = update_room;
+					if (this.selectedRoom){
+						if (this.selectedRoom.name == update_room.name){
+							//console.log("updated selected room");
+							this.change_sender_avatar(this.selectedRoom.name);
+							this.selecting_room(this.selectedRoom.name);
+						}
+					}
+				},
+				error: (error : HttpErrorResponse) => (
+					console.log("Error message: ", error.message)
+				)
 			})
 
-			this.chatService.get_all_blocked().subscribe((blocked: any) => {
-				// console.log("blockedlist:", blocked);
-				this.blockedList = blocked
+			this.chatService.error_message().subscribe({
+				next: (msg: ErrorMessage) => {
+					// this.errorService.showError(msg);
+					let room_id = 0;
+					let room_name = 'Global';
+					
+					if (!msg.msg)
+						msg.msg = "Undefined error";
+					if (this.selectedRoom){
+						room_id = this.selectedRoom?.id;
+						room_name = this.selectedRoom?.name;
+					}
+					if (msg.room){
+						room_id = this.roomsList[msg.room].id;
+						room_name = msg.room;
+					}
+					const message : MessageInterface = {
+						message: msg.msg,
+						roomId: room_id,
+						room_name: room_name,
+						senderId: -1,
+						sender_name: "System messager",
+						sender_avatar: '',
+						type: 'text',
+						created: new Date(),
+					}
+					//console.log(`error_message received ${message.message} - to ${message.room_name} - ${this.selectedRoom?.name}`);
+					if (!this.roomsList[message.room_name])
+						this.roomsList[message.room_name];
+					this.roomsList[message.room_name].messages?.push(message);
+					this.selecting_room(message.room_name);
+					},
+				error: (error : HttpErrorResponse) => (
+					console.log("Error message: ", error.message)
+				)
+			})
+
+			this.blockService.getBlocked().subscribe({
+				next: (blocked: any) => {
+					//console.log("blockedlist:", blocked);
+					this.blockedList = blocked
+				},
+				error: (error : HttpErrorResponse) => (
+					console.log("Error message: ", error.message)
+				)
 			})
 		 
-			this.chatService.update_all_users().subscribe((users: any) => {
-				console.log("update all user");
-				console.log(users);
+			this.chatService.selectRoom().subscribe({
+				next: (room: string) => {
+					// console.log("selectRoom:", room);
+					this.selecting_room(room);
+				},
+				error: (error : HttpErrorResponse) => (
+					console.log("Error message: ", error.message)
+				)
 			})
 
-			this.chatService.selectRoom().subscribe((room: string) => {
-				setTimeout(() => {
-					this.onSelect(this.roomsList[room]);
-				}, 300);
+			this.chatService.getBlockedList().subscribe({
+				next: (blocked: any) => {
+					// console.log("selectRoom:", room);
+					this.blockedList = blocked
+				},
+				error: (error : HttpErrorResponse) => (
+					console.log("Error message: ", error.message)
+				)
 			})
 
-			this.chatService.update_single_user().subscribe((users: any) => {
-				console.log("update single user");
-				console.log(users);
+			this.chatService.reload().subscribe({
+				next: (users: any) => {
+					console.log("reload");
+					window.location.reload();
+				},
+				error: (error : HttpErrorResponse) => (
+					console.log("Error message: ", error.message)
+				)
 			})
-
-
 			subbed = true;
 		}
 
-		this.chatService.getRoomsss().subscribe((chatRoomList: Record<string, Rooms>) => {
-			console.log("gettrooms: ", chatRoomList)
-			this.roomsList = chatRoomList;
-		});
-
-		this.chatService.getConnectedUsers().subscribe((userList: any) => {
-			console.log("getConnectedUsers: ", userList)
-			this.userss = userList;
+		this.chatService.getRoomsss().subscribe({
+			next: (chatRoomList: Record<string, Rooms>) => {
+				//console.log("gettrooms: ", chatRoomList)
+				this.roomsList = chatRoomList;
+			},
+			error: (error : HttpErrorResponse) => (
+				console.log("Error message: ", error.message)
+			)
 		})
 
-		this.chatService.update_public().subscribe((update_room: Rooms) => {
-			console.log(`update_public: ${update_room.name}`);
-			// console.log(update_room);
-			
+		this.chatService.getConnectedUsers().subscribe({
+			next: (userList: any) => {
+				//console.log("getConnectedUsers: ", userList)
+				this.userss = userList;
+			},
+			error: (error : HttpErrorResponse) => (
+				console.log("Error message: ", error.message)
+			)
+		})
 
-			if (update_room.messages){
-				for (let i = update_room.messages.length - 1; i >= 0; i--) {
-					const msg = update_room.messages[i];
-					const isBlocked = this.blockedList?.some(block => Number(block.target.id) === msg.senderId);
-					if (isBlocked){
-						update_room.messages.splice(i, 1);
+		this.chatService.update_public().subscribe({
+			next: (update_room: Rooms) => {
+				//console.log(`update_public: ${update_room.name}`);
+				// console.log(update_room);
+				if (update_room.messages){
+					for (let i = update_room.messages.length - 1; i >= 0; i--) {
+						const msg = update_room.messages[i];
+						const isBlocked = this.blockedList?.some(block => Number(block.target.id) === msg.senderId);
+						if (isBlocked){
+							update_room.messages.splice(i, 1);
+						}
 					}
 				}
-			}
-			
-			this.roomsList[update_room.name] = update_room;
-			this.change_sender_avatar(update_room.name);
+				this.change_sender_avatar(update_room.name);
+				this.roomsList[update_room.name] = update_room;
+				if (this.selectedRoom){
+					if (this.selectedRoom?.name == update_room.name){
+						this.selecting_room(update_room.name);
+					}
+				}
+			},
+			error: (error : HttpErrorResponse) => (
+				console.log("Error message: ", error.message)
+			)
 		})
 
-		this.chatService.delete_room().subscribe((room: string) => {
-			console.log(`delete_room: ${room}`);
-			delete this.roomsList[room];
+		this.chatService.delete_room().subscribe({
+			next: (room: string) => {
+				//console.log(`delete_room: ${room}`);
+				delete this.roomsList[room];
+			},
+			error: (error : HttpErrorResponse) => (
+				console.log("Error message: ", error.message)
+			)
 		})
 	};
 
 	ngAfterViewInit() {
-		console.log("afterviewcheckedINIT");
-		
+		//console.log("afterviewcheckedINIT");
 		if (!this.selectedRoom){
-			console.log("updating page");
+			//console.log("updating page");
 			setTimeout(() => {
-				this.chatService.updatePage();
+				if (this.user)
+					this.chatService.updatePage(this.user);
 			}, 200);
 		}
 		Object.values(this.roomsList).forEach(room => {
@@ -260,10 +344,19 @@ export class FranChatUiComponent implements AfterViewInit{
 		
 	}
 
+	selecting_room(room: string){
+		//console.log("selecting_room:", room);
+		setTimeout(() => {
+			this.onSelect(this.roomsList[room]);
+		}, 100);
+	}
+
 	sendMessage(event: any) {
 		if (event.message) {
-			console.log("avatar: ", this.user.avatar)
-			this.chatService.sendMessage(event.message, this.selectedRoom!.name, this.user!.avatar);
+			//console.log("avatar: ", this.user.avatar)
+			this.selecting_room(this.selectedRoom!.name);
+			if (this.user)
+				this.chatService.sendMessage(this.user, event.message, this.selectedRoom!.name, this.user!.avatar);
 		}
 		this.message = '';
 	}
@@ -281,14 +374,15 @@ export class FranChatUiComponent implements AfterViewInit{
 
 	userCreatesRoom() {
 		this.dialogService.open(createChatRoom, {
-			context: {}
+			context: { currentUsername: this.user?.nickname, roomslist: this.roomsList}
 		  }).onClose.subscribe((input: any) => {
 			if (input) {
-				console.log(input);
-
-				this.chatService.createRoom(input.roomName, input.roomType, input.password, +this.user.id);
+				//console.log(input);
+				if (this.user)
+					this.chatService.createRoom(input.roomName, input.roomType, input.password, +this.user.id);
 				setTimeout(() => {
-					this.onSelect(this.roomsList[input.roomName])
+					if (this.roomsList[input.roomName])
+						this.onSelect(this.roomsList[input.roomName])
 				}, 300);
 			}
 		  });
@@ -300,8 +394,8 @@ export class FranChatUiComponent implements AfterViewInit{
 			this.dialogService.open(settingsChat, {context:{selectedRoom: this.selectedRoom, users: this.chatService.usernames}
 			}).onClose.subscribe((input: any) => {
 				if (input) {
-					console.log(input);
-					console.log(input.roomName);
+					//console.log(input);
+					//console.log(input.roomName);
 					this.chatService.settingsChat(input);
 					setTimeout(() => {
 						this.onSelect(this.roomsList[input.roomName])
@@ -314,22 +408,17 @@ export class FranChatUiComponent implements AfterViewInit{
 	passwordPopup(room: Rooms): Promise<void>  {
 		return new Promise((resolve) => {
 			this.chatService.room = this.selectedRoom!;
-			console.log("password popup", this.chatService.room)
 			setTimeout(() => {
 				this.dialogService.open(protectedChat, {context:{selectedRoom: this.selectedRoom}
 				}).onClose.subscribe((input: any) => {
 					if (input) {
-						console.log(input);
 						pw = input.password;
 						this.chatService.checkPassword(input);
-						// setTimeout(() => {
-						// 	this.onSelect(this.roomsList[input.roomName])
-						// }, 300);
+						// this.selecting_room(this.selectedRoom!.name)
 					}
 					resolve();
 				});
-			}, 100);
-		
+			}, 250);
 		})
 	}
 
@@ -342,14 +431,14 @@ export class FranChatUiComponent implements AfterViewInit{
 	}
 
 	joinRoom(data: string, password: string) {
-		this.chatService.joinRoom(data, password);
+		if (this.user)
+			this.chatService.joinRoom(this.user, data, password);
 	}
 
 	leaveRoom() {
-		this.chatService.leaveRoom(this.selectedRoom!.id, this.selectedRoom!.name, this.user.nickname, this.user.id);
-		this.chatService.getRoomsss().subscribe((chatRoomList: Record<string, Rooms>) => {
-			this.roomsList = chatRoomList;
-		});
+		if (this.user)
+			this.chatService.leaveRoom(this.selectedRoom!.id, this.selectedRoom!.name, this.user.nickname, this.user.id);
+		this.selectedRoom = undefined;
 	}
 
 	getConnectedUsers() {
@@ -361,75 +450,110 @@ export class FranChatUiComponent implements AfterViewInit{
 	}
 
 	getRoomNames(): string[] {
-		return Object.keys(this.roomsList);
+		return Object.keys(this.roomsList).sort((a, b) => {
+			const roomA = this.roomsList[a];
+			const roomB = this.roomsList[b];
+		
+			const getOrder = (room: any) => {
+				if (room.status === 'public') return 1;
+				if (room.status === 'private') return 2;
+				if (this.isProtected(room.name) && this.isJoined(room.name)) return 3;
+				if (this.isProtected(room.name) && !this.isJoined(room.name)) return 4;
+				return 5; // Fallback for unexpected statuses
+			};
+			return getOrder(roomA) - getOrder(roomB);
+		  });
+		// return Object.keys(this.roomsList);
 	}
 
 	isChannelOwner(): boolean {
-		return +this.user.id === +this.selectedRoom!.owner;
+		if (this.user)
+			return +this.user.id === +this.selectedRoom!.owner;
+		return false;
 	}
 
 	isChannelAdmin(): boolean {
-		const userIdToNbr = +this.user.id;
+		var userIdToNbr = 0;
+		if (this.user)
+			userIdToNbr = +this.user.id;
 		return this.selectedRoom!.admins.includes(userIdToNbr);
 	}
 
 	battle() {
-		this.chatService.battle(this.selectedRoom!.name, +this.selectedRoom!.id, +this.user.id, this.user.nickname, this.user.avatar);
+		this.chatService.battle(this.selectedRoom!.name, +this.selectedRoom!.id, +this.user!.id, this.user!.nickname, this.user!.avatar);
 		this.router.navigate(['/dashboard/game']);
 	}
 	
-	// joinBattle(roomkey: number) {
-	// 	console.log("IT HEREE---------------------------");
-	// 	this.chatService.joinBattle(roomkey, this.selectedRoom!.name, this.user.avatar);
-	// 	this.router.navigate(['/dashboard', 'game']);
-	// }	
 	joinBattle(msg: any) {
-		console.log("IT HEREE1---------------------------", msg);
-		console.log("IT HEREE2---------------------------", msg.customMessageData);
-		console.log("IT HEREE3---------------------------", msg.customMessageData.roomkey);
-		this.chatService.joinBattle(msg.customMessageData.roomkey, this.selectedRoom!.name, this.user.avatar);
+		//console.log("IT HEREE1---------------------------", msg);
+		//console.log("IT HEREE2---------------------------", msg.customMessageData);
+		//console.log("IT HEREE3---------------------------", msg.customMessageData.roomkey);
+		if (this.user)
+			this.chatService.joinBattle(msg.customMessageData.roomkey, this.selectedRoom!.name, this.user.avatar);
 		this.router.navigate(['/dashboard', 'game']);
 	}
 
 	mute() {
-		this.userInRoom(this.userNameForm.value.userName).subscribe((userIsInRoom) => {
-			if (userIsInRoom) {
-				this.chatService.muteUser(this.selectedRoom!.name, this.userNameForm.value.userName, this.user.avatar);
-				this.userNotFound = false;
-			}
-			else
-				this.userNotFound = true;
+		this.userInRoom(this.userNameForm.value.userName).subscribe({
+			next: (userIsInRoom: any) => {
+				if (userIsInRoom) {
+					this.selecting_room(this.selectedRoom!.name);
+					if (this.user)
+						this.chatService.muteUser(this.selectedRoom!.name, this.userNameForm.value.userName, this.user.avatar);
+					this.userNotFound = false;
+				}
+				else
+					this.userNotFound = true;
+			},
+			error: (error : HttpErrorResponse) => (
+				console.log("Error message: ", error.message)
+			)
 		})
 	}
 
 	ban() {
-		this.userInRoom(this.userNameForm.value.userName).subscribe((userIsInRoom) => {
-			if (userIsInRoom) {
-				this.chatService.banUser(this.selectedRoom!.name, this.userNameForm.value.userName, this.user.avatar);
-				this.userNotFound = false;
-			}
-			else
-				this.userNotFound = true;
+		this.userInRoom(this.userNameForm.value.userName).subscribe({
+			next: (userIsInRoom: any) => {
+				if (userIsInRoom) {
+					this.selecting_room(this.selectedRoom!.name);
+					if (this.user)
+						this.chatService.banUser(this.selectedRoom!.name, this.userNameForm.value.userName, this.user.avatar);
+					this.userNotFound = false;
+				}
+				else
+					this.userNotFound = true;
+			},
+			error: (error : HttpErrorResponse) => (
+				console.log("Error message: ", error.message)
+			)
 		})
 	}
 
 	kick() {
-		this.userInRoom(this.userNameForm.value.userName).subscribe((userIsInRoom) => {
-			if (userIsInRoom) {
-				this.chatService.kickUser(this.selectedRoom!.name, this.userNameForm.value.userName);
-				this.userNotFound = false;
-			}
-			else
-				this.userNotFound = true;
+		this.userInRoom(this.userNameForm.value.userName).subscribe({
+			next: (userIsInRoom: any) => {
+				if (userIsInRoom) {
+					this.selecting_room(this.selectedRoom!.name);
+					this.chatService.kickUser(this.selectedRoom!.name, this.userNameForm.value.userName);
+					this.userNotFound = false;
+				}
+				else
+					this.userNotFound = true;
+			},
+			error: (error : HttpErrorResponse) => (
+				console.log("Error message: ", error.message)
+			)
 		})
 	}
 
 	invite() {
+		this.selecting_room(this.selectedRoom!.name);
 		this.chatService.invite(this.selectedRoom!.name, this.userNameForm.value.userName);
 	}
 
 	deleteRoom(){
-		this.chatService.deleteRoom(Number(this.selectedRoom!.id), this.selectedRoom!.name, this.user.id);
+		if (this.user)
+			this.chatService.deleteRoom(Number(this.selectedRoom!.id), this.selectedRoom!.name, this.user.id);
 	}
 
 	block(){
@@ -441,22 +565,36 @@ export class FranChatUiComponent implements AfterViewInit{
 	}
 
 	updateName(){
-		this.chatService.updateName(this.user.nickname);
+		if (this.user)
+			this.chatService.updateName(this.user.nickname);
 	}
 
 	last_open_room(){
-		this.chatService.last_open_room(this.selectedRoom!.name);
-		console.log("open room: " + this.selectedRoom!.name);
+		if (this.selectedRoom)
+			this.chatService.last_open_room(this.selectedRoom.name);
+	}
+
+	isProtected(room: string){
+		return this.roomsList[room].status === 'protected';
+	}
+
+	isJoined(room: string){
+		return (this.roomsList[room].users.includes(Number(this.user?.id)));
 	}
 
 	setAdmin() {
-		this.userInRoom(this.userNameForm.value.userName).subscribe((userIsInRoom) => {
-			if (userIsInRoom) {
-				////console.log("chat-message component leaveRoom: " + room + ", id: " + userid);
-				this.chatService.setAdmin(this.selectedRoom!.id, this.userNameForm.value.userName);
-				// ////console.log("chat-message sendmessage: " + this.room.name);
-			}
-		});
+		this.userInRoom(this.userNameForm.value.userName).subscribe({
+			next: (userIsInRoom: any) => {
+				if (userIsInRoom) {
+					//console.log("chat-message component leaveRoom: " + room + ", id: " + userid);
+					this.chatService.setAdmin(this.selectedRoom!.id, this.userNameForm.value.userName);
+					//console.log("chat-message sendmessage: " + this.room.name);
+				}
+			},
+			error: (error : HttpErrorResponse) => (
+				console.log("Error message: ", error.message)
+			)
+		})
 	}
 
 	get_avatar(userid: number){
@@ -469,7 +607,7 @@ export class FranChatUiComponent implements AfterViewInit{
 	}
 
 	storeUser(userid: number): Observable<void> {
-		console.log("storeUser");
+		//console.log("storeUser");
 		return this.userService.getAvatar(userid.toString()).pipe(
 		  map((data) => {
 			this.userMap.set(userid, URL.createObjectURL(data));
@@ -498,14 +636,14 @@ export class FranChatUiComponent implements AfterViewInit{
 	private userInRoom(userName: string): Observable<boolean> {
 		return this.userService.getUserIdByName(userName).pipe(
 			map((data: any) => {
-			  this.selectedUserID = data;
-			  return this.selectedRoom!.users.includes(this.selectedUserID!);
+				this.selectedUserID = data;
+				return this.selectedRoom!.users.includes(this.selectedUserID!);
 			}),
 			catchError((error) => {
-			  console.error('Error fetching user ID:', error);
-			  return of(false); // Return false or handle error as needed
+				// console.error('Error fetching user ID:', error);
+				return of(false);
 			})
-		  );
+		);
 	}
 
 	get_all_rooms(){
@@ -514,11 +652,10 @@ export class FranChatUiComponent implements AfterViewInit{
 
 	getLists(){
 		this.blockService.getBlocked().subscribe({
-			next: (data) => (
-				this.blockedList = data,
-				console.log("all blocked ", data)
+			next: (data: any) => (
+				this.blockedList = data
 			),
-			error: (e) => (
+			error: (e: any) => (
 				console.error("all blocked error: " + e))
 		});
 	}

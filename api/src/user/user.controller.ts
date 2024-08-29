@@ -20,10 +20,12 @@ export class UserController {
 	@UseGuards(JwtGuard)
 	async getUser(@Req() req, @Res() res) {
 		const user : User = await this.userService.findUserById(req.user.id);
-		if (!user)
+		if (!user) {
+			res.clearCookie('access_token');
+			res.clearCookie('refresh_token');
 			return res.status(HttpStatus.NOT_FOUND).json({message: 'Current user not found'});
+		}
 		return res.status(HttpStatus.OK).json(user);
-		// return user;
 	}
 	
 	// check if this nickname is taken
@@ -150,7 +152,7 @@ export class UserController {
 		await this.userService.updateRoomKey(req.user.id, key);
 	}
 
-	@Get('getUserByName/:name')
+	@Get('getUserByName')
 	@UseGuards(JwtGuard)
 	async getUserIdByName(@Req() req, @Query() data: NicknameDto) {
 		const user: User = await this.userService.findUserByName(data.nickname);

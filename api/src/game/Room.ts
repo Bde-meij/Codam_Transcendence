@@ -1,11 +1,10 @@
-import { TimeInterval } from "rxjs/internal/operators/timeInterval";
 import { Server, Socket } from "socket.io";
-import { bounce, minVec, plusVec } from "./vectorMath";
+import { bounce, plusVec } from "./vectorMath";
+import { MatchType } from "./entities/match.entity";
 
 export class Room
 {
 	//ROOM
-	id: string = null;
 	name:string;
 	leftPlayer: Socket = null;
 	rightPlayer: Socket = null;
@@ -14,7 +13,7 @@ export class Room
 	stopInterval: NodeJS.Timeout;
 	gravityInterval: NodeJS.Timeout;
 	key: number = 0;
-	// hitwall: boolean = false;
+	type: MatchType = MatchType.CLASSIC;
 
 	//LEFTPLAYER
 	leftId: number = 0;
